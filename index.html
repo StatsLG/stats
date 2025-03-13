@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hurricane Windspeed</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+        }
+        .left-panel {
+            background: #f0f0f0;
+            padding: 20px;
+            width: 368px;
+            overflow: visible;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column; /* Changed to column for vertical positioning */
+            justify-content: center; /* Center vertically (adjustable) */
+            align-items: center; /* Center horizontally */
+        }
+        .right-panel {
+            flex-grow: 1;
+            background: #ffffff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+            width: 50%;
+        }
+        .results {
+            margin-top: 20px;
+            width: 80%;
+            text-align: left;
+        }
+        .results h3 {
+            color: #333;
+        }
+        .calculator-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #FFC107; /* Yellow color (Amber) */
+            color: black; /* Changed to black for contrast */
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 50px; /* Added to lower the button */
+        }
+        .calculator-button:hover {
+            background-color: #FFB300; /* Slightly darker yellow on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel" id="leftPanel">
+            <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
+            <script src="https://www.numworks.com/simulator/embed.js"></script>
+        </div>
+        <div class="right-panel">
+            <h2>Hurricane Atmospheric Pressure and Windspeed Data</h2>
+            <p>Atmospheric pressure is the force exerted by the weight of air in the atmosphere. It plays a crucial role in weather patterns, including the formation and strength of hurricanes. Low atmospheric pressure systems can lead to the development of strong winds and storm systems, including hurricanes. As pressure drops, wind speeds typically increase, fueling storm intensity.</p>
+            <ol>
+                <li>Calculate the correlation coefficient between atmospheric pressure and windspeed.</li>
+                <li>Determine the equation for the best-fit line.</li>
+                <li>Interpret the slope of the best-fit line in the context of hurricanes.</li>
+                <li>Predict the windspeed of a hurricane with an atmospheric pressure of 950 millibars.</li>
+            </ol>
+            <table>
+                <tr>
+                    <th>Atmospheric Pressure (millibars)</th>
+                    <th>Windspeed (MPH)</th>
+                </tr>
+                <tr><td>993</td><td>50</td></tr>
+                <tr><td>995</td><td>60</td></tr>
+                <tr><td>994</td><td>60</td></tr>
+                <tr><td>997</td><td>45</td></tr>
+                <tr><td>1003</td><td>45</td></tr>
+                <tr><td>1004</td><td>40</td></tr>
+                <tr><td>1000</td><td>55</td></tr>
+                <tr><td>994</td><td>55</td></tr>
+                <tr><td>942</td><td>105</td></tr>
+                <tr><td>1006</td><td>30</td></tr>
+                <tr><td>1006</td><td>40</td></tr>
+                <tr><td>942</td><td>120</td></tr>
+                <tr><td>1002</td><td>40</td></tr>
+                <tr><td>986</td><td>50</td></tr>
+                <tr><td>983</td><td>70</td></tr>
+                <tr><td>994</td><td>65</td></tr>
+                <tr><td>940</td><td>120</td></tr>
+                <tr><td>976</td><td>80</td></tr>
+                <tr><td>966</td><td>100</td></tr>
+                <tr><td>982</td><td>55</td></tr>
+            </table>
+            <div class="results">
+                <h3>Results</h3>
+                <p><strong>1. Correlation Coefficient:</strong> Approximately -0.535, indicating a moderate negative correlation. As atmospheric pressure decreases, windspeed tends to increase.</p>
+                <p><strong>2. Best-Fit Line Equation:</strong> \( y = -0.4286x + 486.20 \), where \( y \) is windspeed (MPH) and \( x \) is pressure (millibars).</p>
+                <p><strong>3. Slope Interpretation:</strong> The slope of -0.4286 means that for every 1 millibar decrease in pressure, windspeed increases by about 0.4286 MPH. This shows how lower pressure drives stronger hurricane winds.</p>
+                <p><strong>4. Predicted Windspeed at 950 mb:</strong> Using the equation, the windspeed is approximately 79 MPH.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
