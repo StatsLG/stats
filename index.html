@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hurricane Windspeed Explorer</title>
+    <title>Linear Regression</title>
     <style>
         body {
             margin: 0;
@@ -12,18 +12,6 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-        }
-        header {
-            background: linear-gradient(90deg, #2c3e50, #34495e);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        header h1 {
-            margin: 0;
-            font-size: 2.5em;
-            animation: fadeIn 1s ease-in;
         }
         .container {
             display: flex;
@@ -191,9 +179,6 @@
             table {
                 width: 100%;
             }
-            header h1 {
-                font-size: 1.8em;
-            }
             .toggle-button {
                 left: 10px;
             }
@@ -201,9 +186,6 @@
     </style>
 </head>
 <body>
-    <header>
-        <h1>Hurricane Windspeed Explorer</h1>
-    </header>
     <div class="container" id="container">
         <button class="toggle-button" id="toggleButton">Open Calculator</button>
         <div class="left-panel" id="leftPanel">
@@ -253,7 +235,7 @@
         </div>
     </div>
     <footer>
-        <p>By Luke Garnett</p>
+        <p>Linear Regression Example</p>
     </footer>
 
     <script>
