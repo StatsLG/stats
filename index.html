@@ -32,6 +32,7 @@
             margin: 20px;
             border-radius: 10px;
             overflow: hidden;
+            position: relative;
         }
         .left-panel {
             background: linear-gradient(135deg, #2c3e50, #34495e);
@@ -43,10 +44,13 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
         }
-        .left-panel:hover {
-            transform: scale(1.02);
+        .left-panel.minimized {
+            width: 0;
+            padding: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
         .right-panel {
             flex-grow: 1;
@@ -130,6 +134,27 @@
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
+        .toggle-button {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        .toggle-button:hover {
+            background-color: #d35400;
+        }
+        .container.minimized .toggle-button {
+            display: block;
+        }
         footer {
             background-color: #2c3e50;
             color: white;
@@ -159,11 +184,18 @@
                 width: 100%;
                 padding: 20px 0;
             }
+            .left-panel.minimized {
+                width: 100%;
+                padding: 20px 0;
+            }
             table {
                 width: 100%;
             }
             header h1 {
                 font-size: 1.8em;
+            }
+            .toggle-button {
+                left: 10px;
             }
         }
     </style>
@@ -172,8 +204,10 @@
     <header>
         <h1>Hurricane Windspeed Explorer</h1>
     </header>
-    <div class="container">
+    <div class="container" id="container">
+        <button class="toggle-button" id="toggleButton">Open Calculator</button>
         <div class="left-panel" id="leftPanel">
+            <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
             <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
             <script src="https://www.numworks.com/simulator/embed.js"></script>
         </div>
@@ -219,7 +253,27 @@
         </div>
     </div>
     <footer>
-        <p>&copy; 2025 Hurricane Data Analysis | Powered by xAI</p>
+        <p>By Luke Garnett</p>
     </footer>
+
+    <script>
+        function toggleLeftPanel() {
+            const leftPanel = document.getElementById('leftPanel');
+            const container = document.getElementById('container');
+            const toggleButton = document.getElementById('toggleButton');
+            
+            if (leftPanel.classList.contains('minimized')) {
+                leftPanel.classList.remove('minimized');
+                container.classList.remove('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            } else {
+                leftPanel.classList.add('minimized');
+                container.classList.add('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            }
+        }
+
+        document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
+    </script>
 </body>
 </html>
