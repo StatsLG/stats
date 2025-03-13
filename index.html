@@ -3,19 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hurricane Windspeed</title>
+    <title>Hurricane Windspeed Explorer</title>
     <style>
         body {
             margin: 0;
             font-family: 'Arial', sans-serif;
-            display: flex;
-            height: 100vh;
             background-color: #f5f7fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background: linear-gradient(90deg, #2c3e50, #34495e);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            animation: fadeIn 1s ease-in;
         }
         .container {
             display: flex;
-            width: 100%;
+            flex-grow: 1;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            border-radius: 10px;
+            overflow: hidden;
         }
         .left-panel {
             background: linear-gradient(135deg, #2c3e50, #34495e);
@@ -27,7 +43,10 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
+        }
+        .left-panel:hover {
+            transform: scale(1.02);
         }
         .right-panel {
             flex-grow: 1;
@@ -43,18 +62,28 @@
             font-size: 2em;
             margin-bottom: 20px;
             text-align: center;
+            animation: slideIn 0.8s ease-out;
         }
         p {
             color: #555;
             line-height: 1.6;
             max-width: 800px;
             margin-bottom: 20px;
+            animation: fadeIn 1.2s ease-in;
         }
         ol {
             color: #333;
             line-height: 1.8;
             max-width: 800px;
             margin-bottom: 30px;
+            list-style-position: inside;
+        }
+        ol li {
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+        ol li:hover {
+            color: #e67e22;
         }
         table {
             width: 60%;
@@ -62,6 +91,7 @@
             margin-top: 20px;
             background-color: #fff;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            animation: fadeInUp 1s ease-in;
         }
         th, td {
             border: 1px solid #ddd;
@@ -78,6 +108,7 @@
         }
         tr:hover {
             background-color: #f1f1f1;
+            transition: background-color 0.2s ease;
         }
         .calculator-button {
             display: inline-block;
@@ -91,15 +122,38 @@
             cursor: pointer;
             font-size: 16px;
             margin-top: 20px;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .calculator-button:hover {
             background-color: #d35400;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9em;
+            margin-top: auto;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
+                margin: 10px;
             }
             .left-panel {
                 width: 100%;
@@ -108,10 +162,16 @@
             table {
                 width: 100%;
             }
+            header h1 {
+                font-size: 1.8em;
+            }
         }
     </style>
 </head>
 <body>
+    <header>
+        <h1>Hurricane Windspeed Explorer</h1>
+    </header>
     <div class="container">
         <div class="left-panel" id="leftPanel">
             <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
@@ -158,5 +218,8 @@
             </table>
         </div>
     </div>
+    <footer>
+        <p>&copy; 2025 Hurricane Data Analysis | Powered by xAI</p>
+    </footer>
 </body>
 </html>
