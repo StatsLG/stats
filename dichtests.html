@@ -15,10 +15,13 @@
             <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
             <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
             <script src="https://www.numworks.com/simulator/embed.js"></script>
+            <script type="text/javascript" async
+            src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+          </script>
         </div>
         <div class="right-panel">
             <h1>Dichotomous Tests</h1>
-            <h2>Dichotomous Test – a test with only two possible results</h2>
+            <h2>Tests with only two possible results</h2>
     <p>The concept of a dichotomous test is important in the field of statistics. Common
         examples of these tests include: roadside sobriety test (drunk or not drunk), home
         pregnancy test (pregnant or not pregnant), and cancer screening (have cancer or do not
@@ -31,15 +34,18 @@
         Based on the results, either we will conclude that the drug is effective or there will not be
         enough evidence to conclude the drug is effective. For now, we will focus on the
         probability involved in a dichotomous test.</p>
-    <h2>False Positive Rate (FPR)</h2>
-    <p>The probability of a test concluding positive given the actual condition is negative.</p>
-    <h2>Specificity</h2>
-    <p>The probability of a test concluding negative given the actual condition is negative.</p>
-    <h2>False Negative Rate (FNR)</h2>
-    <p>The probability of a test concluding negative given the actual condition is positive.</p>
-    <h2>Sensitivity</h2>
-    <p>The probability of a test concluding positive given the actual condition is positive.</p>
-    <h2>Example</h2>
+        <h2>False Positive Rate (FPR)</h2>
+        <p>The probability of a test concluding positive given the actual condition is negative:</p>
+        <p>\[ FPR = P(\text{test concludes positive} | \text{actual condition is negative}) \]</p>
+        <h2>Specificity</h2>
+        <p>The probability of a test concluding negative given the actual condition is negative:</p>
+        <p>\[ Specificity = 1 - FPR \]</p>
+        <h2>False Negative Rate (FNR)</h2>
+        <p>The probability of a test concluding negative given the actual condition is positive:</p>
+        <p>\[ FNR = P(\text{test concludes negative} | \text{actual condition is positive}) \]</p>
+        <h2>Sensitivity</h2>
+        <p>The probability of a test concluding positive given the actual condition is positive:</p>
+        <p>\[ Sensitivity = 1 - FNR \]</p>
     <p>Home pregnancy test results for 514 women:</p>
     <table border="1">
         <tr><th></th><th>Pregnant</th><th>Not Pregnant</th><th>Totals</th></tr>
