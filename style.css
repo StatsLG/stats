@@ -113,7 +113,7 @@ tr:hover {
 }
 .calculator-button:hover {
     background-color: #d35400;
-    transformoven translateY(-3px);
+    transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 .font-button {
@@ -202,19 +202,31 @@ footer {
         left: 10px;
     }
 }
-/* Hide the checkbox */
+
+/* Toggle Styles for Questions and Answers */
+.questions-list {
+    color: #333;
+    line-height: 1.8;
+    max-width: 800px;
+    margin-bottom: 30px;
+    list-style-position: inside;
+}
+.questions-list li {
+    margin-bottom: 15px;
+    transition: color 0.3s ease;
+}
 .toggle {
     display: none;
 }
-
-/* Style the question (label) */
 .question {
     cursor: pointer;
-    display: block; /* Ensures the label takes full width */
+    display: block;
+    color: #333;
     transition: color 0.3s ease;
 }
-
-/* Style the answer, hidden by default */
+.questions-list li .question:hover {
+    color: #e67e22;
+}
 .answer {
     display: none;
     padding: 10px;
@@ -226,19 +238,6 @@ footer {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     animation: fadeIn 0.5s ease-in;
 }
-
-/* Show the answer when the checkbox is checked */
 .toggle:checked + .question + .answer {
     display: block;
-}
-
-/* Hover effect for questions, matching your ol li:hover */
-.question:hover {
-    color: #e67e22;
-}
-
-/* Adjust the ordered list styling to accommodate the new structure */
-ol li {
-    margin-bottom: 15px; /* Increased spacing for clarity */
-    padding-left: 0; /* Remove extra padding if any */
 }
