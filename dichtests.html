@@ -7,7 +7,17 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Dichotomous Tests</h1>
+    <div class="container" id="container">
+        <button class="toggle-button" id="toggleButton">Open Calculator</button>
+        <div class="left-panel" id="leftPanel">
+            <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
+            <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
+            <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
+            <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
+            <script src="https://www.numworks.com/simulator/embed.js"></script>
+        </div>
+        <div class="right-panel">
+            <h1>Dichotomous Tests</h1>
     <p>A dichotomous test is a test with only two possible results. Typically, these results are refered to as "positive" and "negative."
         A positive result means the test determined whatever it was testing for was true or present.  Common examples include roadside sobriety tests, home pregnancy tests, and cancer screenings.</p>
     <p>The importance of these tests extends to hypothesis testing in inferential statistics.</p>
@@ -27,5 +37,48 @@
         <tr><td>Not Pregnant</td><td>84</td><td>335</td><td>419</td></tr>
         <tr><td>Totals</td><td>173</td><td>341</td><td>514</td></tr>
     </table>
+        </div>
+    </div>
+    <footer>
+        <p>Linear Regression Example</p>
+    </footer>
+
+    <script>
+        function toggleLeftPanel() {
+            const leftPanel = document.getElementById('leftPanel');
+            const container = document.getElementById('container');
+            const toggleButton = document.getElementById('toggleButton');
+            
+            if (leftPanel.classList.contains('minimized')) {
+                leftPanel.classList.remove('minimized');
+                container.classList.remove('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            } else {
+                leftPanel.classList.add('minimized');
+                container.classList.add('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            }
+        }
+
+        function changeFontSize(action) {
+            const rightPanel = document.querySelector('.right-panel');
+            const currentSize = window.getComputedStyle(rightPanel).fontSize;
+            let newSize = parseFloat(currentSize);
+            
+            if (action === 'increase') {
+                newSize += 2; // Increase by 2px
+            } else if (action === 'decrease') {
+                newSize -= 2; // Decrease by 2px
+            }
+            
+            // Set minimum and maximum font sizes
+            if (newSize < 12) newSize = 12;
+            if (newSize > 24) newSize = 24;
+            
+            rightPanel.style.fontSize = `${newSize}px`;
+        }
+
+        document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
+    </script>
 </body>
 </html>
