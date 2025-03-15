@@ -48,20 +48,43 @@
         <p>\[ Sensitivity = 1 - FNR \]</p>
 
         <h2>Example 1</h2>
-    <p>Home pregnancy test results for 514 women:</p>
-    <table border="1">
-        <tr><th></th><th>Pregnant</th><th>Not Pregnant</th><th>Totals</th></tr>
-        <tr><td>Pregnant</td><td>89</td><td>6</td><td>95</td></tr>
-        <tr><td>Not Pregnant</td><td>84</td><td>335</td><td>419</td></tr>
-        <tr><td>Totals</td><td>173</td><td>341</td><td>514</td></tr>
-    </table>
-    <ol>
-        <li>Calculate the FPR for this home pregnancy test. </li>
-        <li>Calculate theSpecificity.</li>
-        <li>Calculate theFNR.</li>
-        <li>Calculate the Sensitivity.</li>
-
-    </ol>
+        <p>Home pregnancy test results for 514 women:</p>
+        <table border="1">
+            <tr><th></th><th>Pregnant</th><th>Not Pregnant</th><th>Totals</th></tr>
+            <tr><td>Pregnant</td><td>89</td><td>6</td><td>95</td></tr>
+            <tr><td>Not Pregnant</td><td>84</td><td>335</td><td>419</td></tr>
+            <tr><td>Totals</td><td>173</td><td>341</td><td>514</td></tr>
+        </table>
+        <ol>
+            <li>
+                <input type="checkbox" id="q1" class="toggle">
+                <label for="q1" class="question">Calculate the FPR for this home pregnancy test.</label>
+                <div class="answer">
+                    False Positive Rate (FPR) = FP / (FP + TN) = 6 / (6 + 335) = 6 / 341 ≈ 0.0176 or 1.76%
+                </div>
+            </li>
+            <li>
+                <input type="checkbox" id="q2" class="toggle">
+                <label for="q2" class="question">Calculate the Specificity.</label>
+                <div class="answer">
+                    Specificity = TN / (FP + TN) = 335 / (6 + 335) = 335 / 341 ≈ 0.9824 or 98.24%
+                </div>
+            </li>
+            <li>
+                <input type="checkbox" id="q3" class="toggle">
+                <label for="q3" class="question">Calculate the FNR.</label>
+                <div class="answer">
+                    False Negative Rate (FNR) = FN / (FN + TP) = 84 / (84 + 89) = 84 / 173 ≈ 0.4855 or 48.55%
+                </div>
+            </li>
+            <li>
+                <input type="checkbox" id="q4" class="toggle">
+                <label for="q4" class="question">Calculate the Sensitivity.</label>
+                <div class="answer">
+                    Sensitivity = TP / (TP + FN) = 89 / (89 + 84) = 89 / 173 ≈ 0.5145 or 51.45%
+                </div>
+            </li>
+        </ol>
         </div>
     </div>
     <footer>

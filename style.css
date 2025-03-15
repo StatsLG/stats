@@ -1,4 +1,4 @@
-/* styles.css */
+/* style.css */
 body {
     margin: 0;
     font-family: 'Arial', sans-serif;
@@ -201,4 +201,44 @@ footer {
     .toggle-button {
         left: 10px;
     }
+}
+/* Hide the checkbox */
+.toggle {
+    display: none;
+}
+
+/* Style the question (label) */
+.question {
+    cursor: pointer;
+    display: block; /* Ensures the label takes full width */
+    transition: color 0.3s ease;
+}
+
+/* Style the answer, hidden by default */
+.answer {
+    display: none;
+    padding: 10px;
+    background-color: #f9f9f9;
+    color: #333;
+    line-height: 1.6;
+    margin-top: 5px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    animation: fadeIn 0.5s ease-in;
+}
+
+/* Show the answer when the checkbox is checked */
+.toggle:checked + .question + .answer {
+    display: block;
+}
+
+/* Hover effect for questions, matching your ol li:hover */
+.question:hover {
+    color: #e67e22;
+}
+
+/* Adjust the ordered list styling to accommodate the new structure */
+ol li {
+    margin-bottom: 15px; /* Increased spacing for clarity */
+    padding-left: 0; /* Remove extra padding if any */
 }
