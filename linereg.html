@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Regression</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" id="container">
+        <button class="toggle-button" id="toggleButton">Open Calculator</button>
+        <div class="left-panel" id="leftPanel">
+            <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
+            <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
+            <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
+            <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
+            <script src="https://www.numworks.com/simulator/embed.js"></script>
+        </div>
+        <div class="right-panel">
+            <h2>Hurricane Atmospheric Pressure and Windspeed Data</h2>
+            <p>Atmospheric pressure is the force exerted by the weight of air in the atmosphere. It plays a crucial role in weather patterns, including the formation and strength of hurricanes. 
+                Low atmospheric pressure systems can lead to the development of strong winds and storm systems, including hurricanes. 
+                As pressure drops, wind speeds typically increase, fueling storm intensity. The data set below lists the pressure readings and windspeeds from various hurricanes.</p>
+            <ol>
+                <li>Create a scatter plot for atmospheric pressure and windspeed. Is a linear model appropriate for this analysis?</li>
+                <li>Calculate the correlation coefficient between atmospheric pressure and windspeed.</li>
+                <li>Determine the equation for the best-fit line.</li>
+                <li>Interpret the slope of the best-fit line in the context of hurricanes.</li>
+                <li>Hurricane Helene made landfall near Perry, Florida on Sept. 27th, 2024. A few hours before landfall, Helene had a peak atmospheric pressure reading of 938 millibars. 
+                    Based on our model, what windspeeds should the residents of Perry anticipate as they prepare for landfall?</li>
+            </ol>
+            <table>
+                <tr>
+                    <th>Atmospheric Pressure (millibars)</th>
+                    <th>Windspeed (MPH)</th>
+                </tr>
+                <tr><td>993</td><td>50</td></tr>
+                <tr><td>995</td><td>60</td></tr>
+                <tr><td>994</td><td>60</td></tr>
+                <tr><td>997</td><td>45</td></tr>
+                <tr><td>1003</td><td>45</td></tr>
+                <tr><td>1004</td><td>40</td></tr>
+                <tr><td>1000</td><td>55</td></tr>
+                <tr><td>994</td><td>55</td></tr>
+                <tr><td>942</td><td>105</td></tr>
+                <tr><td>1006</td><td>30</td></tr>
+                <tr><td>1006</td><td>40</td></tr>
+                <tr><td>942</td><td>120</td></tr>
+                <tr><td>1002</td><td>40</td></tr>
+                <tr><td>986</td><td>50</td></tr>
+                <tr><td>983</td><td>70</td></tr>
+                <tr><td>994</td><td>65</td></tr>
+                <tr><td>940</td><td>120</td></tr>
+                <tr><td>976</td><td>80</td></tr>
+                <tr><td>966</td><td>100</td></tr>
+                <tr><td>982</td><td>55</td></tr>
+            </table>
+        </div>
+    </div>
+    <footer>
+        <p>Linear Regression Example</p>
+    </footer>
+
+    <script>
+        function toggleLeftPanel() {
+            const leftPanel = document.getElementById('leftPanel');
+            const container = document.getElementById('container');
+            const toggleButton = document.getElementById('toggleButton');
+            
+            if (leftPanel.classList.contains('minimized')) {
+                leftPanel.classList.remove('minimized');
+                container.classList.remove('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            } else {
+                leftPanel.classList.add('minimized');
+                container.classList.add('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            }
+        }
+
+        function changeFontSize(action) {
+            const rightPanel = document.querySelector('.right-panel');
+            const currentSize = window.getComputedStyle(rightPanel).fontSize;
+            let newSize = parseFloat(currentSize);
+            
+            if (action === 'increase') {
+                newSize += 2; // Increase by 2px
+            } else if (action === 'decrease') {
+                newSize -= 2; // Decrease by 2px
+            }
+            
+            // Set minimum and maximum font sizes
+            if (newSize < 12) newSize = 12;
+            if (newSize > 24) newSize = 24;
+            
+            rightPanel.style.fontSize = `${newSize}px`;
+        }
+
+        document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
+    </script>
+</body>
+</html>
