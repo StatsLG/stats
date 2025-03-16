@@ -57,6 +57,10 @@ p {
     margin-bottom: 5px;
     animation: fadeIn 1.2s ease-in;
 }
+hr {
+    border: 2px solid blue;
+    width: 50%;
+}
 ol {
     color: #333;
     line-height: 1.8;
