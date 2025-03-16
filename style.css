@@ -58,7 +58,7 @@ p {
     animation: fadeIn 1.2s ease-in;
 }
 hr {
-    border: 2px solid blue;
+    border: 2px solid rgb(0, 0, 0);
     width: 50%;
 }
 ol {
