@@ -34,6 +34,7 @@
         Based on the results, either we will conclude that the drug is effective or there will not be
         enough evidence to conclude the drug is effective. For now, we will focus on the
         probability involved in a dichotomous test.</p>
+    <p>Dichotomous test are summarized based on the four conditional probabilities defined below.</p>
         <h2>False Positive Rate (FPR)</h2>
         <p>The probability of a test concluding positive given the actual condition is negative:</p>
         <p>\[ FPR = P(\text{test concludes positive} | \text{actual condition is negative}) \]</p>
@@ -46,6 +47,12 @@
         <h2>Sensitivity</h2>
         <p>The probability of a test concluding positive given the actual condition is positive:</p>
         <p>\[ Sensitivity = 1 - FNR \]</p>
+
+        <h3>Notice that the denominator in each of the fractions above is the actual condition of the subject.</h3>
+        <ul>
+            <li>To calculate the false positive rate or the specificity, the denominator is the number of subjects who do not have the attribute tested.</li>
+            <li>To calculate the false negative rate or the sensitivity, the denominator is the number of subjects who do have the attribute tested.</li>
+        </ul>
 
         <h2>Example 1</h2>
         <p>Home pregnancy test results for 514 women:</p>
@@ -68,8 +75,8 @@
                 <input type="checkbox" id="q2" class="toggle">
                 <label for="q2" class="question">Click Here For Answer.</label>
                 <div class="answer">
-                    Specificity = 1-FPR = 1- 0.0176 = 0.9284 or 98.24%
-                    OR
+                    Specificity = 1-FPR = 1- 0.0176 = 0.9284 or 98.24% \n
+                    OR \n
                     = TN / (FP + TN) = 335 / (6 + 335) = 335 / 341 ≈ 0.9824 or 98.24% 
                     
                 </div>
