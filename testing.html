@@ -134,6 +134,9 @@
                     </li>
                 </ol>
             </div>
+
+            <!-- Download Button Added Here -->
+            <button onclick="downloadRightPaneAsWord()">Download as Word</button>
         </div>
     </div>
     <footer>
@@ -186,6 +189,31 @@
             }
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
+        }
+
+        // New function to download right pane content as Word
+        function downloadRightPaneAsWord() {
+            // Get the content of the right panel
+            const rightPanelContent = document.querySelector('.right-panel').innerHTML;
+            
+            // Wrap content in basic HTML structure
+            const htmlContent = `
+                <html>
+                <head><meta charset="UTF-8"></head>
+                <body>${rightPanelContent}</body>
+                </html>
+            `;
+            
+            // Create a Blob with the content
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            
+            // Create a temporary link to trigger the download
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'DichotomousTests.doc'; // Customizable file name
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
