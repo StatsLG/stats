@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dichotomous Tests</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Add this CSS to handle tabs */
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+        }
+        .tab button {
+            background-color: #f1f1f1;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #ccc;
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+        }
+        .tabcontent.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <button class="toggle-button" id="toggleButton">Open Calculator</button>
+        <div class="left-panel" id="leftPanel">
+            <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
+            <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
+            <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
+            <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
+            <script src="https://www.numworks.com/simulator/embed.js"></script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+        </div>
+        <div class="right-panel">
+            <h1>Dichotomous Tests</h1>
+            <h2>Tests with only two possible results</h2>
+
+            <!-- Tab Navigation -->
+            <div class="tab">
+                <button class="tablinks active" onclick="openTab(event, 'Theory')">Theory</button>
+                <button class="tablinks" onclick="openTab(event, 'Examples')">Examples</button>
+            </div>
+
+            <!-- Theory Tab Content -->
+            <div id="Theory" class="tabcontent active">
+                <p>The concept of a dichotomous test is important in the field of statistics. Common examples of these tests include: roadside sobriety test (drunk or not drunk), home pregnancy test (pregnant or not pregnant), and cancer screening (have cancer or do not have cancer). The importance of these tests in the field of statistics extends to the idea of a statistical test (hypothesis test). Later in the course, we will cover hypothesis testing when dealing with inferential statistics. In hypothesis testing, we will have two possible outcomes and will use probability to deal with the error in the tests. In many respects, hypothesis testing is similar to the dichotomous tests introduced here. For example, we may collect data to test and see if a new drug is effective in treating a type of illness. Based on the results, either we will conclude that the drug is effective or there will not be enough evidence to conclude the drug is effective. For now, we will focus on the probability involved in a dichotomous test.</p>
+                <hr/>
+                <p>Dichotomous test are summarized based on the four conditional probabilities defined below.</p>
+                <h2>False Positive Rate (FPR)</h2>
+                <p>The probability of a test concluding positive given the actual condition is negative:</p>
+                <p>\[ FPR = P(\text{test concludes positive} | \text{actual condition is negative}) \]</p>
+                <h2>Specificity</h2>
+                <p>The probability of a test concluding negative given the actual condition is negative:</p>
+                <p>\[ Specificity = 1 - FPR \]</p>
+                <h2>False Negative Rate (FNR)</h2>
+                <p>The probability of a test concluding negative given the actual condition is positive:</p>
+                <p>\[ FNR = P(\text{test concludes negative} | \text{actual condition is positive}) \]</p>
+                <h2>Sensitivity</h2>
+                <p>The probability of a test concluding positive given the actual condition is positive:</p>
+                <p>\[ Sensitivity = 1 - FNR \]</p>
+                <h3>Notice that the denominator in each of the fractions above is the actual condition of the subject.</h3>
+                <ul>
+                    <li>To calculate the false positive rate or the specificity, the denominator is the number of subjects who do not have the attribute tested.</li>
+                    <li>To calculate the false negative rate or the sensitivity, the denominator is the number of subjects who do have the attribute tested.</li>
+                </ul>
+                <hr/>
+                <p>It can be beneficial to think about FPR, Specificity, FNR, and Sensitivity in table form since data collected from dichotomous tests are commonly presented in this way. A table identifying these probabilities is presented below. Each probability (FPR, Specificity, FNR, and Sensitivity) is calculated by taking the number identified in the cell and dividing by the number in the column total. The column totals will represent the number of subjects who have the condition and the number of subjects who do not have the condition (column totals are not identified in the table below).</p>
+                <table>
+                    <tr><th></th><th>Actual Condition is Positive</th><th>Actual Condition is Negative</th></tr>
+                    <tr><td>Test Concludes Positive</td><td>Sensitivity</td><td>FPR</td></tr>
+                    <tr><td>Test Concludes Negative</td><td>FNR</td><td>Specificity</td></tr>
+                </table>
+                <p>The false positive rate and the false negative rate represent the probability of the test being incorrect (probability of error). For a good test, these values will be small, indicating a small amount of error in the result. Conversely, the specificity and sensitivity identify the likelihood of the test being correct (complements of the errors). These values will be high when there is a small amount of error in the test. It is not necessary to look at all four probabilities when determining if a test is good. Commonly these types of dichotomous tests only report the sensitivity and specificity of the test.</p>
+            </div>
+
+            <!-- Examples Tab Content -->
+            <div id="Examples" class="tabcontent">
+                <h2>Example 1</h2>
+                <p>Home pregnancy test results for 514 women:</p>
+                <table border="1">
+                    <tr><th rowspan="2">Test Result</th><th colspan="2">Actual Condition</th><th rowspan="2">Totals</th></tr>
+                    <tr><th>Pregnant</th><th>Not Pregnant</th></tr>
+                    <tr><td>Pregnant</td><td>89</td><td>6</td><td>95</td></tr>
+                    <tr><td>Not Pregnant</td><td>84</td><td>335</td><td>419</td></tr>
+                    <tr><td>Totals</td><td>173</td><td>341</td><td>514</td></tr>
+                </table>
+                <ol class="questions-list">
+                    <li>Calculate the FPR for this home pregnancy test.
+                        <input type="checkbox" id="q1" class="toggle">
+                        <label for="q1" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            False Positive Rate (FPR) = \(\frac{FP}{FP + TN} = \frac{6}{6 + 335} = \frac{6}{341}\) ≈ 0.0176 or 1.76%
+                        </div>
+                    </li>
+                    <li>Calculate the Specificity.
+                        <input type="checkbox" id="q2" class="toggle">
+                        <label for="q2" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            Specificity = 1-FPR = 1- 0.0176 = 0.9284 or 98.24% <br>
+                            OR <br>
+                            \(= \frac{TN}{FP + TN} = \frac{335}{6 + 335} = \frac{335}{341}\) ≈ 0.9824 or 98.24% 
+                        </div>
+                    </li>
+                    <li>Calculate the FNR.
+                        <input type="checkbox" id="q3" class="toggle">
+                        <label for="q3" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            False Negative Rate (FNR) = FN / (FN + TP) = 84 / (84 + 89) = 84 / 173 ≈ 0.4855 or 48.55%
+                        </div>
+                    </li>
+                    <li>Calculate the Sensitivity.
+                        <input type="checkbox" id="q4" class="toggle">
+                        <label for="q4" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            Sensitivity = 1-FNR = 1-0.4855 = 0.5145 or 51.45% <br>
+                            OR <br>
+                            = \( \frac{TP}{TP + FN} = \frac{89}{89 + 84} = \frac{89}{173}\) ≈ 0.5145 or 51.45%
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>Dichotomous Tests</p>
+    </footer>
+
+    <script>
+        function toggleLeftPanel() {
+            const leftPanel = document.getElementById('leftPanel');
+            const container = document.getElementById('container');
+            const toggleButton = document.getElementById('toggleButton');
+            
+            if (leftPanel.classList.contains('minimized')) {
+                leftPanel.classList.remove('minimized');
+                container.classList.remove('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            } else {
+                leftPanel.classList.add('minimized');
+                container.classList.add('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            }
+        }
+
+        function changeFontSize(action) {
+            const rightPanel = document.querySelector('.right-panel');
+            const currentSize = window.getComputedStyle(rightPanel).fontSize;
+            let newSize = parseFloat(currentSize);
+            
+            if (action === 'increase') {
+                newSize += 2;
+            } else if (action === 'decrease') {
+                newSize -= 2;
+            }
+            
+            if (newSize < 12) newSize = 12;
+            if (newSize > 24) newSize = 24;
+            
+            rightPanel.style.fontSize = `${newSize}px`;
+        }
+
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
+    </script>
+</body>
+</html>
