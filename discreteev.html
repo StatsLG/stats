@@ -20,8 +20,36 @@
         <div class="right-panel">
             <h1>Mean of a Discrete Probability Distribution</h1>
             <h2>In Introduction to Expected Value</h2>
-            {{content}}
-            {{example_section}}
+            <p><strong>Expected Value</strong> – the mean of a probability distribution (This value represents the same quantity as the mean did in section II. B. The difference in the calculation comes from the fact that outcomes in a discrete probability distribution are not equally likely in most cases. Thus, this calculation is a weighted average. If all probabilities are the same then the calculation from section II. B. will give the same outcome. The other big difference here as compared to what we looked at in section II. B. is that we are now dealing with a population mean and not a sample mean. In a probability distribution, we have all of the possible outcomes meaning that we are describing the population.)</p>
+            <p>The population mean for a discrete probability distribution is:</p>
+            <p>\[ \mu = \sum x P(x) \]</p>
+            <p>\( \mu \) is a lowercase Greek letter said as ‘mu’ (Can be any real number)</p>
+            <p>The difference in notation for the mean and standard deviation as compared to section II.B. is important. We are now dealing with population values. It is crucial to remember the notation for both the sample and population because later in the course you will see population and sample values in the same formula.</p>
+
+            <hr/>
+            <h2>Example 1</h2>
+            <p>Roll a die and \( x \) is the number rolled. Find the mean of \( x \).</p>
+            <input type="checkbox" id="ex1" class="toggle">
+            <label for="ex1" class="question">Click Here For Answer.</label>
+            <div class="answer">
+                <p>Let's find the expected value (mean) of \( x \):</p>
+                <p>For a fair six-sided die, possible outcomes are 1, 2, 3, 4, 5, 6, each with probability \( \frac{1}{6} \):</p>
+                <p>Probability Distribution Table:</p>
+                <table border="1">
+                    <tr><th>\( x \)</th><th>\( P(x) \)</th></tr>
+                    <tr><td>1</td><td>\( \frac{1}{6} \)</td></tr>
+                    <tr><td>2</td><td>\( \frac{1}{6} \)</td></tr>
+                    <tr><td>3</td><td>\( \frac{1}{6} \)</td></tr>
+                    <tr><td>4</td><td>\( \frac{1}{6} \)</td></tr>
+                    <tr><td>5</td><td>\( \frac{1}{6} \)</td></tr>
+                    <tr><td>6</td><td>\( \frac{1}{6} \)</td></tr>
+                </table>
+                <p>Using the formula \( \mu = \sum x P(x) \):</p>
+                <p>\[ \mu = (1 \cdot \frac{1}{6}) + (2 \cdot \frac{1}{6}) + (3 \cdot \frac{1}{6}) + (4 \cdot \frac{1}{6}) + (5 \cdot \frac{1}{6}) + (6 \cdot \frac{1}{6}) \]</p>
+                <p>\[ = \frac{1}{6} + \frac{2}{6} + \frac{3}{6} + \frac{4}{6} + \frac{5}{6} + \frac{6}{6} \]</p>
+                <p>\[ = \frac{1 + 2 + 3 + 4 + 5 + 6}{6} = \frac{21}{6} = 3.5 \]</p>
+                <p>So, the expected value (mean) of \( x \) is \( \mu = 3.5 \).</p>
+            </div>
         </div>
     </div>
     <footer>
