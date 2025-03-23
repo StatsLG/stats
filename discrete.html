@@ -32,7 +32,7 @@
             <li>\( \sum P(x) = 1 \)</li>
         </ol>
 
-
+        <hr/>
         <h2>Example 1</h2>
         <p>Flip a coin twice where \( x \) = number of tails</p>
         <p>Identify the probability distribution for \( x \)</p>
@@ -55,6 +55,32 @@
                 <tr><td>2</td><td>0.25</td></tr>
             </table>
             <p>Verification: \( \sum P(x) = 0.25 + 0.5 + 0.25 = 1 \), and all probabilities are between 0 and 1, so this is a valid probability distribution.</p>
+        </div>
+
+        <h2>Example 2</h2>
+        <p>Draw one card from a standard deck of 52 cards where \( x = 1 \) if the card is a face card (Jack, Queen, or King), \( x = 0 \) if it is not a face card</p>
+        <p>Identify the probability distribution for \( x \)</p>
+        <input type="checkbox" id="ex2" class="toggle">
+        <label for="ex2" class="question">Click Here For Answer.</label>
+        <div class="answer">
+            <p>Let's determine the probability distribution:</p>
+            <p>A standard deck has 52 cards. Face cards are Jacks, Queens, and Kings (3 per suit, 4 suits):</p>
+            <ul>
+                <li>Number of face cards = \( 3 \times 4 = 12 \)</li>
+                <li>Number of non-face cards = \( 52 - 12 = 40 \)</li>
+            </ul>
+            <p>Where x = 1 for face cards and x = 0 for non-face cards:</p>
+            <ul>
+                <li>\( x = 0 \) (non-face cards): 40 outcomes, \( P(x=0) = \frac{40}{52} = \frac{10}{13} \approx 0.7692 \)</li>
+                <li>\( x = 1 \) (face cards): 12 outcomes, \( P(x=1) = \frac{12}{52} = \frac{3}{13} \approx 0.2308 \)</li>
+            </ul>
+            <p>Probability Distribution Table:</p>
+            <table border="1">
+                <tr><th>\( x \)</th><th>\( P(x) \)</th></tr>
+                <tr><td>0</td><td>\( \frac{10}{13} \approx 0.7692 \)</td></tr>
+                <tr><td>1</td><td>\( \frac{3}{13} \approx 0.2308 \)</td></tr>
+            </table>
+            <p>Verification: \( \sum P(x) = \frac{10}{13} + \frac{3}{13} = \frac{13}{13} = 1 \), and all probabilities are between 0 and 1, so this is a valid probability distribution.</p>
         </div>
         </div>
     </div>
