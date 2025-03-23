@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{page_title}}</title>
+    <title>Discrete Standard Deviation</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
@@ -20,8 +20,60 @@
         <div class="right-panel">
             <h1>Standard Deviation of a Discrete Probability Distribution</h1>
             <h2>{{subtitle}}</h2>
-            {{content}}
-            {{example_section}}
+            <p>As always, in order to calculate standard deviation, we must start by calculating the variance. The population variance for a discrete probability distribution is:</p>
+            <p>\[ \sigma^2 = \sum (x - \mu)^2 P(x) = \sum x^2 P(x) - \mu^2 \]</p>
+            <p>The population standard deviation is the square root of the variance:</p>
+            <p>\[ \sigma = \sqrt{\sigma^2} \]</p>
+            <p>\( \sigma \) is a lowercase Greek letter said as ‘sigma’ (Can be any nonnegative real number)</p>
+            <hr/>
+            <h2>Example 1</h2>
+            <p>Roll a die and \( x \) is the number rolled. Find the standard deviation of \( x \).</p>
+            <input type="checkbox" id="ex1" class="toggle">
+            <label for="ex1" class="question">Click Here For Answer.</label>
+            <div class="answer">
+                <p>Let's find the standard deviation of \( x \):</p>
+                <p>For a fair six-sided die, possible outcomes are 1, 2, 3, 4, 5, 6, each with \( P(x) = \frac{1}{6} \). First, we need the mean (\( \mu \)) from the expected value:</p>
+                <p>\[ \mu = (1 \cdot \frac{1}{6}) + (2 \cdot \frac{1}{6}) + (3 \cdot \frac{1}{6}) + (4 \cdot \frac{1}{6}) + (5 \cdot \frac{1}{6}) + (6 \cdot \frac{1}{6}) = \frac{21}{6} = 3.5 \]</p>
+                <p>Now, calculate variance (\( \sigma^2 \)) using \( \sigma^2 = \sum x^2 P(x) - \mu^2 \):</p>
+                <p>\[ \sum x^2 P(x) = (1^2 \cdot \frac{1}{6}) + (2^2 \cdot \frac{1}{6}) + (3^2 \cdot \frac{1}{6}) + (4^2 \cdot \frac{1}{6}) + (5^2 \cdot \frac{1}{6}) + (6^2 \cdot \frac{1}{6}) \]</p>
+                <p>\[ = (\frac{1}{6}) + (\frac{4}{6}) + (\frac{9}{6}) + (\frac{16}{6}) + (\frac{25}{6}) + (\frac{36}{6}) = \frac{1 + 4 + 9 + 16 + 25 + 36}{6} = \frac{91}{6} \approx 15.1667 \]</p>
+                <p>\[ \mu^2 = (3.5)^2 = 12.25 \]</p>
+                <p>\[ \sigma^2 = \frac{91}{6} - 12.25 = 15.1667 - 12.25 = 2.9167 \]</p>
+                <p>Standard deviation (\( \sigma \)):</p>
+                <p>\[ \sigma = \sqrt{\sigma^2} = \sqrt{2.9167} \approx 1.708 \]</p>
+                <p>So, the standard deviation of \( x \) is approximately \( \sigma \approx 1.708 \).</p>
+            </div>
+            <hr/>
+            <h2>Example 2</h2>
+            <p>A game involves spinning a spinner divided into three sections:</p>
+            <ul>
+                <li>Section A (50% of the area): Win 2 points</li>
+                <li>Section B (30% of the area): Win 5 points</li>
+                <li>Section C (20% of the area): Lose 1 point (i.e., -1 point)</li>
+            </ul>
+            <p>Let \( x \) be the number of points won or lost in one spin. Find the standard deviation of \( x \).</p>
+            <input type="checkbox" id="ex2" class="toggle">
+            <label for="ex2" class="question">Click Here For Answer.</label>
+            <div class="answer">
+                <p>Let's find the standard deviation of \( x \):</p>
+                <p>The probability distribution is:</p>
+                <table border="1">
+                    <tr><th>\( x \)</th><th>\( P(x) \)</th></tr>
+                    <tr><td>2</td><td>0.5</td></tr>
+                    <tr><td>5</td><td>0.3</td></tr>
+                    <tr><td>-1</td><td>0.2</td></tr>
+                </table>
+                <p>First, calculate the mean (\( \mu \)):</p>
+                <p>\[ \mu = (2 \cdot 0.5) + (5 \cdot 0.3) + (-1 \cdot 0.2) = 1 + 1.5 - 0.2 = 2.3 \]</p>
+                <p>Now, calculate variance (\( \sigma^2 \)) using \( \sigma^2 = \sum x^2 P(x) - \mu^2 \):</p>
+                <p>\[ \sum x^2 P(x) = (2^2 \cdot 0.5) + (5^2 \cdot 0.3) + ((-1)^2 \cdot 0.2) \]</p>
+                <p>\[ = (4 \cdot 0.5) + (25 \cdot 0.3) + (1 \cdot 0.2) = 2 + 7.5 + 0.2 = 9.7 \]</p>
+                <p>\[ \mu^2 = (2.3)^2 = 5.29 \]</p>
+                <p>\[ \sigma^2 = 9.7 - 5.29 = 4.41 \]</p>
+                <p>Standard deviation (\( \sigma \)):</p>
+                <p>\[ \sigma = \sqrt{\sigma^2} = \sqrt{4.41} = 2.1 \]</p>
+                <p>So, the standard deviation of \( x \) is \( \sigma = 2.1 \) points.</p>
+            </div>
         </div>
     </div>
     <footer>
