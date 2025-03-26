@@ -101,26 +101,64 @@
             <!-- Applications Tab (Examples 3 and 4) -->
             <div id="Applications" class="tabcontent">
                 <section>
-                    <h2>Example 3: Powerball Lottery</h2>
-                    <p>In a simplified Powerball, a ticket costs $2, and the jackpot is $400M with \( P(\text{win}) = \frac{1}{292,201,338} \). Define \( X \) as net gain. Find the probability distribution, expected value, and standard deviation.</p>
+                    <h2>Example 3.1: Powerball Lottery</h2>
+                    <p>In a simplified Powerball, a ticket costs $2, and the jackpot is $484M with \( P(\text{win}) = \frac{1}{292,201,338} \). Define \( X \) as net gain. Find the probability distribution, expected value, and standard deviation.</p>
                     <input type="checkbox" id="ex3" class="toggle">
                     <label for="ex3" class="question">Click Here For Answer</label>
                     <div class="answer">
                         <p>\( X \) = net gain:</p>
                         <ul>
-                            <li>Win: \( X = 400,000,000 - 2 = 399,999,998 \), \( P(X = 399,999,998) = \frac{1}{292,201,338} \approx 0.00000000342 \)</li>
+                            <li>Win: \( X = 484,000,000 - 2 = 483,999,998 \), \( P(X = 483,999,998) = \frac{1}{292,201,338} \approx 0.00000000342 \)</li>
                             <li>Lose: \( X = -2 \), \( P(X = -2) = \frac{292,201,337}{292,201,338} \approx 0.99999999658 \)</li>
                         </ul>
                         <table>
                             <tr><th>\( X \)</th><th>\( P(X) \)</th></tr>
-                            <tr><td>399,999,998</td><td>\( \frac{1}{292,201,338} \approx 0.00000000342 \)</td></tr>
+                            <tr><td>483,999,998</td><td>\( \frac{1}{292,201,338} \approx 0.00000000342 \)</td></tr>
                             <tr><td>-2</td><td>\( \frac{292,201,337}{292,201,338} \approx 0.99999999658 \)</td></tr>
                         </table>
                         <p>Verification: \( \sum P(X) = 1 \), all \( P(X) \) between 0 and 1. Valid distribution.</p>
-                        <p><strong>Expected Value \( E(X) \):</strong> \( E(X) = (399,999,998) \cdot \frac{1}{292,201,338} + (-2) \cdot \frac{292,201,337}{292,201,338} \approx 1.3688 - 2.0000 \approx -0.6312 \) ($-0.63 loss per ticket).</p>
-                        <p><strong>Variance \( \text{Var}(X) \):</strong> \( E(X^2) = (399,999,998)^2 \cdot \frac{1}{292,201,338} + 4 \cdot \frac{292,201,337}{292,201,338} \approx 547,943,801 \), \( [E(X)]^2 \approx 0.3984 \), \( \text{Var}(X) \approx 547,943,800 \).</p>
-                        <p><strong>Standard Deviation \( \sigma(X) \):</strong> \( \sigma(X) = \sqrt{547,943,800} \approx 23,407 \).</p>
+                        <p><strong>Expected Value \( E(X) \):</strong> \( E(X) = (483,999,998) \cdot \frac{1}{292,201,338} + (-2) \cdot \frac{292,201,337}{292,201,338} \approx 1.6563 - 2.0000 \approx -0.3437 \) ($-0.34 loss per ticket).</p>
+                        <p><strong>Variance \( \text{Var}(X) \):</strong> \( E(X^2) = (483,999,998)^2 \cdot \frac{1}{292,201,338} + 4 \cdot \frac{292,201,337}{292,201,338} \approx 801,553,921 + 4 \approx 801,553,925 \), \( [E(X)]^2 \approx (-0.3437)^2 \approx 0.1181 \), \( \text{Var}(X) \approx 801,553,925 - 0.1181 \approx 801,553,924 \).</p>
+                        <p><strong>Standard Deviation \( \sigma(X) \):</strong> \( \sigma(X) = \sqrt{801,553,924} \approx 28,311 \).</p>
                         <p><strong>Note:</strong> Ignores smaller prizes, taxes, and multiple winners for simplicity.</p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Example 3.2: Powerball with Smaller Prizes</h2>
+                    <p>In Powerball, a ticket costs $2, and the jackpot is $484M with \( P(\text{win}) = \frac{1}{292,201,338} \). There are also 8 smaller prize tiers. Define \( X \) as the net gain per ticket (prize minus $2 cost). Identify the probability distribution and calculate the expected value \( E(X) \).</p>
+                    <input type="checkbox" id="ex32" class="toggle">
+                    <label for="ex32" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p>\( X \) = net gain. Total tickets = 292,201,338. Prize tiers, odds, and net gains:</p>
+                        <ul>
+                            <li>Jackpot ($484M, 1 way): \( X = 484,000,000 - 2 = 483,999,998 \), \( P(X = 483,999,998) = \frac{1}{292,201,338} \approx 0.00000000342 \)</li>
+                            <li>Match 5 ($1M, 25 ways): \( X = 1,000,000 - 2 = 999,998 \), \( P(X = 999,998) = \frac{25}{292,201,338} \approx 0.00000008556 \)</li>
+                            <li>Match 4 + Powerball ($50K, 320 ways): \( X = 50,000 - 2 = 49,998 \), \( P(X = 49,998) = \frac{320}{292,201,338} \approx 0.000001095 \)</li>
+                            <li>Match 4 ($100, 8,013 ways): \( X = 100 - 2 = 98 \), \( P(X = 98) = \frac{8,013}{292,201,338} \approx 0.00002743 \)</li>
+                            <li>Match 3 + Powerball ($100, 20,096 ways): \( X = 100 - 2 = 98 \), \( P(X = 98) = \frac{20,096}{292,201,338} \approx 0.00006878 \)</li>
+                            <li>Match 3 ($7, 504,633 ways): \( X = 7 - 2 = 5 \), \( P(X = 5) = \frac{504,633}{292,201,338} \approx 0.001727 \)</li>
+                            <li>Match 2 + Powerball ($7, 416,224 ways): \( X = 7 - 2 = 5 \), \( P(X = 5) = \frac{416,224}{292,201,338} \approx 0.001424 \)</li>
+                            <li>Match 1 + Powerball ($4, 3,176,779 ways): \( X = 4 - 2 = 2 \), \( P(X = 2) = \frac{3,176,779}{292,201,338} \approx 0.01087 \)</li>
+                            <li>Match Powerball ($4, 7,624,525 ways): \( X = 4 - 2 = 2 \), \( P(X = 2) = \frac{7,624,525}{292,201,338} \approx 0.02609 \)</li>
+                            <li>Loss (280,444,742 ways): \( X = -2 \), \( P(X = -2) = \frac{280,444,742}{292,201,338} \approx 0.9598 \)</li>
+                        </ul>
+                        <p>Consolidating duplicate \( X \) values:</p>
+                        <table>
+                            <tr><th>\( X \)</th><th>Prize</th><th>\( P(X) \)</th></tr>
+                            <tr><td>483,999,998</td><td>Jackpot</td><td>\( \frac{1}{292,201,338} \approx 0.00000000342 \)</td></tr>
+                            <tr><td>999,998</td><td>Match 5</td><td>\( \frac{25}{292,201,338} \approx 0.00000008556 \)</td></tr>
+                            <tr><td>49,998</td><td>Match 4 + PB</td><td>\( \frac{320}{292,201,338} \approx 0.000001095 \)</td></tr>
+                            <tr><td>98</td><td>Match 4 or 3 + PB</td><td>\( \frac{8,013 + 20,096}{292,201,338} = \frac{28,109}{292,201,338} \approx 0.00009621 \)</td></tr>
+                            <tr><td>5</td><td>Match 3 or 2 + PB</td><td>\( \frac{504,633 + 416,224}{292,201,338} = \frac{920,857}{292,201,338} \approx 0.003151 \)</td></tr>
+                            <tr><td>2</td><td>Match 1 + PB or PB</td><td>\( \frac{3,176,779 + 7,624,525}{292,201,338} = \frac{10,801,304}{292,201,338} \approx 0.03696 \)</td></tr>
+                            <tr><td>-2</td><td>No win</td><td>\( \frac{280,444,742}{292,201,338} \approx 0.9598 \)</td></tr>
+                        </table>
+                        <p>Verification: \( \sum P(X) = \frac{1 + 25 + 320 + 28,109 + 920,857 + 10,801,304 + 280,444,742}{292,201,338} = 1 \), all \( P(X) \) between 0 and 1. Valid distribution.</p>
+                        <p><strong>Expected Value \( E(X) \):</strong></p>
+                        <p>\( E(X) = (483,999,998) \cdot \frac{1}{292,201,338} + (999,998) \cdot \frac{25}{292,201,338} + (49,998) \cdot \frac{320}{292,201,338} + 98 \cdot \frac{28,109}{292,201,338} + 5 \cdot \frac{920,857}{292,201,338} + 2 \cdot \frac{10,801,304}{292,201,338} + (-2) \cdot \frac{280,444,742}{292,201,338} \)</p>
+                        <p>\( \approx 1.6563 + 0.08556 + 0.05475 + 0.002754 + 0.01577 + 0.07393 - 1.9166 \approx -0.0283 \)</p>
+                        <p>The EV is approximately -$0.03, meaning a loss of about 3 cents per ticket.</p>
+                        <p><strong>Note:</strong> Excludes Power Play, taxes, and multiple winners. Smaller prizes reduce the loss compared to jackpot-only (Example 3).</p>
                     </div>
                 </section>
                 <section>
