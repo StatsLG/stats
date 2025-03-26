@@ -1,10 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Discrete Probability Distributions</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discrete Probability Distributions</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Inline CSS for toggle functionality */
+        .toggle { display: none; }
+        .answer { display: none; }
+        .toggle:checked + .question + .answer { display: block; }
+        .question { cursor: pointer; color: #0066cc; }
+        table { border-collapse: collapse; margin: 10px 0; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    </style>
 </head>
 <body>
     <div class="container" id="container">
@@ -14,112 +23,112 @@
             <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
             <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
             <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
-            <script src="https://www.numworks.com/simulator/embed.js"></script>
-            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
         </div>
         <div class="right-panel">
             <h1>Valid Discrete Probability Distributions</h1>
-            <h2>Intro to Probability Distributions</h2>
-            <p>First, it is important to make sure that we distinguish between a discrete and continuous random variable. While the idea of a probability distribution is the same in both cases, the way we have to look at the probability distribution is different. We will focus on the idea of probability for a discrete random variable here.</p>
-        <p><strong>Discrete Random Variable</strong> – potential values are separated points on the number line; there is a finite or countable number of values (outcomes are typically counted)</p>
-        <p><strong>Continuous Random Variable</strong> – potential values fall in an interval on the number line; there is an infinite number of values (outcomes are typically measured)</p>
-        <p>A discrete random variable will include a finite or countable number of outcomes. Therefore, we assign probabilities to each value of the random variable.</p>
-        <p><strong>Probability distribution</strong> – the collection of \( P(x) \) values for all possible x values</p>
-        <p>For a discrete probability distribution to be valid, it must satisfy the following:</p>
-        <ol>
-            <li>The variable, x, must be discrete</li>
-            <li>\( 0 \leq P(x) \leq 1 \) for all x</li>
-            <li>\( \sum P(x) = 1 \)</li>
-        </ol>
-
-        <hr/>
-        <h2>Example 1</h2>
-        <p>Flip a coin twice where \( x \) = number of tails</p>
-        <p>Identify the probability distribution for \( x \)</p>
-        <input type="checkbox" id="ex1" class="toggle">
-        <label for="ex1" class="question">Click Here For Answer.</label>
-        <div class="answer">
-            <p>Let's determine the probability distribution:</p>
-            <p>Possible outcomes when flipping a coin twice: HH, HT, TH, TT</p>
-            <p>Where x = number of tails can be 0, 1, or 2:</p>
-            <ul>
-                <li>\( x = 0 \) (HH): 1 outcome, \( P(x=0) = \frac{1}{4} = 0.25 \)</li>
-                <li>\( x = 1 \) (HT, TH): 2 outcomes, \( P(x=1) = \frac{2}{4} = 0.5 \)</li>
-                <li>\( x = 2 \) (TT): 1 outcome, \( P(x=2) = \frac{1}{4} = 0.25 \)</li>
-            </ul>
-            <p>Probability Distribution Table:</p>
-            <table border="1">
-                <tr><th>\( x \)</th><th>\( P(x) \)</th></tr>
-                <tr><td>0</td><td>0.25</td></tr>
-                <tr><td>1</td><td>0.5</td></tr>
-                <tr><td>2</td><td>0.25</td></tr>
-            </table>
-            <p>Verification: \( \sum P(x) = 0.25 + 0.5 + 0.25 = 1 \), and all probabilities are between 0 and 1, so this is a valid probability distribution.</p>
-        </div>
-
-        <h2>Example 2</h2>
-        <p>Draw one card from a standard deck of 52 cards where \( x = 1 \) if the card is a face card (Jack, Queen, or King), \( x = 0 \) if it is not a face card</p>
-        <p>Identify the probability distribution for \( x \)</p>
-        <input type="checkbox" id="ex2" class="toggle">
-        <label for="ex2" class="question">Click Here For Answer.</label>
-        <div class="answer">
-            <p>Let's determine the probability distribution:</p>
-            <p>A standard deck has 52 cards. Face cards are Jacks, Queens, and Kings (3 per suit, 4 suits):</p>
-            <ul>
-                <li>Number of face cards = \( 3 \times 4 = 12 \)</li>
-                <li>Number of non-face cards = \( 52 - 12 = 40 \)</li>
-            </ul>
-            <p>Where x = 1 for face cards and x = 0 for non-face cards:</p>
-            <ul>
-                <li>\( x = 0 \) (non-face cards): 40 outcomes, \( P(x=0) = \frac{40}{52} = \frac{10}{13} \approx 0.7692 \)</li>
-                <li>\( x = 1 \) (face cards): 12 outcomes, \( P(x=1) = \frac{12}{52} = \frac{3}{13} \approx 0.2308 \)</li>
-            </ul>
-            <p>Probability Distribution Table:</p>
-            <table border="1">
-                <tr><th>\( x \)</th><th>\( P(x) \)</th></tr>
-                <tr><td>0</td><td>\( \frac{10}{13} \approx 0.7692 \)</td></tr>
-                <tr><td>1</td><td>\( \frac{3}{13} \approx 0.2308 \)</td></tr>
-            </table>
-            <p>Verification: \( \sum P(x) = \frac{10}{13} + \frac{3}{13} = \frac{13}{13} = 1 \), and all probabilities are between 0 and 1, so this is a valid probability distribution.</p>
-        </div>
+            <section>
+                <h2>Intro to Probability Distributions</h2>
+                <p>First, it’s important to distinguish between discrete and continuous random variables. While the concept of a probability distribution applies to both, the approach differs. Here, we focus on discrete random variables.</p>
+                <p><strong>Discrete Random Variable:</strong> Values are distinct points on the number line; finite or countable (e.g., counting outcomes).</p>
+                <p><strong>Continuous Random Variable:</strong> Values form an interval on the number line; infinite (e.g., measuring outcomes).</p>
+                <p>A discrete random variable has a finite or countable number of outcomes, each assigned a probability.</p>
+                <p><strong>Probability Distribution:</strong> The set of \( P(x) \) values for all possible \( x \).</p>
+                <p>A valid discrete probability distribution must satisfy:</p>
+                <ol>
+                    <li>\( x \) is discrete.</li>
+                    <li>\( 0 \leq P(x) \leq 1 \) for all \( x \).</li>
+                    <li>\( \sum P(x) = 1 \).</li>
+                </ol>
+            </section>
+            <hr>
+            <section>
+                <h2>Example 1: Coin Flip</h2>
+                <p>Flip a coin twice, where \( x \) = number of tails. Identify the probability distribution for \( x \).</p>
+                <input type="checkbox" id="ex1" class="toggle">
+                <label for="ex1" class="question">Click Here For Answer</label>
+                <div class="answer">
+                    <p>Possible outcomes: HH, HT, TH, TT</p>
+                    <p>\( x \) (number of tails) can be 0, 1, or 2:</p>
+                    <ul>
+                        <li>\( x = 0 \) (HH): \( P(x=0) = \frac{1}{4} = 0.25 \)</li>
+                        <li>\( x = 1 \) (HT, TH): \( P(x=1) = \frac{2}{4} = 0.5 \)</li>
+                        <li>\( x = 2 \) (TT): \( P(x=2) = \frac{1}{4} = 0.25 \)</li>
+                    </ul>
+                    <table>
+                        <tr><th>\( x \)</th><th>\( P(x) \)</th></tr>
+                        <tr><td>0</td><td>0.25</td></tr>
+                        <tr><td>1</td><td>0.5</td></tr>
+                        <tr><td>2</td><td>0.25</td></tr>
+                    </table>
+                    <p>Verification: \( \sum P(x) = 0.25 + 0.5 + 0.25 = 1 \), all \( P(x) \) between 0 and 1. Valid distribution.</p>
+                </div>
+            </section>
+            <section>
+                <h2>Example 2: Card Draw</h2>
+                <p>Draw one card from a 52-card deck, where \( x = 1 \) if it’s a face card (Jack, Queen, King), \( x = 0 \) if not. Identify the probability distribution for \( x \).</p>
+                <input type="checkbox" id="ex2" class="toggle">
+                <label for="ex2" class="question">Click Here For Answer</label>
+                <div class="answer">
+                    <p>Face cards: 3 per suit × 4 suits = 12. Non-face cards: 52 - 12 = 40.</p>
+                    <ul>
+                        <li>\( x = 0 \) (non-face): \( P(x=0) = \frac{40}{52} = \frac{10}{13} \approx 0.7692 \)</li>
+                        <li>\( x = 1 \) (face): \( P(x=1) = \frac{12}{52} = \frac{3}{13} \approx 0.2308 \)</li>
+                    </ul>
+                    <table>
+                        <tr><th>\( x \)</th><th>\( P(x) \)</th></tr>
+                        <tr><td>0</td><td>\( \frac{10}{13} \approx 0.7692 \)</td></tr>
+                        <tr><td>1</td><td>\( \frac{3}{13} \approx 0.2308 \)</td></tr>
+                    </table>
+                    <p>Verification: \( \sum P(x) = \frac{10}{13} + \frac{3}{13} = 1 \), all \( P(x) \) between 0 and 1. Valid distribution.</p>
+                </div>
+            </section>
+            <section>
+                <h2>Example 3: Powerball Lottery</h2>
+                <p>In a simplified Powerball, a ticket costs $2, and the jackpot is $400M with \( P(\text{win}) = \frac{1}{292,201,338} \). Define \( X \) as net gain. Find the probability distribution, expected value, and standard deviation.</p>
+                <input type="checkbox" id="ex3" class="toggle">
+                <label for="ex3" class="question">Click Here For Answer</label>
+                <div class="answer">
+                    <p>\( X \) = net gain:</p>
+                    <ul>
+                        <li>Win: \( X = 400,000,000 - 2 = 399,999,998 \), \( P(X = 399,999,998) = \frac{1}{292,201,338} \approx 0.00000000342 \)</li>
+                        <li>Lose: \( X = -2 \), \( P(X = -2) = \frac{292,201,337}{292,201,338} \approx 0.99999999658 \)</li>
+                    </ul>
+                    <table>
+                        <tr><th>\( X \)</th><th>\( P(X) \)</th></tr>
+                        <tr><td>399,999,998</td><td>\( \frac{1}{292,201,338} \approx 0.00000000342 \)</td></tr>
+                        <tr><td>-2</td><td>\( \frac{292,201,337}{292,201,338} \approx 0.99999999658 \)</td></tr>
+                    </table>
+                    <p>Verification: \( \sum P(X) = 1 \), all \( P(X) \) between 0 and 1. Valid distribution.</p>
+                    <p><strong>Expected Value \( E(X) \):</strong> \( E(X) = (399,999,998) \cdot \frac{1}{292,201,338} + (-2) \cdot \frac{292,201,337}{292,201,338} \approx 1.3688 - 2.0000 \approx -0.6312 \) ($-0.63 loss per ticket).</p>
+                    <p><strong>Variance \( \text{Var}(X) \):</strong> \( E(X^2) = (399,999,998)^2 \cdot \frac{1}{292,201,338} + 4 \cdot \frac{292,201,337}{292,201,338} \approx 547,943,801 \), \( [E(X)]^2 \approx 0.3984 \), \( \text{Var}(X) \approx 547,943,800 \).</p>
+                    <p><strong>Standard Deviation \( \sigma(X) \):</strong> \( \sigma(X) = \sqrt{547,943,800} \approx 23,407 \).</p>
+                    <p><strong>Note:</strong> Ignores smaller prizes, taxes, and multiple winners for simplicity.</p>
+                </div>
+            </section>
         </div>
     </div>
     <footer>
         <p>{{footer_text}}</p>
     </footer>
 
+    <script src="https://www.numworks.com/simulator/embed.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
     <script>
         function toggleLeftPanel() {
             const leftPanel = document.getElementById('leftPanel');
             const container = document.getElementById('container');
             const toggleButton = document.getElementById('toggleButton');
-            
-            if (leftPanel.classList.contains('minimized')) {
-                leftPanel.classList.remove('minimized');
-                container.classList.remove('minimized');
-                toggleButton.textContent = 'Open Calculator';
-            } else {
-                leftPanel.classList.add('minimized');
-                container.classList.add('minimized');
-                toggleButton.textContent = 'Open Calculator';
-            }
+            const isMinimized = leftPanel.classList.toggle('minimized');
+            container.classList.toggle('minimized', isMinimized);
+            toggleButton.textContent = isMinimized ? 'Open Calculator' : 'Close Calculator';
         }
 
         function changeFontSize(action) {
             const rightPanel = document.querySelector('.right-panel');
-            const currentSize = window.getComputedStyle(rightPanel).fontSize;
-            let newSize = parseFloat(currentSize);
-            
-            if (action === 'increase') {
-                newSize += 2;
-            } else if (action === 'decrease') {
-                newSize -= 2;
-            }
-            
-            if (newSize < 12) newSize = 12;
-            if (newSize > 24) newSize = 24;
-            
-            rightPanel.style.fontSize = `${newSize}px`;
+            let size = parseFloat(getComputedStyle(rightPanel).fontSize);
+            size += (action === 'increase') ? 2 : -2;
+            size = Math.min(Math.max(size, 12), 24); // Clamp between 12px and 24px
+            rightPanel.style.fontSize = `${size}px`;
         }
 
         document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
