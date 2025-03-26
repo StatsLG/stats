@@ -6,13 +6,19 @@
     <title>Discrete Probability Distributions</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Inline CSS for toggle functionality */
+        /* Inline CSS for toggle functionality and tabs */
         .toggle { display: none; }
         .answer { display: none; }
         .toggle:checked + .question + .answer { display: block; }
         .question { cursor: pointer; color: #0066cc; }
         table { border-collapse: collapse; margin: 10px 0; }
         th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        .tab { overflow: hidden; border-bottom: 1px solid #ccc; }
+        .tab button { background-color: #f1f1f1; float: left; border: none; outline: none; cursor: pointer; padding: 14px 16px; transition: 0.3s; }
+        .tab button:hover { background-color: #ddd; }
+        .tab button.active { background-color: #ccc; }
+        .tabcontent { display: none; padding: 20px 0; }
+        .tabcontent.active { display: block; }
     </style>
 </head>
 <body>
@@ -41,70 +47,106 @@
                 </ol>
             </section>
             <hr>
-            <section>
-                <h2>Example 1: Coin Flip</h2>
-                <p>Flip a coin twice, where \( x \) = number of tails. Identify the probability distribution for \( x \).</p>
-                <input type="checkbox" id="ex1" class="toggle">
-                <label for="ex1" class="question">Click Here For Answer</label>
-                <div class="answer">
-                    <p>Possible outcomes: HH, HT, TH, TT</p>
-                    <p>\( x \) (number of tails) can be 0, 1, or 2:</p>
-                    <ul>
-                        <li>\( x = 0 \) (HH): \( P(x=0) = \frac{1}{4} = 0.25 \)</li>
-                        <li>\( x = 1 \) (HT, TH): \( P(x=1) = \frac{2}{4} = 0.5 \)</li>
-                        <li>\( x = 2 \) (TT): \( P(x=2) = \frac{1}{4} = 0.25 \)</li>
-                    </ul>
-                    <table>
-                        <tr><th>\( x \)</th><th>\( P(x) \)</th></tr>
-                        <tr><td>0</td><td>0.25</td></tr>
-                        <tr><td>1</td><td>0.5</td></tr>
-                        <tr><td>2</td><td>0.25</td></tr>
-                    </table>
-                    <p>Verification: \( \sum P(x) = 0.25 + 0.5 + 0.25 = 1 \), all \( P(x) \) between 0 and 1. Valid distribution.</p>
-                </div>
-            </section>
-            <section>
-                <h2>Example 2: Card Draw</h2>
-                <p>Draw one card from a 52-card deck, where \( x = 1 \) if it’s a face card (Jack, Queen, King), \( x = 0 \) if not. Identify the probability distribution for \( x \).</p>
-                <input type="checkbox" id="ex2" class="toggle">
-                <label for="ex2" class="question">Click Here For Answer</label>
-                <div class="answer">
-                    <p>Face cards: 3 per suit × 4 suits = 12. Non-face cards: 52 - 12 = 40.</p>
-                    <ul>
-                        <li>\( x = 0 \) (non-face): \( P(x=0) = \frac{40}{52} = \frac{10}{13} \approx 0.7692 \)</li>
-                        <li>\( x = 1 \) (face): \( P(x=1) = \frac{12}{52} = \frac{3}{13} \approx 0.2308 \)</li>
-                    </ul>
-                    <table>
-                        <tr><th>\( x \)</th><th>\( P(x) \)</th></tr>
-                        <tr><td>0</td><td>\( \frac{10}{13} \approx 0.7692 \)</td></tr>
-                        <tr><td>1</td><td>\( \frac{3}{13} \approx 0.2308 \)</td></tr>
-                    </table>
-                    <p>Verification: \( \sum P(x) = \frac{10}{13} + \frac{3}{13} = 1 \), all \( P(x) \) between 0 and 1. Valid distribution.</p>
-                </div>
-            </section>
-            <section>
-                <h2>Example 3: Powerball Lottery</h2>
-                <p>In a simplified Powerball, a ticket costs $2, and the jackpot is $400M with \( P(\text{win}) = \frac{1}{292,201,338} \). Define \( X \) as net gain. Find the probability distribution, expected value, and standard deviation.</p>
-                <input type="checkbox" id="ex3" class="toggle">
-                <label for="ex3" class="question">Click Here For Answer</label>
-                <div class="answer">
-                    <p>\( X \) = net gain:</p>
-                    <ul>
-                        <li>Win: \( X = 400,000,000 - 2 = 399,999,998 \), \( P(X = 399,999,998) = \frac{1}{292,201,338} \approx 0.00000000342 \)</li>
-                        <li>Lose: \( X = -2 \), \( P(X = -2) = \frac{292,201,337}{292,201,338} \approx 0.99999999658 \)</li>
-                    </ul>
-                    <table>
-                        <tr><th>\( X \)</th><th>\( P(X) \)</th></tr>
-                        <tr><td>399,999,998</td><td>\( \frac{1}{292,201,338} \approx 0.00000000342 \)</td></tr>
-                        <tr><td>-2</td><td>\( \frac{292,201,337}{292,201,338} \approx 0.99999999658 \)</td></tr>
-                    </table>
-                    <p>Verification: \( \sum P(X) = 1 \), all \( P(X) \) between 0 and 1. Valid distribution.</p>
-                    <p><strong>Expected Value \( E(X) \):</strong> \( E(X) = (399,999,998) \cdot \frac{1}{292,201,338} + (-2) \cdot \frac{292,201,337}{292,201,338} \approx 1.3688 - 2.0000 \approx -0.6312 \) ($-0.63 loss per ticket).</p>
-                    <p><strong>Variance \( \text{Var}(X) \):</strong> \( E(X^2) = (399,999,998)^2 \cdot \frac{1}{292,201,338} + 4 \cdot \frac{292,201,337}{292,201,338} \approx 547,943,801 \), \( [E(X)]^2 \approx 0.3984 \), \( \text{Var}(X) \approx 547,943,800 \).</p>
-                    <p><strong>Standard Deviation \( \sigma(X) \):</strong> \( \sigma(X) = \sqrt{547,943,800} \approx 23,407 \).</p>
-                    <p><strong>Note:</strong> Ignores smaller prizes, taxes, and multiple winners for simplicity.</p>
-                </div>
-            </section>
+            <!-- Tab Navigation -->
+            <div class="tab">
+                <button class="tablinks active" onclick="openTab(event, 'BasicExamples')">Basic Examples</button>
+                <button class="tablinks" onclick="openTab(event, 'Applications')">Applications</button>
+            </div>
+
+            <!-- Basic Examples Tab (Examples 1 and 2) -->
+            <div id="BasicExamples" class="tabcontent active">
+                <section>
+                    <h2>Example 1: Coin Flip</h2>
+                    <p>Flip a coin twice, where \( x \) = number of tails. Identify the probability distribution for \( x \).</p>
+                    <input type="checkbox" id="ex1" class="toggle">
+                    <label for="ex1" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p>Possible outcomes: HH, HT, TH, TT</p>
+                        <p>\( x \) (number of tails) can be 0, 1, or 2:</p>
+                        <ul>
+                            <li>\( x = 0 \) (HH): \( P(x=0) = \frac{1}{4} = 0.25 \)</li>
+                            <li>\( x = 1 \) (HT, TH): \( P(x=1) = \frac{2}{4} = 0.5 \)</li>
+                            <li>\( x = 2 \) (TT): \( P(x=2) = \frac{1}{4} = 0.25 \)</li>
+                        </ul>
+                        <table>
+                            <tr><th>\( x \)</th><th>\( P(x) \)</th></tr>
+                            <tr><td>0</td><td>0.25</td></tr>
+                            <tr><td>1</td><td>0.5</td></tr>
+                            <tr><td>2</td><td>0.25</td></tr>
+                        </table>
+                        <p>Verification: \( \sum P(x) = 0.25 + 0.5 + 0.25 = 1 \), all \( P(x) \) between 0 and 1. Valid distribution.</p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Example 2: Card Draw</h2>
+                    <p>Draw one card from a 52-card deck, where \( x = 1 \) if it’s a face card (Jack, Queen, King), \( x = 0 \) if not. Identify the probability distribution for \( x \).</p>
+                    <input type="checkbox" id="ex2" class="toggle">
+                    <label for="ex2" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p>Face cards: 3 per suit × 4 suits = 12. Non-face cards: 52 - 12 = 40.</p>
+                        <ul>
+                            <li>\( x = 0 \) (non-face): \( P(x=0) = \frac{40}{52} = \frac{10}{13} \approx 0.7692 \)</li>
+                            <li>\( x = 1 \) (face): \( P(x=1) = \frac{12}{52} = \frac{3}{13} \approx 0.2308 \)</li>
+                        </ul>
+                        <table>
+                            <tr><th>\( x \)</th><th>\( P(x) \)</th></tr>
+                            <tr><td>0</td><td>\( \frac{10}{13} \approx 0.7692 \)</td></tr>
+                            <tr><td>1</td><td>\( \frac{3}{13} \approx 0.2308 \)</td></tr>
+                        </table>
+                        <p>Verification: \( \sum P(x) = \frac{10}{13} + \frac{3}{13} = 1 \), all \( P(x) \) between 0 and 1. Valid distribution.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Applications Tab (Examples 3 and 4) -->
+            <div id="Applications" class="tabcontent">
+                <section>
+                    <h2>Example 3: Powerball Lottery</h2>
+                    <p>In a simplified Powerball, a ticket costs $2, and the jackpot is $400M with \( P(\text{win}) = \frac{1}{292,201,338} \). Define \( X \) as net gain. Find the probability distribution, expected value, and standard deviation.</p>
+                    <input type="checkbox" id="ex3" class="toggle">
+                    <label for="ex3" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p>\( X \) = net gain:</p>
+                        <ul>
+                            <li>Win: \( X = 400,000,000 - 2 = 399,999,998 \), \( P(X = 399,999,998) = \frac{1}{292,201,338} \approx 0.00000000342 \)</li>
+                            <li>Lose: \( X = -2 \), \( P(X = -2) = \frac{292,201,337}{292,201,338} \approx 0.99999999658 \)</li>
+                        </ul>
+                        <table>
+                            <tr><th>\( X \)</th><th>\( P(X) \)</th></tr>
+                            <tr><td>399,999,998</td><td>\( \frac{1}{292,201,338} \approx 0.00000000342 \)</td></tr>
+                            <tr><td>-2</td><td>\( \frac{292,201,337}{292,201,338} \approx 0.99999999658 \)</td></tr>
+                        </table>
+                        <p>Verification: \( \sum P(X) = 1 \), all \( P(X) \) between 0 and 1. Valid distribution.</p>
+                        <p><strong>Expected Value \( E(X) \):</strong> \( E(X) = (399,999,998) \cdot \frac{1}{292,201,338} + (-2) \cdot \frac{292,201,337}{292,201,338} \approx 1.3688 - 2.0000 \approx -0.6312 \) ($-0.63 loss per ticket).</p>
+                        <p><strong>Variance \( \text{Var}(X) \):</strong> \( E(X^2) = (399,999,998)^2 \cdot \frac{1}{292,201,338} + 4 \cdot \frac{292,201,337}{292,201,338} \approx 547,943,801 \), \( [E(X)]^2 \approx 0.3984 \), \( \text{Var}(X) \approx 547,943,800 \).</p>
+                        <p><strong>Standard Deviation \( \sigma(X) \):</strong> \( \sigma(X) = \sqrt{547,943,800} \approx 23,407 \).</p>
+                        <p><strong>Note:</strong> Ignores smaller prizes, taxes, and multiple winners for simplicity.</p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Example 4: Roulette Wheel Bet</h2>
+                    <p>In American roulette, a wheel has 38 slots: numbers 1-36, 0, and 00. You bet $1 on a single number (e.g., 17). If your number hits, you win $35 plus your $1 back; otherwise, you lose the $1. Define \( X \) as the net gain from this bet. Identify the probability distribution for \( X \), then calculate its expected value and standard deviation.</p>
+                    <input type="checkbox" id="ex4" class="toggle">
+                    <label for="ex4" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p>\( X \) = net gain. Total slots = 38. Outcomes:</p>
+                        <ul>
+                            <li>Win (number hits): \( X = 35 + 1 - 1 = 35 \) (win $35, keep $1, minus bet), 1 way, \( P(X=35) = \frac{1}{38} \approx 0.0263 \)</li>
+                            <li>Lose (number misses): \( X = 0 - 1 = -1 \) (lose $1), 37 ways, \( P(X=-1) = \frac{37}{38} \approx 0.9737 \)</li>
+                        </ul>
+                        <table>
+                            <tr><th>\( X \)</th><th>\( P(X) \)</th></tr>
+                            <tr><td>35</td><td>\( \frac{1}{38} \approx 0.0263 \)</td></tr>
+                            <tr><td>-1</td><td>\( \frac{37}{38} \approx 0.9737 \)</td></tr>
+                        </table>
+                        <p>Verification: \( \sum P(X) = \frac{1}{38} + \frac{37}{38} = 1 \), all \( P(X) \) between 0 and 1. Valid distribution.</p>
+                        <p><strong>Expected Value \( E(X) \):</strong> \( E(X) = 35 \cdot \frac{1}{38} + (-1) \cdot \frac{37}{38} = \frac{35 - 37}{38} = -\frac{2}{38} = -\frac{1}{19} \approx -0.0526 \). On average, you lose about 5.26 cents per $1 bet.</p>
+                        <p><strong>Variance \( \text{Var}(X) \):</strong> \( E(X^2) = 1225 \cdot \frac{1}{38} + 1 \cdot \frac{37}{38} = \frac{1262}{38} = \frac{631}{19} \approx 33.2105 \), \( [E(X)]^2 = \left(-\frac{1}{19}\right)^2 = \frac{1}{361} \approx 0.00277 \), \( \text{Var}(X) \approx 33.2077 \).</p>
+                        <p><strong>Standard Deviation \( \sigma(X) \):</strong> \( \sigma(X) = \sqrt{33.2077} \approx 5.7626 \). The net gain varies by about $5.76 from the mean.</p>
+                        <p><strong>Note:</strong> The negative \( E(X) \) reflects the house edge in roulette.</p>
+                    </div>
+                </section>
+            </div>
         </div>
     </div>
     <footer>
@@ -127,8 +169,21 @@
             const rightPanel = document.querySelector('.right-panel');
             let size = parseFloat(getComputedStyle(rightPanel).fontSize);
             size += (action === 'increase') ? 2 : -2;
-            size = Math.min(Math.max(size, 12), 24); // Clamp between 12px and 24px
+            size = Math.min(Math.max(size, 12), 24);
             rightPanel.style.fontSize = `${size}px`;
+        }
+
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName('tabcontent');
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove('active');
+            }
+            const tablinks = document.getElementsByClassName('tablinks');
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove('active');
+            }
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
         }
 
         document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
