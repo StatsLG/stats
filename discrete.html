@@ -146,6 +146,51 @@
                         <p><strong>Note:</strong> The negative \( E(X) \) reflects the house edge in roulette.</p>
                     </div>
                 </section>
+                <section>
+                    <h2>Example 5: NCAA Basketball Shot Expected Values</h2>
+                    <p>In NCAA Division I men’s basketball, a player attempts a field goal that could be a short-range shot (at the rim), a medium-range shot (2-point jumper outside the paint), or a long-range shot (3-pointer). Using approximate NCAA averages: short-range shots succeed 60% of the time (2 points), medium-range shots 40% (2 points), and long-range shots 34% (3 points). Define \( X \) as the points scored per shot attempt for each type. Calculate the expected value \( E(X) \) for each shot type.</p>
+                    <input type="checkbox" id="ex5" class="toggle">
+                    <label for="ex5" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p>For each shot type, \( X \) = points scored, with probabilities based on success rates. \( E(X) = \sum X \cdot P(X) \).</p>
+                        <p><strong>Short-Range Shots (At the Rim):</strong></p>
+                        <ul>
+                            <li>Make: \( X = 2 \), \( P(X=2) = 0.60 \)</li>
+                            <li>Miss: \( X = 0 \), \( P(X=0) = 0.40 \)</li>
+                        </ul>
+                        <table>
+                            <tr><th>\( X \)</th><th>\( P(X) \)</th></tr>
+                            <tr><td>2</td><td>0.60</td></tr>
+                            <tr><td>0</td><td>0.40</td></tr>
+                        </table>
+                        <p>\( E(X) = 2 \cdot 0.60 + 0 \cdot 0.40 = 1.20 \) points per shot.</p>
+                        <p><strong>Medium-Range Shots (2-Point Jumpers):</strong></p>
+                        <ul>
+                            <li>Make: \( X = 2 \), \( P(X=2) = 0.40 \)</li>
+                            <li>Miss: \( X = 0 \), \( P(X=0) = 0.60 \)</li>
+                        </ul>
+                        <table>
+                            <tr><th>\( X \)</th><th>\( P(X) \)</th></tr>
+                            <tr><td>2</td><td>0.40</td></tr>
+                            <tr><td>0</td><td>0.60</td></tr>
+                        </table>
+                        <p>\( E(X) = 2 \cdot 0.40 + 0 \cdot 0.60 = 0.80 \) points per shot.</p>
+                        <p><strong>Long-Range Shots (3-Pointers):</strong></p>
+                        <ul>
+                            <li>Make: \( X = 3 \), \( P(X=3) = 0.34 \)</li>
+                            <li>Miss: \( X = 0 \), \( P(X=0) = 0.66 \)</li>
+                        </ul>
+                        <table>
+                            <tr><th>\( X \)</th><th>\( P(X) \)</th></tr>
+                            <tr><td>3</td><td>0.34</td></tr>
+                            <tr><td>0</td><td>0.66</td></tr>
+                        </table>
+                        <p>\( E(X) = 3 \cdot 0.34 + 0 \cdot 0.66 = 1.02 \) points per shot.</p>
+                        <p><strong>Verification:</strong> Each distribution sums to 1 (e.g., 0.60 + 0.40 = 1), and all \( P(X) \) are between 0 and 1. Valid discrete distributions.</p>
+                        <p><strong>Comparison:</strong> Short-range shots have the highest EV (1.20), followed by long-range (1.02), then medium-range (0.80). This suggests prioritizing shots at the rim, then 3-pointers, over mid-range jumpers.</p>
+                        <p><strong>Note:</strong> Percentages are approximates from NCAA data (e.g., 2019-20 and 2024-25 trends). Actual values vary by team, season, and shot specifics (e.g., contested vs. open).</p>
+                    </div>
+                </section>
             </div>
         </div>
     </div>
