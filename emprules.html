@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{page_title}}</title>
+    <title>Emperical Rules</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
@@ -21,13 +21,13 @@
             <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
         </div>
         <div class="right-panel">
-            <h1>Emperical Rules</h1>
-            <h2>68-95-99.7</h2>
+            <h1>Finding Probabilities for a Normal Distribution</h1>
+            <h2>The Emperical Rule (68-95-99.7 Rule)</h2>
 
             <h1>Finding Probability for a Normal Distribution</h1>
             <h2>Empirical Rule (for Mound-Shaped Distributions)</h2>
             <p>The <strong>Empirical Rule</strong> applies to mound-shaped distributions, where the curve increases to a peak and then decreases. This shape can be skewed or symmetric but cannot be uniform or bimodal. Derived from the normal distribution, the Empirical Rule provides exact percentages (not approximations) for normal curves:</p>
-            <ul>
+            <ol>
                 <li>Approximately <strong>68%</strong> of the data fall within 1 standard deviation of the mean:
                     <ul>
                         <li>For a population: \(\mu - \sigma, \mu + \sigma\)</li>
@@ -46,25 +46,55 @@
                         <li>For a sample: \(\bar{x} - 3s, \bar{x} + 3s\)</li>
                     </ul>
                 </li>
-            </ul>
+            </ol>
             <p>To work with more precise probabilities beyond the Empirical Rule, you can use a <strong>standard normal table</strong> (z-table), available on the Unit III website. This table lists z-scores and their corresponding percentiles, proportions, or probabilities, allowing you to find exact areas under the normal curve.</p>
-
+            {{example_section}}
             <h2>Examples</h2>
-            <h3>Example 2: Female Heights and the Empirical Rule</h3>
-            <p>Suppose the heights of females are normally distributed with \(\mu = 65\) inches and \(\sigma = 5\) inches. Using the Empirical Rule:</p>
-            <ul>
-                <li>68% of females have heights between \(65 - 5 = 60\) and \(65 + 5 = 70\) inches.</li>
-                <li>95% of females have heights between \(65 - 2 \cdot 5 = 55\) and \(65 + 2 \cdot 5 = 75\) inches.</li>
-                <li>99.7% of females have heights between \(65 - 3 \cdot 5 = 50\) and \(65 + 3 \cdot 5 = 80\) inches.</li>
-            </ul>
-            <p>This distribution can be visualized as a bell-shaped curve with these intervals marked. <a href="#">[Video solution]</a></p>
-            <h3>Example 3: IQ Test Scores Setup</h3>
-            <p>Suppose scores on an IQ test are normally distributed with \(\mu = 110\) and \(\sigma = 25\). Use this information for the following examples (3–8). For instance:</p>
-            <ul>
-                <li>To find the probability of a score between 85 and 135 (1 standard deviation from the mean), note that this is approximately 68% per the Empirical Rule.</li>
-                <li>For more precise probabilities (e.g., the percentage of scores below 120), convert to a z-score and use the z-table:</li>
-            </ul>
-            <p>Calculate the z-score for 120: \( z = \frac{120 - 110}{25} = \frac{10}{25} = 0.4 \). Using a z-table, \(z = 0.4\) corresponds to approximately 0.6554, meaning 65.54% of scores are below 120.</p>
+            <h3>Example 1: Female Heights and the Empirical Rule</h3>
+            <p>Suppose the heights of females are normally distributed with \(\mu = 65\) inches and \(\sigma = 5\) inches. Using the Empirical Rule, calculate the intervals for the following percentages:</p>
+            <ol class="questions-list">
+                <li>What range contains 68% of the heights?
+                    <input type="checkbox" id="q1" class="toggle">
+                    <label for="q1" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        68% of females have heights between \(65 - 5 = 60\) and \(65 + 5 = 70\) inches.
+                    </div>
+                </li>
+                <li>What range contains 95% of the heights?
+                    <input type="checkbox" id="q2" class="toggle">
+                    <label for="q2" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        95% of females have heights between \(65 - 2 \cdot 5 = 55\) and \(65 + 2 \cdot 5 = 75\) inches.
+                    </div>
+                </li>
+                <li>What range contains 99.7% of the heights?
+                    <input type="checkbox" id="q3" class="toggle">
+                    <label for="q3" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        99.7% of females have heights between \(65 - 3 \cdot 5 = 50\) and \(65 + 3 \cdot 5 = 80\) inches.
+                    </div>
+                </li>
+            </ol>
+            <p>This distribution can be visualized as a bell-shaped curve with these intervals marked.</p>
+            <h3>Example 3: IQ Test Scores</h3>
+            <p>Suppose scores on an IQ test are normally distributed with \(\mu = 110\) and \(\sigma = 25\). Answer the following:</p>
+            <ol class="questions-list">
+                <li>What is the probability of a score between 85 and 135 (1 standard deviation from the mean)?
+                    <input type="checkbox" id="q4" class="toggle">
+                    <label for="q4" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        Approximately 68% per the Empirical Rule, since \(110 - 25 = 85\) and \(110 + 25 = 135\).
+                    </div>
+                </li>
+                <li>What percentage of scores are below 120? (Use the z-table for precision.)
+                    <input type="checkbox" id="q5" class="toggle">
+                    <label for="q5" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        Calculate the z-score: \( z = \frac{120 - 110}{25} = \frac{10}{25} = 0.4 \). <br>
+                        Using a z-table, \(z = 0.4\) corresponds to approximately 0.6554, meaning 65.54% of scores are below 120.
+                    </div>
+                </li>
+            </ol>
             <p>Explore more examples using the calculator on the left or refer to the z-table on the Unit III website!</p>
         </div>
     </div>
