@@ -5,6 +5,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Add this CSS to handle tabs, matching Dichotomous Tests */
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+        }
+        .tab button {
+            background-color: #f1f1f1;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #ccc;
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+        }
+        .tabcontent.active {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <div class="container" id="container">
@@ -23,110 +52,119 @@
         <div class="right-panel">
             <h1>Finding Probabilities for a Normal Distribution</h1>
             <h2>Empirical Rules and Normal Tables</h2>
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" onclick="openTab('content-tab')">Content</button>
-                    <button class="tab-button" onclick="openTab('calc-help-tab')">Calc Help</button>
-                </div>
-                <div id="content-tab" class="tab-content active">
-                    <h1>Finding Probability for a Normal Distribution</h1>
-                    <h2>Empirical Rule (for Mound-Shaped Distributions)</h2>
-                    <p>The <strong>Empirical Rule</strong> applies to mound-shaped distributions, where the curve increases to a peak and then decreases. This shape can be skewed or symmetric but cannot be uniform or bimodal. Derived from the normal distribution, the Empirical Rule provides exact percentages (not approximations) for normal curves:</p>
-                    <ol>
-                        <li>Approximately <strong>68%</strong> of the data fall within 1 standard deviation of the mean:
-                            <ul>
-                                <li>For a population: \(\mu - \sigma, \mu + \sigma\)</li>
-                                <li>For a sample: \(\bar{x} - s, \bar{x} + s\)</li>
-                            </ul>
-                        </li>
-                        <li>Approximately <strong>95%</strong> of the data fall within 2 standard deviations of the mean:
-                            <ul>
-                                <li>For a population: \(\mu - 2\sigma, \mu + 2\sigma\)</li>
-                                <li>For a sample: \(\bar{x} - 2s, \bar{x} + 2s\)</li>
-                            </ul>
-                        </li>
-                        <li>Approximately <strong>99.7%</strong> of the data fall within 3 standard deviations of the mean:
-                            <ul>
-                                <li>For a population: \(\mu - 3\sigma, \mu + 3\sigma\)</li>
-                                <li>For a sample: \(\bar{x} - 3s, \bar{x} + 3s\)</li>
-                            </ul>
-                        </li>
-                    </ol>
-                    <p>To work with more precise probabilities beyond the Empirical Rule, you can use a <strong>standard normal table</strong> (z-table), available on the Unit III website. This table lists z-scores and their corresponding percentiles, proportions, or probabilities, allowing you to find exact areas under the normal curve.</p>
-                    <h2>Examples</h2>
-                    <h3>Example 1: Female Heights and the Empirical Rule</h3>
-                    <p>Suppose the heights of females are normally distributed with \(\mu = 65\) inches and \(\sigma = 5\) inches. Using the Empirical Rule, calculate the intervals for the following percentages:</p>
-                    <ol class="questions-list">
-                        <li>What range contains 68% of the heights?
-                            <input type="checkbox" id="q1" class="toggle">
-                            <label for="q1" class="question">Click Here For Answer</label>
-                            <div class="answer">
-                                68% of females have heights between \(65 - 5 = 60\) and \(65 + 5 = 70\) inches.
-                            </div>
-                        </li>
-                        <li>What range contains 95% of the heights?
-                            <input type="checkbox" id="q2" class="toggle">
-                            <label for="q2" class="question">Click Here For Answer</label>
-                            <div class="answer">
-                                95% of females have heights between \(65 - 2 \cdot 5 = 55\) and \(65 + 2 \cdot 5 = 75\) inches.
-                            </div>
-                        </li>
-                        <li>What range contains 99.7% of the heights?
-                            <input type="checkbox" id="q3" class="toggle">
-                            <label for="q3" class="question">Click Here For Answer</label>
-                            <div class="answer">
-                                99.7% of females have heights between \(65 - 3 \cdot 5 = 50\) and \(65 + 3 \cdot 5 = 80\) inches.
-                            </div>
-                        </li>
-                    </ol>
-                    <p>This distribution can be visualized as a bell-shaped curve with these intervals marked.</p>
-                    <h3>Example 3: IQ Test Scores</h3>
-                    <p>Suppose scores on an IQ test are normally distributed with \(\mu = 110\) and \(\sigma = 25\). Answer the following:</p>
-                    <ol class="questions-list">
-                        <li>What is the probability of a score between 85 and 135 (1 standard deviation from the mean)?
-                            <input type="checkbox" id="q4" class="toggle">
-                            <label for="q4" class="question">Click Here For Answer</label>
-                            <div class="answer">
-                                Approximately 68% per the Empirical Rule, since \(110 - 25 = 85\) and \(110 + 25 = 135\).
-                            </div>
-                        </li>
-                        <li>What percentage of scores are below 120? (Use the z-table for precision.)
-                            <input type="checkbox" id="q5" class="toggle">
-                            <label for="q5" class="question">Click Here For Answer</label>
-                            <div class="answer">
-                                Calculate the z-score: \( z = \frac{120 - 110}{25} = \frac{10}{25} = 0.4 \). <br>
-                                Using a z-table, \(z = 0.4\) corresponds to approximately 0.6554, meaning 65.54% of scores are below 120.
-                            </div>
-                        </li>
-                    </ol>
-                    <p>Explore more examples using the calculator on the left or refer to the z-table on the Unit III website!</p>
-                </div>
-                <div id="calc-help-tab" class="tab-content">
-                    <h1>Calculator Help</h1>
-                    <h2>Calculating Normal Probabilities on a NumWorks Calculator</h2>
-                    <p>The NumWorks calculator can compute probabilities for a normal distribution using the <strong>Normal Distribution</strong> function. Follow these steps to find the probability of a value falling within a specific range (e.g., \(P(a < X < b)\)):</p>
-                    <ol>
-                        <li><strong>Open the Statistics App:</strong> From the home screen, press the <em>Apps</em> key, scroll to <em>Statistics</em>, and press <em>OK</em>.</li>
-                        <li><strong>Select Normal Distribution:</strong> Choose <em>Normal CDF</em> (Cumulative Distribution Function) from the menu to calculate the probability between two values.</li>
-                        <li><strong>Enter Parameters:</strong>
-                            <ul>
-                                <li><em>Lower Bound:</em> Input the lower value (e.g., \(a\)).</li>
-                                <li><em>Upper Bound:</em> Input the upper value (e.g., \(b\)).</li>
-                                <li><em>Mean (\(\mu\)):</em> Enter the mean of the distribution.</li>
-                                <li><em>Standard Deviation (\(\sigma\)):</em> Enter the standard deviation.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Calculate:</strong> Press <em>OK</em> to compute the probability. The result is the area under the normal curve between the lower and upper bounds.</li>
-                    </ol>
-                    <h3>Example:</h3>
-                    <p>To find the probability of an IQ score between 85 and 135 (\(\mu = 110\), \(\sigma = 25\)):</p>
-                    <ol>
-                        <li>Go to <em>Statistics > Normal CDF</em>.</li>
-                        <li>Enter: Lower = 85, Upper = 135, \(\mu = 110\), \(\sigma = 25\).</li>
-                        <li>Press <em>OK</em>. The result should be approximately 0.68 (68%), matching the Empirical Rule.</li>
-                    </ol>
-                    <p>For probabilities below a value (e.g., \(P(X < 120)\)), use a very small lower bound (e.g., -1000) and the desired upper bound (120). Try it with the calculator on the left!</p>
-                </div>
+
+            <!-- Tab Navigation -->
+            <div class="tab">
+                <button class="tablinks active" onclick="openTab(event, 'Theory')">Theory</button>
+                <button class="tablinks" onclick="openTab(event, 'Examples')">Examples</button>
+                <button class="tablinks" onclick="openTab(event, 'CalcHelp')">Calc Help</button>
+            </div>
+
+            <!-- Theory Tab Content -->
+            <div id="Theory" class="tabcontent active">
+                <h1>Finding Probability for a Normal Distribution</h1>
+                <h2>Empirical Rule (for Mound-Shaped Distributions)</h2>
+                <p>The <strong>Empirical Rule</strong> applies to mound-shaped distributions, where the curve increases to a peak and then decreases. This shape can be skewed or symmetric but cannot be uniform or bimodal. Derived from the normal distribution, the Empirical Rule provides exact percentages (not approximations) for normal curves:</p>
+                <ol>
+                    <li>Approximately <strong>68%</strong> of the data fall within 1 standard deviation of the mean:
+                        <ul>
+                            <li>For a population: \(\mu - \sigma, \mu + \sigma\)</li>
+                            <li>For a sample: \(\bar{x} - s, \bar{x} + s\)</li>
+                        </ul>
+                    </li>
+                    <li>Approximately <strong>95%</strong> of the data fall within 2 standard deviations of the mean:
+                        <ul>
+                            <li>For a population: \(\mu - 2\sigma, \mu + 2\sigma\)</li>
+                            <li>For a sample: \(\bar{x} - 2s, \bar{x} + 2s\)</li>
+                        </ul>
+                    </li>
+                    <li>Approximately <strong>99.7%</strong> of the data fall within 3 standard deviations of the mean:
+                        <ul>
+                            <li>For a population: \(\mu - 3\sigma, \mu + 3\sigma\)</li>
+                            <li>For a sample: \(\bar{x} - 3s, \bar{x} + 3s\)</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p>To work with more precise probabilities beyond the Empirical Rule, you can use a <strong>standard normal table</strong> (z-table), available on the Unit III website. This table lists z-scores and their corresponding percentiles, proportions, or probabilities, allowing you to find exact areas under the normal curve.</p>
+            </div>
+
+            <!-- Examples Tab Content -->
+            <div id="Examples" class="tabcontent">
+                <h2>Examples</h2>
+                <h3>Example 1: Female Heights and the Empirical Rule</h3>
+                <p>Suppose the heights of females are normally distributed with \(\mu = 65\) inches and \(\sigma = 5\) inches. Using the Empirical Rule, calculate the intervals for the following percentages:</p>
+                <ol class="questions-list">
+                    <li>What range contains 68% of the heights?
+                        <input type="checkbox" id="q1" class="toggle">
+                        <label for="q1" class="question">Click Here For Answer</label>
+                        <div class="answer">
+                            68% of females have heights between \(65 - 5 = 60\) and \(65 + 5 = 70\) inches.
+                        </div>
+                    </li>
+                    <li>What range contains 95% of the heights?
+                        <input type="checkbox" id="q2" class="toggle">
+                        <label for="q2" class="question">Click Here For Answer</label>
+                        <div class="answer">
+                            95% of females have heights between \(65 - 2 \cdot 5 = 55\) and \(65 + 2 \cdot 5 = 75\) inches.
+                        </div>
+                    </li>
+                    <li>What range contains 99.7% of the heights?
+                        <input type="checkbox" id="q3" class="toggle">
+                        <label for="q3" class="question">Click Here For Answer</label>
+                        <div class="answer">
+                            99.7% of females have heights between \(65 - 3 \cdot 5 = 50\) and \(65 + 3 \cdot 5 = 80\) inches.
+                        </div>
+                    </li>
+                </ol>
+                <p>This distribution can be visualized as a bell-shaped curve with these intervals marked.</p>
+                <h3>Example 3: IQ Test Scores</h3>
+                <p>Suppose scores on an IQ test are normally distributed with \(\mu = 110\) and \(\sigma = 25\). Answer the following:</p>
+                <ol class="questions-list">
+                    <li>What is the probability of a score between 85 and 135 (1 standard deviation from the mean)?
+                        <input type="checkbox" id="q4" class="toggle">
+                        <label for="q4" class="question">Click Here For Answer</label>
+                        <div class="answer">
+                            Approximately 68% per the Empirical Rule, since \(110 - 25 = 85\) and \(110 + 25 = 135\).
+                        </div>
+                    </li>
+                    <li>What percentage of scores are below 120? (Use the z-table for precision.)
+                        <input type="checkbox" id="q5" class="toggle">
+                        <label for="q5" class="question">Click Here For Answer</label>
+                        <div class="answer">
+                            Calculate the z-score: \( z = \frac{120 - 110}{25} = \frac{10}{25} = 0.4 \). <br>
+                            Using a z-table, \(z = 0.4\) corresponds to approximately 0.6554, meaning 65.54% of scores are below 120.
+                        </div>
+                    </li>
+                </ol>
+                <p>Explore more examples using the calculator on the left or refer to the z-table on the Unit III website!</p>
+            </div>
+
+            <!-- Calc Help Tab Content -->
+            <div id="CalcHelp" class="tabcontent">
+                <h1>Calculator Help</h1>
+                <h2>Calculating Normal Probabilities on a NumWorks Calculator</h2>
+                <p>The NumWorks calculator can compute probabilities for a normal distribution using the <strong>Normal Distribution</strong> function. Follow these steps to find the probability of a value falling within a specific range (e.g., \(P(a < X < b)\)):</p>
+                <ol>
+                    <li><strong>Open the Statistics App:</strong> From the home screen, press the <em>Apps</em> key, scroll to <em>Statistics</em>, and press <em>OK</em>.</li>
+                    <li><strong>Select Normal Distribution:</strong> Choose <em>Normal CDF</em> (Cumulative Distribution Function) from the menu to calculate the probability between two values.</li>
+                    <li><strong>Enter Parameters:</strong>
+                        <ul>
+                            <li><em>Lower Bound:</em> Input the lower value (e.g., \(a\)).</li>
+                            <li><em>Upper Bound:</em> Input the upper value (e.g., \(b\)).</li>
+                            <li><em>Mean (\(\mu\)):</em> Enter the mean of the distribution.</li>
+                            <li><em>Standard Deviation (\(\sigma\)):</em> Enter the standard deviation.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Calculate:</strong> Press <em>OK</em> to compute the probability. The result is the area under the normal curve between the lower and upper bounds.</li>
+                </ol>
+                <h3>Example:</h3>
+                <p>To find the probability of an IQ score between 85 and 135 (\(\mu = 110\), \(\sigma = 25\)):</p>
+                <ol>
+                    <li>Go to <em>Statistics > Normal CDF</em>.</li>
+                    <li>Enter: Lower = 85, Upper = 135, \(\mu = 110\), \(\sigma = 25\).</li>
+                    <li>Press <em>OK</em>. The result should be approximately 0.68 (68%), matching the Empirical Rule.</li>
+                </ol>
+                <p>For probabilities below a value (e.g., \(P(X < 120)\)), use a very small lower bound (e.g., -1000) and the desired upper bound (120). Try it with the calculator on the left!</p>
             </div>
         </div>
     </div>
@@ -168,17 +206,18 @@
             rightPanel.style.fontSize = `${newSize}px`;
         }
 
-        function openTab(tabName) {
-            const tabs = document.getElementsByClassName('tab-content');
-            for (let i = 0; i < tabs.length; i++) {
-                tabs[i].classList.remove('active');
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
             }
-            const buttons = document.getElementsByClassName('tab-button');
-            for (let i = 0; i < buttons.length; i++) {
-                buttons[i].classList.remove('active');
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
             }
-            document.getElementById(tabName).classList.add('active');
-            event.currentTarget.classList.add('active');
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
         }
 
         document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
