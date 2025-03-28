@@ -22,7 +22,6 @@
         </div>
         <div class="right-panel">
             <h1>Finding Probabilities for a Normal Distribution</h1>
-            <h2>Empirical Rules and Normal Tables</h2>
 
             <!-- Tab Navigation -->
             <div class="tab">
@@ -33,7 +32,6 @@
 
             <!-- Theory Tab Content -->
             <div id="Theory" class="tabcontent active">
-                <h1>Finding Probability for a Normal Distribution</h1>
                 <h2>Empirical Rule (for Mound-Shaped Distributions)</h2>
                 <p>The <strong>Empirical Rule</strong> applies to mound-shaped distributions, where the curve increases to a peak and then decreases. This shape can be skewed or symmetric but cannot be uniform or bimodal. Derived from the normal distribution, the Empirical Rule provides exact percentages (not approximations) for normal curves:</p>
                 <ol>
@@ -56,7 +54,7 @@
                         </ul>
                     </li>
                 </ol>
-                <p>To work with more precise probabilities beyond the Empirical Rule, you can use a <strong>standard normal table</strong> (z-table), available on the Unit III website. This table lists z-scores and their corresponding percentiles, proportions, or probabilities, allowing you to find exact areas under the normal curve.</p>
+                <p>To work with more precise probabilities beyond the Empirical Rule, you can use a <strong>standard normal table</strong> (z-table), available on the Unit III website or a<strong>Numworks Calculator</strong>. The table lists z-scores and their corresponding percentiles, proportions, or probabilities, allowing you to find exact areas under the normal curve.</p>
             </div>
 
             <!-- Examples Tab Content -->
@@ -116,24 +114,27 @@
                 <h2>Calculating Normal Probabilities on a NumWorks Calculator</h2>
                 <p>The NumWorks calculator can compute probabilities for a normal distribution using the <strong>Normal Distribution</strong> function. Follow these steps to find the probability of a value falling within a specific range (e.g., \(P(a < X < b)\)):</p>
                 <ol>
-                    <li><strong>Open the Statistics App:</strong> From the home screen, press the <em>Apps</em> key, scroll to <em>Statistics</em>, and press <em>OK</em>.</li>
-                    <li><strong>Select Normal Distribution:</strong> Choose <em>Normal CDF</em> (Cumulative Distribution Function) from the menu to calculate the probability between two values.</li>
+                    <li><strong>Open the Distributions App:</strong> From the home screen, scroll to <em>Distributions</em>, and press <em>OK</em>.</li>
+                    <li><strong>Select Normal Distribution:</strong> Choose <em>Normal</em>, and press <em>OK</em></li>
                     <li><strong>Enter Parameters:</strong>
                         <ul>
-                            <li><em>Lower Bound:</em> Input the lower value (e.g., \(a\)).</li>
-                            <li><em>Upper Bound:</em> Input the upper value (e.g., \(b\)).</li>
-                            <li><em>Mean (\(\mu\)):</em> Enter the mean of the distribution.</li>
-                            <li><em>Standard Deviation (\(\sigma\)):</em> Enter the standard deviation.</li>
+                            <li><em>Mean (\(\mu\)):</em> Enter the mean</li>
+                            <li><em>Standard Deviation (\(\sigma\)):</em> Enter the standard deviation</li>
                         </ul>
                     </li>
-                    <li><strong>Calculate:</strong> Press <em>OK</em> to compute the probability. The result is the area under the normal curve between the lower and upper bounds.</li>
+                    <li>Select <strong>Next</strong> Press <em>OK</em>.</li>
+                    <li>Choose the <strong>appropraite inequality</strong> option to the left of the <strong>P</strong>. Less Than, In-Between, or Grater Than. </li>
+                    <li>Enter the value(s) of interest in the box(es)  inside the parentheses. Press <strong>OK</strong>.</li>
+                    <li>The <strong>probability</strong> is to the right of the equals sign.</strong></li>
                 </ol>
                 <h3>Example:</h3>
                 <p>To find the probability of an IQ score between 85 and 135 (\(\mu = 110\), \(\sigma = 25\)):</p>
                 <ol>
-                    <li>Go to <em>Statistics > Normal CDF</em>.</li>
-                    <li>Enter: Lower = 85, Upper = 135, \(\mu = 110\), \(\sigma = 25\).</li>
+                    <li>Go to <em>Distributions > Normal</em>.</li>
+                    <li>Enter 110 for the mean and 25 for the stand deviation. \(\mu = 110\), \(\sigma = 25\)</li>
+                    <li>Choose in-between and Enter: Lower = 85, Upper = 135.</li>
                     <li>Press <em>OK</em>. The result should be approximately 0.68 (68%), matching the Empirical Rule.</li>
+                    <li><img src="3-2Example.png" alt="A screenshot from a Numworks calculator showing a normal distribution probability example. "></li>
                 </ol>
                 <p>For probabilities below a value (e.g., \(P(X < 120)\)), use a very small lower bound (e.g., -1000) and the desired upper bound (120). Try it with the calculator on the left!</p>
             </div>
