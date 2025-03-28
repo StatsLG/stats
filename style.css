@@ -245,3 +245,47 @@ footer {
 .toggle:checked + .question + .answer {
     display: block;
 }
+
+/* Tab Styles (Moved from inline CSS and customized) */
+.tab {
+    overflow: hidden;
+    border-bottom: 2px solid #34495e; /* Matches left-panel color */
+    max-width: 800px; /* Aligns with content max-width */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.tab button {
+    background-color: #34495e; /* Matches left-panel gradient */
+    color: white;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    margin: 0 5px;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.tab button:hover {
+    background-color: #e67e22; /* Matches calculator-button hover */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+.tab button.active {
+    background-color: #e67e22; /* Active tab stands out */
+    transform: translateY(0);
+    box-shadow: none;
+}
+.tabcontent {
+    display: none;
+    padding: 20px;
+    max-width: 800px; /* Aligns with content max-width */
+    width: 100%;
+}
+.tabcontent.active {
+    display: block;
+    animation: fadeIn 0.5s ease-in; /* Matches existing animation */
+}
