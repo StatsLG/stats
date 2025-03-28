@@ -22,12 +22,11 @@
 
         <main class="right-panel">
             <header>
-                <h1>{{main_title}}</h1>
-                <h2>{{subtitle}}</h2>
+                <h1>Density Curves</h1>
+                <h2>Continuous Random Variables</h2>
             </header>
 
             <section>
-                <h1>Density Curves</h1>
                 <p>A <strong>density curve</strong> is a smooth curve that provides the most common representation of a population's distribution. Statistical software can transform the separate bars of a histogram into this smooth curve, effectively capturing the overall shape of the distribution.</p>
                 
                 <p>The shape of a density curve is determined using methods similar to those applied to histograms, making it a familiar tool for visualizing data distributions.</p>
@@ -48,26 +47,24 @@
             </section>
 
             <section class="example-section">
-                <h2>Example: Normal Distribution of Heights</h2>
-                <p>Suppose the heights of adult males in a population follow a normal distribution with a mean (\(\mu\)) of 70 inches and a standard deviation (\(\sigma\)) of 3 inches. The density curve for this distribution is a bell-shaped curve.</p>
+                <h2>Example: Understanding a Generic Density Curve</h2>
+                <p>Consider a generic density curve representing the distribution of a continuous variable, such as time spent on a task, test scores, or any measurable quantity. Below is an illustration of such a curve:</p>
                 
-                <p><strong>Question:</strong> What proportion of adult males have heights between 67 and 73 inches?</p>
+                <figure>
+                    <img src="generic-density-curve.png" alt="A smooth, continuous density curve with a shaded area between two points, a and b, above the x-axis, demonstrating probability as area under the curve.">
+                    <figcaption>Figure 1: A generic density curve with a shaded area between points \(a\) and \(b\), representing the probability of values falling within that interval.</figcaption>
+                </figure>
                 
-                <p><strong>Solution:</strong></p>
+                <p><strong>Scenario:</strong> Suppose this curve models a continuous distribution where the x-axis represents the variable (e.g., time in minutes), and the y-axis represents the density. The total area under the curve is 1, satisfying the properties of a density curve.</p>
+                
+                <p><strong>Application:</strong> To find the probability that the variable falls between two values, say \(a\) and \(b\):</p>
                 <ol>
-                    <li>Convert the heights to z-scores using the formula \( z = \frac{x - \mu}{\sigma} \):
-                        <ul>
-                            <li>For 67 inches: \( z = \frac{67 - 70}{3} = -1 \)</li>
-                            <li>For 73 inches: \( z = \frac{73 - 70}{3} = 1 \)</li>
-                        </ul>
-                    </li>
-                    <li>Find the area under the standard normal curve between \( z = -1 \) and \( z = 1 \). Using a standard normal table (or calculator), this area is approximately 0.6826.</li>
-                    <li>Thus, about 68.26% of adult males have heights between 67 and 73 inches, as this corresponds to the area under the density curve between these points.</li>
+                    <li>Identify the interval on the x-axis (from \(a\) to \(b\)).</li>
+                    <li>The shaded area under the curve between \(a\) and \(b\) represents the probability of the variable falling within this range.</li>
+                    <li>For example, if the shaded area is calculated (using software or integration) to be 0.3, then there’s a 30% chance the variable lies between \(a\) and \(b\).</li>
                 </ol>
                 
-                <p>This example illustrates how the area under the density curve represents probability. Here, the total area under the curve is 1, and the specific interval from 67 to 73 inches covers roughly 68% of the population, a common property of normal distributions within one standard deviation of the mean.</p>
-                
-                <p>Try using the calculator on the left to compute z-scores or explore other intervals!</p>
+                <p>This generic example highlights how density curves visually and mathematically represent probabilities as areas. Use the calculator on the left to experiment with different intervals or distributions!</p>
             </section>
         </main>
     </div>
