@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Normal Probabilities</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Normal Probabilities</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -54,12 +54,13 @@
                         </ul>
                     </li>
                 </ol>
-                <p>To work with more precise probabilities beyond the Empirical Rule, you can use a <strong>standard normal table</strong> (z-table), available on the Unit III website or a<strong>Numworks Calculator</strong>. The table lists z-scores and their corresponding percentiles, proportions, or probabilities, allowing you to find exact areas under the normal curve.</p>
+                <p>To work with more precise probabilities beyond the Empirical Rule, use a <strong>standard normal table</strong> (z-table), available on the Unit III website, or a <strong>NumWorks Calculator</strong>. The table lists z-scores and their corresponding percentiles, proportions, or probabilities, allowing you to find exact areas under the normal curve.</p>
             </div>
 
             <!-- Examples Tab Content -->
             <div id="Examples" class="tabcontent">
                 <h2>Examples</h2>
+                
                 <h3>Example 1: Female Heights and the Empirical Rule</h3>
                 <p>Suppose the heights of females are normally distributed with \(\mu = 65\) inches and \(\sigma = 5\) inches. Using the Empirical Rule, calculate the intervals for the following percentages:</p>
                 <ol class="questions-list">
@@ -86,19 +87,42 @@
                     </li>
                 </ol>
                 <p>This distribution can be visualized as a bell-shaped curve with these intervals marked.</p>
+
+                <h3>Example 2: Basketball Heights (Yao Ming and Brittney Griner)</h3>
+                <p>Suppose NBA male heights are normally distributed with \(\mu = 79\) inches and \(\sigma = 3.5\) inches, and WNBA female heights are normally distributed with \(\mu = 69\) inches and \(\sigma = 3\) inches. Yao Ming is 90 inches tall, and Brittney Griner is 81 inches tall. Calculate the following using z-scores:</p>
+                <ol class="questions-list">
+                    <li>What is the probability of an NBA player being taller than Yao Ming?
+                        <input type="checkbox" id="q4" class="toggle">
+                        <label for="q4" class="question">Click Here For Answer</label>
+                        <div class="answer">
+                            Calculate the z-score: \( z = \frac{90 - 79}{3.5} = \frac{11}{3.5} \approx 3.14 \). <br>
+                            Using a z-table, \(z = 3.14\) corresponds to 0.9992 (area to the left). Thus, the probability of being taller is \(1 - 0.9992 = 0.0008\), or 0.08%.
+                        </div>
+                    </li>
+                    <li>What is the probability of a WNBA player being taller than Brittney Griner?
+                        <input type="checkbox" id="q5" class="toggle">
+                        <label for="q5" class="question">Click Here For Answer</label>
+                        <div class="answer">
+                            Calculate the z-score: \( z = \frac{81 - 69}{3} = \frac{12}{3} = 4.0 \). <br>
+                            Using a z-table, \(z = 4.0\) corresponds to 0.999968 (area to the left). Thus, the probability of being taller is \(1 - 0.999968 = 0.000032\), or 0.0032%.
+                        </div>
+                    </li>
+                </ol>
+                <p>These extremely low probabilities highlight how exceptional Yao Ming and Brittney Griner are in their respective leagues!</p>
+
                 <h3>Example 3: IQ Test Scores</h3>
                 <p>Suppose scores on an IQ test are normally distributed with \(\mu = 110\) and \(\sigma = 25\). Answer the following:</p>
                 <ol class="questions-list">
                     <li>What is the probability of a score between 85 and 135 (1 standard deviation from the mean)?
-                        <input type="checkbox" id="q4" class="toggle">
-                        <label for="q4" class="question">Click Here For Answer</label>
+                        <input type="checkbox" id="q6" class="toggle">
+                        <label for="q6" class="question">Click Here For Answer</label>
                         <div class="answer">
                             Approximately 68% per the Empirical Rule, since \(110 - 25 = 85\) and \(110 + 25 = 135\).
                         </div>
                     </li>
                     <li>What percentage of scores are below 120? (Use the z-table for precision.)
-                        <input type="checkbox" id="q5" class="toggle">
-                        <label for="q5" class="question">Click Here For Answer</label>
+                        <input type="checkbox" id="q7" class="toggle">
+                        <label for="q7" class="question">Click Here For Answer</label>
                         <div class="answer">
                             Calculate the z-score: \( z = \frac{120 - 110}{25} = \frac{10}{25} = 0.4 \). <br>
                             Using a z-table, \(z = 0.4\) corresponds to approximately 0.6554, meaning 65.54% of scores are below 120.
@@ -115,30 +139,30 @@
                 <p>The NumWorks calculator can compute probabilities for a normal distribution using the <strong>Normal Distribution</strong> function. Follow these steps to find the probability of a value falling within a specific range (e.g., \(P(a < X < b)\)):</p>
                 <ol>
                     <li><strong>Open the Distributions App:</strong> From the home screen, scroll to <em>Distributions</em>, and press <em>OK</em>.</li>
-                    <li><strong>Select Normal Distribution:</strong> Choose <em>Normal</em>, and press <em>OK</em></li>
+                    <li><strong>Select Normal Distribution:</strong> Choose <em>Normal</em>, and press <em>OK</em>.</li>
                     <li><strong>Enter Parameters:</strong>
                         <ul>
-                            <li><em>Mean (\(\mu\)):</em> Enter the mean</li>
-                            <li><em>Standard Deviation (\(\sigma\)):</em> Enter the standard deviation</li>
+                            <li><em>Mean (\(\mu\)):</em> Enter the mean.</li>
+                            <li><em>Standard Deviation (\(\sigma\)):</em> Enter the standard deviation.</li>
                         </ul>
                     </li>
-                    <li>Select <strong>Next</strong> Press <em>OK</em>.</li>
-                    <li>Choose the <strong>appropraite inequality</strong> option to the left of the <strong>P</strong>. Less Than, In-Between, or Grater Than. </li>
-                    <li>Enter the value(s) of interest in the box(es)  inside the parentheses. Press <strong>OK</strong>.</li>
-                    <li>The <strong>probability</strong> is to the right of the equals sign.</strong></li>
+                    <li>Select <strong>Next</strong> and press <em>OK</em>.</li>
+                    <li>Choose the <strong>appropriate inequality</strong> option to the left of the <strong>P</strong>: Less Than, In-Between, or Greater Than.</li>
+                    <li>Enter the value(s) of interest in the box(es) inside the parentheses. Press <strong>OK</strong>.</li>
+                    <li>The <strong>probability</strong> is to the right of the equals sign.</li>
                 </ol>
                 <h3>Example:</h3>
                 <p>To find the probability of an IQ score between 85 and 135 (\(\mu = 110\), \(\sigma = 25\)):</p>
                 <ol>
                     <li>Go to <em>Distributions > Normal</em>.</li>
-                    <li>Enter 110 for the mean and 25 for the stand deviation. \(\mu = 110\), \(\sigma = 25\)</li>
-                    <li>Choose in-between and Enter: Lower = 85, Upper = 135.</li>
+                    <li>Enter 110 for the mean and 25 for the standard deviation (\(\mu = 110\), \(\sigma = 25\)).</li>
+                    <li>Choose "In-Between" and enter: Lower = 85, Upper = 135.</li>
                     <li>Press <em>OK</em>. The result should be approximately 0.68 (68%), matching the Empirical Rule.</li>
-                    <li><img src="3-2Example.png" alt="A screenshot from a Numworks calculator showing a normal distribution probability example. "></li>
-                    <li>NumWorks gave us 0.6827. This is the probability.</li>
+                    <li><img src="3-2Example.png" alt="A screenshot from a NumWorks calculator showing a normal distribution probability example."></li>
+                    <li>NumWorks gives 0.6827. This is the probability.</li>
                 </ol>
-                <p>For probabilities below a value (e.g., \(P(X < 120)\)), Simply choose the less than option and input 120 as the value of interest. We get 0.6554.</p>
-                <p><img src="3-2Example2.png" alt="A screenshot from a Numworks calculator showing a normal distribution probability example. "></p>
+                <p>For probabilities below a value (e.g., \(P(X < 120)\)), choose the "Less Than" option and input 120 as the value of interest. The result is 0.6554.</p>
+                <p><img src="3-2Example2.png" alt="A screenshot from a NumWorks calculator showing a normal distribution probability example."></p>
             </div>
         </div>
     </div>
@@ -174,22 +198,21 @@
                 newSize -= 2;
             }
             
-            if (newSize < 12) newSize = 12;
-            if (newSize > 24) newSize = 24;
-            
+            newSize = Math.max(12, Math.min(24, newSize)); // Clamp between 12px and 24px
             rightPanel.style.fontSize = `${newSize}px`;
         }
 
         function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
+            const tabcontent = document.getElementsByClassName("tabcontent");
+            const tablinks = document.getElementsByClassName("tablinks");
+            
+            for (let i = 0; i < tabcontent.length; i++) {
                 tabcontent[i].classList.remove("active");
             }
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
+            for (let i = 0; i < tablinks.length; i++) {
                 tablinks[i].classList.remove("active");
             }
+            
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
         }
