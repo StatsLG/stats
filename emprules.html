@@ -22,12 +22,12 @@
         </div>
         <div class="right-panel">
             <h1>Finding Probabilities for a Normal Distribution</h1>
-
             <!-- Tab Navigation -->
             <div class="tab">
                 <button class="tablinks active" onclick="openTab(event, 'Theory')">Theory</button>
                 <button class="tablinks" onclick="openTab(event, 'Examples')">Examples</button>
                 <button class="tablinks" onclick="openTab(event, 'CalcHelp')">Calc Help</button>
+                <button class="tablinks" onclick="openTab(event, 'ZTable')">Z-Table</button>
             </div>
 
             <!-- Theory Tab Content -->
@@ -62,30 +62,23 @@
             <!-- Examples Tab Content -->
             <div id="Examples" class="tabcontent">
                 <h2>Examples</h2>
-                
                 <h3>Example 1: Female Heights and the Empirical Rule</h3>
                 <p>Suppose the heights of females are normally distributed with \(\mu = 65\) inches and \(\sigma = 5\) inches. Using the Empirical Rule, calculate the intervals for the following percentages:</p>
                 <ol class="questions-list">
                     <li>What range contains 68% of the heights?
                         <input type="checkbox" id="q1" class="toggle">
                         <label for="q1" class="question">Click Here For Answer</label>
-                        <div class="answer">
-                            68% of females have heights between \(65 - 5 = 60\) and \(65 + 5 = 70\) inches.
-                        </div>
+                        <div class="answer">68% of females have heights between \(65 - 5 = 60\) and \(65 + 5 = 70\) inches.</div>
                     </li>
                     <li>What range contains 95% of the heights?
                         <input type="checkbox" id="q2" class="toggle">
                         <label for="q2" class="question">Click Here For Answer</label>
-                        <div class="answer">
-                            95% of females have heights between \(65 - 2 \cdot 5 = 55\) and \(65 + 2 \cdot 5 = 75\) inches.
-                        </div>
+                        <div class="answer">95% of females have heights between \(65 - 2 \cdot 5 = 55\) and \(65 + 2 \cdot 5 = 75\) inches.</div>
                     </li>
                     <li>What range contains 99.7% of the heights?
                         <input type="checkbox" id="q3" class="toggle">
                         <label for="q3" class="question">Click Here For Answer</label>
-                        <div class="answer">
-                            99.7% of females have heights between \(65 - 3 \cdot 5 = 50\) and \(65 + 3 \cdot 5 = 80\) inches.
-                        </div>
+                        <div class="answer">99.7% of females have heights between \(65 - 3 \cdot 5 = 50\) and \(65 + 3 \cdot 5 = 80\) inches.</div>
                     </li>
                 </ol>
                 <p>This distribution can be visualized as a bell-shaped curve with these intervals marked.</p>
@@ -97,7 +90,7 @@
                         <input type="checkbox" id="q4" class="toggle">
                         <label for="q4" class="question">Click Here For Answer</label>
                         <div class="answer">
-                            Calculate the z-score: \( z = \frac{90 - 79}{3.5} = \frac{11}{3.5} \approx 3.14 \). <br>
+                            Calculate the z-score: \( z = \frac{90 - 79}{3.5} = \frac{11}{3.5} \approx 3.14 \).<br>
                             Using a z-table, \(z = 3.14\) corresponds to 0.9992 (area to the left). Thus, the probability of being taller is \(1 - 0.9992 = 0.0008\), or 0.08%.
                         </div>
                     </li>
@@ -105,7 +98,7 @@
                         <input type="checkbox" id="q5" class="toggle">
                         <label for="q5" class="question">Click Here For Answer</label>
                         <div class="answer">
-                            Calculate the z-score: \( z = \frac{81 - 69}{3} = \frac{12}{3} = 4.0 \). <br>
+                            Calculate the z-score: \( z = \frac{81 - 69}{3} = \frac{12}{3} = 4.0 \).<br>
                             Using a z-table, \(z = 4.0\) corresponds to 0.999968 (area to the left). Thus, the probability of being taller is \(1 - 0.999968 = 0.000032\), or 0.0032%.
                         </div>
                     </li>
@@ -118,15 +111,13 @@
                     <li>What is the probability of a score between 85 and 135 (1 standard deviation from the mean)?
                         <input type="checkbox" id="q6" class="toggle">
                         <label for="q6" class="question">Click Here For Answer</label>
-                        <div class="answer">
-                            Approximately 68% per the Empirical Rule, since \(110 - 25 = 85\) and \(110 + 25 = 135\).
-                        </div>
+                        <div class="answer">Approximately 68% per the Empirical Rule, since \(110 - 25 = 85\) and \(110 + 25 = 135\).</div>
                     </li>
                     <li>What percentage of scores are below 120? (Use the z-table for precision.)
                         <input type="checkbox" id="q7" class="toggle">
                         <label for="q7" class="question">Click Here For Answer</label>
                         <div class="answer">
-                            Calculate the z-score: \( z = \frac{120 - 110}{25} = \frac{10}{25} = 0.4 \). <br>
+                            Calculate the z-score: \( z = \frac{120 - 110}{25} = \frac{10}{25} = 0.4 \).<br>
                             Using a z-table, \(z = 0.4\) corresponds to approximately 0.6554, meaning 65.54% of scores are below 120.
                         </div>
                     </li>
@@ -134,35 +125,35 @@
                 <p>Explore more examples using the calculator on the left or refer to the z-table on the Unit III website!</p>
 
                 <h3>Example 4: Converting an ACT Score to an SAT Score</h3>
-<p>Suppose ACT scores are normally distributed with a mean (\(\mu\)) of 21 and a standard deviation (\(\sigma\)) of 5, and SAT scores (combined Evidence-Based Reading and Writing + Math, out of 1600) are normally distributed with a mean (\(\mu\)) of 1050 and a standard deviation (\(\sigma\)) of 200. You scored a 22 on the ACT and want to find the equivalent SAT score using z-scores.</p>
-<ol class="questions-list">
-    <li>Step 1: Calculate the z-score for an ACT score of 22.
-        <input type="checkbox" id="q8" class="toggle">
-        <label for="q8" class="question">Click Here For Answer</label>
-        <div class="answer">
-            Using the z-score formula: \( z = \frac{x - \mu}{\sigma} \), where \(x = 22\), \(\mu = 21\), and \(\sigma = 5\): <br>
-            \( z = \frac{22 - 21}{5} = \frac{1}{5} = 0.2 \). <br>
-            This means your ACT score is 0.2 standard deviations above the mean.
-        </div>
-    </li>
-    <li>Step 2: Find the equivalent SAT score using the z-score.
-        <input type="checkbox" id="q9" class="toggle">
-        <label for="q9" class="question">Click Here For Answer</label>
-        <div class="answer">
-            For the SAT, use the z-score formula rearranged: \( x = \mu + z \cdot \sigma \), where \(\mu = 1050\), \(\sigma = 200\), and \(z = 0.2\): <br>
-            \( x = 1050 + 0.2 \cdot 200 = 1050 + 40 = 1090 \). <br>
-            So, an ACT score of 22 corresponds to an SAT score of approximately 1090.
-        </div>
-    </li>
-    <li>Step 3: Interpret the result.
-        <input type="checkbox" id="q10" class="toggle">
-        <label for="q10" class="question">Click Here For Answer</label>
-        <div class="answer">
-            A z-score of 0.2 indicates your score is slightly above average. Using a z-table, \(z = 0.2\) corresponds to a percentile of approximately 57.93%, meaning about 57.93% of test-takers score below you on either test, confirming the equivalence.
-        </div>
-    </li>
-</ol>
-<p>This method assumes the percentile ranks of the ACT and SAT align via their normal distributions, providing a practical way to compare scores across tests!</p>
+                <p>Suppose ACT scores are normally distributed with a mean (\(\mu\)) of 21 and a standard deviation (\(\sigma\)) of 5, and SAT scores (combined Evidence-Based Reading and Writing + Math, out of 1600) are normally distributed with a mean (\(\mu\)) of 1050 and a standard deviation (\(\sigma\)) of 200. You scored a 22 on the ACT and want to find the equivalent SAT score using z-scores.</p>
+                <ol class="questions-list">
+                    <li>Step 1: Calculate the z-score for an ACT score of 22.
+                        <input type="checkbox" id="q8" class="toggle">
+                        <label for="q8" class="question">Click Here For Answer</label>
+                        <div class="answer">
+                            Using the z-score formula: \( z = \frac{x - \mu}{\sigma} \), where \(x = 22\), \(\mu = 21\), and \(\sigma = 5\):<br>
+                            \( z = \frac{22 - 21}{5} = \frac{1}{5} = 0.2 \).<br>
+                            This means your ACT score is 0.2 standard deviations above the mean.
+                        </div>
+                    </li>
+                    <li>Step 2: Find the equivalent SAT score using the z-score.
+                        <input type="checkbox" id="q9" class="toggle">
+                        <label for="q9" class="question">Click Here For Answer</label>
+                        <div class="answer">
+                            For the SAT, use the z-score formula rearranged: \( x = \mu + z \cdot \sigma \), where \(\mu = 1050\), \(\sigma = 200\), and \(z = 0.2\):<br>
+                            \( x = 1050 + 0.2 \cdot 200 = 1050 + 40 = 1090 \).<br>
+                            So, an ACT score of 22 corresponds to an SAT score of approximately 1090.
+                        </div>
+                    </li>
+                    <li>Step 3: Interpret the result.
+                        <input type="checkbox" id="q10" class="toggle">
+                        <label for="q10" class="question">Click Here For Answer</label>
+                        <div class="answer">
+                            A z-score of 0.2 indicates your score is slightly above average. Using a z-table, \(z = 0.2\) corresponds to a percentile of approximately 57.93%, meaning about 57.93% of test-takers score below you on either test, confirming the equivalence.
+                        </div>
+                    </li>
+                </ol>
+                <p>This method assumes the percentile ranks of the ACT and SAT align via their normal distributions, providing a practical way to compare scores across tests!</p>
             </div>
 
             <!-- Calc Help Tab Content -->
@@ -197,52 +188,52 @@
                 <p>For probabilities below a value (e.g., \(P(X < 120)\)), choose the "Less Than" option and input 120 as the value of interest. The result is 0.6554.</p>
                 <p><img src="3-2Example2.png" alt="A screenshot from a NumWorks calculator showing a normal distribution probability example."></p>
             </div>
+
             <!-- Z-Table Tab Content -->
-<div id="ZTable" class="tabcontent">
-    <h1>Z-Score Percentage Table</h1>
-    <p>This table provides the cumulative probability (area to the left) for selected z-scores under the standard normal curve. The z-score represents the number of standard deviations a value is from the mean (\(\mu = 0, \sigma = 1\)). Use this table to find precise probabilities beyond the Empirical Rule.</p>
-    <p>For example, a z-score of 1.00 corresponds to 0.8413, meaning 84.13% of the data lies below this value. To find the area to the right, subtract from 1 (e.g., \(1 - 0.8413 = 0.1587\) or 15.87%).</p>
-    
-    <h2>Standard Normal Z-Table</h2>
-    <table border="1" style="width: 100%; max-width: 600px; margin: 20px auto; text-align: center;">
-        <thead>
-            <tr>
-                <th>z-score</th>
-                <th>Probability (Area to Left)</th>
-                <th>z-score</th>
-                <th>Probability (Area to Left)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td>0.0</td><td>0.5000</td><td>2.0</td><td>0.9772</td></tr>
-            <tr><td>0.1</td><td>0.5398</td><td>2.1</td><td>0.9821</td></tr>
-            <tr><td>0.2</td><td>0.5793</td><td>2.2</td><td>0.9861</td></tr>
-            <tr><td>0.3</td><td>0.6179</td><td>2.3</td><td>0.9893</td></tr>
-            <tr><td>0.4</td><td>0.6554</td><td>2.4</td><td>0.9918</td></tr>
-            <tr><td>0.5</td><td>0.6915</td><td>2.5</td><td>0.9938</td></tr>
-            <tr><td>0.6</td><td>0.7257</td><td>2.6</td><td>0.9953</td></tr>
-            <tr><td>0.7</td><td>0.7580</td><td>2.7</td><td>0.9965</td></tr>
-            <tr><td>0.8</td><td>0.7881</td><td>2.8</td><td>0.9974</td></tr>
-            <tr><td>0.9</td><td>0.8159</td><td>2.9</td><td>0.9981</td></tr>
-            <tr><td>1.0</td><td>0.8413</td><td>3.0</td><td>0.9987</td></tr>
-            <tr><td>1.1</td><td>0.8643</td><td>3.1</td><td>0.9990</td></tr>
-            <tr><td>1.2</td><td>0.8849</td><td>3.2</td><td>0.9993</td></tr>
-            <tr><td>1.3</td><td>0.9032</td><td>3.3</td><td>0.9995</td></tr>
-            <tr><td>1.4</td><td>0.9192</td><td>3.4</td><td>0.9997</td></tr>
-            <tr><td>1.5</td><td>0.9332</td><td>3.5</td><td>0.9998</td></tr>
-            <tr><td>1.6</td><td>0.9452</td><td>4.0</td><td>0.999968</td></tr>
-            <tr><td>1.7</td><td>0.9554</td><td>4.5</td><td>0.999999</td></tr>
-            <tr><td>1.8</td><td>0.9641</td><td>5.0</td><td>0.99999997</td></tr>
-            <tr><td>1.9</td><td>0.9713</td><td>-</td><td>-</td></tr>
-        </tbody>
-    </table>
-    <p><strong>Notes:</strong></p>
-    <ul>
-        <li>For negative z-scores, use symmetry: \( P(Z < -z) = 1 - P(Z < z) \). For example, \( P(Z < -1.0) = 1 - 0.8413 = 0.1587 \).</li>
-        <li>For probabilities between two z-scores, subtract: \( P(a < Z < b) = P(Z < b) - P(Z < a) \).</li>
-        <li>This table is abbreviated. Full z-tables include more decimal precision (e.g., 0.00 to 0.09 for each integer z-value). Refer to the Unit III website for a complete version!</li>
-    </ul>
-</div>
+            <div id="ZTable" class="tabcontent">
+                <h1>Z-Score Percentage Table</h1>
+                <p>This table provides the cumulative probability (area to the left) for selected z-scores under the standard normal curve. The z-score represents the number of standard deviations a value is from the mean (\(\mu = 0, \sigma = 1\)). Use this table to find precise probabilities beyond the Empirical Rule.</p>
+                <p>For example, a z-score of 1.00 corresponds to 0.8413, meaning 84.13% of the data lies below this value. To find the area to the right, subtract from 1 (e.g., \(1 - 0.8413 = 0.1587\) or 15.87%).</p>
+                <h2>Standard Normal Z-Table</h2>
+                <table border="1" style="width: 100%; max-width: 600px; margin: 20px auto; text-align: center;">
+                    <thead>
+                        <tr>
+                            <th>z-score</th>
+                            <th>Probability (Area to Left)</th>
+                            <th>z-score</th>
+                            <th>Probability (Area to Left)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0.0</td><td>0.5000</td><td>2.0</td><td>0.9772</td></tr>
+                        <tr><td>0.1</td><td>0.5398</td><td>2.1</td><td>0.9821</td></tr>
+                        <tr><td>0.2</td><td>0.5793</td><td>2.2</td><td>0.9861</td></tr>
+                        <tr><td>0.3</td><td>0.6179</td><td>2.3</td><td>0.9893</td></tr>
+                        <tr><td>0.4</td><td>0.6554</td><td>2.4</td><td>0.9918</td></tr>
+                        <tr><td>0.5</td><td>0.6915</td><td>2.5</td><td>0.9938</td></tr>
+                        <tr><td>0.6</td><td>0.7257</td><td>2.6</td><td>0.9953</td></tr>
+                        <tr><td>0.7</td><td>0.7580</td><td>2.7</td><td>0.9965</td></tr>
+                        <tr><td>0.8</td><td>0.7881</td><td>2.8</td><td>0.9974</td></tr>
+                        <tr><td>0.9</td><td>0.8159</td><td>2.9</td><td>0.9981</td></tr>
+                        <tr><td>1.0</td><td>0.8413</td><td>3.0</td><td>0.9987</td></tr>
+                        <tr><td>1.1</td><td>0.8643</td><td>3.1</td><td>0.9990</td></tr>
+                        <tr><td>1.2</td><td>0.8849</td><td>3.2</td><td>0.9993</td></tr>
+                        <tr><td>1.3</td><td>0.9032</td><td>3.3</td><td>0.9995</td></tr>
+                        <tr><td>1.4</td><td>0.9192</td><td>3.4</td><td>0.9997</td></tr>
+                        <tr><td>1.5</td><td>0.9332</td><td>3.5</td><td>0.9998</td></tr>
+                        <tr><td>1.6</td><td>0.9452</td><td>4.0</td><td>0.999968</td></tr>
+                        <tr><td>1.7</td><td>0.9554</td><td>4.5</td><td>0.999999</td></tr>
+                        <tr><td>1.8</td><td>0.9641</td><td>5.0</td><td>0.99999997</td></tr>
+                        <tr><td>1.9</td><td>0.9713</td><td>-</td><td>-</td></tr>
+                    </tbody>
+                </table>
+                <p><strong>Notes:</strong></p>
+                <ul>
+                    <li>For negative z-scores, use symmetry: \( P(Z < -z) = 1 - P(Z < z) \). For example, \( P(Z < -1.0) = 1 - 0.8413 = 0.1587 \).</li>
+                    <li>For probabilities between two z-scores, subtract: \( P(a < Z < b) = P(Z < b) - P(Z < a) \).</li>
+                    <li>This table is abbreviated. Full z-tables include more decimal precision (e.g., 0.00 to 0.09 for each integer z-value). Refer to the Unit III website for a complete version!</li>
+                </ul>
+            </div>
         </div>
     </div>
     <footer>
@@ -254,7 +245,6 @@
             const leftPanel = document.getElementById('leftPanel');
             const container = document.getElementById('container');
             const toggleButton = document.getElementById('toggleButton');
-            
             if (leftPanel.classList.contains('minimized')) {
                 leftPanel.classList.remove('minimized');
                 container.classList.remove('minimized');
@@ -270,30 +260,26 @@
             const rightPanel = document.querySelector('.right-panel');
             const currentSize = window.getComputedStyle(rightPanel).fontSize;
             let newSize = parseFloat(currentSize);
-            
             if (action === 'increase') {
                 newSize += 2;
             } else if (action === 'decrease') {
                 newSize -= 2;
             }
-            
             newSize = Math.max(12, Math.min(24, newSize)); // Clamp between 12px and 24px
             rightPanel.style.fontSize = `${newSize}px`;
         }
 
         function openTab(evt, tabName) {
-            const tabcontent = document.getElementsByClassName("tabcontent");
-            const tablinks = document.getElementsByClassName("tablinks");
-            
+            const tabcontent = document.getElementsByClassName('tabcontent');
+            const tablinks = document.getElementsByClassName('tablinks');
             for (let i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].classList.remove("active");
+                tabcontent[i].classList.remove('active');
             }
             for (let i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove("active");
+                tablinks[i].classList.remove('active');
             }
-            
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
         }
 
         document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
