@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{page_title}}</title>
+    <title>Sampling Distribution of the Sample Mean</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
@@ -18,19 +18,49 @@
             <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
         </div>
         <div class="right-panel">
-            <h1>{{main_title}}</h1>
-            <h2>{{subtitle}}</h2>
-            {{content}}
-            {{example_section}}
+            <h1>Sampling Distribution of \(\bar{x}\)</h1>
+            <h2>Estimating the Population Mean</h2>
+            
+            <div class="content">
+                <p>The statistic \(\bar{x}\) (sample mean) estimates \(\mu\) (population mean). In this class, we focus on "good" statistics, meaning that with proper techniques, the sampling distribution is centered at the parameter and has low variability. Understanding these characteristics helps us derive key facts about the sampling distribution of \(\bar{x}\).</p>
+
+                <h3>Key Properties</h3>
+                <ul>
+                    <li>\(\mu_{\bar{x}} = \mu\)<br>
+                        The average value of \(\bar{x}\) across all possible samples equals \(\mu\), the population mean. This makes sense since the sampling distribution of \(\bar{x}\) is centered on the parameter it estimates (\(\mu\)).
+                    </li>
+                    <li>\(\sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}}\)<br>
+                        The standard deviation of the sampling distribution of \(\bar{x}\) is the population standard deviation \(\sigma\) divided by the square root of the sample size \(n\). As \(n\) increases, the variability in \(\bar{x}\) decreases (a larger denominator reduces the overall quantity). Thus, larger sample sizes reduce estimation error.
+                    </li>
+                </ul>
+
+                <p><strong>Standard Error</strong>: The standard deviation of the sampling distribution (\(\frac{\sigma}{\sqrt{n}}\)) is called the standard error of \(\bar{x}\).</p>
+
+                <h3>Normal Distribution Case</h3>
+                <p>Recall that for a normal distribution with mean \(\mu\) and standard deviation \(\sigma\), we can find probabilities using the transformation:</p>
+                <p>\[ Z = \frac{x - \mu}{\sigma} \]</p>
+                <p>This converts an observation to a standard normal variable. We can apply a similar transformation to the sampling distribution. If the sample comes from a normal population with mean \(\mu\) and standard deviation \(\sigma\), then:</p>
+                <p>\[ Z = \frac{\bar{x} - \mu}{\frac{\sigma}{\sqrt{n}}} \]</p>
+                <p>has a standard normal distribution.</p>
+
+                <h3>Non-Normal Populations</h3>
+                <p>In reality, populations are rarely normally distributed. What do we do then? Statisticians have addressed this with one of the most important theorems in statistics:</p>
+                
+                <p><strong>Central Limit Theorem</strong>: If we sample from a population with mean \(\mu\) and standard deviation \(\sigma\), then:</p>
+                <p>\[ Z = \frac{\bar{x} - \mu}{\frac{\sigma}{\sqrt{n}}} \]</p>
+                <p>is approximately standard normal for large \(n\). The theorem applies even when the population isn’t normal.</p>
+
+                <p><strong>How large is "large"?</strong> Generally, if \(n \geq 30\), the Central Limit Theorem holds in most cases. This is the rule we’ll use in class.</p>
+            </div>
         </div>
     </div>
     <footer>
-        <p>{{footer_text}}</p>
+        <p>Statistics Education Resource - April 2025</p>
     </footer>
 
     <script>
         function toggleLeftPanel() {
-            const leftPanel = document.getElementById('leftPanel');
+            const[leftPanel](http://leftpanel/) = document.getElementById('leftPanel');
             const container = document.getElementById('container');
             const toggleButton = document.getElementById('toggleButton');
             
