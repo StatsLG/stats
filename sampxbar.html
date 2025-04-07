@@ -20,68 +20,92 @@
         <div class="right-panel">
             <h1>Sampling Distribution of \(\bar{x}\)</h1>
             <h2>Estimating the Population Mean</h2>
-            
-            <div class="content">
-                <p>The statistic \(\bar{x}\) (sample mean) estimates \(\mu\) (population mean). In this class, we focus on "good" statistics, meaning that with proper techniques, the sampling distribution is centered at the parameter and has low variability. Understanding these characteristics helps us derive key facts about the sampling distribution of \(\bar{x}\).</p>
 
-                <h3>Key Properties</h3>
-                <ul>
-                    <li>\(\mu_{\bar{x}} = \mu\)<br>The average value of \(\bar{x}\) across all possible samples equals \(\mu\), the population mean.</li>
-                    <li>\(\sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}}\)<br>The standard deviation of the sampling distribution of \(\bar{x}\) is the population standard deviation \(\sigma\) divided by the square root of the sample size \(n\).</li>
-                </ul>
+            <!-- Tabbed Section Moved to Top -->
+            <div class="tab">
+                <button class="tablinks active" onclick="openTab(event, 'Examples')">Examples</button>
+                <button class="tablinks" onclick="openTab(event, 'Theory')">Theory</button>
+            </div>
 
-                <p><strong>Standard Error</strong>: The standard deviation of the sampling distribution (\(\frac{\sigma}{\sqrt{n}}\)) is called the standard error of \(\bar{x}\).</p>
+            <div id="Examples" class="tabcontent active">
+                <h3>Examples</h3>
+                <section>
+                    <h2>Example 1</h2>
+                    <p>A population of soft drink cans has amounts of liquid following a normal distribution with \(\mu = 12\) oz and \(\sigma = 0.2\) oz.</p>
+                    <ol>
+                        <li>What is the probability that a single can is between 11.9 and 12.1 oz?</li>
+                        <li>What is the probability that \(\bar{x}\) is between 11.9 and 12.1 oz for \(n = 16\) cans?</li>
+                    </ol>
+                    <input type="checkbox" id="ex1" class="toggle">
+                    <label for="ex1" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>1.</strong> For a single can (\(x\)):</p>
+                        <p>\( Z_1 = \frac{11.9 - 12}{0.2} = -0.5 \), \( Z_2 = \frac{12.1 - 12}{0.2} = 0.5 \)</p>
+                        <p>Using standard normal tables: \( P(-0.5 < Z < 0.5) = P(Z < 0.5) - P(Z < -0.5) = 0.6915 - 0.3085 = 0.3830 \)</p>
+                        <p><strong>2.</strong> For \(\bar{x}\) with \(n = 16\):</p>
+                        <p>Standard error: \(\sigma_{\bar{x}} = \frac{0.2}{\sqrt{16}} = \frac{0.2}{4} = 0.05\)</p>
+                        <p>\( Z_1 = \frac{11.9 - 12}{0.05} = -2 \), \( Z_2 = \frac{12.1 - 12}{0.05} = 2 \)</p>
+                        <p>\( P(-2 < Z < 2) = P(Z < 2) - P(Z < -2) = 0.9772 - 0.0228 = 0.9544 \)</p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Example 2</h2>
+                    <p>A population of trees has heights with a mean of 110 feet and a standard deviation of 20 feet. Suppose a sample of 100 trees is selected. Find the following:</p>
+                    <ol>
+                        <li>\(\mu_{\bar{x}}\)</li>
+                        <li>\(\sigma_{\bar{x}}\)</li>
+                        <li>\(P(\bar{x} > 108)\)</li>
+                        <li>What about \(P(X > 108)\)?</li>
+                    </ol>
+                    <input type="checkbox" id="ex2" class="toggle">
+                    <label for="ex2" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>1.</strong> \(\mu_{\bar{x}} = \mu = 110\) feet</p>
+                        <p><strong>2.</strong> \(\sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}} = \frac{20}{\sqrt{100}} = \frac{20}{10} = 2\) feet</p>
+                        <p><strong>3.</strong> \(P(\bar{x} > 108)\): \( Z = \frac{108 - 110}{2} = -1 \), \( P(Z > -1) = 1 - P(Z < -1) = 1 - 0.1587 = 0.8413 \)</p>
+                        <p><strong>4.</strong> \(P(X > 108)\) (single tree): \( Z = \frac{108 - 110}{20} = -0.1 \), \( P(Z > -0.1) = 1 - P(Z < -0.1) = 1 - 0.4602 = 0.5398 \)</p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Example 3</h2>
+                    <p>In a standard deck of 52 cards, assign values: Ace = 1, 2–10 = face value, Jack = 11, Queen = 12, King = 13. Assume draws are with replacement.</p>
+                    <ol>
+                        <li>What is the expected value and standard deviation of a single draw?</li>
+                        <li>What is the expected value and standard deviation of the sum of 5 draws?</li>
+                    </ol>
+                    <input type="checkbox" id="ex3" class="toggle">
+                    <label for="ex3" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>1.</strong> Single draw:</p>
+                        <p>Expected value: \( E[X] = \frac{1 + 2 + \dots + 13}{13} = \frac{91}{13} = 7 \)</p>
+                        <p>Variance: \( Var[X] = E[X^2] - (E[X])^2 = 63 - 49 = 14 \), where \( E[X^2] = \frac{1^2 + 2^2 + \dots + 13^2}{13} = \frac{819}{13} = 63 \)</p>
+                        <p>Standard deviation: \( \sigma = \sqrt{14} \approx 3.7417 \)</p>
+                        <p><strong>2.</strong> Sum of 5 draws:</p>
+                        <p>Expected value: \( E[S] = 5 \times E[X] = 5 \times 7 = 35 \)</p>
+                        <p>Variance: \( Var[S] = 5 \times Var[X] = 5 \times 14 = 70 \)</p>
+                        <p>Standard deviation: \( \sigma_S = \sqrt{70} \approx 8.3666 \)</p>
+                    </div>
+                </section>
+            </div>
 
-                <h3>Normal Distribution Case</h3>
-                <p>If the sample comes from a normal population with mean \(\mu\) and standard deviation \(\sigma\), then: \[ Z = \frac{\bar{x} - \mu}{\frac{\sigma}{\sqrt{n}}} \] has a standard normal distribution.</p>
+            <div id="Theory" class="tabcontent">
+                <h3>Theory</h3>
+                <div class="content">
+                    <p>The statistic \(\bar{x}\) (sample mean) estimates \(\mu\) (population mean). In this class, we focus on "good" statistics, meaning that with proper techniques, the sampling distribution is centered at the parameter and has low variability. Understanding these characteristics helps us derive key facts about the sampling distribution of \(\bar{x}\).</p>
 
-                <h3>Central Limit Theorem</h3>
-                <p>For any population with mean \(\mu\) and standard deviation \(\sigma\), if \(n \geq 30\): \[ Z = \frac{\bar{x} - \mu}{\frac{\sigma}{\sqrt{n}}} \] is approximately standard normal.</p>
+                    <h4>Key Properties</h4>
+                    <ul>
+                        <li>\(\mu_{\bar{x}} = \mu\)<br>The average value of \(\bar{x}\) across all possible samples equals \(\mu\), the population mean.</li>
+                        <li>\(\sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}}\)<br>The standard deviation of the sampling distribution of \(\bar{x}\) is the population standard deviation \(\sigma\) divided by the square root of the sample size \(n\).</li>
+                    </ul>
 
-                <!-- Tabbed Section -->
-                <div class="tab">
-                    <button class="tablinks active" onclick="openTab(event, 'Examples')">Examples</button>
-                </div>
+                    <p><strong>Standard Error</strong>: The standard deviation of the sampling distribution (\(\frac{\sigma}{\sqrt{n}}\)) is called the standard error of \(\bar{x}\).</p>
 
-                <div id="Examples" class="tabcontent active">
-                    <h3>Examples</h3>
-                    <section>
-                        <h2>Example 1</h2>
-                        <p>A population of soft drink cans has amounts of liquid following a normal distribution with \(\mu = 12\) oz and \(\sigma = 0.2\) oz.</p>
-                        <ol>
-                            <li>What is the probability that a single can is between 11.9 and 12.1 oz?</li>
-                            <li>What is the probability that \(\bar{x}\) is between 11.9 and 12.1 oz for \(n = 16\) cans?</li>
-                        </ol>
-                        <input type="checkbox" id="ex1" class="toggle">
-                        <label for="ex1" class="question">Click Here For Answer</label>
-                        <div class="answer">
-                            <p><strong>1.</strong> For a single can (\(x\)):</p>
-                            <p>\( Z_1 = \frac{11.9 - 12}{0.2} = -0.5 \), \( Z_2 = \frac{12.1 - 12}{0.2} = 0.5 \)</p>
-                            <p>Using standard normal tables: \( P(-0.5 < Z < 0.5) = P(Z < 0.5) - P(Z < -0.5) = 0.6915 - 0.3085 = 0.3830 \)</p>
-                            <p><strong>2.</strong> For \(\bar{x}\) with \(n = 16\):</p>
-                            <p>Standard error: \(\sigma_{\bar{x}} = \frac{0.2}{\sqrt{16}} = \frac{0.2}{4} = 0.05\)</p>
-                            <p>\( Z_1 = \frac{11.9 - 12}{0.05} = -2 \), \( Z_2 = \frac{12.1 - 12}{0.05} = 2 \)</p>
-                            <p>\( P(-2 < Z < 2) = P(Z < 2) - P(Z < -2) = 0.9772 - 0.0228 = 0.9544 \)</p>
-                        </div>
-                    </section>
-                    <section>
-                        <h2>Example 2</h2>
-                        <p>A population of trees has heights with a mean of 110 feet and a standard deviation of 20 feet. Suppose a sample of 100 trees is selected. Find the following:</p>
-                        <ol>
-                            <li>\(\mu_{\bar{x}}\)</li>
-                            <li>\(\sigma_{\bar{x}}\)</li>
-                            <li>\(P(\bar{x} > 108)\)</li>
-                            <li>What about \(P(X > 108)\)?</li>
-                        </ol>
-                        <input type="checkbox" id="ex2" class="toggle">
-                        <label for="ex2" class="question">Click Here For Answer</label>
-                        <div class="answer">
-                            <p><strong>1.</strong> \(\mu_{\bar{x}} = \mu = 110\) feet</p>
-                            <p><strong>2.</strong> \(\sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}} = \frac{20}{\sqrt{100}} = \frac{20}{10} = 2\) feet</p>
-                            <p><strong>3.</strong> \(P(\bar{x} > 108)\): \( Z = \frac{108 - 110}{2} = -1 \), \( P(Z > -1) = 1 - P(Z < -1) = 1 - 0.1587 = 0.8413 \)</p>
-                            <p><strong>4.</strong> \(P(X > 108)\) (single tree): \( Z = \frac{108 - 110}{20} = -0.1 \), \( P(Z > -0.1) = 1 - P(Z < -0.1) = 1 - 0.4602 = 0.5398 \)</p>
-                        </div>
-                    </section>
+                    <h4>Normal Distribution Case</h4>
+                    <p>If the sample comes from a normal population with mean \(\mu\) and standard deviation \(\sigma\), then: \[ Z = \frac{\bar{x} - \mu}{\frac{\sigma}{\sqrt{n}}} \] has a standard normal distribution.</p>
+
+                    <h4>Central Limit Theorem</h4>
+                    <p>For any population with mean \(\mu\) and standard deviation \(\sigma\), if \(n \geq 30\): \[ Z = \frac{\bar{x} - \mu}{\frac{\sigma}{\sqrt{n}}} \] is approximately standard normal.</p>
                 </div>
             </div>
         </div>
