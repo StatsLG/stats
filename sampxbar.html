@@ -26,31 +26,17 @@
 
                 <h3>Key Properties</h3>
                 <ul>
-                    <li>\(\mu_{\bar{x}} = \mu\)<br>
-                        The average value of \(\bar{x}\) across all possible samples equals \(\mu\), the population mean. This makes sense since the sampling distribution of \(\bar{x}\) is centered on the parameter it estimates (\(\mu\)).
-                    </li>
-                    <li>\(\sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}}\)<br>
-                        The standard deviation of the sampling distribution of \(\bar{x}\) is the population standard deviation \(\sigma\) divided by the square root of the sample size \(n\). As \(n\) increases, the variability in \(\bar{x}\) decreases (a larger denominator reduces the overall quantity). Thus, larger sample sizes reduce estimation error.
-                    </li>
+                    <li>\(\mu_{\bar{x}} = \mu\)<br>The average value of \(\bar{x}\) across all possible samples equals \(\mu\), the population mean.</li>
+                    <li>\(\sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}}\)<br>The standard deviation of the sampling distribution of \(\bar{x}\) is the population standard deviation \(\sigma\) divided by the square root of the sample size \(n\).</li>
                 </ul>
 
                 <p><strong>Standard Error</strong>: The standard deviation of the sampling distribution (\(\frac{\sigma}{\sqrt{n}}\)) is called the standard error of \(\bar{x}\).</p>
 
                 <h3>Normal Distribution Case</h3>
-                <p>Recall that for a normal distribution with mean \(\mu\) and standard deviation \(\sigma\), we can find probabilities using the transformation:</p>
-                <p>\[ Z = \frac{x - \mu}{\sigma} \]</p>
-                <p>This converts an observation to a standard normal variable. We can apply a similar transformation to the sampling distribution. If the sample comes from a normal population with mean \(\mu\) and standard deviation \(\sigma\), then:</p>
-                <p>\[ Z = \frac{\bar{x} - \mu}{\frac{\sigma}{\sqrt{n}}} \]</p>
-                <p>has a standard normal distribution.</p>
+                <p>If the sample comes from a normal population with mean \(\mu\) and standard deviation \(\sigma\), then: \[ Z = \frac{\bar{x} - \mu}{\frac{\sigma}{\sqrt{n}}} \] has a standard normal distribution.</p>
 
-                <h3>Non-Normal Populations</h3>
-                <p>In reality, populations are rarely normally distributed. What do we do then? Statisticians have addressed this with one of the most important theorems in statistics:</p>
-                
-                <p><strong>Central Limit Theorem</strong>: If we sample from a population with mean \(\mu\) and standard deviation \(\sigma\), then:</p>
-                <p>\[ Z = \frac{\bar{x} - \mu}{\frac{\sigma}{\sqrt{n}}} \]</p>
-                <p>is approximately standard normal for large \(n\). The theorem applies even when the population isn’t normal.</p>
-
-                <p><strong>How large is "large"?</strong> Generally, if \(n \geq 30\), the Central Limit Theorem holds in most cases. This is the rule we’ll use in class.</p>
+                <h3>Central Limit Theorem</h3>
+                <p>For any population with mean \(\mu\) and standard deviation \(\sigma\), if \(n \geq 30\): \[ Z = \frac{\bar{x} - \mu}{\frac{\sigma}{\sqrt{n}}} \] is approximately standard normal.</p>
 
                 <!-- Tabbed Section -->
                 <div class="tab">
@@ -59,21 +45,43 @@
 
                 <div id="Examples" class="tabcontent active">
                     <h3>Examples</h3>
-                    <p><strong>Example 1</strong></p>
-                    <p>A population of soft drink cans has amounts of liquid following a normal distribution with \(\mu = 12\) oz and \(\sigma = 0.2\) oz.</p>
-                    <ol>
-                        <li>What is the probability that a single can is between 11.9 and 12.1 oz?</li>
-                        <li>What is the probability that \(\bar{x}\) is between 11.9 and 12.1 oz for \(n = 16\) cans?</li>
-                    </ol>
-
-                    <p><strong>Example 2</strong></p>
-                    <p>A population of trees has heights with a mean of 110 feet and a standard deviation of 20 feet. Suppose a sample of 100 trees is selected. Find the following:</p>
-                    <ol>
-                        <li>\(\mu_{\bar{x}}\)</li>
-                        <li>\(\sigma_{\bar{x}}\)</li>
-                        <li>\(P(\bar{x} > 108)\)</li>
-                        <li>What about \(P(X > 108)\)?</li>
-                    </ol>
+                    <section>
+                        <h2>Example 1</h2>
+                        <p>A population of soft drink cans has amounts of liquid following a normal distribution with \(\mu = 12\) oz and \(\sigma = 0.2\) oz.</p>
+                        <ol>
+                            <li>What is the probability that a single can is between 11.9 and 12.1 oz?</li>
+                            <li>What is the probability that \(\bar{x}\) is between 11.9 and 12.1 oz for \(n = 16\) cans?</li>
+                        </ol>
+                        <input type="checkbox" id="ex1" class="toggle">
+                        <label for="ex1" class="question">Click Here For Answer</label>
+                        <div class="answer">
+                            <p><strong>1.</strong> For a single can (\(x\)):</p>
+                            <p>\( Z_1 = \frac{11.9 - 12}{0.2} = -0.5 \), \( Z_2 = \frac{12.1 - 12}{0.2} = 0.5 \)</p>
+                            <p>Using standard normal tables: \( P(-0.5 < Z < 0.5) = P(Z < 0.5) - P(Z < -0.5) = 0.6915 - 0.3085 = 0.3830 \)</p>
+                            <p><strong>2.</strong> For \(\bar{x}\) with \(n = 16\):</p>
+                            <p>Standard error: \(\sigma_{\bar{x}} = \frac{0.2}{\sqrt{16}} = \frac{0.2}{4} = 0.05\)</p>
+                            <p>\( Z_1 = \frac{11.9 - 12}{0.05} = -2 \), \( Z_2 = \frac{12.1 - 12}{0.05} = 2 \)</p>
+                            <p>\( P(-2 < Z < 2) = P(Z < 2) - P(Z < -2) = 0.9772 - 0.0228 = 0.9544 \)</p>
+                        </div>
+                    </section>
+                    <section>
+                        <h2>Example 2</h2>
+                        <p>A population of trees has heights with a mean of 110 feet and a standard deviation of 20 feet. Suppose a sample of 100 trees is selected. Find the following:</p>
+                        <ol>
+                            <li>\(\mu_{\bar{x}}\)</li>
+                            <li>\(\sigma_{\bar{x}}\)</li>
+                            <li>\(P(\bar{x} > 108)\)</li>
+                            <li>What about \(P(X > 108)\)?</li>
+                        </ol>
+                        <input type="checkbox" id="ex2" class="toggle">
+                        <label for="ex2" class="question">Click Here For Answer</label>
+                        <div class="answer">
+                            <p><strong>1.</strong> \(\mu_{\bar{x}} = \mu = 110\) feet</p>
+                            <p><strong>2.</strong> \(\sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}} = \frac{20}{\sqrt{100}} = \frac{20}{10} = 2\) feet</p>
+                            <p><strong>3.</strong> \(P(\bar{x} > 108)\): \( Z = \frac{108 - 110}{2} = -1 \), \( P(Z > -1) = 1 - P(Z < -1) = 1 - 0.1587 = 0.8413 \)</p>
+                            <p><strong>4.</strong> \(P(X > 108)\) (single tree): \( Z = \frac{108 - 110}{20} = -0.1 \), \( P(Z > -0.1) = 1 - P(Z < -0.1) = 1 - 0.4602 = 0.5398 \)</p>
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>
@@ -87,51 +95,33 @@
             const leftPanel = document.getElementById('leftPanel');
             const container = document.getElementById('container');
             const toggleButton = document.getElementById('toggleButton');
-            
-            if (leftPanel.classList.contains('minimized')) {
-                leftPanel.classList.remove('minimized');
-                container.classList.remove('minimized');
-                toggleButton.textContent = 'Open Calculator';
-            } else {
-                leftPanel.classList.add('minimized');
-                container.classList.add('minimized');
-                toggleButton.textContent = 'Open Calculator';
-            }
+            const isMinimized = leftPanel.classList.toggle('minimized');
+            container.classList.toggle('minimized', isMinimized);
+            toggleButton.textContent = isMinimized ? 'Open Calculator' : 'Close Calculator';
         }
 
         function changeFontSize(action) {
             const rightPanel = document.querySelector('.right-panel');
-            const currentSize = window.getComputedStyle(rightPanel).fontSize;
-            let newSize = parseFloat(currentSize);
-            
-            if (action === 'increase') {
-                newSize += 2;
-            } else if (action === 'decrease') {
-                newSize -= 2;
+            let size = parseFloat(getComputedStyle(rightPanel).fontSize);
+            size += (action === 'increase') ? 2 : -2;
+            size = Math.min(Math.max(size, 12), 24);
+            rightPanel.style.fontSize = `${size}px`;
+        }
+
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName('tabcontent');
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove('active');
             }
-            
-            if (newSize < 12) newSize = 12;
-            if (newSize > 24) newSize = 24;
-            
-            rightPanel.style.fontSize = `${newSize}px`;
+            const tablinks = document.getElementsByClassName('tablinks');
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove('active');
+            }
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
         }
 
         document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
-
-        // Tab functionality
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].classList.remove("active");
-            }
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove("active");
-            }
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-        }
     </script>
 </body>
 </html>

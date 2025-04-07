@@ -22,7 +22,7 @@
             <h2>Estimating the Population Proportion</h2>
             
             <div class="content">
-                <p>The sample proportion \(\hat{p}\) estimates the population proportion \(p\). These are defined as:</p>
+                <p>The sample proportion \(\hat{p}\) estimates the population proportion \(p\):</p>
                 <ul>
                     <li>Population Proportion: \( p = \frac{\text{\# in population with characteristic}}{\text{\# in population}} \)</li>
                     <li>Sample Proportion: \( \hat{p} = \frac{\text{\# in sample with characteristic}}{n} \)</li>
@@ -30,18 +30,12 @@
 
                 <h3>Key Properties</h3>
                 <ul>
-                    <li>\(\mu_{\hat{p}} = p\)<br>
-                        The average value of \(\hat{p}\) across all possible samples equals \(p\), the population proportion. This makes sense because the sampling distribution of \(\hat{p}\) is centered on the parameter it estimates (\(p\)).
-                    </li>
-                    <li>\(\sigma_{\hat{p}} = \sqrt{\frac{p(1 - p)}{n}}\)<br>
-                        The standard deviation of \(\hat{p}\), also called the standard error, is \(\sqrt{\frac{p(1 - p)}{n}}\).
-                    </li>
+                    <li>\(\mu_{\hat{p}} = p\)<br>The average value of \(\hat{p}\) across all possible samples equals \(p\).</li>
+                    <li>\(\sigma_{\hat{p}} = \sqrt{\frac{p(1 - p)}{n}}\)<br>The standard error of \(\hat{p}\) is \(\sqrt{\frac{p(1 - p)}{n}}\).</li>
                 </ul>
 
                 <h3>Normal Approximation</h3>
-                <p>If we sample from a population with proportion \(p\), then:</p>
-                <p>\[ Z = \frac{\hat{p} - p}{\sqrt{\frac{p(1 - p)}{n}}} \]</p>
-                <p>is approximately standard normal for large \(n\).</p>
+                <p>For large \(n\): \[ Z = \frac{\hat{p} - p}{\sqrt{\frac{p(1 - p)}{n}}} \] is approximately standard normal.</p>
 
                 <!-- Tabbed Section -->
                 <div class="tab">
@@ -50,21 +44,38 @@
 
                 <div id="Examples" class="tabcontent active">
                     <h3>Examples</h3>
-                    <p><strong>Example 3</strong></p>
-                    <p>Suppose the president’s approval rating is 56%, and we look at samples of size 100.</p>
-                    <ol>
-                        <li>Find \(\mu_{\hat{p}}\).</li>
-                        <li>Find \(\sigma_{\hat{p}}\).</li>
-                    </ol>
-
-                    <p><strong>Example 4</strong></p>
-                    <p>A survey of 1024 registered voters yields 512 who plan to vote for the republican candidate, where \(p\) is the proportion of all voters who plan to vote for the republican candidate.</p>
-                    <ol>
-                        <li>Calculate \(\hat{p}\).</li>
-                        <li>Calculate the margin of error (Recall this is \(\frac{1}{\sqrt{n}}\)).</li>
-                        <li>Calculate an estimate for the standard deviation of the sampling distribution.</li>
-                        <li>The empirical rule says that 95% of data should be within 2 standard deviations. Do you see where the margin of error comes from?</li>
-                    </ol>
+                    <section>
+                        <h2>Example 3</h2>
+                        <p>Suppose the president’s approval rating is 56%, and we look at samples of size 100.</p>
+                        <ol>
+                            <li>Find \(\mu_{\hat{p}}\).</li>
+                            <li>Find \(\sigma_{\hat{p}}\).</li>
+                        </ol>
+                        <input type="checkbox" id="ex3" class="toggle">
+                        <label for="ex3" class="question">Click Here For Answer</label>
+                        <div class="answer">
+                            <p><strong>1.</strong> \(\mu_{\hat{p}} = p = 0.56\)</p>
+                            <p><strong>2.</strong> \(\sigma_{\hat{p}} = \sqrt{\frac{p(1 - p)}{n}} = \sqrt{\frac{0.56 \cdot (1 - 0.56)}{100}} = \sqrt{\frac{0.56 \cdot 0.44}{100}} = \sqrt{\frac{0.2464}{100}} = \sqrt{0.002464} \approx 0.0496\)</p>
+                        </div>
+                    </section>
+                    <section>
+                        <h2>Example 4</h2>
+                        <p>A survey of 1024 registered voters yields 512 who plan to vote for the republican candidate, where \(p\) is the proportion of all voters who plan to vote for the republican candidate.</p>
+                        <ol>
+                            <li>Calculate \(\hat{p}\).</li>
+                            <li>Calculate the margin of error (\(\frac{1}{\sqrt{n}}\)).</li>
+                            <li>Calculate an estimate for the standard deviation of the sampling distribution.</li>
+                            <li>The empirical rule says 95% of data is within 2 standard deviations. Do you see where the margin of error comes from?</li>
+                        </ol>
+                        <input type="checkbox" id="ex4" class="toggle">
+                        <label for="ex4" class="question">Click Here For Answer</label>
+                        <div class="answer">
+                            <p><strong>1.</strong> \(\hat{p} = \frac{512}{1024} = 0.5\)</p>
+                            <p><strong>2.</strong> Margin of error (as given): \(\frac{1}{\sqrt{n}} = \frac{1}{\sqrt{1024}} = \frac{1}{32} \approx 0.03125\)</p>
+                            <p><strong>3.</strong> Estimated \(\sigma_{\hat{p}} = \sqrt{\frac{\hat{p}(1 - \hat{p})}{n}} = \sqrt{\frac{0.5 \cdot 0.5}{1024}} = \sqrt{\frac{0.25}{1024}} = \sqrt{0.00024414} \approx 0.015625\)</p>
+                            <p><strong>4.</strong> For 95% coverage: \( 2 \cdot \sigma_{\hat{p}} = 2 \cdot 0.015625 = 0.03125 \), which matches the margin of error \(\frac{1}{\sqrt{n}}\). This suggests the margin of error approximates 2 standard errors, aligning with the empirical rule for a 95% interval.</p>
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>
@@ -78,51 +89,33 @@
             const leftPanel = document.getElementById('leftPanel');
             const container = document.getElementById('container');
             const toggleButton = document.getElementById('toggleButton');
-            
-            if (leftPanel.classList.contains('minimized')) {
-                leftPanel.classList.remove('minimized');
-                container.classList.remove('minimized');
-                toggleButton.textContent = 'Open Calculator';
-            } else {
-                leftPanel.classList.add('minimized');
-                container.classList.add('minimized');
-                toggleButton.textContent = 'Open Calculator';
-            }
+            const isMinimized = leftPanel.classList.toggle('minimized');
+            container.classList.toggle('minimized', isMinimized);
+            toggleButton.textContent = isMinimized ? 'Open Calculator' : 'Close Calculator';
         }
 
         function changeFontSize(action) {
             const rightPanel = document.querySelector('.right-panel');
-            const currentSize = window.getComputedStyle(rightPanel).fontSize;
-            let newSize = parseFloat(currentSize);
-            
-            if (action === 'increase') {
-                newSize += 2;
-            } else if (action === 'decrease') {
-                newSize -= 2;
+            let size = parseFloat(getComputedStyle(rightPanel).fontSize);
+            size += (action === 'increase') ? 2 : -2;
+            size = Math.min(Math.max(size, 12), 24);
+            rightPanel.style.fontSize = `${size}px`;
+        }
+
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName('tabcontent');
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove('active');
             }
-            
-            if (newSize < 12) newSize = 12;
-            if (newSize > 24) newSize = 24;
-            
-            rightPanel.style.fontSize = `${newSize}px`;
+            const tablinks = document.getElementsByClassName('tablinks');
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove('active');
+            }
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
         }
 
         document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
-
-        // Tab functionality
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].classList.remove("active");
-            }
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove("active");
-            }
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-        }
     </script>
 </body>
 </html>
