@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sampling Distribution Basics</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" id="container">
+        <button class="toggle-button" id="toggleButton">Open Calculator</button>
+        <div class="left-panel" id="leftPanel">
+            <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
+            <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
+            <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
+            <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
+            <script src="https://www.numworks.com/simulator/embed.js"></script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+        </div>
+        <div class="right-panel">
+            <h1>Understanding Sampling Distributions</h1>
+            <h2>Key Concepts in Inferential Statistics</h2>
+            
+            <div class="content">
+                <p>To understand sampling distributions, you need to be familiar with some key statistical terms:</p>
+                <ul>
+                    <li><strong>Inferential Statistics</strong> – making inferences about a population based on a sample</li>
+                    <li><strong>Population</strong> – the group of interest or all possible measurements</li>
+                    <li><strong>Sample</strong> – a subset of the population</li>
+                    <li><strong>Parameter</strong> – a numerical characteristic of the population</li>
+                    <li><strong>Statistic</strong> – a numerical characteristic of the sample</li>
+                </ul>
+
+                <p>Since populations are often unavailable, we use statistics to estimate parameters. We'll focus on the sample mean, denoted as \(\bar{x}\). While equations change for different measures, the core concept remains the same.</p>
+
+                <p>In practice, we:
+                    1. Take a random sample from the population
+                    2. Compute a statistic like \(\bar{x}\)
+                </p>
+
+                <p>The value of \(\bar{x}\) depends on which items are in the sample, making \(\bar{x}\) a random variable. Computing \(\bar{x}\) from a random sample is equivalent to randomly selecting one of its possible values.</p>
+
+                <p><strong>Sampling Distribution</strong> – the probability distribution of a statistic over all possible samples. We want it to be:
+                    - Centered at the parameter value
+                    - Have minimal variation
+                </p>
+
+                <p>Consider three statistics estimating a parameter \(\theta\):</p>
+                <ul>
+                    <li>Statistic 1: Biased (consistently overestimates \(\theta\))</li>
+                    <li>Statistic 2: Unbiased but high variability</li>
+                    <li>Statistic 3: Unbiased with low variability (best choice)</li>
+                </ul>
+
+                <p>Random sampling prevents bias, centering the distribution over the parameter. Low variability (as in Statistic 3) means most outcomes are close to the parameter, reducing estimation error. Increasing sample size decreases variability in the sampling distribution, leading to more precise estimates.</p>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>Statistics Education Resource - April 2025</p>
+    </footer>
+
+    <script>
+        function toggleLeftPanel() {
+            const leftPanel = document.getElementById('leftPanel');
+            const container = document.getElementById('container');
+            const toggleButton = document.getElementById('toggleButton');
+            
+            if (leftPanel.classList.contains('minimized')) {
+                leftPanel.classList.remove('minimized');
+                container.classList.remove('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            } else {
+                leftPanel.classList.add('minimized');
+                container.classList.add('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            }
+        }
+
+        function changeFontSize(action) {
+            const rightPanel = document.querySelector('.right-panel');
+            const currentSize = window.getComputedStyle(rightPanel).fontSize;
+            let newSize = parseFloat(currentSize);
+            
+            if (action === 'increase') {
+                newSize += 2;
+            } else if (action === 'decrease') {
+                newSize -= 2;
+            }
+            
+            if (newSize < 12) newSize = 12;
+            if (newSize > 24) newSize = 24;
+            
+            rightPanel.style.fontSize = `${newSize}px`;
+        }
+
+        document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
+    </script>
+</body>
+</html>
