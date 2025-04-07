@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sampling Distribution of the Sample Mean</title>
+    <title>Sampling Distribution of the Sample Proportion</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
@@ -18,39 +18,30 @@
             <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
         </div>
         <div class="right-panel">
-            <h1>Sampling Distribution of \(\bar{x}\)</h1>
-            <h2>Estimating the Population Mean</h2>
+            <h1>Sampling Distribution of \(\hat{p}\)</h1>
+            <h2>Estimating the Population Proportion</h2>
             
             <div class="content">
-                <p>The statistic \(\bar{x}\) (sample mean) estimates \(\mu\) (population mean). In this class, we focus on "good" statistics, meaning that with proper techniques, the sampling distribution is centered at the parameter and has low variability. Understanding these characteristics helps us derive key facts about the sampling distribution of \(\bar{x}\).</p>
+                <p>The sample proportion \(\hat{p}\) estimates the population proportion \(p\). These are defined as:</p>
+                <ul>
+                    <li>Population Proportion: \( p = \frac{\text{\# in population with characteristic}}{\text{\# in population}} \)</li>
+                    <li>Sample Proportion: \( \hat{p} = \frac{\text{\# in sample with characteristic}}{n} \)</li>
+                </ul>
 
                 <h3>Key Properties</h3>
                 <ul>
-                    <li>\(\mu_{\bar{x}} = \mu\)<br>
-                        The average value of \(\bar{x}\) across all possible samples equals \(\mu\), the population mean. This makes sense since the sampling distribution of \(\bar{x}\) is centered on the parameter it estimates (\(\mu\)).
+                    <li>\(\mu_{\hat{p}} = p\)<br>
+                        The average value of \(\hat{p}\) across all possible samples equals \(p\), the population proportion. This makes sense because the sampling distribution of \(\hat{p}\) is centered on the parameter it estimates (\(p\)).
                     </li>
-                    <li>\(\sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}}\)<br>
-                        The standard deviation of the sampling distribution of \(\bar{x}\) is the population standard deviation \(\sigma\) divided by the square root of the sample size \(n\). As \(n\) increases, the variability in \(\bar{x}\) decreases (a larger denominator reduces the overall quantity). Thus, larger sample sizes reduce estimation error.
+                    <li>\(\sigma_{\hat{p}} = \sqrt{\frac{p(1 - p)}{n}}\)<br>
+                        The standard deviation of \(\hat{p}\), also called the standard error, is \(\sqrt{\frac{p(1 - p)}{n}}\).
                     </li>
                 </ul>
 
-                <p><strong>Standard Error</strong>: The standard deviation of the sampling distribution (\(\frac{\sigma}{\sqrt{n}}\)) is called the standard error of \(\bar{x}\).</p>
-
-                <h3>Normal Distribution Case</h3>
-                <p>Recall that for a normal distribution with mean \(\mu\) and standard deviation \(\sigma\), we can find probabilities using the transformation:</p>
-                <p>\[ Z = \frac{x - \mu}{\sigma} \]</p>
-                <p>This converts an observation to a standard normal variable. We can apply a similar transformation to the sampling distribution. If the sample comes from a normal population with mean \(\mu\) and standard deviation \(\sigma\), then:</p>
-                <p>\[ Z = \frac{\bar{x} - \mu}{\frac{\sigma}{\sqrt{n}}} \]</p>
-                <p>has a standard normal distribution.</p>
-
-                <h3>Non-Normal Populations</h3>
-                <p>In reality, populations are rarely normally distributed. What do we do then? Statisticians have addressed this with one of the most important theorems in statistics:</p>
-                
-                <p><strong>Central Limit Theorem</strong>: If we sample from a population with mean \(\mu\) and standard deviation \(\sigma\), then:</p>
-                <p>\[ Z = \frac{\bar{x} - \mu}{\frac{\sigma}{\sqrt{n}}} \]</p>
-                <p>is approximately standard normal for large \(n\). The theorem applies even when the population isn’t normal.</p>
-
-                <p><strong>How large is "large"?</strong> Generally, if \(n \geq 30\), the Central Limit Theorem holds in most cases. This is the rule we’ll use in class.</p>
+                <h3>Normal Approximation</h3>
+                <p>If we sample from a population with proportion \(p\), then:</p>
+                <p>\[ Z = \frac{\hat{p} - p}{\sqrt{\frac{p(1 - p)}{n}}} \]</p>
+                <p>is approximately standard normal for large \(n\).</p>
 
                 <!-- Tabbed Section -->
                 <div class="tab">
@@ -59,20 +50,20 @@
 
                 <div id="Examples" class="tabcontent active">
                     <h3>Examples</h3>
-                    <p><strong>Example 1</strong></p>
-                    <p>A population of soft drink cans has amounts of liquid following a normal distribution with \(\mu = 12\) oz and \(\sigma = 0.2\) oz.</p>
+                    <p><strong>Example 3</strong></p>
+                    <p>Suppose the president’s approval rating is 56%, and we look at samples of size 100.</p>
                     <ol>
-                        <li>What is the probability that a single can is between 11.9 and 12.1 oz?</li>
-                        <li>What is the probability that \(\bar{x}\) is between 11.9 and 12.1 oz for \(n = 16\) cans?</li>
+                        <li>Find \(\mu_{\hat{p}}\).</li>
+                        <li>Find \(\sigma_{\hat{p}}\).</li>
                     </ol>
 
-                    <p><strong>Example 2</strong></p>
-                    <p>A population of trees has heights with a mean of 110 feet and a standard deviation of 20 feet. Suppose a sample of 100 trees is selected. Find the following:</p>
+                    <p><strong>Example 4</strong></p>
+                    <p>A survey of 1024 registered voters yields 512 who plan to vote for the republican candidate, where \(p\) is the proportion of all voters who plan to vote for the republican candidate.</p>
                     <ol>
-                        <li>\(\mu_{\bar{x}}\)</li>
-                        <li>\(\sigma_{\bar{x}}\)</li>
-                        <li>\(P(\bar{x} > 108)\)</li>
-                        <li>What about \(P(X > 108)\)?</li>
+                        <li>Calculate \(\hat{p}\).</li>
+                        <li>Calculate the margin of error (Recall this is \(\frac{1}{\sqrt{n}}\)).</li>
+                        <li>Calculate an estimate for the standard deviation of the sampling distribution.</li>
+                        <li>The empirical rule says that 95% of data should be within 2 standard deviations. Do you see where the margin of error comes from?</li>
                     </ol>
                 </div>
             </div>
