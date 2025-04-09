@@ -22,27 +22,30 @@
             <h2>Estimating the Population Proportion</h2>
             
             <div class="content">
-                <p>The sample proportion \(\hat{p}\) estimates the population proportion \(p\):</p>
-                <ul>
-                    <li>Population Proportion: \( p = \frac{\text{\# in population with characteristic}}{\text{\# in population}} \)</li>
-                    <li>Sample Proportion: \( \hat{p} = \frac{\text{\# in sample with characteristic}}{n} \)</li>
-                </ul>
-
-                <h3>Key Properties</h3>
-                <ul>
-                    <li>\(\mu_{\hat{p}} = p\)<br>The average value of \(\hat{p}\) across all possible samples equals \(p\).</li>
-                    <li>\(\sigma_{\hat{p}} = \sqrt{\frac{p(1 - p)}{n}}\)<br>The standard error of \(\hat{p}\) is \(\sqrt{\frac{p(1 - p)}{n}}\).</li>
-                </ul>
-
-                <h3>Normal Approximation</h3>
-                <p>For large \(n\): \[ Z = \frac{\hat{p} - p}{\sqrt{\frac{p(1 - p)}{n}}} \] is approximately standard normal.</p>
-
-                <!-- Tabbed Section -->
+                <!-- Tabbed Section Moved Up -->
                 <div class="tab">
-                    <button class="tablinks active" onclick="openTab(event, 'Examples')">Examples</button>
+                    <button class="tablinks active" onclick="openTab(event, 'Theory')">Theory</button>
+                    <button class="tablinks" onclick="openTab(event, 'Examples')">Examples</button>
                 </div>
 
-                <div id="Examples" class="tabcontent active">
+                <div id="Theory" class="tabcontent active">
+                    <p>The sample proportion \(\hat{p}\) estimates the population proportion \(p\):</p>
+                    <ul>
+                        <li>Population Proportion: \( p = \frac{\text{\# in population with characteristic}}{\text{\# in population}} \)</li>
+                        <li>Sample Proportion: \( \hat{p} = \frac{\text{\# in sample with characteristic}}{n} \)</li>
+                    </ul>
+
+                    <h3>Key Properties</h3>
+                    <ul>
+                        <li>\(\mu_{\hat{p}} = p\)<br>The average value of \(\hat{p}\) across all possible samples equals \(p\).</li>
+                        <li>\(\sigma_{\hat{p}} = \sqrt{\frac{p(1 - p)}{n}}\)<br>The standard error of \(\hat{p}\) is \(\sqrt{\frac{p(1 - p)}{n}}\).</li>
+                    </ul>
+
+                    <h3>Normal Approximation</h3>
+                    <p>For large \(n\): \[ Z = \frac{\hat{p} - p}{\sqrt{\frac{p(1 - p)}{n}}} \] is approximately standard normal.</p>
+                </div>
+
+                <div id="Examples" class="tabcontent">
                     <h3>Examples</h3>
                     <section>
                         <h2>Example 3</h2>
@@ -63,17 +66,17 @@
                         <p>A survey of 1024 registered voters yields 512 who plan to vote for the republican candidate, where \(p\) is the proportion of all voters who plan to vote for the republican candidate.</p>
                         <ol>
                             <li>Calculate \(\hat{p}\).</li>
-                            <li>Calculate the margin of error (\(\frac{1}{\sqrt{n}}\)).</li>
+                            <li>Calculate the margin of error for a 95% confidence interval.</li>
                             <li>Calculate an estimate for the standard deviation of the sampling distribution.</li>
-                            <li>The empirical rule says 95% of data is within 2 standard deviations. Do you see where the margin of error comes from?</li>
+                            <li>The empirical rule says 95% of data is within 2 standard deviations. How does this relate to the margin of error?</li>
                         </ol>
                         <input type="checkbox" id="ex4" class="toggle">
                         <label for="ex4" class="question">Click Here For Answer</label>
                         <div class="answer">
                             <p><strong>1.</strong> \(\hat{p} = \frac{512}{1024} = 0.5\)</p>
-                            <p><strong>2.</strong> Margin of error (as given): \(\frac{1}{\sqrt{n}} = \frac{1}{\sqrt{1024}} = \frac{1}{32} \approx 0.03125\)</p>
+                            <p><strong>2.</strong> Margin of error (95% CI): \( 1.96 \cdot \sigma_{\hat{p}} = 1.96 \cdot \sqrt{\frac{\hat{p}(1 - \hat{p})}{n}} = 1.96 \cdot \sqrt{\frac{0.5 \cdot 0.5}{1024}} = 1.96 \cdot \sqrt{\frac{0.25}{1024}} = 1.96 \cdot 0.015625 \approx 0.030625 \)</p>
                             <p><strong>3.</strong> Estimated \(\sigma_{\hat{p}} = \sqrt{\frac{\hat{p}(1 - \hat{p})}{n}} = \sqrt{\frac{0.5 \cdot 0.5}{1024}} = \sqrt{\frac{0.25}{1024}} = \sqrt{0.00024414} \approx 0.015625\)</p>
-                            <p><strong>4.</strong> For 95% coverage: \( 2 \cdot \sigma_{\hat{p}} = 2 \cdot 0.015625 = 0.03125 \), which matches the margin of error \(\frac{1}{\sqrt{n}}\). This suggests the margin of error approximates 2 standard errors, aligning with the empirical rule for a 95% interval.</p>
+                            <p><strong>4.</strong> For 95% coverage, the empirical rule approximates 2 standard deviations: \( 2 \cdot \sigma_{\hat{p}} = 2 \cdot 0.015625 = 0.03125 \). The actual margin of error (using 1.96) is 0.030625, very close to 2 standard errors, showing how the 95% confidence interval aligns with the empirical rule.</p>
                         </div>
                     </section>
                 </div>
