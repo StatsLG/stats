@@ -22,7 +22,7 @@
             <h2>Estimating the Population Proportion</h2>
             
             <div class="content">
-                <!-- Tabbed Section Moved Up -->
+                <!-- Tabbed Section -->
                 <div class="tab">
                     <button class="tablinks active" onclick="openTab(event, 'Theory')">Theory</button>
                     <button class="tablinks" onclick="openTab(event, 'Examples')">Examples</button>
@@ -48,35 +48,35 @@
                 <div id="Examples" class="tabcontent">
                     <h3>Examples</h3>
                     <section>
-                        <h2>Example 3</h2>
-                        <p>Suppose the president’s approval rating is 56%, and we look at samples of size 100.</p>
+                        <h2>Example 1: Stats Class Pass Rates</h2>
+                        <p>A university claims that 75% of students pass their introductory statistics course. A random sample of 80 students is taken.</p>
                         <ol>
                             <li>Find \(\mu_{\hat{p}}\).</li>
                             <li>Find \(\sigma_{\hat{p}}\).</li>
                         </ol>
-                        <input type="checkbox" id="ex3" class="toggle">
-                        <label for="ex3" class="question">Click Here For Answer</label>
+                        <input type="checkbox" id="ex1" class="toggle">
+                        <label for="ex1" class="question">Click Here For Answer</label>
                         <div class="answer">
-                            <p><strong>1.</strong> \(\mu_{\hat{p}} = p = 0.56\)</p>
-                            <p><strong>2.</strong> \(\sigma_{\hat{p}} = \sqrt{\frac{p(1 - p)}{n}} = \sqrt{\frac{0.56 \cdot (1 - 0.56)}{100}} = \sqrt{\frac{0.56 \cdot 0.44}{100}} = \sqrt{\frac{0.2464}{100}} = \sqrt{0.002464} \approx 0.0496\)</p>
+                            <p><strong>1.</strong> \(\mu_{\hat{p}} = p = 0.75\)</p>
+                            <p><strong>2.</strong> \(\sigma_{\hat{p}} = \sqrt{\frac{p(1 - p)}{n}} = \sqrt{\frac{0.75 \cdot (1 - 0.75)}{80}} = \sqrt{\frac{0.75 \cdot 0.25}{80}} = \sqrt{\frac{0.1875}{80}} = \sqrt{0.00234375} \approx 0.0484\)</p>
                         </div>
                     </section>
                     <section>
-                        <h2>Example 4</h2>
-                        <p>A survey of 1024 registered voters yields 512 who plan to vote for the republican candidate, where \(p\) is the proportion of all voters who plan to vote for the republican candidate.</p>
+                        <h2>Example 2: Equine Vaccination Rates</h2>
+                        <p>In a survey of 200 horse owners, 160 report that their horses are vaccinated against equine influenza, where \(p\) is the proportion of all horses vaccinated in the population.</p>
                         <ol>
                             <li>Calculate \(\hat{p}\).</li>
                             <li>Calculate the margin of error for a 95% confidence interval.</li>
                             <li>Calculate an estimate for the standard deviation of the sampling distribution.</li>
-                            <li>The empirical rule says 95% of data is within 2 standard deviations. How does this relate to the margin of error?</li>
+                            <li>How does the margin of error relate to the standard deviation?</li>
                         </ol>
-                        <input type="checkbox" id="ex4" class="toggle">
-                        <label for="ex4" class="question">Click Here For Answer</label>
+                        <input type="checkbox" id="ex2" class="toggle">
+                        <label for="ex2" class="question">Click Here For Answer</label>
                         <div class="answer">
-                            <p><strong>1.</strong> \(\hat{p} = \frac{512}{1024} = 0.5\)</p>
-                            <p><strong>2.</strong> Margin of error (95% CI): \( 1.96 \cdot \sigma_{\hat{p}} = 1.96 \cdot \sqrt{\frac{\hat{p}(1 - \hat{p})}{n}} = 1.96 \cdot \sqrt{\frac{0.5 \cdot 0.5}{1024}} = 1.96 \cdot \sqrt{\frac{0.25}{1024}} = 1.96 \cdot 0.015625 \approx 0.030625 \)</p>
-                            <p><strong>3.</strong> Estimated \(\sigma_{\hat{p}} = \sqrt{\frac{\hat{p}(1 - \hat{p})}{n}} = \sqrt{\frac{0.5 \cdot 0.5}{1024}} = \sqrt{\frac{0.25}{1024}} = \sqrt{0.00024414} \approx 0.015625\)</p>
-                            <p><strong>4.</strong> For 95% coverage, the empirical rule approximates 2 standard deviations: \( 2 \cdot \sigma_{\hat{p}} = 2 \cdot 0.015625 = 0.03125 \). The actual margin of error (using 1.96) is 0.030625, very close to 2 standard errors, showing how the 95% confidence interval aligns with the empirical rule.</p>
+                            <p><strong>1.</strong> \(\hat{p} = \frac{160}{200} = 0.8\)</p>
+                            <p><strong>2.</strong> Margin of error (95% CI): \( 1.96 \cdot \sigma_{\hat{p}} = 1.96 \cdot \sqrt{\frac{\hat{p}(1 - \hat{p})}{n}} = 1.96 \cdot \sqrt{\frac{0.8 \cdot 0.2}{200}} = 1.96 \cdot \sqrt{\frac{0.16}{200}} = 1.96 \cdot \sqrt{0.0008} \approx 1.96 \cdot 0.02828 \approx 0.0554 \)</p>
+                            <p><strong>3.</strong> Estimated \(\sigma_{\hat{p}} = \sqrt{\frac{\hat{p}(1 - \hat{p})}{n}} = \sqrt{\frac{0.8 \cdot 0.2}{200}} = \sqrt{\frac{0.16}{200}} = \sqrt{0.0008} \approx 0.02828\)</p>
+                            <p><strong>4.</strong> The margin of error is \( 1.96 \cdot \sigma_{\hat{p}} \approx 0.0554 \), which is approximately 2 standard deviations (since \( 2 \cdot 0.02828 = 0.05656 \)), aligning with the empirical rule’s 95% coverage approximation.</p>
                         </div>
                     </section>
                 </div>
