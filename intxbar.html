@@ -31,6 +31,20 @@
         .tab-content.active {
             display: block;
         }
+        /* Answer toggle styling */
+        .answer-toggle {
+            color: blue;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .answer {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -52,6 +66,7 @@
             <div class="tab-container">
                 <div class="tab" onclick="openTab('standard-normal')">Standard Normal Distribution</div>
                 <div class="tab" onclick="openTab('t-distribution')">t-Distribution</div>
+                <div class="tab" onclick="openTab('examples')">Examples</div>
             </div>
 
             <!-- Tab Content -->
@@ -61,18 +76,6 @@
                 <p>Therefore, when estimating \(\mu\):</p>
                 <p>\(E = z \left(\frac{\sigma}{\sqrt{n}}\right)\)</p>
                 <p>\(\bar{x} \pm E\)</p>
-
-                <h4>Example Section</h4>
-                <h5>Example 1</h5>
-                <p>A sample of 100 visa accounts was taken to estimate the population mean unpaid balance of all visa accounts.</p>
-                <p>\(\bar{x} = \$645\)</p>
-                <p>Assume \(\sigma = \$132\).</p>
-                <p>Construct and interpret a 99% confidence interval.</p>
-
-                <h5>Example 2</h5>
-                <p>A random sample of 500 apples yields \(\bar{x} = 9.2 \, \text{oz}\).</p>
-                <p>Assume \(\sigma = 1.1 \, \text{oz}\).</p>
-                <p>Construct and interpret a 95% confidence interval.</p>
             </div>
 
             <div id="t-distribution" class="tab-content">
@@ -82,6 +85,38 @@
                 <p>\(E = t \left(\frac{s}{\sqrt{n}}\right)\)</p>
                 <p>\(\bar{x} \pm E\)</p>
                 <p>As you can see the only change in the formula is \(\sigma\) being replaced by \(s\) which means the \(z\) becomes a \(t\). As stated above you will not need to do t-distribution problems by hand. However, when doing the lab assignment you will compute confidence intervals using the t-distribution. Of course, in these problems the software will do the math.</p>
+            </div>
+
+            <div id="examples" class="tab-content">
+                <h3>Examples</h3>
+                <h4>Example 1: Visa Accounts</h4>
+                <p>A sample of 100 visa accounts was taken to estimate the population mean unpaid balance of all visa accounts.</p>
+                <p>\(\bar{x} = \$645\)</p>
+                <p>Assume \(\sigma = \$132\).</p>
+                <p>Construct and interpret a 99% confidence interval.</p>
+                <p><span class="answer-toggle" onclick="toggleAnswer('answer1')">Click here for answer</span></p>
+                <div id="answer1" class="answer">
+                    <p>Given: \(\bar{x} = 645\), \(\sigma = 132\), \(n = 100\), and confidence level = 99%.</p>
+                    <p>For a 99% confidence interval, \(z = 2.576\).</p>
+                    <p>Calculate the margin of error: \(E = z \left(\frac{\sigma}{\sqrt{n}}\right) = 2.576 \left(\frac{132}{\sqrt{100}}\right) = 2.576 \left(\frac{132}{10}\right) = 2.576 \times 13.2 = 34.0032\).</p>
+                    <p>The confidence interval is: \(\bar{x} \pm E = 645 \pm 34.0032\).</p>
+                    <p>Thus, the 99% confidence interval is \([610.9968, 679.0032]\).</p>
+                    <p>Interpretation: We are 99% confident that the true population mean unpaid balance of all visa accounts lies between \$610.9968 and \$679.0032.</p>
+                </div>
+
+                <h4>Example 2: Apples</h4>
+                <p>A random sample of 500 apples yields \(\bar{x} = 9.2 \, \text{oz}\).</p>
+                <p>Assume \(\sigma = 1.1 \, \text{oz}\).</p>
+                <p>Construct and interpret a 95% confidence interval.</p>
+                <p><span class="answer-toggle" onclick="toggleAnswer('answer2')">Click here for answer</span></p>
+                <div id="answer2" class="answer">
+                    <p>Given: \(\bar{x} = 9.2\), \(\sigma = 1.1\), \(n = 500\), and confidence level = 95%.</p>
+                    <p>For a 95% confidence interval, \(z = 1.96\).</p>
+                    <p>Calculate the margin of error: \(E = z \left(\frac{\sigma}{\sqrt{n}}\right) = 1.96 \left(\frac{1.1}{\sqrt{500}}\right) = 1.96 \left(\frac{1.1}{\sqrt{500}}\right) \approx 1.96 \times 0.0492 \approx 0.0964\).</p>
+                    <p>The confidence interval is: \(\bar{x} \pm E = 9.2 \pm 0.0964\).</p>
+                    <p>Thus, the 95% confidence interval is \([9.1036, 9.2964]\).</p>
+                    <p>Interpretation: We are 95% confident that the true population mean weight of apples lies between 9.1036 oz and 9.2964 oz.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -128,13 +163,20 @@
 
         // Tab switching script
         function openTab(tabId) {
-            // Remove active class from all tabs and content
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-            // Add active class to the clicked tab and corresponding content
             document.querySelector(`.tab[onclick="openTab('${tabId}')"]`).classList.add('active');
             document.getElementById(tabId).classList.add('active');
+        }
+
+        // Answer toggle script
+        function toggleAnswer(answerId) {
+            const answer = document.getElementById(answerId);
+            if (answer.style.display === 'block') {
+                answer.style.display = 'none';
+            } else {
+                answer.style.display = 'block';
+            }
         }
 
         // Set the default tab to Standard Normal Distribution
