@@ -1,10 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{page_title}}</title>
+    <title>Confidence Intervals for Population Mean</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Tab styling */
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab.active {
+            background-color: #fff;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <div class="container" id="container">
@@ -18,17 +45,52 @@
             <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
         </div>
         <div class="right-panel">
-            <h1>{{main_title}}</h1>
-            <h2>{{subtitle}}</h2>
-            {{content}}
-            {{example_section}}
+            <h1>Confidence Intervals for \(\mu\)</h1>
+            <h2>Estimating the Population Mean</h2>
+
+            <!-- Tab Navigation -->
+            <div class="tab-container">
+                <div class="tab" onclick="openTab('standard-normal')">Standard Normal Distribution</div>
+                <div class="tab" onclick="openTab('t-distribution')">t-Distribution</div>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="standard-normal" class="tab-content">
+                <h3>Confidence Interval for \(\mu\) Using the Standard Normal Distribution</h3>
+                <p>Remember that \(\mu_{\bar{x}} = \mu\) and \(\sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}}\).</p>
+                <p>Therefore, when estimating \(\mu\):</p>
+                <p>\(E = z \left(\frac{\sigma}{\sqrt{n}}\right)\)</p>
+                <p>\(\bar{x} \pm E\)</p>
+
+                <h4>Example Section</h4>
+                <h5>Example 1</h5>
+                <p>A sample of 100 visa accounts was taken to estimate the population mean unpaid balance of all visa accounts.</p>
+                <p>\(\bar{x} = \$645\)</p>
+                <p>Assume \(\sigma = \$132\).</p>
+                <p>Construct and interpret a 99% confidence interval.</p>
+
+                <h5>Example 2</h5>
+                <p>A random sample of 500 apples yields \(\bar{x} = 9.2 \, \text{oz}\).</p>
+                <p>Assume \(\sigma = 1.1 \, \text{oz}\).</p>
+                <p>Construct and interpret a 95% confidence interval.</p>
+            </div>
+
+            <div id="t-distribution" class="tab-content">
+                <h3>Confidence Interval for \(\mu\) Using the t-Distribution</h3>
+                <p>As we study inferential statistics, the main goal is understanding the process which is consistent even when the mathematics gets more complicated. When doing confidence intervals by hand we will always use the standard normal distribution, but you may have noticed a problem with using \(E = z \left(\frac{\sigma}{\sqrt{n}}\right)\). The issue is when we are estimating the population mean, \(\mu\), we will not know the population standard deviation, \(\sigma\) (the only way to know this quantity would be to have the population, and if we had the population we could just calculate the mean). In statistics, when we do not know a value, we estimate it. So, in this case we can estimate the population standard deviation, \(\sigma\), with the sample standard deviation, \(s\). The ramification of replacing \(\sigma\) by \(s\) is the sampling distribution is no longer standard normal. The sampling distribution will instead be a t-distribution.</p>
+                <p>The t-distribution is still continuous and symmetric about 0, but it is more variable and a slightly different shape than the standard normal distribution. Basically, we are estimating another quantity so there is more error in the estimate. The confidence interval formula for \(\mu\) using the t-distribution follows:</p>
+                <p>\(E = t \left(\frac{s}{\sqrt{n}}\right)\)</p>
+                <p>\(\bar{x} \pm E\)</p>
+                <p>As you can see the only change in the formula is \(\sigma\) being replaced by \(s\) which means the \(z\) becomes a \(t\). As stated above you will not need to do t-distribution problems by hand. However, when doing the lab assignment you will compute confidence intervals using the t-distribution. Of course, in these problems the software will do the math.</p>
+            </div>
         </div>
     </div>
     <footer>
-        <p>{{footer_text}}</p>
+        <p>© 2025 Confidence Intervals for Population Mean Tutorial</p>
     </footer>
 
     <script>
+        // Existing scripts for left panel and font size
         function toggleLeftPanel() {
             const leftPanel = document.getElementById('leftPanel');
             const container = document.getElementById('container');
@@ -63,6 +125,22 @@
         }
 
         document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
+
+        // Tab switching script
+        function openTab(tabId) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to the clicked tab and corresponding content
+            document.querySelector(`.tab[onclick="openTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Set the default tab to Standard Normal Distribution
+        document.addEventListener('DOMContentLoaded', () => {
+            openTab('standard-normal');
+        });
     </script>
 </body>
 </html>
