@@ -1,10 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{page_title}}</title>
+    <title>Confidence Intervals for Proportion</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Tab styling */
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab.active {
+            background-color: #fff;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* Answer toggle styling */
+        .answer-toggle {
+            color: blue;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .answer {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
     <div class="container" id="container">
@@ -18,17 +59,47 @@
             <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
         </div>
         <div class="right-panel">
-            <h1>{{main_title}}</h1>
-            <h2>{{subtitle}}</h2>
-            {{content}}
-            {{example_section}}
+            <h1>Confidence Intervals for \(p\)</h1>
+            <h2>Estimating the Population Proportion</h2>
+
+            <!-- Tab Navigation -->
+            <div class="tab-container">
+                <div class="tab" onclick="openTab('confidence-interval-p')">Confidence Interval for \(p\)</div>
+                <div class="tab" onclick="openTab('examples')">Examples</div>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="confidence-interval-p" class="tab-content">
+                <h3>Confidence Interval for \(p\)</h3>
+                <p>Remember that \(\mu_{\hat{p}} = p\) and \(\sigma_{\hat{p}} \approx \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}\).</p>
+                <p>Therefore, when estimating \(p\):</p>
+                <p>\(E = z \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}\)</p>
+                <p>\(\hat{p} \pm E\)</p>
+            </div>
+
+            <div id="examples" class="tab-content">
+                <h3>Examples</h3>
+                <h4>Example 3: Voter Survey</h4>
+                <p>A survey of 1,200 registered voters yields 540 who plan to vote for the democratic candidate. Find and interpret a 95% confidence interval for \(p\).</p>
+                <p><span class="answer-toggle" onclick="toggleAnswer('answer3')">Click here for answer</span></p>
+                <div id="answer3" class="answer">
+                    <p>Given: \(n = 1200\), number of successes = 540, confidence level = 95%.</p>
+                    <p>Calculate the sample proportion: \(\hat{p} = \frac{540}{1200} = 0.45\).</p>
+                    <p>For a 95% confidence interval, \(z = 1.96\).</p>
+                    <p>Calculate the margin of error: \(E = z \sqrt{\frac{\hat{p}(1-\hat{p})}{n}} = 1.96 \sqrt{\frac{0.45(1-0.45)}{1200}} = 1.96 \sqrt{\frac{0.45 \times 0.55}{1200}} = 1.96 \sqrt{\frac{0.2475}{1200}} = 1.96 \sqrt{0.00020625} \approx 1.96 \times 0.01436 \approx 0.02815\).</p>
+                    <p>The confidence interval is: \(\hat{p} \pm E = 0.45 \pm 0.02815\).</p>
+                    <p>Thus, the 95% confidence interval is \([0.42185, 0.47815]\).</p>
+                    <p>Interpretation: We are 95% confident that the true proportion of registered voters who plan to vote for the democratic candidate lies between 42.185% and 47.815%.</p>
+                </div>
+            </div>
         </div>
     </div>
     <footer>
-        <p>{{footer_text}}</p>
+        <p>© 2025 Confidence Intervals for Proportion Tutorial</p>
     </footer>
 
     <script>
+        // Existing scripts for left panel and font size
         function toggleLeftPanel() {
             const leftPanel = document.getElementById('leftPanel');
             const container = document.getElementById('container');
@@ -63,6 +134,29 @@
         }
 
         document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
+
+        // Tab switching script
+        function openTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelector(`.tab[onclick="openTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Answer toggle script
+        function toggleAnswer(answerId) {
+            const answer = document.getElementById(answerId);
+            if (answer.style.display === 'block') {
+                answer.style.display = 'none';
+            } else {
+                answer.style.display = 'block';
+            }
+        }
+
+        // Set the default tab to Confidence Interval for p
+        document.addEventListener('DOMContentLoaded', () => {
+            openTab('confidence-interval-p');
+        });
     </script>
 </body>
 </html>
