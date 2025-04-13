@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confidence Intervals</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Tab styling */
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab.active {
+            background-color: #fff;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <button class="toggle-button" id="toggleButton">Open Calculator</button>
+        <div class="left-panel" id="leftPanel">
+            <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
+            <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
+            <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
+            <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
+            <script src="https://www.numworks.com/simulator/embed.js"></script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+        </div>
+        <div class="right-panel">
+            <h1>Confidence Intervals</h1>
+            <h2>Understanding Interval Estimation</h2>
+
+            <!-- Tab Navigation -->
+            <div class="tab-container">
+                <div class="tab" onclick="openTab('general-setup')">General Setup</div>
+                <div class="tab" onclick="openTab('examples')">Examples</div>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="general-setup" class="tab-content">
+                <h3>General Setup of a Confidence Interval</h3>
+                <p>Why not simply use a statistic to estimate a parameter? Is margin of error really necessary? The mean will be utilized in order to illustrate the importance of interval estimation, but the concept is the same for other statistics.</p>
+                <p>When doing inferential statistics, the population mean, \(\mu\), is an unknown parameter. We wish to estimate \(\mu\) based on a sample. The statistic \(\bar{x}\) estimates the parameter \(\mu\). We call \(\bar{x}\) a point estimate because its value is a specific point on the real number line. Unfortunately, if we sample from a continuous distribution, \(P(\bar{x} = \mu) = 0\) (the probability for any single point in a continuous distribution is 0). Therefore, we are sure the estimate is wrong if we just use a point estimate. Thus, statisticians prefer interval estimates.</p>
+                <p>Margin of error (also referred to as error tolerance) is calculated from the standard error (standard deviation of the sampling distribution). The number of standard deviations we need depends on how confident we want to be in the conclusion (just like in the empirical rule). The confidence level gives us the \(z\) which is multiplied by the standard error.</p>
+                <p>It is customary in statistics to use a confidence level of 90%, 95%, or 99%. For this class, these are the only confidence levels we will use when doing analysis by hand. The corresponding \(z\) values follow. You should keep in mind that any level of confidence can be chosen if you know the \(z\) value.</p>
+                <ul>
+                    <li>For a 90% confidence interval: \(z = 1.645\)</li>
+                    <li>For a 95% confidence interval: \(z = 1.96\)</li>
+                    <li>For a 99% confidence interval: \(z = 2.576\)</li>
+                </ul>
+                <p>All confidence intervals are two-sided probabilities with a total area of \(\alpha\). This means if there is 5% of error (we are 95% confident), then 2.5% of that error is in each tail. Another way to say this would be: there is a 2.5% chance that the actual value of the parameter is above the interval and a 2.5% chance that the value is below the interval.</p>
+                <p><strong>Level of Confidence</strong> – the degree of certainty (probability that we are correct)</p>
+                <p><strong>Level of Significance</strong> – denoted \(\alpha\), is one minus the level of confidence (probability that we are incorrect)</p>
+                <p><strong>Error Tolerance</strong> – denoted \(E\), depends on the sample size, confidence level, and the amount of variability in the population (also called margin of error)</p>
+                <p>As the sample size increases, the error tolerance decreases, giving a narrower interval. As the confidence level increases, the error tolerance increases, giving a wider interval. In situations where the variability in the population is higher, the error tolerance will also be higher if other factors are held constant.</p>
+            </div>
+
+            <div id="examples" class="tab-content">
+                <h3>Examples</h3>
+                <p>Add your examples here...</p>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>© 2025 Confidence Intervals Tutorial</p>
+    </footer>
+
+    <script>
+        // Existing scripts for left panel and font size
+        function toggleLeftPanel() {
+            const leftPanel = document.getElementById('leftPanel');
+            const container = document.getElementById('container');
+            const toggleButton = document.getElementById('toggleButton');
+            
+            if (leftPanel.classList.contains('minimized')) {
+                leftPanel.classList.remove('minimized');
+                container.classList.remove('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            } else {
+                leftPanel.classList.add('minimized');
+                container.classList.add('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            }
+        }
+
+        function changeFontSize(action) {
+            const rightPanel = document.querySelector('.right-panel');
+            const currentSize = window.getComputedStyle(rightPanel).fontSize;
+            let newSize = parseFloat(currentSize);
+            
+            if (action === 'increase') {
+                newSize += 2;
+            } else if (action === 'decrease') {
+                newSize -= 2;
+            }
+            
+            if (newSize < 12) newSize = 12;
+            if (newSize > 24) newSize = 24;
+            
+            rightPanel.style.fontSize = `${newSize}px`;
+        }
+
+        document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
+
+        // Tab switching script
+        function openTab(tabId) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to the clicked tab and corresponding content
+            document.querySelector(`.tab[onclick="openTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Set the default tab to General Setup
+        document.addEventListener('DOMContentLoaded', () => {
+            openTab('general-setup');
+        });
+    </script>
+</body>
+</html>
