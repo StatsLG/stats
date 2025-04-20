@@ -223,3 +223,41 @@
             if (newSize < 12) newSize = 12;
             if (newSize > 24) newSize = 24;
             
+            rightPanel.style.fontSize = `${newSize}px`;
+        }
+
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function downloadRightPaneAsWord() {
+            const rightPanelContent = document.querySelector('.right-panel').innerHTML;
+            const htmlContent = `
+                <html>
+                <head><meta charset="UTF-8"></head>
+                <body>${rightPanelContent}</body>
+                </html>
+            `;
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'HypothesisTestMean.doc';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
+    </script>
+</body>
+</html>
