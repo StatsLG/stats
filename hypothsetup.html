@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hypothesis Testing</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Add this CSS to handle tabs */
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+        }
+        .tab button {
+            background-color: #f1f1f1;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #ccc;
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+        }
+        .tabcontent.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <button class="toggle-button" id="toggleButton">Open Calculator</button>
+        <div class="left-panel" id="leftPanel">
+            <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
+            <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
+            <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
+            <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
+            <script src="https://www.numworks.com/simulator/embed.js"></script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+        </div>
+        <div class="right-panel">
+            <h1>Hypothesis Testing</h1>
+            <h2>General Setup of a Hypothesis Test</h2>
+
+            <!-- Tab Navigation -->
+            <div class="tab">
+                <button class="tablinks active" onclick="openTab(event, 'Theory')">Theory</button>
+                <button class="tablinks" onclick="openTab(event, 'Examples')">Examples</button>
+            </div>
+
+            <!-- Theory Tab Content -->
+            <div id="Theory" class="tabcontent active">
+                <p>Statistical hypotheses are statements about population parameters. In statistics, we test one hypothesis against another. The <strong>Alternative Hypothesis</strong> (\(H_a\)) is the hypothesis we want to prove, while the <strong>Null Hypothesis</strong> (\(H_0\)) is the hypothesis that contradicts \(H_a\). In a hypothesis test, we test the null hypothesis, attempting to prove it false with a high level of confidence.</p>
+                <p>After collecting sample data, we make one of two decisions:</p>
+                <ol>
+                    <li>Reject \(H_0\) (and believe \(H_a\))</li>
+                    <li>Fail to reject \(H_0\) (due to insufficient evidence to reject it)</li>
+                </ol>
+                <h2>Types of Errors</h2>
+                <p>There are two types of errors in a hypothesis test:</p>
+                <ul>
+                    <li><strong>Type I Error</strong>: Reject \(H_0\) when \(H_0\) is true. The probability of this error is the <strong>Level of Significance</strong>, denoted \(\alpha\).</li>
+                    <li><strong>Type II Error</strong>: Fail to reject \(H_0\) when \(H_0\) is false. The probability of this error is denoted \(\beta\).</li>
+                </ul>
+                <p>The <strong>Level of Significance</strong> (\(\alpha\)) represents the risk of a Type I error. For example, if \(\alpha = 0.05\), rejecting \(H_0\) means we are 95% confident in concluding \(H_a\) (where \(1 - \alpha\) is the confidence level).</p>
+                <p><strong>Power</strong> (\(1 - \beta\)) is the probability of rejecting \(H_0\) when it is false (i.e., correctly proving \(H_a\)). While power is complex to calculate, it’s important to understand its relationship with errors and confidence.</p>
+                <h2>Error and Decision Table</h2>
+                <p>The table below summarizes decisions, errors, and their probabilities:</p>
+                <table>
+                    <tr><th>Decision</th><th>\(H_0\) is False</th><th>\(H_0\) is True</th></tr>
+                    <tr><td>Reject \(H_0\)</td><td>Correct Decision (Power, \(1 - \beta\))</td><td>Type I Error (Level of Significance, \(\alpha\))</td></tr>
+                    <tr><td>Fail to Reject \(H_0\)</td><td>Type II Error (\(\beta\))</td><td>Correct Decision (Confidence Level, \(1 - \alpha\))</td></tr>
+                </table>
+                <p>Hypothesis tests are similar to dichotomous tests (introduced in section III.B.). Both have two possible outcomes (Reject \(H_0\) or Fail to Reject \(H_0\)). The Type I error (\(\alpha\)) is analogous to the false positive rate, and the Type II error (\(\beta\)) is analogous to the false negative rate. Power is similar to sensitivity, and the confidence level is similar to specificity.</p>
+                <h2>Managing Errors</h2>
+                <p>In inferential statistics, we aim for small \(\alpha\) and \(\beta\). However, decreasing \(\alpha\) increases \(\beta\) if all else is constant, and vice versa. Increasing the sample size is the best way to reduce both errors simultaneously.</p>
+                <h2>Test Statistic and p-value</h2>
+                <p>The <strong>Test Statistic</strong> is computed to make the decision in a hypothesis test, based on the known sampling distribution. The <strong>p-value</strong> is the smallest \(\alpha\) at which \(H_0\) would be rejected. Decision rules are:</p>
+                <ul>
+                    <li>If \(p\)-value \(\leq \alpha\), Reject \(H_0\).</li>
+                    <li>If \(p\)-value \(> \alpha\), Fail to Reject \(H_0\).</li>
+                </ul>
+                <h2>Steps for a Hypothesis Test</h2>
+                <ol>
+                    <li>State \(H_a\) and \(H_0\).</li>
+                    <li>Calculate the test statistic.</li>
+                    <li>Identify the p-value.</li>
+                    <li>Make a decision.</li>
+                    <li>Interpret the result.</li>
+                </ol>
+            </div>
+
+            <!-- Examples Tab Content -->
+            <div id="Examples" class="tabcontent">
+                <h2>Examples</h2>
+                <p>Below are example statements of statistical hypotheses:</p>
+                <ul>
+                    <li>Mean weight of adult males is greater than 160 pounds (\(H_a: \mu > 160\)).</li>
+                    <li>Proportion of students with a 4.0 GPA is less than 0.01 (\(H_a: p < 0.01\)).</li>
+                </ul>
+                <p>For each example, the null hypothesis (\(H_0\)) would contradict the alternative hypothesis. For instance:</p>
+                <ul>
+                    <li>For the mean weight: \(H_0: \mu \leq 160\).</li>
+                    <li>For the GPA proportion: \(H_0: p \geq 0.01\).</li>
+                </ul>
+                <p>These examples illustrate how to set up hypotheses for testing. To perform a full hypothesis test, you would follow the steps outlined in the Theory tab, including calculating a test statistic and p-value based on sample data.</p>
+            </div>
+
+            <!-- Download Button -->
+            <button onclick="downloadRightPaneAsWord()">Download as Word Doc</button>
+        </div>
+    </div>
+    <footer>
+        <p>Hypothesis Testing</p>
+    </footer>
+
+    <script>
+        function toggleLeftPanel() {
+            const leftPanel = document.getElementById('leftPanel');
+            const container = document.getElementById('container');
+            const toggleButton = document.getElementById('toggleButton');
+            
+            if (leftPanel.classList.contains('minimized')) {
+                leftPanel.classList.remove('minimized');
+                container.classList.remove('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            } else {
+                leftPanel.classList.add('minimized');
+                container.classList.add('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            }
+        }
+
+        function changeFontSize(action) {
+            const rightPanel = document.querySelector('.right-panel');
+            const currentSize = window.getComputedStyle(rightPanel).fontSize;
+            let newSize = parseFloat(currentSize);
+            
+            if (action === 'increase') {
+                newSize += 2;
+            } else if (action === 'decrease') {
+                newSize -= 2;
+            }
+            
+            if (newSize < 12) newSize = 12;
+            if (newSize > 24) newSize = 24;
+            
+            rightPanel.style.fontSize = `${newSize}px`;
+        }
+
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function downloadRightPaneAsWord() {
+            const rightPanelContent = document.querySelector('.right-panel').innerHTML;
+            const htmlContent = `
+                <html>
+                <head><meta charset="UTF-8"></head>
+                <body>${rightPanelContent}</body>
+                </html>
+            `;
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'HypothesisTesting.doc';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
+    </script>
+</body>
+</html>
