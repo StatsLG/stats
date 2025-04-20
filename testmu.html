@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hypothesis Test for Mean</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Add this CSS to handle tabs */
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+        }
+        .tab button {
+            background-color: #f1f1f1;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #ccc;
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+        }
+        .tabcontent.active {
+            display: block;
+        }
+        /* Styling for interactive questions */
+        .questions-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .questions-list li {
+            margin-bottom: 10px;
+        }
+        .toggle {
+            display: none;
+        }
+        .question {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+        .answer {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+        .toggle:checked ~ .answer {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <button class="toggle-button" id="toggleButton">Open Calculator</button>
+        <div class="left-panel" id="leftPanel">
+            <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
+            <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
+            <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
+            <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
+            <script src="https://www.numworks.com/simulator/embed.js"></script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+        </div>
+        <divigesting for the Mean</h1>
+            <h2>Using the Standard Normal Distribution</h2>
+
+            <!-- Tab Navigation -->
+            <div class="tab">
+                <button class="tablinks active" onclick="openTab(event, 'Theory')">Theory</button>
+                <button class="tablinks" onclick="openTab(event, 'Examples')">Examples</button>
+            </div>
+
+            <!-- Theory Tab Content -->
+            <div id="Theory" class="tabcontent active">
+                <p>In hypothesis testing for the population mean (\(\mu\)), we use the test statistic:</p>
+                <p>\[ Z = \frac{\bar{x} - \mu}{\sigma / \sqrt{n}} \]</p>
+                <p>Here, \(\bar{x}\) is the sample mean, \(\mu\) is the hypothesized population mean, \(\sigma\) is the population standard deviation, and \(n\) is the sample size. This test statistic, \(Z\), follows a <strong>standard normal distribution</strong> when conducting a test for \(\mu\), assuming the population is normally distributed or the sample size is large (\(n \geq 30\)).</p>
+                <p>The \(Z\)-statistic allows us to calculate the <strong>p-value</strong>, which is the probability of observing a test statistic as extreme as, or more extreme than, the one calculated, under the null hypothesis (\(H_0\)). We use techniques from standard normal distribution probability calculations (introduced in section III.C. and revisited in section IV.A. for sampling distributions) to find the p-value.</p>
+                <p>To perform a hypothesis test for \(\mu\), follow these steps:</p>
+                <ol>
+                    <li>State the null (\(H_0\)) and alternative (\(H_a\)) hypotheses.</li>
+                    <li>Calculate the test statistic (\(Z\)).</li>
+                    <li>Determine the p-value using the standard normal distribution.</li>
+                    <li>Compare the p-value to the level of significance (\(\alpha\)):</li>
+                    <ul>
+                        <li>If \(p\)-value \(\leq \alpha\), reject \(H_0\).</li>
+                        <li>If \(p\)-value \(> \alpha\), fail to reject \(H_0\).</li>
+                    </ul>
+                    <li>Interpret the result in the context of the problem.</li>
+                </ol>
+                <p>The p-value depends on the type of test:</p>
+                <ul>
+                    <li><strong>Left-tailed test</strong> (\(H_a: \mu < \mu_0\)): p-value = \(P(Z < z)\).</li>
+                    <li><strong>Right-tailed test</strong> (\(H_a: \mu > \mu_0\)): p-value = \(P(Z > z) = 1 - P(Z < z)\).</li>
+                    <li><strong>Two-tailed test</strong> (\(H_a: \mu \neq \mu_0\)): p-value = \(2 \times P(Z > |z|)\).</li>
+                </ul>
+            </div>
+
+            <!-- Examples Tab Content -->
+            <div id="Examples" class="tabcontent">
+                <h2>Example 1</h2>
+                <p>A consumer protection agency wants to prove that packages of Post Grape Nuts have a mean weight of less than 24 oz. Use the following information to test this claim:</p>
+                <p>\(\alpha = 0.05\), \(n = 100\), \(\bar{x} = 23.94\), \(\sigma = 0.13\)</p>
+                <ol class="questions-list">
+                    <li>State the hypotheses.
+                        <input type="checkbox" id="q1" class="toggle">
+                        <label for="q1" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>Null Hypothesis: \(H_0: \mu \geq 24\)</p>
+                            <p>Alternative Hypothesis: \(H_a: \mu < 24\) (left-tailed test)</p>
+                        </div>
+                    </li>
+                    <li>Calculate the test statistic.
+                        <input type="checkbox" id="q2" class="toggle">
+                        <label for="q2" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>\[ Z = \frac{\bar{x} - \mu}{\sigma / \sqrt{n}} = \frac{23.94 - 24}{0.13 / \sqrt{100}} = \frac{-0.06}{0.13 / 10} = \frac{-0.06}{0.013} \approx -4.615 \]</p>
+                        </div>
+                    </li>
+                    <li>Determine the p-value.
+                        <input type="checkbox" id="q3" class="toggle">
+                        <label for="q3" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>For a left-tailed test, p-value = \(P(Z < -4.615)\).</p>
+                            <p>Using standard normal tables, \(P(Z < -4.615) \approx 0.000002\) (since \(-4.615\) is far in the left tail).</p>
+                        </div>
+                    </li>
+                    <li>Make a decision and interpret the result.
+                        <input type="checkbox" id="q4" class="toggle">
+                        <label for="q4" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>Since p-value \(\approx 0.000002 < 0.05 = \alpha\), reject \(H_0\).</p>
+                            <p>Interpretation: There is sufficient evidence at the 5% significance level to conclude that the mean weight of Post Grape Nuts packages is less than 24 oz.</p>
+                        </div>
+                    </li>
+                </ol>
+
+                <h2>Example 2</h2>
+                <p>It is desired to show the mean weight of a metal component is greater than 4.5 oz. Use the following information to conduct a hypothesis test:</p>
+                <p>\(\alpha = 0.05\), \(n = 10\), \(\bar{x} = 4.59\), \(\sigma = 0.504\)</p>
+                <ol class="questions-list">
+                    <li>State the hypotheses.
+                        <input type="checkbox" id="q5" class="toggle">
+                        <label for="q5" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>Null Hypothesis: \(H_0: \mu \leq 4.5\)</p>
+                            <p>Alternative Hypothesis: \(H_a: \mu > 4.5\) (right-tailed test)</p>
+                        </div>
+                    </li>
+                    <li>Calculate the test statistic.
+                        <input type="checkbox" id="q6" class="toggle">
+                        <label for="q6" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>\[ Z = \frac{\bar{x} - \mu}{\sigma / \sqrt{n}} = \frac{4.59 - 4.5}{0.504 / \sqrt{10}} = \frac{0.09}{0.504 / 3.162} = \frac{0.09}{0.1594} \approx 0.565 \]</p>
+                        </div>
+                    </li>
+                    <li>Determine the p-value.
+                        <input type="checkbox" id="q7" class="toggle">
+                        <label for="q7" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>For a right-tailed test, p-value = \(P(Z > 0.565) = 1 - P(Z < 0.565)\).</p>
+                            <p>Using standard normal tables, \(P(Z < 0.565) \approx 0.714\), so p-value = \(1 - 0.714 = 0.286\).</p>
+                        </div>
+                    </li>
+                    <li>Make a decision and interpret the result.
+                        <input type="checkbox" id="q8" class="toggle">
+                        <label for="q8" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>Since p-value \(\approx 0.286 > 0.05 = \alpha\), fail to reject \(H_0\).</p>
+                            <p>Interpretation: There is insufficient evidence at the 5% significance level to conclude that the mean weight of the metal component is greater than 4.5 oz.</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- Download Button -->
+            <button onclick="downloadRightPaneAsWord()">Download as Word Doc</button>
+        </div>
+    </div>
+    <footer>
+        <p>Hypothesis Test for Mean</p>
+    </footer>
+
+    <script>
+        function toggleLeftPanel() {
+            const leftPanel = document.getElementById('leftPanel');
+            const container = document.getElementById('container');
+            const toggleButton = document.getElementById('toggleButton');
+            
+            if (leftPanel.classList.contains('minimized')) {
+                leftPanel.classList.remove('minimized');
+                container.classList.remove('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            } else {
+                leftPanel.classList.add('minimized');
+                container.classList.add('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            }
+        }
+
+        function changeFontSize(action) {
+            const rightPanel = document.querySelector('.right-panel');
+            const currentSize = window.getComputedStyle(rightPanel).fontSize;
+            let newSize = parseFloat(currentSize);
+            
+            if (action === 'increase') {
+                newSize += 2;
+            } else if (action === 'decrease') {
+                newSize -= 2;
+            }
+            
+            if (newSize < 12) newSize = 12;
+            if (newSize > 24) newSize = 24;
+            

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hypothesis Test for Proportion</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Add this CSS to handle tabs */
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+        }
+        .tab button {
+            background-color: #f1f1f1;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #ccc;
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+        }
+        .tabcontent.active {
+            display: block;
+        }
+        /* Styling for interactive questions */
+        .questions-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .questions-list li {
+            margin-bottom: 10px;
+        }
+        .toggle {
+            display: none;
+        }
+        .question {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+        .answer {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+        .toggle:checked ~ .answer {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <button class="toggle-button" id="toggleButton">Open Calculator</button>
+        <div class="left-panel" id="leftPanel">
+            <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
+            <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
+            <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
+            <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
+            <script src="https://www.numworks.com/simulator/embed.js"></script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+        </div>
+        <div class="right-panel">
+            <h1>Hypothesis Test for Proportion</h1>
+            <h2>Using the Standard Normal Distribution</h2>
+
+            <!-- Tab Navigation -->
+            <div class="tab">
+                <button class="tablinks active" onclick="openTab(event, 'Theory')">Theory</button>
+                <button class="tablinks" onclick="openTab(event, 'Examples')">Examples</button>
+            </div>
+
+            <!-- Theory Tab Content -->
+            <div id="Theory" class="tabcontent active">
+                <p>In hypothesis testing for the population proportion (\(p\)), we use the test statistic:</p>
+                <p>\[ Z = \frac{\hat{p} - p}{\sqrt{\frac{p(1 - p)}{n}}} \]</p>
+                <p>Here, \(\hat{p}\) is the sample proportion, \(p\) is the hypothesized population proportion, and \(n\) is the sample size. This test statistic, \(Z\), follows a <strong>standard normal distribution</strong> when conducting a test for \(p\), provided the sample size is large enough (typically \(np \geq 5\) and \(n(1-p) \geq 5\)).</p>
+                <p>The \(Z\)-statistic is used to calculate the <strong>p-value</strong>, which is the probability of observing a test statistic as extreme as, or more extreme than, the one calculated, under the null hypothesis (\(H_0\)). The p-value is determined using standard normal distribution probability calculations.</p>
+                <p>To perform a hypothesis test for \(p\), follow these steps:</p>
+                <ol>
+                    <li>State the null (\(H_0\)) and alternative (\(H_a\)) hypotheses.</li>
+                    <li>Calculate the test statistic (\(Z\)).</li>
+                    <li>Determine the p-value using the standard normal distribution.</li>
+                    <li>Compare the p-value to the level of significance (\(\alpha\)):</li>
+                    <ul>
+                        <li>If \(p\)-value \(\leq \alpha\), reject \(H_0\).</li>
+                        <li>If \(p\)-value \(> \alpha\), fail to reject \(H_0\).</li>
+                    </ul>
+                    <li>Interpret the result in the context of the problem.</li>
+                </ol>
+                <p>The p-value depends on the type of test:</p>
+                <ul>
+                    <li><strong>Left-tailed test</strong> (\(H_a: p < p_0\)): p-value = \(P(Z < z)\).</li>
+                    <li><strong>Right-tailed test</strong> (\(H_a: p > p_0\)): p-value = \(P(Z > z) = 1 - P(Z < z)\).</li>
+                    <li><strong>Two-tailed test</strong> (\(H_a: p \neq p_0\)): p-value = \(2 \times P(Z > |z|)\).</li>
+                </ul>
+            </div>
+
+            <!-- Examples Tab Content -->
+            <div id="Examples" class="tabcontent">
+                <h2>Example 3</h2>
+                <p>The current treatment for a type of cancer produces remission 20% of the time. An investigator wishes to prove that a new method is better. Suppose \(\alpha = 0.05\) and 26 of 100 patients go into remission using the new method. Perform a hypothesis test to see if the new method is better.</p>
+                <ol class="questions-list">
+                    <li>State the hypotheses.
+                        <input type="checkbox" id="q1" class="toggle">
+                        <label for="q1" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>Null Hypothesis: \(H_0: p \leq 0.20\)</p>
+                            <p>Alternative Hypothesis: \(H_a: p > 0.20\) (right-tailed test)</p>
+                        </div>
+                    </li>
+                    <li>Calculate the test statistic.
+                        <input type="checkbox" id="q2" class="toggle">
+                        <label for="q2" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>Sample proportion: \(\hat{p} = \frac{26}{100} = 0.26\)</p>
+                            <p>\[ Z = \frac{\hat{p} - p}{\sqrt{\frac{p(1 - p)}{n}}} = \frac{0.26 - 0.20}{\sqrt{\frac{0.20 \cdot 0.80}{100}}} = \frac{0.06}{\sqrt{\frac{0.16}{100}}} = \frac{0.06}{0.04} = 1.5 \]</p>
+                        </div>
+                    </li>
+                    <li>Determine the p-value.
+                        <input type="checkbox" id="q3" class="toggle">
+                        <label for="q3" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>For a right-tailed test, p-value = \(P(Z > 1.5) = 1 - P(Z < 1.5)\).</p>
+                            <p>Using standard normal tables, \(P(Z < 1.5) \approx 0.9332\), so p-value = \(1 - 0.9332 = 0.0668\).</p>
+                        </div>
+                    </li>
+                    <li>Make a decision and interpret the result.
+                        <input type="checkbox" id="q4" class="toggle">
+                        <label for="q4" class="question"> New Method for Cancer Treatment</label>
+                        <div class="answer">
+                            <p>Since p-value \(\approx 0.0668 > 0.05 = \alpha\), fail to reject \(H_0\).</p>
+                            <p>Interpretation: There is insufficient evidence at the 5% significance level to conclude that the new cancer treatment method has a remission rate greater than 20%.</p>
+                        </div>
+                    </li>
+                </ol>
+
+                <h2>Example 4</h2>
+                <p>Suppose you are doing a taste test comparing Murray’s Vanilla Wafers with Nabisco. You want to prove that less than 50% of people prefer Murray’s. Suppose \(\alpha = 0.05\) and 42 of 250 choose Murray’s. Perform a hypothesis test.</p>
+                <ol class="questions-list">
+                    <li>State the hypotheses.
+                        <input type="checkbox" id="q5" class="toggle">
+                        <label for="q5" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>Null Hypothesis: \(H_0: p \geq 0.50\)</p>
+                            <p>Alternative Hypothesis: \(H_a: p < 0.50\) (left-tailed test)</p>
+                        </div>
+                    </li>
+                    <li>Calculate the test statistic.
+                        <input type="checkbox" id="q6" class="toggle">
+                        <label for="q6" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>Sample proportion: \(\hat{p} = \frac{42}{250} = 0.168\)</p>
+                            <p>\[ Z = \frac{\hat{p} - p}{\sqrt{\frac{p(1 - p)}{n}}} = \frac{0.168 - 0.50}{\sqrt{\frac{0.50 \cdot 0.50}{250}}} = \frac{-0.332}{\sqrt{\frac{0.25}{250}}} = \frac{-0.332}{0.0316} \approx -10.506 \]</p>
+                        </div>
+                    </li>
+                    <li>Determine the p-value.
+                        <input type="checkbox" id="q7" class="toggle">
+                        <label for="q7" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>For a left-tailed test, p-value = \(P(Z < -10.506)\).</p>
+                            <p>Since \(-10.506\) is far in the left tail, \(P(Z < -10.506) \approx 0\) (standard normal tables give \(P(Z < -4) \approx 0.00003\)).</p>
+                        </div>
+                    </li>
+                    <li>Make a decision and interpret the result.
+                        <input type="checkbox" id="q8" class="toggle">
+                        <label for="q8" class="question">Click Here For Answer.</label>
+                        <div class="answer">
+                            <p>Since p-value \(\approx 0 < 0.05 = \alpha\), reject \(H_0\).</p>
+                            <p>Interpretation: There is sufficient evidence at the 5% significance level to conclude that less than 50% of people prefer Murray’s Vanilla Wafers over Nabisco.</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- Download Button -->
+            <button onclick="downloadRightPaneAsWord()">Download as Word Doc</button>
+        </div>
+    </div>
+    <footer>
+        <p>Hypothesis Test for Proportion</p>
+    </footer>
+
+    <script>
+        function toggleLeftPanel() {
+            const leftPanel = document.getElementById('leftPanel');
+            const container = document.getElementById('container');
+            const toggleButton = document.getElementById('toggleButton');
+            
+            if (leftPanel.classList.contains('minimized')) {
+                leftPanel.classList.remove('minimized');
+                container.classList.remove('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            } else {
+                leftPanel.classList.add('minimized');
+                container.classList.add('minimized');
+                toggleButton.textContent = 'Open Calculator';
+            }
+        }
+
+        function changeFontSize(action) {
+            const rightPanel = document.querySelector('.right-panel');
+            const currentSize = window.getComputedStyle(rightPanel).fontSize;
+            let newSize = parseFloat(currentSize);
+            
+            if (action === 'increase') {
+                newSize += 2;
+            } else if (action === 'decrease') {
+                newSize -= 2;
+            }
+            
+            if (newSize < 12) newSize = 12;
+            if (newSize > 24) newSize = 24;
+            
+            rightPanel.style.fontSize = `${newSize}px`;
+        }
+
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function downloadRightPaneAsWord() {
+            const rightPanelContent = document.querySelector('.right-panel').innerHTML;
+            const htmlContent = `
+                <html>
+                <head><meta charset="UTF-8"></head>
+                <body>${rightPanelContent}</body>
+                </html>
+            `;
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'HypothesisTestProportion.doc';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
+    </script>
+</body>
+</html>
