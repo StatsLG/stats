@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Introduction to Statistics and Data Collection</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" id="container">
+        <button class="toggle-button" id="toggleButton">Open Calculator</button>
+        <div class="left-panel" id="leftPanel">
+            <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
+            <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
+            <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
+            <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
+            <script src="https://www.numworks.com/simulator/embed.js"></script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+        </div>
+        <div class="right-panel">
+            <h1>Introduction to Statistics and Data Collection</h1>
+            <h2>Foundations of Statistical Analysis</h2>
+
+            <!-- Tabbed Section with Theory First -->
+            <div class="tab">
+                <button class="tablinks active" onclick="openTab(event, 'Theory')">Theory</button>
+                <button class="tablinks" onclick="openTab(event, 'Examples')">Examples</button>
+            </div>
+
+            <div id="Theory" class="tabcontent active">
+                <h3>Theory</h3>
+                <div class="content">
+                    <h4>Basic Statistical Terminology</h4>
+                    <p><strong>Statistics</strong> is the study of how to collect, organize, analyze, and interpret information. It provides a process for estimation and decision-making under uncertainty without bias. Key terms include:</p>
+                    <ul>
+                        <li><strong>Population</strong>: The entire collection of individuals or items of interest.</li>
+                        <li><strong>Sample</strong>: A subset of the population on which measurements are taken.</li>
+                        <li><strong>Data</strong>: The measurements collected from the sample.</li>
+                        <li><strong>Individuals</strong>: The objects (people, animals, or things) described by the data.</li>
+                        <li><strong>Variable</strong>: A characteristic of an individual that varies across individuals.</li>
+                        <li><strong>Statistic</strong>: A numerical characteristic of a sample, which varies from sample to sample.</li>
+                        <li><strong>Parameter</strong>: A fixed numerical characteristic of a population, known only through a perfect census.</li>
+                        <li><strong>Census</strong>: Measurements taken from the entire population.</li>
+                    </ul>
+
+                    <h4>Branches of Statistics</h4>
+                    <p>Statistics is divided into two main branches:</p>
+                    <ul>
+                        <li><strong>Descriptive Statistics</strong>: Methods to summarize data without error, as they describe the data at hand.</li>
+                        <li><strong>Inferential Statistics</strong>: Methods to make inferences about a population based on a sample, involving error that can be controlled and calculated using probability.</li>
+                    </ul>
+
+                    <h4>Types of Studies</h4>
+                    <p>Common types of studies include:</p>
+                    <ul>
+                        <li><strong>Observational Study</strong>: Observes individuals and measures variables without influencing responses.</li>
+                        <li><strong>Simulation</strong>: A numerical model of real-world phenomena, often used for complex or dangerous scenarios.</li>
+                        <li><strong>Experiment</strong>: Imposes treatments on individuals to observe responses, studying cause-and-effect relationships.</li>
+                    </ul>
+                    <p><strong>Experiment Terminology</strong>: Includes <em>subjects</em> (individuals studied), <em>treatment</em> (conditions applied), and <em>treatment diagram</em> (a table showing treatment combinations).</p>
+
+                    <h4>Types of Data</h4>
+                    <p>Data is classified as:</p>
+                    <ul>
+                        <li><strong>Qualitative (Categorical)</strong>: Non-numerical data that categorizes individuals (e.g., gender).</li>
+                        <li><strong>Quantitative</strong>: Numerical data with meaningful values, either <em>discrete</em> (counted, e.g., number of children) or <em>continuous</em> (measured, e.g., height).</li>
+                    </ul>
+
+                    <h4>Levels of Measurement</h4>
+                    <p>Variables are measured at different levels:</p>
+                    <ul>
+                        <li><strong>Nominal</strong>: Identifies categories without order (e.g., gender).</li>
+                        <li><strong>Ordinal</strong>: Categories with order but no meaningful differences (e.g., rankings).</li>
+                        <li><strong>Interval</strong>: Ordered data with meaningful differences but no true zero (e.g., temperature in Fahrenheit).</li>
+                        <li><strong>Ratio</strong>: Ordered data with meaningful differences and a true zero (e.g., height, weight).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="Examples" class="tabcontent">
+                <h3>Examples</h3>
+                <section>
+                    <h2>Example 1: Terminology</h2>
+                    <p>Suppose we want to estimate the average income for all residents of Kentucky by selecting 1000 people and collecting their incomes. Identify the following:</p>
+                    <ol>
+                        <li>What is the population?</li>
+                        <li>What is the sample?</li>
+                        <li>What is the data?</li>
+                        <li>Who are the individuals?</li>
+                        <li>What is the variable?</li>
+                        <li>What is the parameter?</li>
+                        <li>What is the statistic?</li>
+                        <li>If we measured all residents, what would this be called?</li>
+                    </ol>
+                    <input type="checkbox" id="ex1" class="toggle">
+                    <label for="ex1" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>1.</strong> All residents of the state of Kentucky</p>
+                        <p><strong>2.</strong> The 1000 people selected from the state</p>
+                        <p><strong>3.</strong> The list of the 1000 incomes collected from the sample</p>
+                        <p><strong>4.</strong> Each person in the sample</p>
+                        <p><strong>5.</strong> Income (varies across individuals)</p>
+                        <p><strong>6.</strong> The average income for all residents of Kentucky</p>
+                        <p><strong>7.</strong> The average income for the 1000 people selected</p>
+                        <p><strong>8.</strong> A census</p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Example 2: Branches of Statistics</h2>
+                    <p>Classify each as a descriptive or inferential statistic:</p>
+                    <ol>
+                        <li>A basketball player’s free throw percentage based on performance up to the midpoint of the season.</li>
+                        <li>The average GPA for all current students based on complete data from the records office.</li>
+                        <li>The president’s approval rating based on a survey of 5,000 U.S. residents.</li>
+                        <li>A graph showing all sales this year for major vehicle manufacturers.</li>
+                   –
+
+                    <input type="checkbox" id="ex2" class="toggle">
+                    <label for="ex2" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>1.</strong> Descriptive (no error, based on known performance data)</p>
+                        <p><strong>2.</strong> Descriptive (no error, uses complete population data)</p>
+                        <p><strong>3.</strong> Inferential (error exists, estimates population approval using a sample)</p>
+                        <p><strong>4.</strong> Descriptive (no error, shows all sales data)</p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Example 3: Types of Studies</h2>
+                    <p>Identify each study as an observational study, experiment, or simulation:</p>
+                    <ol>
+                        <li>Patients are given a drug at various dosage levels to study effectiveness.</li>
+                        <li>Various vehicles are studied to see which are safest in a head-on collision.</li>
+                        <li>The outcome of a presidential election is predicted by asking individuals over the telephone.</li>
+                        <li>Change a container from Pepsi to Coke and calculate the percentage of people who notice.</li>
+                    </ol>
+                    <input type="checkbox" id="ex3" class="toggle">
+                    <label for="ex3" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>1.</strong> Experiment (drug dosage is imposed to measure effects)</p>
+                        <p><strong>2.</strong> Simulation (uses models to simulate crashes, avoiding real harm)</p>
+                        <p><strong>3.</strong> Observational (surveys without influencing responses)</p>
+                        <p><strong>4.</strong> Experiment (changes container to measure noticeability)</p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Example 4: Types of Data and Levels of Measurement</h2>
+                    <p>Identify the data type (qualitative or quantitative) and level of measurement for each:</p>
+                    <ol>
+                        <li>Gender</li>
+                        <li>Time to run a mile</li>
+                        <li>Number of soccer goals scored</li>
+                        <li>Temperature in Fahrenheit</li>
+                    </ol>
+                    <input type="checkbox" id="ex4" class="toggle">
+                    <label for="ex4" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>1.</strong> Qualitative, Nominal</p>
+                        <p><strong>2.</strong> Quantitative (Continuous), Ratio</p>
+                        <p><strong>3.</strong> Quantitative (Discrete), Ratio</p>
+                        <p><strong>4.</strong> Quantitative (Continuous), Interval</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>Statistics Education Resource - April 2025</p>
+    </footer>
+
+    <script>
+        function toggleLeftPanel() {
+            const leftPanel = document.getElementById('leftPanel');
+            const container = document.getElementById('container');
+            const toggleButton = document.getElementById('toggleButton');
+            const isMinimized = leftPanel.classList.toggle('minimized');
+            container.classList.toggle('minimized', isMinimized);
+            toggleButton.textContent = isMinimized ? 'Open Calculator' : 'Close Calculator';
+        }
+
+        function changeFontSize(action) {
+            const rightPanel = document.querySelector('.right-panel');
+            let size = parseFloat(getComputedStyle(rightPanel).fontSize);
+            size += (action === 'increase') ? 2 : -2;
+            size = Math.min(Math.max(size, 12), 24);
+            rightPanel.style.fontSize = `${size}px`;
+        }
+
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName('tabcontent');
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove('active');
+            }
+            const tablinks = document.getElementsByClassName('tablinks');
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove('active');
+            }
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
+        document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
+    </script>
+</body>
+</html>
