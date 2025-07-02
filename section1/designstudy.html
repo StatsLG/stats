@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Conducting a Statistical Study</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" id="container">
+        <button class="toggle-button" id="toggleButton">Open Calculator</button>
+        <div class="left-panel" id="leftPanel">
+            <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
+            <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
+            <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
+            <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
+            <script src="https://www.numworks.com/simulator/embed.js"></script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+        </div>
+        <div class="right-panel">
+            <h1>Conducting a Statistical Study</h1>
+            <h2>Designing and Interpreting Research</h2>
+
+            <!-- Tabbed Section with Theory First -->
+            <div class="tab">
+                <button class="tablinks active" onclick="openTab(event, 'Theory')">Theory</button>
+                <button class="tablinks" onclick="openTab(event, 'Examples')">Examples</button>
+            </div>
+
+            <div id="Theory" class="tabcontent active">
+                <h3>Theory</h3>
+                <div class="content">
+                    <h4>Variables in a Study</h4>
+                    <p><strong>Response Variable (Dependent)</strong>: Measures the outcome of a study.</p>
+                    <p><strong>Explanatory Variable (Independent)</strong>: Attempts to explain or cause changes in the response variable.</p>
+                    <p><strong>Lurking Variable</strong>: Affects the response variable but is not included in the study.</p>
+                    <p><strong>Confounding Variable</strong>: Its effect on the response variable cannot be separated from the explanatory variable’s effect.</p>
+
+                    <h4>Observational Study vs. Experiment</h4>
+                    <p><strong>Experiment</strong>: Creates differences in the explanatory variable and examines results, often using:</p>
+                    <ul>
+                        <li><strong>Random Assignment</strong>: Assigns subjects to treatment groups by chance (e.g., coin flip).</li>
+                        <li><strong>Control Group</strong>: Receives no treatment or a placebo to control lurking variables.</li>
+                        <li><strong>Placebo</strong>: Mimics the treatment to blind subjects.</li>
+                        <li><strong>Blinding</strong>: Single (subjects unaware of treatment) or double (neither subjects nor administrators know).</li>
+                        <li><strong>Completely Randomized Design</strong>: All subjects randomly assigned to treatment groups.</li>
+                        <li><strong>Block Design</strong>: Random assignment within groups (blocks) similar in a characteristic affecting the response.</li>
+                    </ul>
+                    <p><strong>Observational Study</strong>: Observes differences in the explanatory variable and their relation to the response variable, without assigning treatments. Confounding is harder to control.</p>
+
+                    <h4>Measurement</h4>
+                    <p><strong>Sample Survey</strong>: Collects data by asking questions and recording responses, common in observational studies.</p>
+                    <p><strong>Survey Question Guidelines</strong>:</p>
+                    <ul>
+                        <li>Avoid unnecessary complexity; keep questions simple and specific.</li>
+                        <li>Ensure neutrality to avoid leading respondents.</li>
+                        <li>Randomize question order to prevent bias.</li>
+                        <li>Be aware of respondents’ desire to please.</li>
+                        <li><strong>Open-Ended Questions</strong>: Allow free responses but are hard to summarize.</li>
+                        <li><strong>Closed-Ended Questions</strong>: Provide response options, easier to analyze but limit ideas.</li>
+                    </ul>
+                    <p><strong>Validity</strong>: A measure is valid if it measures what it claims (e.g., rates are often more valid than frequencies).</p>
+                    <p><strong>Reliability</strong>: A measure is reliable if it is consistent across repeated measurements.</p>
+
+                    <h4>Non-sampling Error</h4>
+                    <p>Errors not due to sampling include:</p>
+                    <ul>
+                        <li><strong>Measurement Error</strong>: Errors in measuring outcomes.</li>
+                        <li><strong>Response Error</strong>: Incorrect or careless responses.</li>
+                        <li><strong>Processing Error</strong>: Data entry or calculation mistakes.</li>
+                        <li><strong>Loss of Subjects</strong>: Non-adherers (not following treatment) or dropouts (not completing the study).</li>
+                        <li><strong>Non-response</strong>: Failure of subjects to respond, reducing representativeness. Response rate = \( \frac{\text{Number of Responses}}{\text{Total Sampled}} \).</li>
+                    </ul>
+
+                    <h4>Interpretation of Results</h4>
+                    <p><strong>Statistically Significant</strong>: An effect unlikely to occur by chance, indicating its existence in the population.</p>
+                    <p><strong>Practically Significant</strong>: An effect large enough to be meaningful, not guaranteed by statistical significance.</p>
+                    <p><strong>Interaction</strong>: When the effect of one explanatory variable on the response depends on another explanatory variable.</p>
+
+                    <h4>Believing a Statistic</h4>
+                    <p>Key considerations for evaluating research:</p>
+                    <ul>
+                        <li>Funding and conductor of the research (avoid conflicts of interest).</li>
+                        <li>Type of study (observational, experiment, simulation).</li>
+                        <li>Selection and characteristics of subjects.</li>
+                        <li>Presence of bias or non-sampling errors.</li>
+                        <li>Sample size and reported sampling error.</li>
+                        <li>Control of lurking and confounding variables.</li>
+                        <li>Random assignment and group comparability.</li>
+                        <li>Magnitude and practical significance of effects.</li>
+                        <li>Appropriateness of analysis techniques.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="Examples" class="tabcontent">
+                <h3>Examples</h3>
+                <section>
+                    <h2>Example 1: Variables in a Study</h2>
+                    <p>In a study examining the effect of drug dosage on blood pressure reduction, identify the response and explanatory variables, and suggest a potential lurking variable.</p>
+                    <input type="checkbox" id="ex1" class="toggle">
+                    <label for="ex1" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>Response Variable</strong>: Blood pressure reduction (depends on the drug).</p>
+                        <p><strong>Explanatory Variable</strong>: Drug dosage (causes changes in blood pressure).</p>
+                        <p><strong>Lurking Variable</strong>: Diet, as it may affect blood pressure but is not part of the study.</p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Example 2: Observational Study vs. Experiment</h2>
+                    <p>Classify each study as an observational study or experiment, and explain why:</p>
+                    <ol>
+                        <li>Researchers give a drug to one group and a placebo to another to measure pain relief.</li>
+                        <li>Researchers survey teachers to see if years of experience relate to student test scores.</li>
+                    </ol>
+                    <input type="checkbox" id="ex2" class="toggle">
+                    <label for="ex2" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>1.</strong> Experiment: Researchers assign the drug or placebo (explanatory variable) and measure pain relief (response variable).</p>
+                        <p><strong>2.</strong> Observational Study: Researchers observe years of experience (explanatory variable) and test scores (response variable) without assigning treatments.</p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Example 3: Measurement</h2>
+                    <p>Evaluate the validity and reliability of measuring U.S. homicides from 1970 to present using:</p>
+                    <ol>
+                        <li>The number of homicides.</li>
+                        <li>A scale that always weighs 10 pounds too heavy.</li>
+                    </ol>
+                    <input type="checkbox" id="ex3" class="toggle">
+                    <label for="ex3" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>1.</strong> Number of homicides: Not valid (population growth affects counts, not reflecting true trends); reliability depends on consistent data collection.</p>
+                        <p><strong>2.</strong> Scale: Reliable (consistently 10 pounds heavy) but not valid (inaccurate measurements).</p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Example 4: Non-sampling Error</h2>
+                    <p>A survey of 3200 people yields 1200 responses. Calculate the response rate and discuss its implications.</p>
+                    <input type="checkbox" id="ex4" class="toggle">
+                    <label for="ex4" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>Response Rate</strong>: \( \frac{1200}{3200} = 0.375 \) or 37.5%.</p>
+                        <p><strong>Implications</strong>: A 37.5% response rate is low (below 80%), suggesting potential bias, as responders may differ from non-responders on the variable of interest, reducing representativeness.</p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Example 5: Interpretation and Believing a Statistic</h2>
+                    <p>A study finds a statistically significant difference in test scores between online and in-class students. What questions should you ask to evaluate the results?</p>
+                    <input type="checkbox" id="ex5" class="toggle">
+                    <label for="ex5" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p>Key questions include:</p>
+                        <ul>
+                            <li>Was the study an experiment with random assignment or an observational study?</li>
+                            <li>Was there a control for lurking variables (e.g., student motivation)?</li>
+                            <li>Is the difference practically significant, or is it small despite statistical significance?</li>
+                            <li>What was the sample size, and was the sampling method random?</li>
+                            <li>Who funded or conducted the study, and is there a conflict of interest?</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>Statistics Education Resource - April 2025</p>
+    </footer>
+
+    <script>
+        function toggleLeftPanel() {
+            const leftPanel = document.getElementById('leftPanel');
+            const container = document.getElementById('container');
+            const toggleButton = document.getElementById('toggleButton');
+            const isMinimized = leftPanel.classList.toggle('minimized');
+            container.classList.toggle('minimized', isMinimized);
+            toggleButton.textContent = isMinimized ? 'Open Calculator' : 'Close Calculator';
+        }
+
+        function changeFontSize(action) {
+            const rightPanel = document.querySelector('.right-panel');
+            let size = parseFloat(getComputedStyle(rightPanel).fontSize);
+            size += (action === 'increase') ? 2 : -2;
+            size = Math.min(Math.max(size, 12), 24);
+            rightPanel.style.fontSize = `${size}px`;
+        }
+
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName('tabcontent');
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove('active');
+            }
+            const tablinks = document.getElementsByClassName('tablinks');
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove('active');
+            }
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
+        document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
+    </script>
+</body>
+</html>
