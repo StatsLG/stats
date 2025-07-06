@@ -12,7 +12,6 @@
       margin-top: 20px;
       border-radius: 8px;
     }
-
     .city-section input,
     .city-section button {
       width: 100%;
@@ -20,24 +19,39 @@
       margin-top: 10px;
       font-size: 1em;
     }
-
-    .city-section .output {
+    .output {
       margin-top: 15px;
       background: #f8f8f8;
       padding: 10px;
       border: 1px solid #ccc;
     }
-
     .tabcontent {
       display: none;
     }
-
     .tabcontent.active {
       display: block;
     }
-
     .tab button.active {
       background-color: #ccc;
+    }
+    .toggle { display: none; }
+    .question {
+      display: block;
+      background: #eee;
+      padding: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+      border-radius: 4px;
+    }
+    .toggle:checked + .question + .answer {
+      display: block;
+    }
+    .answer {
+      display: none;
+      margin-top: 10px;
+      background: #f9f9f9;
+      padding: 10px;
+      border-left: 3px solid #ccc;
     }
   </style>
 </head>
@@ -47,13 +61,11 @@
     <div class="left-panel" id="leftPanel">
       <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
       <a class="nws-simulator-embed calculator-button"
-        data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam"
-        data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
+         data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam"
+         data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
       <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
       <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
       <script src="https://www.numworks.com/simulator/embed.js"></script>
-      <script type="text/javascript" async
-        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     </div>
 
     <div class="right-panel">
@@ -68,14 +80,87 @@
 
       <div id="Theory" class="tabcontent active">
         <h3>Theory</h3>
-        <!-- [your original theory content here] -->
-        <p><em>Theory content placeholder</em></p>
+        <h4>Bias</h4>
+        <p><strong>Bias</strong> occurs when a sample is selected in a way that favors certain characteristics...</p>
+        <ul>
+          <li><strong>Convenience Sampling</strong>: Uses readily available data...</li>
+          <li><strong>Voluntary Response Sampling</strong>: Often over-represents those with strong opinions...</li>
+        </ul>
+
+        <h4>Random Sampling</h4>
+        <p><strong>Simple Random Sample</strong>: Every possible sample of size \(n\) has an equal chance of being selected.</p>
+        <ul>
+          <li><strong>Stratified Sampling</strong>: Divides the population into strata...</li>
+          <li><strong>Systematic Sampling</strong>: Selects every \(k\)-th individual...</li>
+          <li><strong>Cluster Sampling</strong>: Divides the population into clusters...</li>
+        </ul>
+
+        <h4>Sampling Error</h4>
+        <ul>
+          <li><strong>Sampling Variability</strong>: The extent to which a statistic varies...</li>
+          <li><strong>Margin of Error</strong>: For proportions: \( \frac{1}{\sqrt{n}} \)</li>
+          <li><strong>Under-coverage</strong>: When some groups are excluded...</li>
+        </ul>
       </div>
 
       <div id="Examples" class="tabcontent">
         <h3>Examples</h3>
-        <!-- [your original example content here] -->
-        <p><em>Examples content placeholder</em></p>
+
+        <section>
+          <h4>Example 1: Identifying Bias</h4>
+          <p>Determine whether each sampling method introduces bias:</p>
+          <ol>
+            <li>Restaurant comment cards are used to assess service quality.</li>
+            <li>A new cancer treatment is tested on volunteers with severe cases.</li>
+          </ol>
+          <input type="checkbox" id="ex1" class="toggle">
+          <label for="ex1" class="question">Click Here For Answer</label>
+          <div class="answer">
+            <p><strong>1.</strong> Biased — Voluntary response over-represents strong opinions.</p>
+            <p><strong>2.</strong> Biased — Volunteers with severe cases are not representative.</p>
+          </div>
+        </section>
+
+        <section>
+          <h4>Example 2: Random Sampling</h4>
+          <p>You select 1000 males from Lexington to estimate Kentucky income...</p>
+          <input type="checkbox" id="ex2" class="toggle">
+          <label for="ex2" class="question">Click Here For Answer</label>
+          <div class="answer">
+            <p>Not a simple random sample. Over-represents males and Lexington residents...</p>
+          </div>
+        </section>
+
+        <section>
+          <h4>Example 3: Types of Random Sampling</h4>
+          <p>Identify the type of sampling in each scenario:</p>
+          <ol>
+            <li>Choosing one row of a classroom</li>
+            <li>Dividing surgeons by gender and sampling each</li>
+            <li>Every 7th inmate from a list</li>
+            <li>Randomly selecting schools and surveying all students</li>
+          </ol>
+          <input type="checkbox" id="ex3" class="toggle">
+          <label for="ex3" class="question">Click Here For Answer</label>
+          <div class="answer">
+            <p>1. Cluster | 2. Stratified | 3. Systematic | 4. Cluster</p>
+          </div>
+        </section>
+
+        <section>
+          <h4>Example 4: Sampling Error</h4>
+          <p>1600 adults sampled, 800 enjoy amusement parks:</p>
+          <ol>
+            <li>Sample proportion?</li>
+            <li>Margin of error?</li>
+            <li>95% confidence interval?</li>
+          </ol>
+          <input type="checkbox" id="ex4" class="toggle">
+          <label for="ex4" class="question">Click Here For Answer</label>
+          <div class="answer">
+            <p>1. 0.5 | 2. 0.025 | 3. (0.475, 0.525)</p>
+          </div>
+        </section>
       </div>
 
       <div id="Lab" class="tabcontent">
@@ -121,9 +206,7 @@
       evt.currentTarget.classList.add('active');
     }
 
-    document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
-
-    // === Lab Tab App ===
+    // Lab tab app
     const cityProbabilities = {
       'A': 0.8,
       'B': 0.5,
@@ -131,21 +214,9 @@
     };
 
     const cityInfo = {
-      'A': {
-        title: '🏙️ City A',
-        inputId: 'sampleCountA',
-        outputId: 'outputA'
-      },
-      'B': {
-        title: '🏙️ City B',
-        inputId: 'sampleCountB',
-        outputId: 'outputB'
-      },
-      'C': {
-        title: '🌎 Both Cities Combined',
-        inputId: 'sampleCountC',
-        outputId: 'outputC'
-      }
+      'A': { title: '🏙️ City A', inputId: 'sampleCountA', outputId: 'outputA' },
+      'B': { title: '🏙️ City B', inputId: 'sampleCountB', outputId: 'outputB' },
+      'C': { title: '🌎 Both Cities Combined', inputId: 'sampleCountC', outputId: 'outputC' }
     };
 
     const cities = ['A', 'B', 'C'];
@@ -198,6 +269,8 @@
         ${sample.join("<br>")}
       `;
     }
+
+    document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
   </script>
 </body>
 </html>
