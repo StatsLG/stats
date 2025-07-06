@@ -125,6 +125,105 @@
 
             <div id="Lab" class="tabcontent">
                 <h3>TEST</h3>
+                <head>
+                <title>Dog Sampler by City (Random Order)</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; max-width: 700px; margin: auto; }
+                    .city-section { border: 1px solid #ccc; padding: 15px; margin-top: 20px; border-radius: 8px; }
+                    input, button { width: 100%; padding: 10px; margin-top: 10px; font-size: 1em; }
+                    .output { margin-top: 15px; background: #f8f8f8; padding: 10px; border: 1px solid #ccc; }
+                </style>
+                </head>
+                <body>
+                <h1>Random Dog Sampler by City</h1>
+                <p>Each city has a different dog population mix. Sample randomly from each city to explore how breeds are distributed.</p>
+
+                <div id="container"></div>
+
+                <script>
+                    // Probabilities (kept hidden)
+                    const cityProbabilities = {
+                    'A': 0.8,   // City A
+                    'B': 0.5,   // City B
+                    'C': 0.65   // Combined
+                    };
+
+                    const cityInfo = {
+                    'A': {
+                        title: '🏙️ City A',
+                        inputId: 'sampleCountA',
+                        outputId: 'outputA'
+                    },
+                    'B': {
+                        title: '🏙️ City B',
+                        inputId: 'sampleCountB',
+                        outputId: 'outputB'
+                    },
+                    'C': {
+                        title: '🌎 Both Cities Combined',
+                        inputId: 'sampleCountC',
+                        outputId: 'outputC'
+                    }
+                    };
+
+                    // Randomize order
+                    const cities = ['A', 'B', 'C'];
+                    for (let i = cities.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [cities[i], cities[j]] = [cities[j], cities[i]];
+                    }
+
+                    const container = document.getElementById("container");
+
+                    cities.forEach(city => {
+                    const section = document.createElement("div");
+                    section.className = "city-section";
+
+                    section.innerHTML = `
+                        <h2>${cityInfo[city].title}</h2>
+                        <label>Number of dogs to sample:</label>
+                        <input type="number" id="${cityInfo[city].inputId}" min="1" placeholder="e.g. 10" />
+                        <button onclick="sampleDogs('${city}')">Sample from ${cityInfo[city].title}</button>
+                        <div id="${cityInfo[city].outputId}" class="output"></div>
+                    `;
+
+                    container.appendChild(section);
+                    });
+
+                    function sampleDogs(city) {
+                    const inputId = cityInfo[city].inputId;
+                    const outputId = cityInfo[city].outputId;
+                    const sampleCount = parseInt(document.getElementById(inputId).value);
+                    const outputDiv = document.getElementById(outputId);
+                    const labProbability = cityProbabilities[city];
+
+                    if (isNaN(sampleCount) || sampleCount < 1) {
+                        outputDiv.innerHTML = "Please enter a valid number of dogs to sample.";
+                        return;
+                    }
+
+                    const sample = [];
+                    let labCount = 0;
+
+                    for (let i = 0; i < sampleCount; i++) {
+                        const isLab = Math.random() < labProbability;
+                        const dog = isLab ? "Labrador Retriever" : "Pomeranian";
+                        sample.push(dog);
+                        if (isLab) labCount++;
+                    }
+
+                    const pomCount = sampleCount - labCount;
+
+                    outputDiv.innerHTML = `
+                        <strong>Sampled ${sampleCount} Dogs:</strong><br>
+                        🐕 Labrador Retrievers: ${labCount}<br>
+                        🐶 Pomeranians: ${pomCount}<br><br>
+                        <em>Sample Details:</em><br>
+                        ${sample.join("<br>")}
+                    `;
+                    }
+                </script>
+                </body>
             </div>
             
 
