@@ -1,36 +1,176 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Introduction to Statistics and Data Collection</title>
     <meta charset="UTF-8">
+    <title>Introduction to Statistics and Data Collection</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container" id="container">
         <button class="toggle-button" id="toggleButton">Open Calculator</button>
-
-        <!-- Sidebar placeholder -->
-        <div id="sidebar-container"></div>
+        
+        <div class="left-panel" id="leftPanel">
+            <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
+            <a class="nws-simulator-embed calculator-button" 
+               data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" 
+               data-nws-width="368px" 
+               data-nws-height="720px">Open Calculator</a>
+            <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
+            <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
+        </div>
 
         <div class="right-panel">
             <h1>Introduction to Statistics and Data Collection</h1>
             <h2>Foundations of Statistical Analysis</h2>
 
-            <!-- Tabs -->
             <div class="tab">
                 <button class="tablinks active" onclick="openTab(event, 'Theory')">Theory</button>
                 <button class="tablinks" onclick="openTab(event, 'Examples')">Examples</button>
             </div>
 
             <div id="Theory" class="tabcontent active">
-                <h3>Theory updated</h3>
-                <!-- Theory content... -->
+                <h3>Theory</h3>
+                <div class="content">
+                    <!-- Terminology -->
+                    <h4>Basic Statistical Terminology</h4>
+                    <p><strong>Statistics</strong> is the study of how to collect, organize, analyze, and interpret information...</p>
+                    <ul>
+                        <li><strong>Population</strong>: The entire collection of individuals or items of interest.</li>
+                        <li><strong>Sample</strong>: A subset of the population...</li>
+                        <li><strong>Data</strong>: The measurements collected from the sample.</li>
+                        <li><strong>Individuals</strong>: The objects described by the data.</li>
+                        <li><strong>Variable</strong>: A characteristic of an individual...</li>
+                        <li><strong>Statistic</strong>: A numerical characteristic of a sample.</li>
+                        <li><strong>Parameter</strong>: A fixed numerical characteristic of a population.</li>
+                        <li><strong>Census</strong>: Measurements taken from the entire population.</li>
+                    </ul>
+
+                    <!-- Branches -->
+                    <h4>Branches of Statistics</h4>
+                    <p>Statistics is divided into two main branches:</p>
+                    <ul>
+                        <li><strong>Descriptive</strong>: Summarizes data without error.</li>
+                        <li><strong>Inferential</strong>: Uses a sample to infer about the population.</li>
+                    </ul>
+
+                    <!-- Studies -->
+                    <h4>Types of Studies</h4>
+                    <ul>
+                        <li><strong>Observational Study</strong>: Observes individuals without interfering.</li>
+                        <li><strong>Simulation</strong>: Uses models to replicate conditions.</li>
+                        <li><strong>Experiment</strong>: Applies treatments to measure responses.</li>
+                    </ul>
+                    <p><strong>Experiment Terminology</strong>: <em>Subjects</em>, <em>treatment</em>, <em>treatment diagram</em>.</p>
+
+                    <!-- Data Types -->
+                    <h4>Types of Data</h4>
+                    <ul>
+                        <li><strong>Qualitative</strong>: Non-numerical (e.g., gender).</li>
+                        <li><strong>Quantitative</strong>: Numerical (discrete or continuous).</li>
+                    </ul>
+
+                    <!-- Levels of Measurement -->
+                    <h4>Levels of Measurement</h4>
+                    <ul>
+                        <li><strong>Nominal</strong>: Categories with no order.</li>
+                        <li><strong>Ordinal</strong>: Ordered categories without true differences.</li>
+                        <li><strong>Interval</strong>: Ordered with differences but no true zero.</li>
+                        <li><strong>Ratio</strong>: Ordered with differences and true zero.</li>
+                    </ul>
+                </div>
             </div>
 
             <div id="Examples" class="tabcontent">
                 <h3>Examples</h3>
-                <!-- Examples content... -->
+
+                <!-- Example 1 -->
+                <section>
+                    <h2>Example 1: Terminology</h2>
+                    <p>Suppose we want to estimate the average income for all residents of Kentucky...</p>
+                    <ol>
+                        <li>What is the population?</li>
+                        <li>What is the sample?</li>
+                        <li>What is the data?</li>
+                        <li>Who are the individuals?</li>
+                        <li>What is the variable?</li>
+                        <li>What is the parameter?</li>
+                        <li>What is the statistic?</li>
+                        <li>If we measured all residents, what would this be called?</li>
+                    </ol>
+                    <input type="checkbox" id="ex1" class="toggle">
+                    <label for="ex1" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>1.</strong> All residents of Kentucky</p>
+                        <p><strong>2.</strong> The 1000 people selected</p>
+                        <p><strong>3.</strong> Their income data</p>
+                        <p><strong>4.</strong> Each person</p>
+                        <p><strong>5.</strong> Income</p>
+                        <p><strong>6.</strong> The average income of all residents</p>
+                        <p><strong>7.</strong> The average income of the sample</p>
+                        <p><strong>8.</strong> A census</p>
+                    </div>
+                </section>
+
+                <!-- Example 2 -->
+                <section>
+                    <h2>Example 2: Branches of Statistics</h2>
+                    <p>Classify each as descriptive or inferential:</p>
+                    <ol>
+                        <li>A basketball player's free throw percentage mid-season.</li>
+                        <li>The average GPA for all students based on full records.</li>
+                        <li>A survey estimating the president's approval rating.</li>
+                        <li>A graph showing yearly sales for vehicle makers.</li>
+                    </ol>
+                    <input type="checkbox" id="ex2" class="toggle">
+                    <label for="ex2" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>1.</strong> Descriptive</p>
+                        <p><strong>2.</strong> Descriptive</p>
+                        <p><strong>3.</strong> Inferential</p>
+                        <p><strong>4.</strong> Descriptive</p>
+                    </div>
+                </section>
+
+                <!-- Example 3 -->
+                <section>
+                    <h2>Example 3: Types of Studies</h2>
+                    <p>Identify the type of study:</p>
+                    <ol>
+                        <li>Drug trial at various dosage levels</li>
+                        <li>Vehicle crash safety model</li>
+                        <li>Election prediction phone survey</li>
+                        <li>Changing soda label in blind test</li>
+                    </ol>
+                    <input type="checkbox" id="ex3" class="toggle">
+                    <label for="ex3" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>1.</strong> Experiment</p>
+                        <p><strong>2.</strong> Simulation</p>
+                        <p><strong>3.</strong> Observational</p>
+                        <p><strong>4.</strong> Experiment</p>
+                    </div>
+                </section>
+
+                <!-- Example 4 -->
+                <section>
+                    <h2>Example 4: Types of Data and Levels of Measurement</h2>
+                    <p>Identify the type and level of each:</p>
+                    <ol>
+                        <li>Gender</li>
+                        <li>Time to run a mile</li>
+                        <li>Soccer goals scored</li>
+                        <li>Temperature in Fahrenheit</li>
+                    </ol>
+                    <input type="checkbox" id="ex4" class="toggle">
+                    <label for="ex4" class="question">Click Here For Answer</label>
+                    <div class="answer">
+                        <p><strong>1.</strong> Qualitative, Nominal</p>
+                        <p><strong>2.</strong> Quantitative (Continuous), Ratio</p>
+                        <p><strong>3.</strong> Quantitative (Discrete), Ratio</p>
+                        <p><strong>4.</strong> Quantitative (Continuous), Interval</p>
+                    </div>
+                </section>
             </div>
         </div>
     </div>
@@ -39,58 +179,40 @@
         <p>Statistics Education Resource - April 2025</p>
     </footer>
 
-    <!-- Load sidebar and make everything work -->
+    <!-- External Scripts -->
+    <script src="https://www.numworks.com/simulator/embed.js"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+    <!-- Custom Script -->
     <script>
-    function openTab(evt, tabName) {
-        const tabcontent = document.getElementsByClassName('tabcontent');
-        for (let i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].classList.remove('active');
+        function toggleLeftPanel() {
+            const leftPanel = document.getElementById('leftPanel');
+            const container = document.getElementById('container');
+            const toggleButton = document.getElementById('toggleButton');
+            const isMinimized = leftPanel.classList.toggle('minimized');
+            container.classList.toggle('minimized', isMinimized);
+            toggleButton.textContent = isMinimized ? 'Open Calculator' : 'Close Calculator';
+            toggleButton.setAttribute('aria-expanded', !isMinimized);
         }
-        const tablinks = document.getElementsByClassName('tablinks');
-        for (let i = 0; i < tablinks.length; i++) {
-            tablinks[i].classList.remove('active');
+
+        function changeFontSize(action) {
+            const rightPanel = document.querySelector('.right-panel');
+            let size = parseFloat(getComputedStyle(rightPanel).fontSize);
+            size += (action === 'increase') ? 2 : -2;
+            size = Math.min(Math.max(size, 12), 24);
+            rightPanel.style.fontSize = `${size}px`;
         }
-        document.getElementById(tabName).classList.add('active');
-        evt.currentTarget.classList.add('active');
-    }
 
-    // Load sidebar.html
-    fetch('sidebar.html')
-        .then(response => response.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
+        function openTab(evt, tabName) {
+            const contents = document.querySelectorAll('.tabcontent');
+            const tabs = document.querySelectorAll('.tablinks');
+            contents.forEach(c => c.classList.remove('active'));
+            tabs.forEach(t => t.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
 
-            // Inject sidebar HTML
-            document.getElementById('sidebar-container').innerHTML = doc.body.innerHTML;
-
-            // Manually inject and execute <script> tags
-            doc.querySelectorAll('script').forEach(oldScript => {
-                const newScript = document.createElement('script');
-                if (oldScript.src) {
-                    newScript.src = oldScript.src;
-                    newScript.async = oldScript.async;
-                    newScript.onload = () => {
-                        // Re-initialize the NumWorks calculator
-                        if (typeof window.NWS !== 'undefined') {
-                            window.NWS.init();
-                        }
-                    };
-                } else {
-                    newScript.textContent = oldScript.textContent;
-                }
-                document.body.appendChild(newScript);
-            });
-
-            // Attach toggle button after sidebar is added
-            document.getElementById('toggleButton').addEventListener('click', () => {
-                const leftPanel = document.getElementById('leftPanel');
-                const container = document.getElementById('container');
-                const isMinimized = leftPanel.classList.toggle('minimized');
-                container.classList.toggle('minimized', isMinimized);
-                document.getElementById('toggleButton').textContent = isMinimized ? 'Open Calculator' : 'Close Calculator';
-            });
-        });
-</script>
+        document.getElementById('toggleButton').addEventListener('click', toggleLeftPanel);
+    </script>
 </body>
 </html>
