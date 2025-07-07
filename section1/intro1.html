@@ -10,14 +10,14 @@
     <div class="container" id="container">
         <button class="toggle-button" id="toggleButton">Open Calculator</button>
 
-        <!-- Sidebar loaded from external file -->
+        <!-- Sidebar placeholder -->
         <div id="sidebar-container"></div>
 
         <div class="right-panel">
             <h1>Introduction to Statistics and Data Collection</h1>
             <h2>Foundations of Statistical Analysis</h2>
 
-            <!-- Tabbed Section with Theory First -->
+            <!-- Tabs -->
             <div class="tab">
                 <button class="tablinks active" onclick="openTab(event, 'Theory')">Theory</button>
                 <button class="tablinks" onclick="openTab(event, 'Examples')">Examples</button>
@@ -25,30 +25,12 @@
 
             <div id="Theory" class="tabcontent active">
                 <h3>Theory</h3>
-                <div class="content">
-                    <!-- your theory content -->
-                    <!-- (unchanged from your original file) -->
-                </div>
+                <!-- Theory content... -->
             </div>
 
             <div id="Examples" class="tabcontent">
                 <h3>Examples</h3>
-                <section>
-                    <h2>Example 1: Terminology</h2>
-                    <p>Suppose we want to estimate the average income for all residents of Kentucky...</p>
-                    <ol>
-                        <li>What is the population?</li>
-                        <li>What is the sample?</li>
-                        <!-- ... -->
-                    </ol>
-                    <input type="checkbox" id="ex1" class="toggle">
-                    <label for="ex1" class="question">Click Here For Answer</label>
-                    <div class="answer">
-                        <p><strong>1.</strong> All residents of the state of Kentucky</p>
-                        <!-- ... -->
-                    </div>
-                </section>
-                <!-- ... More Examples (unchanged) ... -->
+                <!-- Examples content... -->
             </div>
         </div>
     </div>
@@ -57,32 +39,8 @@
         <p>Statistics Education Resource - April 2025</p>
     </footer>
 
-    <!-- JavaScript to load sidebar and tab handling -->
+    <!-- Load sidebar and make everything work -->
     <script>
-        // Load sidebar.html and inject scripts
-        fetch('sidebar.html')
-            .then(response => response.text())
-            .then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-
-                // Inject sidebar HTML
-                document.getElementById('sidebar-container').innerHTML = doc.body.innerHTML;
-
-                // Re-inject all scripts from sidebar.html
-                doc.querySelectorAll("script").forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    if (oldScript.src) {
-                        newScript.src = oldScript.src;
-                        newScript.async = oldScript.async;
-                    } else {
-                        newScript.textContent = oldScript.textContent;
-                    }
-                    document.body.appendChild(newScript);
-                });
-            });
-
-        // Tab switching logic
         function openTab(evt, tabName) {
             const tabcontent = document.getElementsByClassName('tabcontent');
             for (let i = 0; i < tabcontent.length; i++) {
@@ -95,6 +53,38 @@
             document.getElementById(tabName).classList.add('active');
             evt.currentTarget.classList.add('active');
         }
+
+        // Load sidebar.html
+        fetch('sidebar.html')
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                // Inject HTML
+                document.getElementById('sidebar-container').innerHTML = doc.body.innerHTML;
+
+                // Run embedded scripts
+                doc.querySelectorAll('script').forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    if (oldScript.src) {
+                        newScript.src = oldScript.src;
+                        newScript.async = oldScript.async;
+                    } else {
+                        newScript.textContent = oldScript.textContent;
+                    }
+                    document.body.appendChild(newScript);
+                });
+
+                // IMPORTANT: Attach the button handler AFTER sidebar is loaded
+                document.getElementById('toggleButton').addEventListener('click', () => {
+                    const leftPanel = document.getElementById('leftPanel');
+                    const container = document.getElementById('container');
+                    const isMinimized = leftPanel.classList.toggle('minimized');
+                    container.classList.toggle('minimized', isMinimized);
+                    document.getElementById('toggleButton').textContent = isMinimized ? 'Open Calculator' : 'Close Calculator';
+                });
+            });
     </script>
 </body>
 </html>
