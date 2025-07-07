@@ -1,8 +1,27 @@
-<div class="left-panel">
-    <h2>Navigation</h2>
-    <ul>
-        <li><a href="intro.html" style="color:white;">Introduction</a></li>
-        <li><a href="chapter1.html" style="color:white;">Chapter 1</a></li>
-        <li><a href="chapter2.html" style="color:white;">Chapter 2</a></li>
-    </ul>
+<div class="left-panel" id="leftPanel">
+    <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
+    <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
+    <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
+    <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
+    <script src="https://www.numworks.com/simulator/embed.js"></script>
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </div>
+
+<script>
+    function toggleLeftPanel() {
+        const leftPanel = document.getElementById('leftPanel');
+        const container = document.getElementById('container');
+        const toggleButton = document.getElementById('toggleButton');
+        const isMinimized = leftPanel.classList.toggle('minimized');
+        container.classList.toggle('minimized', isMinimized);
+        toggleButton.textContent = isMinimized ? 'Open Calculator' : 'Close Calculator';
+    }
+
+    function changeFontSize(action) {
+        const rightPanel = document.querySelector('.right-panel');
+        let size = parseFloat(getComputedStyle(rightPanel).fontSize);
+        size += (action === 'increase') ? 2 : -2;
+        size = Math.min(Math.max(size, 12), 24);
+        rightPanel.style.fontSize = `${size}px`;
+    }
+</script>
