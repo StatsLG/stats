@@ -1,10 +1,12 @@
 <div class="left-panel" id="leftPanel">
     <button class="minimize-button calculator-button" onclick="toggleLeftPanel()">Minimize</button>
-    <a class="nws-simulator-embed calculator-button" data-nws-src="https://www.numworks.com/simulator/embed/#sid=122zbam" data-nws-width="368px" data-nws-height="720px">Open Calculator</a>
+
+    <!-- Calculator Embed Container -->
+    <div id="calculator-container" style="margin-top: 20px;"></div>
+
+    <!-- Font Controls -->
     <button class="font-button increase-font" onclick="changeFontSize('increase')">Increase Font</button>
     <button class="font-button decrease-font" onclick="changeFontSize('decrease')">Decrease Font</button>
-    <script src="https://www.numworks.com/simulator/embed.js"></script>
-    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </div>
 
 <script>
@@ -24,4 +26,27 @@
         size = Math.min(Math.max(size, 12), 24);
         rightPanel.style.fontSize = `${size}px`;
     }
+
+    // Load NumWorks calculator after injection
+    function loadCalculator() {
+        const script = document.createElement('script');
+        script.src = "https://www.numworks.com/simulator/embed.js";
+        script.onload = () => {
+            if (window.NWS && window.NWS.createIframe) {
+                NWS.createIframe({
+                    sid: "122zbam",
+                    container: document.getElementById("calculator-container"),
+                    width: 368,
+                    height: 720
+                });
+            }
+        };
+        document.body.appendChild(script);
+    }
+
+    // Run it
+    loadCalculator();
 </script>
+
+<!-- Optional: MathJax if you're using it elsewhere -->
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
