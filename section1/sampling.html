@@ -25,15 +25,42 @@
       padding: 10px;
       border: 1px solid #ccc;
     }
-    .tabcontent {
-      display: none;
+
+    .tab {
+      overflow: hidden;
+      background-color: #f1f1f1;
+      margin-top: 20px;
     }
-    .tabcontent.active {
-      display: block;
+
+    .tab button {
+      background-color: inherit;
+      float: left;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 10px 20px;
+      transition: 0.3s;
+      font-size: 16px;
     }
+
+    .tab button:hover {
+      background-color: #ddd;
+    }
+
     .tab button.active {
       background-color: #ccc;
     }
+
+    .tabcontent {
+      display: none;
+      padding: 15px;
+      border-top: none;
+    }
+
+    .tabcontent.active {
+      display: block;
+    }
+
     .toggle { display: none; }
     .question {
       display: block;
@@ -54,7 +81,17 @@
       border-left: 3px solid #ccc;
     }
   </style>
+
+  <!-- ✅ MathJax Setup -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 </head>
+
 <body>
   <div class="container" id="container">
     <button class="toggle-button" id="toggleButton">Open Calculator</button>
@@ -80,42 +117,38 @@
 
       <div id="Theory" class="tabcontent active">
         <h3>I. Introduction and Data Collection</h3>
-         <h3>Theory</h3>
-                <div class="content">
-                    <h4>Bias</h4>
-                    <p><strong>Bias</strong> occurs when a sample is selected in a way that favors certain characteristics, leading to overestimation or underestimation of the population parameter. Bias can be minimized or eliminated by using proper sampling techniques.</p>
-                    <p><strong>Types of Biased Sampling</strong>:</p>
-                    <ul>
-                        <li><strong>Convenience Sampling</strong>: Uses readily available data, risking severe bias. Results cannot be generalized to the population for inferential statistics but can be used for descriptive statistics of the sample.</li>
-                        <li><strong>Voluntary Response Sampling</strong>: A type of convenience sampling where participants volunteer, often over-representing those with strong opinions, making it unsuitable for population inferences.</li>
-                    </ul>
+        <h3>Theory</h3>
+        <div class="content">
+          <h4>Bias</h4>
+          <p><strong>Bias</strong> occurs when a sample is selected in a way that favors certain characteristics, leading to overestimation or underestimation of the population parameter. Bias can be minimized or eliminated by using proper sampling techniques.</p>
+          <ul>
+            <li><strong>Convenience Sampling</strong>: Uses readily available data, risking severe bias.</li>
+            <li><strong>Voluntary Response Sampling</strong>: Often over-represents people with strong opinions.</li>
+          </ul>
 
-                    <h4>Random Sampling</h4>
-                    <p>A <strong>random sample</strong> is selected by chance to ensure representativeness, allowing results to be extended to the population with calculable error probabilities. Random samples tend to mirror the population’s demographic and other characteristics.</p>
-                    <p><strong>Types of Random Sampling</strong>:</p>
-                    <ul>
-                        <li><strong>Simple Random Sample</strong>: Every possible sample of size \( n \) has an equal chance of being selected. This is the most common method used in this course.</li>
-                        <li><strong>Stratified Sampling</strong>: Divides the population into strata (e.g., by gender) and takes a random sample from each stratum to ensure representation of specific groups.</li>
-                        <li><strong>Systematic Sampling</strong>: Selects every \( k \)-th individual from a random starting point, effective only if the population is in random order.</li>
-                        <li><strong>Cluster Sampling</strong>: Divides the population into clusters (e.g., schools), randomly selects clusters, and samples all or some individuals within them.</li>
-                    </ul>
+          <h4>Random Sampling</h4>
+          <ul>
+            <li><strong>Simple Random Sample</strong>: Every sample of size \( n \) has equal chance of selection.</li>
+            <li><strong>Stratified Sampling</strong>: Split into groups (strata), then randomly sample from each.</li>
+            <li><strong>Systematic Sampling</strong>: Pick every \( k \)-th individual from a list.</li>
+            <li><strong>Cluster Sampling</strong>: Divide into clusters, sample some clusters entirely or partially.</li>
+          </ul>
 
-                    <h4>Sampling Error</h4>
-                    <p><strong>Sampling error</strong> arises because a statistic varies from sample to sample as a random variable. Key concepts include:</p>
-                    <ul>
-                        <li><strong>Sampling Variability</strong>: The extent to which a statistic varies across different samples.</li>
-                        <li><strong>Margin of Error</strong>: Quantifies the expected random sampling error, often expressed with 95% confidence. For proportions, it is calculated as \( \frac{1}{\sqrt{n}} \).</li>
-                        <li><strong>Random Sampling Error</strong>: Expected error from random sampling, covered by the margin of error.</li>
-                        <li><strong>Bad Sampling Methods</strong>: Non-random methods (e.g., convenience sampling) introduce bias, increasing error.</li>
-                        <li><strong>Sampling Frame</strong>: The list of all population individuals.</li>
-                        <li><strong>Under-coverage</strong>: When some population groups are excluded from the sampling frame, leading to bias.</li>
-                    </ul>
-                </div>
+          <h4>Sampling Error</h4>
+          <ul>
+            <li><strong>Sampling Variability</strong>: How results change with different samples.</li>
+            <li><strong>Margin of Error</strong>: \( \frac{1}{\sqrt{n}} \) for proportions (95% confidence).</li>
+            <li><strong>Random Sampling Error</strong>: Variability due to random chance in sampling.</li>
+            <li><strong>Bad Sampling Methods</strong>: Non-random methods introduce bias and error.</li>
+            <li><strong>Sampling Frame</strong>: List of all possible individuals to be sampled.</li>
+            <li><strong>Under-coverage</strong>: Some groups excluded from the frame.</li>
+          </ul>
+        </div>
       </div>
 
       <div id="Examples" class="tabcontent">
         <h3>Examples</h3>
-        <p>[Your detailed examples from the original Theory section have been moved here. This includes restaurant comment cards, medical volunteers, Lexington income, student rows, surgeon satisfaction, inmate sampling, NYC school clusters, and margin of error questions.]</p>
+        <p>[Your detailed examples from the original Theory section have been moved here.]</p>
       </div>
 
       <div id="Lab" class="tabcontent">
@@ -153,12 +186,19 @@
       for (let i = 0; i < tabcontent.length; i++) {
         tabcontent[i].classList.remove('active');
       }
+
       const tablinks = document.getElementsByClassName('tablinks');
       for (let i = 0; i < tablinks.length; i++) {
         tablinks[i].classList.remove('active');
       }
+
       document.getElementById(tabName).classList.add('active');
       evt.currentTarget.classList.add('active');
+
+      // ✅ Re-render MathJax when switching tabs
+      if (window.MathJax) {
+        MathJax.typesetPromise();
+      }
     }
 
     const cityProbabilities = {
