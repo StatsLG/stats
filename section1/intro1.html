@@ -41,50 +41,56 @@
 
     <!-- Load sidebar and make everything work -->
     <script>
-        function openTab(evt, tabName) {
-            const tabcontent = document.getElementsByClassName('tabcontent');
-            for (let i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].classList.remove('active');
-            }
-            const tablinks = document.getElementsByClassName('tablinks');
-            for (let i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove('active');
-            }
-            document.getElementById(tabName).classList.add('active');
-            evt.currentTarget.classList.add('active');
+    function openTab(evt, tabName) {
+        const tabcontent = document.getElementsByClassName('tabcontent');
+        for (let i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].classList.remove('active');
         }
+        const tablinks = document.getElementsByClassName('tablinks');
+        for (let i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove('active');
+        }
+        document.getElementById(tabName).classList.add('active');
+        evt.currentTarget.classList.add('active');
+    }
 
-        // Load sidebar.html
-        fetch('sidebar.html')
-            .then(response => response.text())
-            .then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
+    // Load sidebar.html
+    fetch('sidebar.html')
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
 
-                // Inject HTML
-                document.getElementById('sidebar-container').innerHTML = doc.body.innerHTML;
+            // Inject sidebar HTML
+            document.getElementById('sidebar-container').innerHTML = doc.body.innerHTML;
 
-                // Run embedded scripts
-                doc.querySelectorAll('script').forEach(oldScript => {
-                    const newScript = document.createElement('script');
-                    if (oldScript.src) {
-                        newScript.src = oldScript.src;
-                        newScript.async = oldScript.async;
-                    } else {
-                        newScript.textContent = oldScript.textContent;
-                    }
-                    document.body.appendChild(newScript);
-                });
-
-                // IMPORTANT: Attach the button handler AFTER sidebar is loaded
-                document.getElementById('toggleButton').addEventListener('click', () => {
-                    const leftPanel = document.getElementById('leftPanel');
-                    const container = document.getElementById('container');
-                    const isMinimized = leftPanel.classList.toggle('minimized');
-                    container.classList.toggle('minimized', isMinimized);
-                    document.getElementById('toggleButton').textContent = isMinimized ? 'Open Calculator' : 'Close Calculator';
-                });
+            // Manually inject and execute <script> tags
+            doc.querySelectorAll('script').forEach(oldScript => {
+                const newScript = document.createElement('script');
+                if (oldScript.src) {
+                    newScript.src = oldScript.src;
+                    newScript.async = oldScript.async;
+                    newScript.onload = () => {
+                        // Re-initialize the NumWorks calculator
+                        if (typeof window.NWS !== 'undefined') {
+                            window.NWS.init();
+                        }
+                    };
+                } else {
+                    newScript.textContent = oldScript.textContent;
+                }
+                document.body.appendChild(newScript);
             });
-    </script>
+
+            // Attach toggle button after sidebar is added
+            document.getElementById('toggleButton').addEventListener('click', () => {
+                const leftPanel = document.getElementById('leftPanel');
+                const container = document.getElementById('container');
+                const isMinimized = leftPanel.classList.toggle('minimized');
+                container.classList.toggle('minimized', isMinimized);
+                document.getElementById('toggleButton').textContent = isMinimized ? 'Open Calculator' : 'Close Calculator';
+            });
+        });
+</script>
 </body>
 </html>
