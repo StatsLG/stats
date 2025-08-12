@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Excel → Charts (Pie, Bar, Histogram)</title>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <!-- SheetJS (XLSX) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+  <style>
+    :root{--bg:#0b1220;--card:#121a2b;--muted:#9fb0c4;--text:#e6eef7;--accent:#7cc4ff;--danger:#ff7c7c}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;background:linear-gradient(120deg,#0b1220,#0a1830 60%,#0b1220);color:var(--text)}
+    header{padding:24px 18px 6px;}
+    h1{margin:0 0 6px;font-size:clamp(20px,2.6vw,32px)}
+    p.sub{margin:0;color:var(--muted)}
+    .wrap{display:grid;grid-template-columns:360px 1fr;gap:18px;padding:18px}
+    .card{background:var(--card);border:1px solid #24324d;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .panel{padding:16px}
+    .panel h3{margin:0 0 10px;font-size:16px;color:#cfe6ff}
+    label{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px}
+    input[type="file"],select,button,input[type="number"],input[type="text"]{width:100%;padding:10px 12px;border-radius:12px;border:1px solid #2d3b57;background:#0f1729;color:var(--text)}
+    button{cursor:pointer;border:1px solid #2d3b57;background:#0f223a}
+    button.primary{background:linear-gradient(180deg,#0f355c,#0d2743);border-color:#2f507a}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .hint{font-size:12px;color:var(--muted);margin-top:6px}
+    .danger{color:var(--danger)}
+    .preview{max-height:240px;overflow:auto;border-top:1px dashed #2b3b5a;margin-top:12px;padding-top:12px}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th,td{border-bottom:1px solid #21304d;padding:6px 8px;text-align:left}
+    .flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .chip{background:#0f223a;border:1px solid #2f507a;border-radius:999px;padding:6px 10px;color:#cfe6ff;font-size:12px}
+    footer{padding:12px 18px 24px;color:var(--muted);font-size:12px}
+    canvas{background:#0b1220;border-radius:12px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Excel → Charts</h1>
+    <p class="sub">Upload an Excel (.xlsx/.xls) or CSV, then build a <strong>pie</strong>, <strong>bar</strong>, or <strong>histogram</strong>.</p>
+  </header>
+
+  <div class="wrap">
+    <!-- Controls -->
+    <section class="card panel" id="controls">
+      <h3>1) Data</h3>
+      <label>Upload file (.xlsx, .xls, .csv)</label>
+      <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
+      <div id="sheetRow" class="row" style="margin-top:10px;display:none">
+        <div>
+          <label>Sheet</label>
+          <select id="sheetSelect"></select>
+        </div>
+        <div>
+          <label>Header Row?</label>
+          <select id="headerSelect">
+            <option value="1" selected>Yes (use first row)</option>
+            <option value="0">No (auto-names: Col1, Col2, ...)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="preview" id="previewBox" style="display:none">
+        <div class="flex" style="justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div class="flex">
+            <span class="chip" id="dimChip">0 rows × 0 cols</span>
+            <span class="chip" id="sheetChip" style="display:none"></span>
+          </div>
+          <button id="downloadCleanCSV" class="primary" style="width:auto">Download cleaned CSV</button>
+        </div>
+        <div id="previewTableWrap"></div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid #24324d;margin:16px 0" />
+
+      <h3>2) Chart Setup</h3>
+      <label>Chart Type</label>
+      <select id="chartType">
+        <option value="pie">Pie</option>
+        <option value="bar">Bar (category counts)</option>
+        <option value="hist">Histogram (numeric)</option>
+      </select>
+
+      <div id="pieBarOptions">
+        <div class="row">
+          <div>
+            <label>Category Column</label>
+            <select id="catColumn"></select>
+          </div>
+          <div>
+            <label>Use values instead of counts? (Pie)</label>
+            <select id="pieUseValues">
+              <option value="no" selected>No (use counts)</option>
+              <option value="yes">Yes (use numeric column)</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" id="pieValueRow" style="display:none">
+          <div>
+            <label>Numeric Values Column</label>
+            <select id="valueColumn"></select>
+          </div>
+          <div>
+            <label>Are these values percentages?</label>
+            <select id="isPercent">
+              <option value="no" selected>No</option>
+              <option value="yes">Yes (should sum to ~100%)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="histOptions" style="display:none">
+        <div class="row">
+          <div>
+            <label>Numeric Column</label>
+            <select id="histNumeric"></select>
+          </div>
+          <div>
+            <label>Bins</label>
+            <input id="histBins" type="number" min="2" max="100" step="1" value="10" />
+          </div>
+        </div>
+      </div>
+
+      <div class="hint" id="validationMsg"></div>
+
+      <div style="margin-top:14px" class="row">
+        <button id="drawBtn" class="primary">Draw Chart</button>
+        <button id="clearBtn">Clear</button>
+      </div>
+
+      <div class="hint" style="margin-top:8px">Tip: Click the legend to toggle series. Hover bars/slices to see exact values.</div>
+    </section>
+
+    <!-- Chart Area -->
+    <section class="card panel">
+      <div class="flex" style="justify-content:space-between;align-items:center;margin-bottom:8px">
+        <h3 style="margin:0">Chart</h3>
+        <div class="flex" style="gap:8px">
+          <input type="text" id="chartTitle" placeholder="Chart title (optional)" style="width:260px" />
+          <button id="downloadPNG">Download PNG</button>
+          <button id="downloadJSON">Download JSON</button>
+        </div>
+      </div>
+      <canvas id="chartCanvas" height="380"></canvas>
+    </section>
+  </div>
+
+  <footer>
+    Built with ✨ <a href="https://www.npmjs.com/package/xlsx" target="_blank" rel="noreferrer" style="color:var(--accent)">SheetJS</a> and <a href="https://www.chartjs.org/" target="_blank" rel="noreferrer" style="color:var(--accent)">Chart.js</a>. Your data never leaves your browser.
+  </footer>
+
+  <script>
+    // State
+    let rawSheets = {};        // { sheetName: array-of-arrays }
+    let rows = [];             // working data as array of objects [{Col1:..., Col2:...}, ...]
+    let headers = [];          // header names
+    let chart = null;
+
+    const els = {
+      file: document.getElementById('fileInput'),
+      sheetRow: document.getElementById('sheetRow'),
+      sheetSelect: document.getElementById('sheetSelect'),
+      headerSelect: document.getElementById('headerSelect'),
+      previewBox: document.getElementById('previewBox'),
+      previewTableWrap: document.getElementById('previewTableWrap'),
+      dimChip: document.getElementById('dimChip'),
+      sheetChip: document.getElementById('sheetChip'),
+      downloadCleanCSV: document.getElementById('downloadCleanCSV'),
+      chartType: document.getElementById('chartType'),
+      pieBarOptions: document.getElementById('pieBarOptions'),
+      pieUseValues: document.getElementById('pieUseValues'),
+      pieValueRow: document.getElementById('pieValueRow'),
+      catColumn: document.getElementById('catColumn'),
+      valueColumn: document.getElementById('valueColumn'),
+      histOptions: document.getElementById('histOptions'),
+      histNumeric: document.getElementById('histNumeric'),
+      histBins: document.getElementById('histBins'),
+      validationMsg: document.getElementById('validationMsg'),
+      drawBtn: document.getElementById('drawBtn'),
+      clearBtn: document.getElementById('clearBtn'),
+      chartTitle: document.getElementById('chartTitle'),
+      downloadPNG: document.getElementById('downloadPNG'),
+      downloadJSON: document.getElementById('downloadJSON'),
+      isPercent: document.getElementById('isPercent'),
+    };
+
+    // Utils
+    function toObjects(aoa, useHeader=true){
+      if(!aoa || !aoa.length) return { headers: [], rows: [] };
+      let hdrs = [];
+      let start = 0;
+      if(useHeader){
+        hdrs = aoa[0].map((h,i)=> (h==null || h==="") ? `Col${i+1}` : String(h).trim());
+        start = 1;
+      } else {
+        hdrs = aoa[0].map((_,i)=>`Col${i+1}`);
+      }
+      const out = [];
+      for(let r=start;r<aoa.length;r++){
+        const row = {};
+        for(let c=0;c<hdrs.length;c++){
+          row[hdrs[c]] = aoa[r][c];
+        }
+        out.push(row);
+      }
+      return { headers: hdrs, rows: out };
+    }
+
+    function renderPreview(){
+      els.previewBox.style.display = 'block';
+      els.dimChip.textContent = `${rows.length} rows × ${headers.length} cols`;
+      // Build table
+      const maxRows = Math.min(30, rows.length);
+      let html = '<table><thead><tr>' + headers.map(h=>`<th>${escapeHtml(h)}</th>`).join('') + '</tr></thead><tbody>';
+      for(let i=0;i<maxRows;i++){
+        const r = rows[i] || {};
+        html += '<tr>' + headers.map(h=>`<td>${escapeHtml(r[h])}</td>`).join('') + '</tr>';
+      }
+      if(rows.length>maxRows){
+        html += `<tr><td colspan="${headers.length}" style="text-align:center;color:var(--muted)">… ${rows.length-maxRows} more rows</td></tr>`;
+      }
+      html += '</tbody></table>';
+      els.previewTableWrap.innerHTML = html;
+    }
+
+    function escapeHtml(v){
+      if(v==null) return '';
+      return String(v).replace(/[&<>"']/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[s]));
+    }
+
+    function populateColumnSelects(){
+      const makeOpts = (sel)=>{
+        sel.innerHTML = headers.map(h=>`<option value="${escapeHtml(h)}">${escapeHtml(h)}</option>`).join('');
+      };
+      makeOpts(els.catColumn);
+      makeOpts(els.valueColumn);
+      makeOpts(els.histNumeric);
+    }
+
+    function updateModeUI(){
+      const t = els.chartType.value;
+      if(t === 'hist'){
+        els.pieBarOptions.style.display = 'none';
+        els.histOptions.style.display = 'block';
+      } else {
+        els.pieBarOptions.style.display = 'block';
+        els.histOptions.style.display = 'none';
+      }
+      els.pieValueRow.style.display = (t==='pie' && els.pieUseValues.value==='yes') ? 'grid' : 'none';
+      els.validationMsg.textContent = '';
+      els.validationMsg.classList.remove('danger');
+    }
+
+    function clearChart(){
+      if(chart){ chart.destroy(); chart = null; }
+      const ctx = document.getElementById('chartCanvas').getContext('2d');
+      ctx.clearRect(0,0,ctx.canvas.width, ctx.canvas.height);
+    }
+
+    function groupCounts(arr, key){
+      const m = new Map();
+      for(const r of arr){
+        const v = r[key];
+        const k = v==null? '': String(v);
+        m.set(k, (m.get(k)||0)+1);
+      }
+      // Sort by count desc
+      return [...m.entries()].sort((a,b)=>b[1]-a[1]);
+    }
+
+    function numericArray(arr, key){
+      const out = [];
+      for(const r of arr){
+        const v = Number(r[key]);
+        if(Number.isFinite(v)) out.push(v);
+      }
+      return out;
+    }
+
+    function histogram(values, bins=10){
+      if(values.length===0) return { labels: [], counts: [] };
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const w = (max - min) / bins || 1;
+      const edges = Array.from({length: bins+1}, (_,i)=> min + i*w);
+      const counts = Array(bins).fill(0);
+      for(const x of values){
+        let idx = Math.floor((x - min) / w);
+        if(idx===bins) idx = bins-1; // include max in last bin
+        counts[idx]++;
+      }
+      const labels = counts.map((_,i)=> `${formatNum(edges[i])}–${formatNum(edges[i+1])}`);
+      return { labels, counts };
+    }
+
+    function formatNum(n){
+      return Number(n.toFixed(2)).toString();
+    }
+
+    function warn(msg){
+      els.validationMsg.textContent = msg;
+      els.validationMsg.classList.add('danger');
+    }
+
+    function ok(msg){
+      els.validationMsg.textContent = msg;
+      els.validationMsg.classList.remove('danger');
+    }
+
+    // File handling
+    els.file.addEventListener('change', async (e)=>{
+      resetAll();
+      const f = e.target.files?.[0];
+      if(!f) return;
+      const name = f.name.toLowerCase();
+      const ab = await f.arrayBuffer();
+
+      if(name.endsWith('.csv')){
+        // Parse CSV via SheetJS
+        const wb = XLSX.read(ab, { type: 'array' });
+        const sheetName = wb.SheetNames[0];
+        const aoa = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, raw: false });
+        rawSheets = { [sheetName]: aoa };
+        els.sheetRow.style.display = 'none';
+        els.sheetChip.style.display = 'none';
+        handleSheet(aoa, true, sheetName);
+      } else {
+        const wb = XLSX.read(ab, { type: 'array' });
+        // Build sheet dropdown
+        els.sheetSelect.innerHTML = wb.SheetNames.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+        rawSheets = {};
+        for(const s of wb.SheetNames){
+          rawSheets[s] = XLSX.utils.sheet_to_json(wb.Sheets[s], { header: 1, raw: false });
+        }
+        els.sheetRow.style.display = 'grid';
+        els.sheetChip.style.display = 'inline-block';
+        const first = wb.SheetNames[0];
+        els.sheetSelect.value = first;
+        handleSheet(rawSheets[first], true, first);
+      }
+    });
+
+    els.sheetSelect.addEventListener('change', ()=>{
+      const s = els.sheetSelect.value;
+      const aoa = rawSheets[s];
+      handleSheet(aoa, els.headerSelect.value==='1', s);
+    });
+
+    els.headerSelect.addEventListener('change', ()=>{
+      const s = els.sheetSelect.value;
+      const aoa = rawSheets[s];
+      handleSheet(aoa, els.headerSelect.value==='1', s);
+    });
+
+    function handleSheet(aoa, useHeader, sheetName){
+      const { headers: hdrs, rows: rws } = toObjects(aoa, useHeader);
+      headers = hdrs; rows = rws;
+      els.sheetChip.textContent = `Sheet: ${sheetName}`;
+      populateColumnSelects();
+      renderPreview();
+      ok('Ready. Choose chart options and click Draw.');
+    }
+
+    // UI handlers
+    els.chartType.addEventListener('change', updateModeUI);
+    els.pieUseValues.addEventListener('change', updateModeUI);
+
+    els.drawBtn.addEventListener('click', ()=>{
+      if(!rows.length){ warn('Please upload data first.'); return; }
+      drawChart();
+    });
+
+    els.clearBtn.addEventListener('click', ()=>{
+      clearChart();
+      ok('Cleared chart.');
+    });
+
+    els.downloadPNG.addEventListener('click', ()=>{
+      if(!chart){ warn('No chart to download.'); return; }
+      const url = chart.toBase64Image();
+      const a = document.createElement('a');
+      a.href = url; a.download = 'chart.png'; a.click();
+    });
+
+    els.downloadJSON.addEventListener('click', ()=>{
+      if(!rows.length){ warn('No data loaded.'); return; }
+      const blob = new Blob([JSON.stringify({ headers, rows }, null, 2)], { type:'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'data.json'; a.click();
+    });
+
+    els.downloadCleanCSV.addEventListener('click', ()=>{
+      if(!rows.length){ warn('No data loaded.'); return; }
+      const aoa = [headers, ...rows.map(r=> headers.map(h=> r[h]))];
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Cleaned');
+      const out = XLSX.write(wb, { bookType:'csv', type:'array' });
+      const blob = new Blob([out], { type: 'text/csv' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'cleaned.csv'; a.click();
+    });
+
+    function drawChart(){
+      updateModeUI();
+      clearChart();
+      const type = els.chartType.value;
+      const title = els.chartTitle.value.trim();
+
+      if(type==='hist'){
+        const col = els.histNumeric.value;
+        const binN = Math.max(2, Math.min(100, Number(els.histBins.value)||10));
+        const vals = numericArray(rows, col);
+        if(vals.length===0){ warn('Selected numeric column has no numeric values.'); return; }
+        const { labels, counts } = histogram(vals, binN);
+        renderBar(labels, counts, title || `Histogram of ${col}`);
+        ok(`Histogram with ${binN} bins from ${vals.length} numeric values.`);
+        return;
+      }
+
+      // pie / bar paths
+      const catCol = els.catColumn.value;
+      if(!catCol){ warn('Select a category column.'); return; }
+
+      if(type==='pie' && els.pieUseValues.value==='yes'){
+        // Values-based pie, optionally percentages
+        const valCol = els.valueColumn.value;
+        const isPct = els.isPercent.value==='yes';
+        // Group by category: sum values per category
+        const map = new Map();
+        for(const r of rows){
+          const k = r[catCol]==null? '': String(r[catCol]);
+          const v = Number(r[valCol]);
+          if(Number.isFinite(v)){
+            map.set(k, (map.get(k)||0) + v);
+          }
+        }
+        const labels = [...map.keys()];
+        const values = [...map.values()];
+        if(!labels.length){ warn('No valid numeric values found for the selected value column.'); return; }
+        if(isPct){
+          const total = values.reduce((a,b)=>a+b,0);
+          const delta = Math.abs(total - 100);
+          if(delta > 0.5){
+            warn(`Percentages sum to ${formatNum(total)}%. Consider normalizing or unchecking the percentage option.`);
+          } else {
+            ok('Percentages sum ≈ 100%.');
+          }
+        }
+        renderPie(labels, values, title || `${catCol}`);
+        return;
+      }
+
+      // Category counts (pie or bar)
+      const entries = groupCounts(rows, catCol);
+      if(entries.length===0){ warn('No data in selected column.'); return; }
+      const labels = entries.map(([k])=>k);
+      const counts = entries.map(([,v])=>v);
+      if(type==='pie') renderPie(labels, counts, title || `${catCol} (counts)`);
+      else renderBar(labels, counts, title || `${catCol} (counts)`);
+      ok(`${type==='pie'?'Pie':'Bar'} chart created from ${rows.length} rows.`);
+    }
+
+    function renderPie(labels, data, title){
+      const ctx = document.getElementById('chartCanvas');
+      chart = new Chart(ctx, {
+        type: 'pie',
+        data: { labels, datasets: [{ data }]},
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'right' },
+            tooltip: { callbacks: { label: (ctx)=>{
+              const v = ctx.raw;
+              const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+              const pct = total? (v/total*100).toFixed(1) : 0;
+              return `${ctx.label}: ${v} (${pct}%)`;
+            } } },
+            title: { display: !!title, text: title }
+          }
+        }
+      });
+    }
+
+    function renderBar(labels, data, title){
+      const ctx = document.getElementById('chartCanvas');
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: title||'Count', data }]},
+        options: {
+          responsive: true,
+          scales: { y: { beginAtZero: true, ticks: { precision:0 } } },
+          plugins: { legend: { display: false }, title: { display: !!title, text: title } }
+        }
+      });
+    }
+
+    function resetAll(){
+      rawSheets = {}; rows = []; headers = [];
+      els.previewBox.style.display = 'none';
+      els.sheetChip.style.display = 'none';
+      els.sheetRow.style.display = 'none';
+      els.validationMsg.textContent = '';
+      clearChart();
+    }
+
+    // Initial UI setup
+    updateModeUI();
+  </script>
+</body>
+</html>
