@@ -8,6 +8,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Chart.js for plotting -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Data labels plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 
   <style>
     :root { --bg:#0f172a; --panel:#111827; --card:#1f2937; --text:#e5e7eb; --muted:#9ca3af; --accent:#60a5fa; }
@@ -17,9 +19,10 @@
     .panel { background:var(--panel); border:1px solid #222; border-radius:14px; padding:16px; display:grid; gap:12px; grid-template-columns:1fr 1fr; }
     .panel > div { background:var(--card); border-radius:12px; padding:14px; }
     .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .col { display:flex; flex-direction:column; gap:6px; }
     label { font-size:.95rem; color:var(--muted); }
     input[type="file"] { color:var(--text); }
-    select, input[type="number"] {
+    select, input[type="number"], input[type="text"] {
       background:#111827; color:var(--text); border:1px solid #30363d; border-radius:8px; padding:8px 10px; min-width:180px;
     }
     button {
@@ -30,11 +33,12 @@
     button:disabled { opacity:.6; cursor:not-allowed; }
     .hint { font-size:.9rem; color:var(--muted); }
     .full { grid-column:1 / -1; }
-    #chartCard { min-height:420px; display:flex; align-items:center; justify-content:center; }
+    #chartCard { min-height:440px; display:flex; align-items:center; justify-content:center; }
     #messages { white-space:pre-line; font-size:.95rem; color:#f8d66d; }
     .badge { display:inline-block; font-size:.8rem; background:#0b1323; border:1px solid #2a2f3a; padding:4px 8px; border-radius:999px; color:#8ab4ff; }
     .spacer { height:4px; }
     .small { font-size:.85rem; color:var(--muted); }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; }
   </style>
 </head>
 <body>
@@ -83,7 +87,34 @@
           <button id="clearBtn" disabled>Clear Chart</button>
         </div>
         <div class="hint">
-          Tip: Histogram requires a numeric column. Pie/Bar work best with categorical columns (few unique values).
+          Tip: Histogram requires a numeric column. Pie/Bar work best with categorical columns (few unique values).<br>
+          Note: Percent data labels are computed from the <em>plotted values</em>.
+        </div>
+      </div>
+
+      <!-- New: Title & axis label options + data label mode -->
+      <div class="full">
+        <div class="grid2">
+          <div class="col">
+            <label for="titleInput">Chart title</label>
+            <input id="titleInput" type="text" placeholder="(Optional) Custom chart title" />
+          </div>
+          <div class="col">
+            <label for="labelMode">Data labels</label>
+            <select id="labelMode">
+              <option value="none">None</option>
+              <option value="count">Count</option>
+              <option value="percent">Percent</option>
+            </select>
+          </div>
+          <div class="col">
+            <label for="xLabelInput">X-axis label</label>
+            <input id="xLabelInput" type="text" placeholder="(Optional) X axis label" />
+          </div>
+          <div class="col">
+            <label for="yLabelInput">Y-axis label</label>
+            <input id="yLabelInput" type="text" placeholder="(Optional) Y axis label" />
+          </div>
         </div>
       </div>
 
@@ -94,6 +125,9 @@
   </div>
 
   <script>
+    // Register datalabels plugin
+    Chart.register(ChartDataLabels);
+
     let workbookData = null;
     let currentChart = null;
 
@@ -112,6 +146,11 @@
       colsBadge: document.getElementById('colsBadge'),
       sheetBadge: document.getElementById('sheetBadge'),
       canvas: document.getElementById('chartCanvas'),
+      // New controls
+      titleInput: document.getElementById('titleInput'),
+      xLabelInput: document.getElementById('xLabelInput'),
+      yLabelInput: document.getElementById('yLabelInput'),
+      labelMode: document.getElementById('labelMode'),
     };
 
     function showMsg(text) { els.messages.textContent = text || ''; }
@@ -255,24 +294,36 @@
       const rawCol = workbookData.columns[colName];
       destroyChart();
 
+      const userTitle = els.titleInput.value.trim();
+      const userX = els.xLabelInput.value.trim();
+      const userY = els.yLabelInput.value.trim();
+      const labelMode = els.labelMode.value; // none | count | percent
+
       if (chartType === 'hist') {
         if (!isNumericArray(rawCol)) { showMsg('Histogram requires numeric.'); return; }
         const values = toNumericArray(rawCol);
         const bins = Math.max(2, Math.min(60, parseInt(els.bins.value || '10', 10)));
         const { labels, counts } = computeHistogram(values, bins);
         drawChart('bar', labels, counts, {
-          title: `${colName} — Histogram (${bins} bins)`,
-          xLabel: colName, yLabel: 'Frequency', isHistogram: true
+          title: userTitle || `${colName} — Histogram (${bins} bins)`,
+          xLabel: userX || colName,
+          yLabel: userY || 'Frequency',
+          isHistogram: true,
+          labelMode
         });
       } else {
         const cleaned = rawCol.map(v => v === null ? null : String(v).trim()).filter(v => v !== null && v !== '');
+        if (cleaned.length === 0) { showMsg('No non-empty values in this column.'); return; }
         const { entries, totalUnique } = uniqueCounts(cleaned, { limit: 30 });
         if (totalUnique > 30) showMsg(`Showing top 30 of ${totalUnique} unique values.`);
         const labels = entries.map(e => e[0]);
         const counts = entries.map(e => e[1]);
         drawChart(chartType, labels, counts, {
-          title: `${colName} — ${chartType === 'pie' ? 'Pie' : 'Bar'} Chart`,
-          xLabel: 'Category', yLabel: 'Count'
+          title: userTitle || `${colName} — ${chartType === 'pie' ? 'Pie' : 'Bar'} Chart`,
+          xLabel: userX || (chartType === 'pie' ? '' : 'Category'),
+          yLabel: userY || (chartType === 'pie' ? '' : 'Count'),
+          isHistogram: false,
+          labelMode
         });
       }
     });
@@ -282,6 +333,19 @@
       const isPie = (kind === 'pie');
       const isHist = !!meta?.isHistogram;
 
+      const total = data.reduce((a,b)=>a+b,0);
+      const formatter = (val, context) => {
+        if (meta?.labelMode === 'none') return null;
+        const count = isHist ? (context.raw?.y ?? 0) :
+                      isPie ? context.raw :
+                      context.raw; // bar
+        if (count === 0) return null;
+        if (meta.labelMode === 'count') return String(count);
+        const pct = total > 0 ? (count / total) * 100 : 0;
+        const places = pct >= 10 ? 1 : 1; // simple 1-decimal
+        return `${pct.toFixed(places)}%`;
+      };
+
       // For histograms, provide (x,y) points on a linear x-scale with unit spacing.
       const dataset = {
         label: meta?.yLabel || 'Value',
@@ -289,9 +353,7 @@
         parsing: !isHist,             // use {x,y} directly for hist
         borderWidth: isHist ? 0 : 1,  // no borders on hist bars
         barPercentage: 1.0,
-        categoryPercentage: 1.0,
-        // You can uncomment the next line to force a fixed pixel width if desired:
-        // barThickness: isHist ? undefined : undefined
+        categoryPercentage: 1.0
       };
 
       const options = {
@@ -300,6 +362,15 @@
         plugins: {
           title: { display: !!meta?.title, text: meta?.title },
           legend: { display: isPie, position: 'bottom' },
+          datalabels: {
+            display: meta?.labelMode !== 'none',
+            formatter,
+            clamp: true,
+            anchor: isPie ? 'end' : 'end',
+            align: isPie ? 'start' : 'end',
+            offset: isPie ? 4 : 0,
+            // No explicit color; Chart.js picks suitable defaults
+          },
           tooltip: isHist ? {
             callbacks: {
               title: (items) => {
@@ -315,7 +386,7 @@
         scales: isPie ? {} : {
           x: isHist ? {
             type: 'linear',
-            min: -0.5,                       // ensures first/last bars have full width
+            min: -0.5,
             max: data.length - 0.5,
             offset: false,
             grid: { display: false, drawBorder: false },
@@ -325,10 +396,7 @@
               autoSkip: false,
               maxRotation: 45,
               minRotation: 0,
-              callback: (value) => {
-                // value is numeric (0..k-1); map to bin range label
-                return Number.isInteger(value) ? (labels[value] ?? '') : '';
-              }
+              callback: (value) => Number.isInteger(value) ? (labels[value] ?? '') : ''
             }
           } : {
             title: { display: !!meta?.xLabel, text: meta?.xLabel },
