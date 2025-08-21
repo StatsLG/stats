@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stats Grapher — Module 1.4 (Fonts + Axis Labels)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body {background:#0f172a;color:#e5e7eb;font-family:sans-serif;margin:0}
+    .wrap{display:grid;grid-template-columns:320px 1fr;gap:14px;padding:14px}
+    .panel{background:#111827;border:1px solid #1f2937;border-radius:14px}
+    .left{padding:14px}
+    .card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:12px;margin-bottom:12px}
+    label{display:block;font-size:13px;color:#9ca3af;margin-bottom:6px}
+    input,select{width:95%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb}
+    .btn{margin-top:6px;padding:8px 10px;background:#14213d;color:#e5e7eb;border:none;border-radius:8px;cursor:pointer}
+    .btn:hover{filter:brightness(1.1)}
+    .preview{max-height:200px;overflow:auto;border:1px solid #374151;border-radius:8px;margin-top:6px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:4px 6px;border-bottom:1px solid #303744;font-size:13px}
+    .chart-wrap{height:520px;width:100%}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="panel left">
+      <div class="card">
+        <label>Upload data (CSV / Excel)</label>
+        <input id="file" type="file" accept=".csv, .xlsx" />
+        <button class="btn" id="loadBtn">Load File</button>
+        <button class="btn" id="sampleBtn">Load Sample</button>
+      </div>
+
+      <div class="card">
+        <label>Column</label>
+        <select id="colSelect"><option value="">—</option></select>
+        <label>Summarize by</label>
+        <select id="summary"><option value="count">Count</option><option value="percent">Percent</option></select>
+        <label>Chart Title</label><input id="titleInput" type="text" placeholder="Chart Title" />
+        <label>Y‑Axis Label</label><input id="ylabelInput" type="text" placeholder="Y Axis Label" />
+        <button class="btn" id="drawBarBtn">Draw Bar Chart</button>
+        <button class="btn" id="downloadPNGBtn">Download PNG</button>
+      </div>
+
+      <div class="card">
+        <label>Bar Fill</label><input id="fillColor" type="color" value="#60a5fa" />
+        <label>Bar Border</label><input id="borderColor" type="color" value="#1f2937" />
+        <label>Fill Opacity</label><input id="opacity" type="number" min="0" max="1" step="0.1" value="0.8" />
+        <label>Chart Height (px)</label><input id="chartH" type="number" value="520" />
+        <label>Chart Width (px)</label><input id="chartW" type="number" placeholder="auto" />
+        <button class="btn" id="applySizeBtn">Apply Size</button>
+      </div>
+
+      <div class="card">
+        <label>Font Family</label>
+        <select id="fontFamily">
+          <option value="sans-serif">Sans-serif</option>
+          <option value="serif">Serif</option>
+          <option value="monospace">Monospace</option>
+          <option value="cursive">Cursive</option>
+        </select>
+        <label>Font Size (px)</label>
+        <input id="fontSize" type="number" value="12" />
+      </div>
+
+      <div class="card">
+        <strong>Dataset Preview</strong>
+        <div id="preview" class="preview"></div>
+      </div>
+    </aside>
+
+    <main class="panel">
+      <div class="chart-wrap"><canvas id="chart"></canvas></div>
+    </main>
+  </div>
+
+<script>
+let DATA = [];
+let HEADERS = [];
+let currentChart = null;
+
+function hexToRgba(hex, alpha=1){
+  const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex);
+  if(!m) return `rgba(96,165,250,${alpha})`;
+  const r = parseInt(m[1],16), g = parseInt(m[2],16), b = parseInt(m[3],16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function buildTable(rows){
+  if(!rows.length) return '<div>No data loaded</div>';
+  const headers = Object.keys(rows[0]);
+  let html = '<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>';
+  for(const r of rows.slice(0,20)){
+    html+='<tr>'+headers.map(h=>`<td>${r[h]}</td>`).join('')+'</tr>';
+  }
+  html+='</tbody></table>';
+  return html;
+}
+
+async function loadFile(file){
+  const buf = await file.arrayBuffer();
+  const wb = XLSX.read(buf,{type:'array'});
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  setData(XLSX.utils.sheet_to_json(ws,{defval:''}));
+}
+
+function setData(rows){
+  DATA = rows;
+  HEADERS = rows.length?Object.keys(rows[0]):[];
+  const colSel=document.getElementById('colSelect');
+  colSel.innerHTML='<option value="">—</option>'+HEADERS.map(h=>`<option value="${h}">${h}</option>`).join('');
+  document.getElementById('preview').innerHTML=buildTable(DATA);
+}
+
+function summarizeCategorical(col){
+  const counts={};
+  let total=0;
+  for(const r of DATA){
+    let v=r[col]?String(r[col]).trim():'';
+    if(v==='') continue;
+    counts[v]=(counts[v]||0)+1; total++;
+  }
+  const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const labels=entries.map(e=>e[0]);
+  const values=entries.map(e=>e[1]);
+  return {labels,values,total};
+}
+
+function applySize(){
+  const wrap=document.querySelector('.chart-wrap');
+  const h=parseInt(document.getElementById('chartH').value,10);
+  if(!isNaN(h)) wrap.style.height=h+'px';
+  const w=document.getElementById('chartW').value;
+  if(w) wrap.style.width=w+'px'; else wrap.style.width='100%';
+}
+
+function drawBar(){
+  const col=document.getElementById('colSelect').value;
+  if(!col) return alert('Pick a column');
+  const {labels,values}=summarizeCategorical(col);
+  const fill=hexToRgba(document.getElementById('fillColor').value,parseFloat(document.getElementById('opacity').value));
+  const border=document.getElementById('borderColor').value;
+  applySize();
+  if(currentChart) currentChart.destroy();
+  const fontFamily=document.getElementById('fontFamily').value;
+  const fontSize=parseInt(document.getElementById('fontSize').value,10)||12;
+
+  const chartTitle=document.getElementById('titleInput').value || col;
+  const ylabel=document.getElementById('ylabelInput').value || '';
+
+  currentChart=new Chart(document.getElementById('chart'),{
+    type:'bar',
+    data:{labels,datasets:[{label:col,data:values,backgroundColor:fill,borderColor:border,borderWidth:1}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{labels:{font:{family:fontFamily,size:fontSize}}},
+        title:{display:true,text:chartTitle,font:{family:fontFamily,size:fontSize+2}},
+        tooltip:{bodyFont:{family:fontFamily,size:fontSize}}
+      },
+      scales:{
+        x:{ticks:{font:{family:fontFamily,size:fontSize}}},
+        y:{title:{display:!!ylabel,text:ylabel,font:{family:fontFamily,size:fontSize}},
+           ticks:{font:{family:fontFamily,size:fontSize}}}
+      }
+    }
+  });
+}
+
+function downloadPNG(){
+  if(!currentChart) return;
+  const a=document.createElement('a');
+  a.href=currentChart.toBase64Image();
+  a.download='chart.png';
+  a.click();
+}
+
+const SAMPLE=[
+  {Snack:"Chips",Class:"A",Day:"Mon"},
+  {Snack:"Cookies",Class:"A",Day:"Mon"},
+  {Snack:"Fruit",Class:"A",Day:"Tue"},
+  {Snack:"Fruit",Class:"B",Day:"Tue"},
+  {Snack:"Chips",Class:"B",Day:"Wed"},
+  {Snack:"Fruit",Class:"B",Day:"Wed"},
+  {Snack:"Cookies",Class:"C",Day:"Thu"},
+  {Snack:"Chips",Class:"C",Day:"Thu"},
+  {Snack:"Fruit",Class:"C",Day:"Fri"},
+  {Snack:"",Class:"C",Day:"Fri"}
+];
+
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('loadBtn').onclick=()=>{const f=document.getElementById('file').files[0];if(f) loadFile(f)};
+  document.getElementById('sampleBtn').onclick=()=>{setData(SAMPLE)};
+  document.getElementById('drawBarBtn').onclick=drawBar;
+  document.getElementById('downloadPNGBtn').onclick=downloadPNG;
+  document.getElementById('applySizeBtn').onclick=applySize;
+});
+</script>
+</body>
+</html>
+
