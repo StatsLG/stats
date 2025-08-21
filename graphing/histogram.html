@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stats Grapher — Module 3 (Histogram)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body {background:#0f172a;color:#e5e7eb;font-family:sans-serif;margin:0}
+    .wrap{display:grid;grid-template-columns:320px 1fr;gap:14px;padding:14px}
+    .panel{background:#111827;border:1px solid #1f2937;border-radius:14px}
+    .left{padding:14px}
+    .card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:12px;margin-bottom:12px}
+    label{display:block;font-size:13px;color:#9ca3af;margin-bottom:6px}
+    input,select{width:95%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb}
+    input[type="color"]{height:40px;padding:0}
+    .btn{margin-top:6px;padding:8px 10px;background:#14213d;color:#e5e7eb;border:none;border-radius:8px;cursor:pointer}
+    .btn:hover{filter:brightness(1.1)}
+    .preview{max-height:200px;overflow:auto;border:1px solid #374151;border-radius:8px;margin-top:6px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:4px 6px;border-bottom:1px solid #303744;font-size:13px}
+    .chart-wrap{height:520px;width:100%}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .muted{color:#9ca3af;font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="panel left">
+      <div class="card">
+        <label>Upload data (CSV / Excel)</label>
+        <input id="file" type="file" accept=".csv, .xlsx" />
+        <button class="btn" id="loadBtn">Load File</button>
+        <button class="btn" id="sampleBtn">Load Sample</button>
+        <div id="status" class="muted" style="margin-top:6px"></div>
+      </div>
+
+      <div class="card">
+        <label>Numeric Column</label>
+        <select id="colSelect"><option value="">—</option></select>
+        <div class="row">
+          <div>
+            <label>Summarize by</label>
+            <select id="summary"><option value="count">Count</option><option value="percent">Percent</option></select>
+          </div>
+          <div>
+            <label>Y starts at 0</label>
+            <select id="yZero"><option value="yes" selected>Yes</option><option value="no">No</option></select>
+          </div>
+        </div>
+        <label>Chart Title</label><input id="titleInput" type="text" placeholder="Histogram Title" />
+        <label>X‑Axis Label</label><input id="xlabelInput" type="text" placeholder="Value" />
+        <label>Y‑Axis Label</label><input id="ylabelInput" type="text" placeholder="Count or Percent" />
+        <button class="btn" id="drawHistBtn">Draw Histogram</button>
+        <button class="btn" id="downloadPNGBtn">Download PNG</button>
+      </div>
+
+      <div class="card">
+        <strong>Bins</strong>
+        <label>Mode</label>
+        <select id="binMode">
+          <option value="auto" selected>Auto</option>
+          <option value="count">By Bin Count</option>
+          <option value="width">By Bin Width</option>
+        </select>
+        <div id="autoRow" class="row" style="margin-top:6px">
+          <div>
+            <label>Auto Method</label>
+            <select id="autoMethod"><option value="sturges" selected>Sturges</option><option value="fd">Freedman–Diaconis</option></select>
+          </div>
+          <div>
+            <label>Clamp to range</label>
+            <select id="clamp"><option value="yes" selected>Yes</option><option value="no">No</option></select>
+          </div>
+        </div>
+        <div id="countRow" class="row" style="display:none;margin-top:6px">
+          <div>
+            <label>Bin Count</label>
+            <input id="binCount" type="number" min="1" value="10" />
+          </div>
+          <div>
+            <label>Clamp to range</label>
+            <select id="clamp2"><option value="yes" selected>Yes</option><option value="no">No</option></select>
+          </div>
+        </div>
+        <div id="widthRow" class="row" style="display:none;margin-top:6px">
+          <div>
+            <label>Bin Width</label>
+            <input id="binWidth" type="number" min="0" step="any" placeholder="e.g., 2" />
+          </div>
+          <div>
+            <label>Clamp to range</label>
+            <select id="clamp3"><option value="yes" selected>Yes</option><option value="no">No</option></select>
+          </div>
+        </div>
+        <div class="row" style="margin-top:6px">
+          <div>
+            <label>Min (optional)</label>
+            <input id="xmin" type="number" step="any" />
+          </div>
+          <div>
+            <label>Max (optional)</label>
+            <input id="xmax" type="number" step="any" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <strong>Style</strong>
+        <label>Bar Fill</label><input id="fillColor" type="color" value="#60a5fa" />
+        <label>Bar Border</label><input id="borderColor" type="color" value="#1f2937" />
+        <label>Fill Opacity</label><input id="opacity" type="number" min="0" max="1" step="0.1" value="0.85" />
+        <label>Graph Background</label><input id="bgColor" type="color" value="#ffffff" />
+        <div class="row">
+          <div>
+            <label>Chart Height (px)</label><input id="chartH" type="number" value="520" />
+          </div>
+          <div>
+            <label>Chart Width (px)</label><input id="chartW" type="number" placeholder="auto" />
+          </div>
+        </div>
+        <label>Chart Padding (px)</label><input id="chartPad" type="number" value="24" />
+        <button class="btn" id="applySizeBtn">Apply Size</button>
+      </div>
+
+      <div class="card">
+        <strong>Fonts</strong>
+        <label>Font Family</label>
+        <select id="fontFamily">
+          <option value="sans-serif">Sans-serif</option>
+          <option value="serif">Serif</option>
+          <option value="monospace">Monospace</option>
+          <option value="cursive">Cursive</option>
+        </select>
+        <label>Font Size (px)</label>
+        <input id="fontSize" type="number" value="12" />
+      </div>
+
+      <div class="card">
+        <strong>Dataset Preview</strong>
+        <div id="preview" class="preview"></div>
+      </div>
+    </aside>
+
+    <main class="panel">
+      <div class="chart-wrap"><canvas id="chart"></canvas></div>
+    </main>
+  </div>
+
+<script>
+let DATA=[]; let HEADERS=[]; let currentChart=null;
+
+function validAlpha(a){ let x=parseFloat(a); if(isNaN(x)) x=0.85; return Math.min(1,Math.max(0,x)); }
+function hexToRgb(hex){ const m=/^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex||'#60a5fa'); if(!m) return [96,165,250]; return [parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)]; }
+function rgba([r,g,b],a){ return `rgba(${r},${g},${b},${a})`; }
+
+function buildTable(rows){ if(!rows.length) return '<div>No data loaded</div>'; const headers=Object.keys(rows[0]); let html='<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>'; for(const r of rows.slice(0,20)){ html+='<tr>'+headers.map(h=>`<td>${r[h]}</td>`).join('')+'</tr>'; } html+='</tbody></table>'; return html; }
+
+async function loadFile(file){ try{ const isExcel=(file.name||'').toLowerCase().endsWith('.xlsx'); if(isExcel){ const buf=await file.arrayBuffer(); const wb=XLSX.read(buf,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; setData(XLSX.utils.sheet_to_json(ws,{defval:''})); } else { const text=await file.text(); const wb=XLSX.read(text,{type:'string'}); const ws=wb.Sheets[wb.SheetNames[0]]; setData(XLSX.utils.sheet_to_json(ws,{defval:''})); } } catch(e){ console.error(e); document.getElementById('status').textContent='Failed to parse file. Use CSV or XLSX.'; } }
+
+function setData(rows){ DATA=rows||[]; HEADERS=DATA.length?Object.keys(DATA[0]):[]; const colSel=document.getElementById('colSelect'); const numericCols=HEADERS.filter(h=> DATA.some(r=> Number.isFinite(parseFloat(r[h])) )); colSel.innerHTML='<option value="">—</option>'+numericCols.map(h=>`<option value="${h}">${h}</option>`).join(''); document.getElementById('preview').innerHTML=buildTable(DATA); document.getElementById('status').textContent=`Loaded ${DATA.length} rows / ${HEADERS.length} cols`; }
+
+function getNumericSeries(col){ const arr=[]; for(const r of DATA){ const v=parseFloat(r[col]); if(Number.isFinite(v)) arr.push(v); } return arr; }
+
+function sturgesBins(n){ return Math.ceil(Math.log2(n))+1; }
+function iqr(arr){ const a=arr.slice().sort((x,y)=>x-y); const q=(p)=>{ const idx=(a.length-1)*p; const lo=Math.floor(idx), hi=Math.ceil(idx); if(lo===hi) return a[lo]; return a[lo]*(hi-idx)+a[hi]*(idx-lo); }; return q(0.75)-q(0.25); }
+
+function makeBins(values){
+  if(values.length===0) return {edges:[0,1], labels:['[0,1)']};
+  let min=Math.min(...values), max=Math.max(...values);
+  const xmin=parseFloat(document.getElementById('xmin').value), xmax=parseFloat(document.getElementById('xmax').value);
+  if(Number.isFinite(xmin)) min=xmin; if(Number.isFinite(xmax)) max=xmax; if(max<=min){ max=min+1; }
+  const mode=document.getElementById('binMode').value;
+  let edges=[];
+  if(mode==='auto'){
+    const method=document.getElementById('autoMethod').value; const n=values.length; let k=sturgesBins(n);
+    if(method==='fd'){
+      const width=(2*iqr(values))/Math.cbrt(n||1); if(width>0){ k=Math.max(1, Math.ceil((max-min)/width)); }
+    }
+    edges = linspace(min, max, k+1);
+  } else if(mode==='count'){
+    const k=Math.max(1, parseInt(document.getElementById('binCount').value,10)||10); edges=linspace(min,max,k+1);
+  } else { // width
+    const w=parseFloat(document.getElementById('binWidth').value); const width = (Number.isFinite(w) && w>0)? w : (max-min)/10; const k=Math.max(1, Math.ceil((max-min)/width)); edges=linspace(min,max,k+1);
+  }
+  const clamp = (mode==='auto'? document.getElementById('clamp').value: mode==='count'? document.getElementById('clamp2').value: document.getElementById('clamp3').value) === 'yes';
+  if(!clamp){ // extend one half-bin on each side
+    const w = (edges[1]-edges[0])||1; edges=[edges[0]-w/2, ...edges.slice(1,-1), edges[edges.length-1]+w/2];
+  }
+  const labels=[]; for(let i=0;i<edges.length-1;i++){ const a=edges[i], b=edges[i+1]; labels.push(`[${round(a)}, ${round(b)}${i===edges.length-2?']':')'}`); }
+  return {edges, labels};
+}
+
+function linspace(a,b,n){ const out=[]; const step=(b-a)/(n-1); for(let i=0;i<n;i++) out.push(a+i*step); return out; }
+function round(x){ const abs=Math.abs(x); if(abs>=100) return x.toFixed(0); if(abs>=10) return x.toFixed(1); if(abs>=1) return x.toFixed(2); return x.toFixed(3); }
+
+function histogram(values, edges){ const counts=new Array(edges.length-1).fill(0); for(const v of values){ if(v<edges[0]||v>edges[edges.length-1]) continue; // outside
+    let i = edges.findIndex((e,idx)=> idx<edges.length-1 && v>=edges[idx] && (v<edges[idx+1] || (idx===edges.length-2 && v<=edges[idx+1])) ); if(i<0) continue; counts[i]++; } return counts; }
+
+const backgroundPlugin={ id:'custom_bgcolor', beforeDraw:(chart)=>{ const ctx=chart.ctx; const bg=(document.getElementById('bgColor')?.value)||'#ffffff'; ctx.save(); ctx.fillStyle=bg; ctx.fillRect(0,0,chart.width,chart.height); ctx.restore(); } };
+
+function applySize(){ const wrap=document.querySelector('.chart-wrap'); const h=parseInt(document.getElementById('chartH').value,10); if(!isNaN(h)) wrap.style.height=h+'px'; const w=document.getElementById('chartW').value; wrap.style.width=w? (w+'px') : '100%'; }
+
+function drawHistogram(){
+  const col=document.getElementById('colSelect').value; if(!col) return alert('Pick a numeric column');
+  const data=getNumericSeries(col); if(data.length===0) return alert('No numeric values found in that column.');
+  const {edges, labels}=makeBins(data);
+  const counts=histogram(data, edges);
+  const summary=document.getElementById('summary').value; const total=counts.reduce((a,b)=>a+b,0);
+  const yvals = (summary==='percent' && total>0) ? counts.map(c=> 100*c/total) : counts;
+
+  const alpha=validAlpha(document.getElementById('opacity').value); const fill=rgba(hexToRgb(document.getElementById('fillColor').value), alpha); const border=document.getElementById('borderColor').value;
+  applySize(); if(currentChart) currentChart.destroy();
+  const fontFamily=document.getElementById('fontFamily').value; const fontSize=parseInt(document.getElementById('fontSize').value,10)||12;
+  const title=document.getElementById('titleInput').value || `Histogram of ${col}`;
+  const xlabel=document.getElementById('xlabelInput').value || col; const ylabel=document.getElementById('ylabelInput').value || (summary==='percent'?'Percent':'Count');
+  const yZero = document.getElementById('yZero').value === 'yes';
+  const padding=parseInt(document.getElementById('chartPad').value,10)||0;
+
+  currentChart=new Chart(document.getElementById('chart'),{
+    type:'bar',
+    data:{ labels, datasets:[{ label: col, data: yvals, backgroundColor: fill, borderColor: border, borderWidth: 1, barPercentage:1.0, categoryPercentage:1.0 }] },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      layout:{ padding: padding },
+      plugins:{
+        legend:{ display:false, labels:{ font:{ family:fontFamily, size:fontSize } } },
+        title:{ display:true, text:title, font:{ family:fontFamily, size:fontSize+2 } },
+        tooltip:{ callbacks:{ label:(ctx)=>{ const idx=ctx.dataIndex; const a=edges[idx], b=edges[idx+1]; const range=`[${round(a)}, ${round(b)}${idx===edges.length-2?']':')'}`; const base = summary==='percent'? ctx.parsed.y.toFixed(1)+'%' : ctx.parsed.y; return `${range}: ${base}`; } }, bodyFont:{ family:fontFamily, size:fontSize } }
+      },
+      scales:{
+        x:{ title:{ display:true, text:xlabel, font:{ family:fontFamily, size:fontSize } }, ticks:{ font:{ family:fontFamily, size:fontSize } } },
+        y:{ beginAtZero:yZero, title:{ display:true, text:ylabel, font:{ family:fontFamily, size:fontSize } }, ticks:{ font:{ family:fontFamily, size:fontSize }, callback:(v)=> summary==='percent'? v+'%': v } }
+      }
+    },
+    plugins:[backgroundPlugin]
+  });
+}
+
+function refreshColors(){ if(!currentChart) return; const alpha=validAlpha(document.getElementById('opacity').value); const fill=rgba(hexToRgb(document.getElementById('fillColor').value), alpha); const border=document.getElementById('borderColor').value; const ds=currentChart.data.datasets[0]; ds.backgroundColor=fill; ds.borderColor=border; currentChart.update(); }
+function refreshBg(){ if(currentChart) currentChart.update(); }
+function refreshPadding(){ if(!currentChart) return; currentChart.options.layout = currentChart.options.layout || {}; currentChart.options.layout.padding = parseInt(document.getElementById('chartPad').value,10)||0; currentChart.update(); }
+
+function downloadPNG(){ if(!currentChart) return; const a=document.createElement('a'); a.href=currentChart.toBase64Image(); a.download='histogram.png'; a.click(); }
+
+const SAMPLE=[ // synthetic exam scores / heights mix
+  {Score: 88, Height: 170.2}, {Score: 92, Height: 172.5}, {Score: 75, Height: 165.1}, {Score: 81, Height: 168.9},
+  {Score: 96, Height: 175.3}, {Score: 67, Height: 160.4}, {Score: 73, Height: 162.0}, {Score: 85, Height: 169.7},
+  {Score: 90, Height: 171.1}, {Score: 78, Height: 166.2}, {Score: 84, Height: 168.3}, {Score: 91, Height: 172.2},
+  {Score: 88, Height: 170.6}, {Score: 93, Height: 173.0}, {Score: 69, Height: 161.3}, {Score: 74, Height: 163.8},
+  {Score: 82, Height: 167.4}, {Score: 95, Height: 174.6}, {Score: 77, Height: 165.9}, {Score: 86, Height: 170.0},
+  {Score: 89, Height: 171.4}, {Score: 72, Height: 162.9}, {Score: 80, Height: 167.0}, {Score: 94, Height: 173.8},
+  {Score: 70, Height: 161.9}, {Score: 76, Height: 164.7}, {Score: 83, Height: 168.0}, {Score: 97, Height: 176.0},
+  {Score: 65, Height: 159.8}, {Score: 79, Height: 166.7}
+];
+
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('loadBtn').onclick=()=>{ const f=document.getElementById('file').files[0]; if(f) loadFile(f); };
+  document.getElementById('sampleBtn').onclick=()=>{ setData(SAMPLE); };
+  document.getElementById('drawHistBtn').onclick=drawHistogram;
+  document.getElementById('downloadPNGBtn').onclick=downloadPNG;
+  document.getElementById('applySizeBtn').onclick=applySize;
+  document.getElementById('binMode').addEventListener('change',()=>{
+    const m=document.getElementById('binMode').value;
+    document.getElementById('autoRow').style.display = (m==='auto')? 'grid':'none';
+    document.getElementById('countRow').style.display = (m==='count')? 'grid':'none';
+    document.getElementById('widthRow').style.display = (m==='width')? 'grid':'none';
+  });
+  ['fillColor','borderColor','opacity'].forEach(id=>{ const el=document.getElementById(id); el.addEventListener('input',refreshColors); el.addEventListener('change',refreshColors); });
+  ['bgColor'].forEach(id=>{ const el=document.getElementById(id); el.addEventListener('input',refreshBg); el.addEventListener('change',refreshBg); });
+  document.getElementById('chartPad').addEventListener('input', refreshPadding);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stats Grapher — Module 2 (Pie / Donut) — v3</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body {background:#0f172a;color:#e5e7eb;font-family:sans-serif;margin:0}
+    .wrap{display:grid;grid-template-columns:320px 1fr;gap:14px;padding:14px}
+    .panel{background:#111827;border:1px solid #1f2937;border-radius:14px}
+    .left{padding:14px}
+    .card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:12px;margin-bottom:12px}
+    label{display:block;font-size:13px;color:#9ca3af;margin-bottom:6px}
+    input,select{width:95%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb}
+    input[type="color"]{height:40px;padding:0}
+    .btn{margin-top:6px;padding:8px 10px;background:#14213d;color:#e5e7eb;border:none;border-radius:8px;cursor:pointer}
+    .btn:hover{filter:brightness(1.1)}
+    .preview{max-height:200px;overflow:auto;border:1px solid #374151;border-radius:8px;margin-top:6px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:4px 6px;border-bottom:1px solid #303744;font-size:13px}
+    .chart-wrap{height:520px;width:100%}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="panel left">
+      <div class="card">
+        <label>Upload data (CSV / Excel)</label>
+        <input id="file" type="file" accept=".csv, .xlsx" />
+        <button class="btn" id="loadBtn">Load File</button>
+        <button class="btn" id="sampleBtn">Load Sample</button>
+      </div>
+
+      <div class="card">
+        <label>Column</label>
+        <select id="colSelect"><option value="">—</option></select>
+        <label>Summarize by</label>
+        <select id="summary"><option value="count">Count</option><option value="percent">Percent</option></select>
+        <label>Sort slices</label>
+        <select id="sortMode"><option value="none">None (A→Z)</option><option value="desc">Largest → Smallest</option></select>
+        <label>Chart Title</label><input id="titleInput" type="text" placeholder="Pie / Donut Title" />
+        <label>Legend</label>
+        <select id="legendDisplay"><option value="show">Show</option><option value="hide">Hide</option></select>
+        <label>Slice Labels</label>
+        <select id="sliceLabelMode">
+          <option value="none">None</option>
+          <option value="count">Count</option>
+          <option value="percent">Percent</option>
+          <option value="label">Label</option>
+          <option value="label+count">Label + Count</option>
+          <option value="label+percent">Label + Percent</option>
+        </select>
+        <button class="btn" id="drawPieBtn">Draw Pie / Donut</button>
+        <button class="btn" id="downloadPNGBtn">Download PNG</button>
+      </div>
+
+      <div class="card">
+        <label>Base Fill (palette seed)</label><input id="fillColor" type="color" value="#60a5fa" />
+        <label>Slice Border</label><input id="borderColor" type="color" value="#0b1220" />
+        <label>Fill Opacity</label><input id="opacity" type="number" min="0" max="1" step="0.1" value="0.85" />
+        <label>Graph Background</label><input id="bgColor" type="color" value="#ffffff" />
+        <label>Donut Hole (%) — 0 = Pie</label><input id="cutoutPct" type="number" min="0" max="90" value="40" />
+        <label>Chart Height (px)</label><input id="chartH" type="number" value="520" />
+        <label>Chart Width (px)</label><input id="chartW" type="number" placeholder="auto" />
+        <label>Chart Padding (px)</label><input id="chartPad" type="number" value="24" />
+        <button class="btn" id="applySizeBtn">Apply Size</button>
+      </div>
+
+      <div class="card">
+        <label>Font Family</label>
+        <select id="fontFamily">
+          <option value="sans-serif">Sans-serif</option>
+          <option value="serif">Serif</option>
+          <option value="monospace">Monospace</option>
+          <option value="cursive">Cursive</option>
+        </select>
+        <label>Font Size (px)</label>
+        <input id="fontSize" type="number" value="12" />
+      </div>
+
+      <div class="card">
+        <strong>Dataset Preview</strong>
+        <div id="preview" class="preview"></div>
+      </div>
+    </aside>
+
+    <main class="panel">
+      <div class="chart-wrap"><canvas id="chart"></canvas></div>
+    </main>
+  </div>
+
+<script>
+let DATA = [];
+let HEADERS = [];
+let currentChart = null;
+
+function validAlpha(a){ let x = parseFloat(a); if(isNaN(x)) x=0.85; return Math.min(1, Math.max(0, x)); }
+function hexToRgb(hex){ const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex||'#60a5fa'); if(!m) return [96,165,250]; return [parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)]; }
+function rgbaStr([r,g,b],a){ return `rgba(${r},${g},${b},${a})`; }
+function hslToRgb(h,s,l){ const c=(1-Math.abs(2*l-1))*s; const x=c*(1-Math.abs((h/60)%2-1)); const m=l-c/2; let r=0,g=0,b=0; if(0<=h&&h<60){r=c;g=x;b=0}else if(60<=h&&h<120){r=x;g=c;b=0}else if(120<=h&&h<180){r=0;g=c;b=x}else if(180<=h&&h<240){r=0;g=x;b=c}else if(240<=h&&h<300){r=x;g=0;b=c}else{r=c;g=0;b=x} return [Math.round((r+m)*255),Math.round((g+m)*255),Math.round((b+m)*255)]; }
+function generatePalette(seedHex, n, alpha){
+  const [r,g,b]=hexToRgb(seedHex); const max=Math.max(r,g,b), min=Math.min(r,g,b); const d=max-min; let h=0; if(d===0) h=0; else if(max===r) h=((g-b)/d)%6; else if(max===g) h=(b-r)/d+2; else h=(r-g)/d+4; h=Math.round(h*60); if(h<0) h+=360; const colors=[]; for(let i=0;i<n;i++){ const hh=(h + i*360/n)%360; const s=0.6; const l=0.5 + 0.08*Math.sin(i); colors.push(rgbaStr(hslToRgb(hh,s,l), validAlpha(document.getElementById('opacity').value))); } return colors; }
+
+function buildTable(rows){ if(!rows.length) return '<div>No data loaded</div>'; const headers = Object.keys(rows[0]); let html = '<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>'; for(const r of rows.slice(0,20)) html+='<tr>'+headers.map(h=>`<td>${r[h]}</td>`).join('')+'</tr>'; html+='</tbody></table>'; return html; }
+
+async function loadFile(file){ const buf=await file.arrayBuffer(); const wb=XLSX.read(buf,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; setData(XLSX.utils.sheet_to_json(ws,{defval:''})); }
+function setData(rows){ DATA=rows; HEADERS=rows.length?Object.keys(rows[0]):[]; const colSel=document.getElementById('colSelect'); colSel.innerHTML='<option value="">—</option>'+HEADERS.map(h=>`<option value="${h}">${h}</option>`).join(''); document.getElementById('preview').innerHTML=buildTable(DATA); }
+
+function summarizeCategorical(col, sortMode='none'){
+  const counts=new Map(); let total=0; for(const r of DATA){ let v=r[col]?String(r[col]).trim():''; if(v==='') continue; total++; counts.set(v,(counts.get(v)||0)+1); }
+  let entries=Array.from(counts.entries()); if(sortMode==='desc') entries.sort((a,b)=>b[1]-a[1]); else entries.sort((a,b)=> String(a[0]).localeCompare(String(b[0])));
+  const labels=entries.map(e=>e[0]); const values=entries.map(e=>e[1]); return {labels,values,total};
+}
+
+function applySize(){ const wrap=document.querySelector('.chart-wrap'); const h=parseInt(document.getElementById('chartH').value,10); if(!isNaN(h)) wrap.style.height=h+'px'; const w=document.getElementById('chartW').value; wrap.style.width=w? (w+'px') : '100%'; }
+
+const backgroundPlugin={ id:'custom_bgcolor', beforeDraw:(chart)=>{ const ctx=chart.ctx; const bg=(document.getElementById('bgColor')?.value)||'#ffffff'; ctx.save(); ctx.fillStyle=bg; ctx.fillRect(0,0,chart.width,chart.height); ctx.restore(); } };
+
+function bestTextColorForBg(hex){ const [r,g,b]=hexToRgb(hex||'#ffffff'); const luma = 0.2126*r + 0.7152*g + 0.0722*b; return luma>180? '#111827' : '#e5e7eb'; }
+
+const sliceLabelPlugin={ id:'slice_labels', afterDatasetsDraw:(chart)=>{
+  const mode=(document.getElementById('sliceLabelMode')?.value)||'none'; if(mode==='none') return;
+  const ds=chart.data.datasets[0]; if(!ds) return; const meta=chart.getDatasetMeta(0); const total=ds.data.reduce((a,b)=>a+b,0);
+  const fontFamily=document.getElementById('fontFamily')?.value||'sans-serif'; const fontSize=parseInt(document.getElementById('fontSize')?.value,10)||12;
+  const bg=(document.getElementById('bgColor')?.value)||'#ffffff'; const color=bestTextColorForBg(bg);
+  const ctx=chart.ctx; ctx.save(); ctx.font=`${fontSize}px ${fontFamily}`; ctx.fillStyle=color; ctx.textAlign='center'; ctx.textBaseline='middle';
+  for(let i=0;i<meta.data.length;i++){
+    const el=meta.data[i]; const v=ds.data[i]; if(!v) continue; const pct= total? 100*v/total : 0; if(pct<3) continue; // skip tiny to avoid clutter
+    const p=el.tooltipPosition(); const lbl=chart.data.labels[i]; let text='';
+    if(mode==='count') text=`${v}`;
+    else if(mode==='percent') text=`${pct.toFixed(0)}%`;
+    else if(mode==='label') text=lbl;
+    else if(mode==='label+count') text=`${lbl}: ${v}`;
+    else if(mode==='label+percent') text=`${lbl}: ${pct.toFixed(0)}%`;
+    ctx.fillText(text, p.x, p.y);
+  }
+  ctx.restore(); } };
+
+function drawPie(){
+  const col=document.getElementById('colSelect').value; if(!col) return alert('Pick a column');
+  const sortMode=document.getElementById('sortMode').value; const {labels,values,total}=summarizeCategorical(col, sortMode);
+  const showLegend=document.getElementById('legendDisplay').value==='show';
+  const alpha=validAlpha(document.getElementById('opacity').value); const base=document.getElementById('fillColor').value; const border=document.getElementById('borderColor').value;
+  const colors=generatePalette(base, labels.length, alpha);
+  applySize(); if(currentChart) currentChart.destroy();
+  const fontFamily=document.getElementById('fontFamily').value; const fontSize=parseInt(document.getElementById('fontSize').value,10)||12;
+  const chartTitle=document.getElementById('titleInput').value || col; const cutout=Math.min(90, Math.max(0, parseInt(document.getElementById('cutoutPct').value,10)||0)) + '%';
+  const padding=parseInt(document.getElementById('chartPad').value,10)||0;
+
+  currentChart=new Chart(document.getElementById('chart'),{
+    type:'doughnut',
+    data:{ labels, datasets:[{ label: col, data: values, backgroundColor: colors, borderColor: border, borderWidth: 1 }] },
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout, rotation: -0.5*Math.PI,
+      layout:{ padding: padding },
+      plugins:{
+        legend:{ display: showLegend, labels:{ font:{ family:fontFamily, size:fontSize } } },
+        title:{ display:true, text: chartTitle, font:{ family:fontFamily, size: fontSize+2 } },
+        tooltip:{ callbacks:{ label:(ctx)=>{ const v=ctx.parsed; const pct = total? (100*v/total).toFixed(1)+'%':'0%'; return `${ctx.label}: ${pct}`; } }, bodyFont:{ family:fontFamily, size:fontSize } }
+      }
+    },
+    plugins:[backgroundPlugin, sliceLabelPlugin]
+  });
+}
+
+function refreshStyle(){ if(!currentChart) return; const base=document.getElementById('fillColor').value; const labels=currentChart.data.labels||[]; const colors=generatePalette(base, labels.length, validAlpha(document.getElementById('opacity').value)); const ds=currentChart.data.datasets[0]; ds.backgroundColor=colors; ds.borderColor=document.getElementById('borderColor').value; currentChart.update(); }
+function refreshBg(){ if(currentChart) currentChart.update(); }
+function refreshPadding(){ if(!currentChart) return; currentChart.options.layout = currentChart.options.layout || {}; currentChart.options.layout.padding = parseInt(document.getElementById('chartPad').value,10)||0; currentChart.update(); }
+function refreshSliceLabels(){ if(currentChart) currentChart.update(); }
+
+function downloadPNG(){ if(!currentChart) return; const a=document.createElement('a'); a.href=currentChart.toBase64Image(); a.download='chart.png'; a.click(); }
+
+const SAMPLE=[
+  {Snack:"Chips",Class:"A",Day:"Mon"},
+  {Snack:"Cookies",Class:"A",Day:"Mon"},
+  {Snack:"Fruit",Class:"A",Day:"Tue"},
+  {Snack:"Fruit",Class:"B",Day:"Tue"},
+  {Snack:"Chips",Class:"B",Day:"Wed"},
+  {Snack:"Fruit",Class:"B",Day:"Wed"},
+  {Snack:"Cookies",Class:"C",Day:"Thu"},
+  {Snack:"Chips",Class:"C",Day:"Thu"},
+  {Snack:"Fruit",Class:"C",Day:"Fri"},
+  {Snack:"",Class:"C",Day:"Fri"}
+];
+
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('loadBtn').onclick=()=>{const f=document.getElementById('file').files[0]; if(f) loadFile(f)};
+  document.getElementById('sampleBtn').onclick=()=>{setData(SAMPLE)};
+  document.getElementById('drawPieBtn').onclick=drawPie;
+  document.getElementById('downloadPNGBtn').onclick=downloadPNG;
+  document.getElementById('applySizeBtn').onclick=applySize;
+  ['fillColor','borderColor','opacity'].forEach(id=>{ const el=document.getElementById(id); el.addEventListener('input',refreshStyle); el.addEventListener('change',refreshStyle); });
+  ['bgColor'].forEach(id=>{ const el=document.getElementById(id); el.addEventListener('input',refreshBg); el.addEventListener('change',refreshBg); });
+  document.getElementById('chartPad').addEventListener('input', refreshPadding);
+  document.getElementById('sliceLabelMode').addEventListener('change', refreshSliceLabels);
+});
+</script>
+</body>
+</html>
