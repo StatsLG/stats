@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stats Grapher — Module 5 (Grouped / Stacked Bar)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body {background:#0f172a;color:#e5e7eb;font-family:sans-serif;margin:0}
+    .wrap{display:grid;grid-template-columns:320px 1fr;gap:14px;padding:14px}
+    .panel{background:#111827;border:1px solid #1f2937;border-radius:14px}
+    .left{padding:14px}
+    .card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:12px;margin-bottom:12px}
+    label{display:block;font-size:13px;color:#9ca3af;margin-bottom:6px}
+    input,select{width:95%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb}
+    input[type="color"]{height:40px;padding:0}
+    .btn{margin-top:6px;padding:8px 10px;background:#14213d;color:#e5e7eb;border:none;border-radius:8px;cursor:pointer}
+    .btn:hover{filter:brightness(1.1)}
+    .preview{max-height:200px;overflow:auto;border:1px solid #374151;border-radius:8px;margin-top:6px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:4px 6px;border-bottom:1px solid #303744;font-size:13px}
+    .chart-wrap{height:520px;width:100%}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="panel left">
+      <div class="card">
+        <label>Upload data (CSV / Excel)</label>
+        <input id="file" type="file" accept=".csv, .xlsx" />
+        <button class="btn" id="loadBtn">Load File</button>
+        <button class="btn" id="sampleBtn">Load Sample</button>
+      </div>
+
+      <div class="card">
+        <label>Main Category (X)</label>
+        <select id="colSelect"><option value="">—</option></select>
+        <label>Group By (optional)</label>
+        <select id="groupBy"><option value="">— none —</option></select>
+        <div class="row">
+          <div>
+            <label>Summarize by</label>
+            <select id="summary"><option value="count">Count</option><option value="percent">Percent</option></select>
+          </div>
+          <div>
+            <label>Layout</label>
+            <select id="layout"><option value="grouped" selected>Grouped</option><option value="stacked">Stacked</option></select>
+          </div>
+        </div>
+        <label>Sort X</label>
+        <select id="sortMode"><option value="alpha">Alphabetical</option><option value="desc">Largest → Smallest</option></select>
+        <label>Chart Title</label><input id="titleInput" type="text" placeholder="Grouped / Stacked Bar" />
+        <label>Y‑Axis Label</label><input id="ylabelInput" type="text" placeholder="Count or Percent" />
+        <button class="btn" id="drawBtn">Draw Chart</button>
+        <button class="btn" id="downloadPNGBtn">Download PNG</button>
+      </div>
+
+      <div class="card">
+        <strong>Style</strong>
+        <label>Base Fill (palette seed)</label><input id="fillColor" type="color" value="#60a5fa" />
+        <label>Bar Border</label><input id="borderColor" type="color" value="#1f2937" />
+        <label>Fill Opacity</label><input id="opacity" type="number" min="0" max="1" step="0.1" value="0.85" />
+        <label>Graph Background</label><input id="bgColor" type="color" value="#ffffff" />
+        <div class="row">
+          <div>
+            <label>Chart Height (px)</label><input id="chartH" type="number" value="520" />
+          </div>
+          <div>
+            <label>Chart Width (px)</label><input id="chartW" type="number" placeholder="auto" />
+          </div>
+        </div>
+        <label>Chart Padding (px)</label><input id="chartPad" type="number" value="24" />
+        <button class="btn" id="applySizeBtn">Apply Size</button>
+      </div>
+
+      <div class="card">
+        <strong>Fonts</strong>
+        <label>Font Family</label>
+        <select id="fontFamily">
+          <option value="sans-serif">Sans-serif</option>
+          <option value="serif">Serif</option>
+          <option value="monospace">Monospace</option>
+          <option value="cursive">Cursive</option>
+        </select>
+        <label>Font Size (px)</label>
+        <input id="fontSize" type="number" value="12" />
+      </div>
+
+      <div class="card">
+        <strong>Dataset Preview</strong>
+        <div id="preview" class="preview"></div>
+      </div>
+    </aside>
+
+    <main class="panel">
+      <div class="chart-wrap"><canvas id="chart"></canvas></div>
+    </main>
+  </div>
+
+<script>
+let DATA=[]; let HEADERS=[]; let currentChart=null;
+
+function validAlpha(a){ let x=parseFloat(a); if(isNaN(x)) x=0.85; return Math.min(1,Math.max(0,x)); }
+function hexToRgb(hex){ const m=/^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex||'#60a5fa'); if(!m) return [96,165,250]; return [parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)]; }
+function rgba([r,g,b],a){ return `rgba(${r},${g},${b},${a})`; }
+function hslToRgb(h,s,l){ const c=(1-Math.abs(2*l-1))*s; const x=c*(1-Math.abs((h/60)%2-1)); const m=l-c/2; let r=0,g=0,b=0; if(0<=h&&h<60){r=c;g=x;b=0}else if(60<=h&&h<120){r=x;g=c;b=0}else if(120<=h&&h<180){r=0;g=c;b=x}else if(180<=h&&h<240){r=0;g=x;b=c}else if(240<=h&&h<300){r=x;g=0;b=c}else{r=c;g=0;b=x} return [Math.round((r+m)*255),Math.round((g+m)*255),Math.round((b+m)*255)]; }
+function generatePalette(seedHex, n, alpha){ const m=/^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(seedHex||'#60a5fa'); const r=parseInt(m[1],16),g=parseInt(m[2],16),b=parseInt(m[3],16); let h=0; const max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min; if(d===0)h=0; else if(max===r)h=((g-b)/d)%6; else if(max===g)h=(b-r)/d+2; else h=(r-g)/d+4; h=(Math.round(h*60)+360)%360; const out=[]; for(let i=0;i<n;i++){ const hh=(h + i*360/n)%360; const s=0.6; const l=0.5 + 0.08*Math.sin(i); out.push(rgba(hslToRgb(hh,s,l), validAlpha(document.getElementById('opacity').value))); } return out; }
+
+function buildTable(rows){ if(!rows.length) return '<div>No data loaded</div>'; const headers=Object.keys(rows[0]); let html='<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>'; for(const r of rows.slice(0,20)) html+='<tr>'+headers.map(h=>`<td>${r[h]}</td>`).join('')+'</tr>'; html+='</tbody></table>'; return html; }
+
+async function loadFile(file){ const buf=await file.arrayBuffer(); const wb=XLSX.read(buf,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; setData(XLSX.utils.sheet_to_json(ws,{defval:''})); }
+
+function setData(rows){ DATA=rows||[]; HEADERS=DATA.length?Object.keys(DATA[0]):[]; const colSel=document.getElementById('colSelect'); const gbSel=document.getElementById('groupBy'); const opts=HEADERS.map(h=>`<option value="${h}">${h}</option>`).join(''); colSel.innerHTML='<option value="">—</option>'+opts; gbSel.innerHTML='<option value="">— none —</option>'+opts; document.getElementById('preview').innerHTML=buildTable(DATA); }
+
+function summarize(col, groupBy, mode, sortMode){
+  const counts=new Map(); // key: x -> Map(group -> count)
+  const groupsSet=new Set();
+  let totalsPerX=new Map();
+  for(const r of DATA){ const x=(r[col]!==undefined? String(r[col]).trim(): ''); if(x==='') continue; const g=groupBy? (r[groupBy]!==undefined? String(r[groupBy]).trim(): '') : '__ALL__'; if(g==='') continue; groupsSet.add(g); if(!counts.has(x)) counts.set(x,new Map()); const row=counts.get(x); row.set(g,(row.get(g)||0)+1); totalsPerX.set(x,(totalsPerX.get(x)||0)+1); }
+  let xLabels=Array.from(counts.keys());
+  if(sortMode==='desc'){
+    xLabels.sort((a,b)=>{ const asum=Array.from(counts.get(a).values()).reduce((q,w)=>q+w,0); const bsum=Array.from(counts.get(b).values()).reduce((q,w)=>q+w,0); return bsum-asum; });
+  } else {
+    xLabels.sort((a,b)=> String(a).localeCompare(String(b)) );
+  }
+  let groupKeys = groupBy? Array.from(groupsSet).sort((a,b)=> String(a).localeCompare(String(b))) : ['__ALL__'];
+  // Build matrix
+  const matrix = groupKeys.map(()=> new Array(xLabels.length).fill(0));
+  for(let xi=0; xi<xLabels.length; xi++){
+    const x=xLabels[xi]; const row=counts.get(x)||new Map();
+    for(let gi=0; gi<groupKeys.length; gi++){
+      const g=groupKeys[gi]; const c=row.get(g)||0;
+      matrix[gi][xi] = (mode==='percent' && totalsPerX.get(x)>0) ? 100*c/totalsPerX.get(x) : c;
+    }
+  }
+  return {xLabels, groupKeys, matrix};
+}
+
+function applySize(){ const wrap=document.querySelector('.chart-wrap'); const h=parseInt(document.getElementById('chartH').value,10); if(!isNaN(h)) wrap.style.height=h+'px'; const w=document.getElementById('chartW').value; wrap.style.width=w? (w+'px') : '100%'; }
+
+const backgroundPlugin={ id:'custom_bgcolor', beforeDraw:(chart)=>{ const ctx=chart.ctx; const bg=(document.getElementById('bgColor')?.value)||'#ffffff'; ctx.save(); ctx.fillStyle=bg; ctx.fillRect(0,0,chart.width,chart.height); ctx.restore(); } };
+
+function drawGrouped(){
+  const col=document.getElementById('colSelect').value; if(!col) return alert('Pick a main category column');
+  const groupBy=document.getElementById('groupBy').value || '';
+  const mode=document.getElementById('summary').value; const sortMode=document.getElementById('sortMode').value; const layout=document.getElementById('layout').value; 
+  const {xLabels, groupKeys, matrix}=summarize(col, groupBy, mode, sortMode);
+
+  const base=document.getElementById('fillColor').value; const colors=generatePalette(base, groupKeys.length, validAlpha(document.getElementById('opacity').value)); const border=document.getElementById('borderColor').value;
+
+  const datasets=groupKeys.map((g,gi)=>({ label: (g==='__ALL__'? col : g), data: matrix[gi], backgroundColor: colors[gi], borderColor: border, borderWidth:1 }));
+
+  const fontFamily=document.getElementById('fontFamily').value; const fontSize=parseInt(document.getElementById('fontSize').value,10)||12;
+  const title=document.getElementById('titleInput').value || (groupBy? `${col} by ${groupBy}` : `${col}`);
+  const ylabel=document.getElementById('ylabelInput').value || (mode==='percent'? 'Percent' : 'Count');
+  const padding=parseInt(document.getElementById('chartPad').value,10)||0;
+
+  applySize(); if(currentChart) currentChart.destroy();
+
+  currentChart=new Chart(document.getElementById('chart'),{
+    type:'bar',
+    data:{ labels:xLabels, datasets},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      layout:{ padding: padding },
+      plugins:{ legend:{ display: groupBy!=='' , labels:{ font:{ family:fontFamily, size:fontSize } } }, title:{ display:true, text:title, font:{ family:fontFamily, size:fontSize+2 } }, tooltip:{ callbacks:{ label:(ctx)=>{ const v=ctx.parsed.y; return `${ctx.dataset.label}: ${mode==='percent'? v.toFixed(1)+'%' : v}` } }, bodyFont:{ family:fontFamily, size:fontSize } } },
+      scales:{ x:{ stacked: layout==='stacked', ticks:{ font:{ family:fontFamily, size:fontSize } } }, y:{ stacked: layout==='stacked', title:{ display:true, text:ylabel, font:{ family:fontFamily, size:fontSize } }, ticks:{ font:{ family:fontFamily, size:fontSize }, callback:(v)=> mode==='percent'? v+'%': v } } }
+    },
+    plugins:[backgroundPlugin]
+  });
+}
+
+function refreshStyle(){ if(!currentChart) return; const base=document.getElementById('fillColor').value; const alpha=validAlpha(document.getElementById('opacity').value); const colors=generatePalette(base, currentChart.data.datasets.length, alpha); const border=document.getElementById('borderColor').value; currentChart.data.datasets.forEach((ds,i)=>{ ds.backgroundColor=colors[i]; ds.borderColor=border; }); currentChart.update(); }
+function refreshBg(){ if(currentChart) currentChart.update(); }
+function refreshPadding(){ if(!currentChart) return; currentChart.options.layout = currentChart.options.layout || {}; currentChart.options.layout.padding = parseInt(document.getElementById('chartPad').value,10)||0; currentChart.update(); }
+
+function downloadPNG(){ if(!currentChart) return; const a=document.createElement('a'); a.href=currentChart.toBase64Image(); a.download='grouped_bar.png'; a.click(); }
+
+const SAMPLE=[
+  {Snack:"Chips",Class:"A",Day:"Mon"},
+  {Snack:"Cookies",Class:"A",Day:"Mon"},
+  {Snack:"Fruit",Class:"A",Day:"Tue"},
+  {Snack:"Fruit",Class:"B",Day:"Tue"},
+  {Snack:"Chips",Class:"B",Day:"Wed"},
+  {Snack:"Fruit",Class:"B",Day:"Wed"},
+  {Snack:"Cookies",Class:"C",Day:"Thu"},
+  {Snack:"Chips",Class:"C",Day:"Thu"},
+  {Snack:"Fruit",Class:"C",Day:"Fri"},
+  {Snack:"",Class:"C",Day:"Fri"}
+];
+
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('loadBtn').onclick=()=>{ const f=document.getElementById('file').files[0]; if(f) loadFile(f); };
+  document.getElementById('sampleBtn').onclick=()=>{ setData(SAMPLE); };
+  document.getElementById('drawBtn').onclick=drawGrouped;
+  document.getElementById('downloadPNGBtn').onclick=downloadPNG;
+  document.getElementById('applySizeBtn').onclick=applySize;
+  ['fillColor','borderColor','opacity'].forEach(id=>{ const el=document.getElementById(id); el.addEventListener('input',refreshStyle); el.addEventListener('change',refreshStyle); });
+  ['bgColor'].forEach(id=>{ const el=document.getElementById(id); el.addEventListener('input',refreshBg); el.addEventListener('change',refreshBg); });
+  document.getElementById('chartPad').addEventListener('input', refreshPadding);
+});
+</script>
+</body>
+</html>

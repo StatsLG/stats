@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stats Grapher — Module 4 (Scatter + Regression)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body {background:#0f172a;color:#e5e7eb;font-family:sans-serif;margin:0}
+    .wrap{display:grid;grid-template-columns:320px 1fr;gap:14px;padding:14px}
+    .panel{background:#111827;border:1px solid #1f2937;border-radius:14px}
+    .left{padding:14px}
+    .card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:12px;margin-bottom:12px}
+    label{display:block;font-size:13px;color:#9ca3af;margin-bottom:6px}
+    input,select{width:95%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb}
+    input[type="color"]{height:40px;padding:0}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .btn{margin-top:6px;padding:8px 10px;background:#14213d;color:#e5e7eb;border:none;border-radius:8px;cursor:pointer}
+    .btn:hover{filter:brightness(1.1)}
+    .preview{max-height:200px;overflow:auto;border:1px solid #374151;border-radius:8px;margin-top:6px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:4px 6px;border-bottom:1px solid #303744;font-size:13px}
+    .chart-wrap{height:520px;width:100%}
+    .muted{color:#9ca3af;font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="panel left">
+      <div class="card">
+        <label>Upload data (CSV / Excel)</label>
+        <input id="file" type="file" accept=".csv, .xlsx" />
+        <button class="btn" id="loadBtn">Load File</button>
+        <button class="btn" id="sampleBtn">Load Sample</button>
+        <div id="status" class="muted" style="margin-top:6px"></div>
+      </div>
+
+      <div class="card">
+        <label>Numeric Columns</label>
+        <div class="row">
+          <div>
+            <label>X</label>
+            <select id="xSelect"><option value="">—</option></select>
+          </div>
+          <div>
+            <label>Y</label>
+            <select id="ySelect"><option value="">—</option></select>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Chart Title</label>
+            <input id="titleInput" type="text" placeholder="Scatterplot" />
+          </div>
+          <div>
+            <label>Show Legend</label>
+            <select id="legendDisplay"><option value="hide">Hide</option><option value="show">Show</option></select>
+          </div>
+        </div>
+        <label>X-Axis Label</label><input id="xlabelInput" type="text" placeholder="X" />
+        <label>Y-Axis Label</label><input id="ylabelInput" type="text" placeholder="Y" />
+        <button class="btn" id="drawScatterBtn">Draw Scatterplot</button>
+        <button class="btn" id="downloadPNGBtn">Download PNG</button>
+      </div>
+
+      <div class="card">
+        <strong>Regression</strong>
+        <div class="row">
+          <div>
+            <label>Trendline</label>
+            <select id="regressionMode">
+              <option value="none">None</option>
+              <option value="linear" selected>Linear</option>
+            </select>
+          </div>
+          <div>
+            <label>Show</label>
+            <select id="regressionShow">
+              <option value="line" selected>Line Only</option>
+              <option value="line+eq">Line + Equation</option>
+              <option value="line+eq+r">Line + Equation + r</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Line Color</label>
+            <input id="regColor" type="color" value="#fca5a5" />
+          </div>
+          <div>
+            <label>Line Width</label>
+            <input id="regWidth" type="number" min="1" value="2" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <strong>Style</strong>
+        <div class="row">
+          <div>
+            <label>Point Fill</label><input id="fillColor" type="color" value="#60a5fa" />
+          </div>
+          <div>
+            <label>Point Border</label><input id="borderColor" type="color" value="#1f2937" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Opacity</label><input id="opacity" type="number" min="0" max="1" step="0.1" value="0.85" />
+          </div>
+          <div>
+            <label>Point Radius</label><input id="pointRadius" type="number" min="1" value="4" />
+          </div>
+        </div>
+        <label>Graph Background</label><input id="bgColor" type="color" value="#ffffff" />
+        <div class="row">
+          <div>
+            <label>Chart Height (px)</label><input id="chartH" type="number" value="520" />
+          </div>
+          <div>
+            <label>Chart Width (px)</label><input id="chartW" type="number" placeholder="auto" />
+          </div>
+        </div>
+        <label>Chart Padding (px)</label><input id="chartPad" type="number" value="24" />
+        <button class="btn" id="applySizeBtn">Apply Size</button>
+      </div>
+
+      <div class="card">
+        <strong>Fonts</strong>
+        <label>Font Family</label>
+        <select id="fontFamily">
+          <option value="sans-serif">Sans-serif</option>
+          <option value="serif">Serif</option>
+          <option value="monospace">Monospace</option>
+          <option value="cursive">Cursive</option>
+        </select>
+        <label>Font Size (px)</label>
+        <input id="fontSize" type="number" value="12" />
+      </div>
+
+      <div class="card">
+        <strong>Dataset Preview</strong>
+        <div id="preview" class="preview"></div>
+      </div>
+    </aside>
+
+    <main class="panel">
+      <div class="chart-wrap"><canvas id="chart"></canvas></div>
+    </main>
+  </div>
+
+<script>
+let DATA=[]; let HEADERS=[]; let currentChart=null; let statsText='';
+
+function validAlpha(a){ let x=parseFloat(a); if(isNaN(x)) x=0.85; return Math.min(1,Math.max(0,x)); }
+function hexToRgb(hex){ const m=/^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex||'#60a5fa'); if(!m) return [96,165,250]; return [parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)]; }
+function rgba([r,g,b],a){ return `rgba(${r},${g},${b},${a})`; }
+
+function buildTable(rows){ if(!rows.length) return '<div>No data loaded</div>'; const headers=Object.keys(rows[0]); let html='<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>'; for(const r of rows.slice(0,20)){ html+='<tr>'+headers.map(h=>`<td>${r[h]}</td>`).join('')+'</tr>'; } html+='</tbody></table>'; return html; }
+
+async function loadFile(file){
+  try{
+    const isExcel=(file.name||'').toLowerCase().endsWith('.xlsx');
+    if(isExcel){
+      const buf=await file.arrayBuffer(); const wb=XLSX.read(buf,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]];
+      setData(XLSX.utils.sheet_to_json(ws,{defval:''}));
+    } else {
+      const text=await file.text(); const wb=XLSX.read(text,{type:'string'}); const ws=wb.Sheets[wb.SheetNames[0]];
+      setData(XLSX.utils.sheet_to_json(ws,{defval:''}));
+    }
+  } catch(e){ console.error(e); document.getElementById('status').textContent='Failed to parse file. Use CSV or XLSX.'; }
+}
+
+function setData(rows){
+  DATA=rows||[]; HEADERS=DATA.length?Object.keys(DATA[0]):[];
+  const numericCols=HEADERS.filter(h=> DATA.some(r=> Number.isFinite(parseFloat(r[h])) ));
+  const xSel=document.getElementById('xSelect'); const ySel=document.getElementById('ySelect');
+  const opts=numericCols.map(h=>`<option value="${h}">${h}</option>`).join('');
+  xSel.innerHTML='<option value="">—</option>'+opts;
+  ySel.innerHTML='<option value="">—</option>'+opts;
+  document.getElementById('preview').innerHTML=buildTable(DATA);
+  document.getElementById('status').textContent=`Loaded ${DATA.length} rows / ${HEADERS.length} cols`;
+}
+
+function getXY(xcol,ycol){
+  const pts=[]; for(const r of DATA){ const x=parseFloat(r[xcol]), y=parseFloat(r[ycol]); if(Number.isFinite(x)&&Number.isFinite(y)) pts.push({x,y}); }
+  return pts;
+}
+
+function linreg(points){
+  const n=points.length; if(n<2) return null;
+  let sx=0, sy=0, sxx=0, syy=0, sxy=0;
+  for(const p of points){ sx+=p.x; sy+=p.y; sxx+=p.x*p.x; syy+=p.y*p.y; sxy+=p.x*p.y; }
+  const xbar=sx/n, ybar=sy/n;
+  const Sxx=sxx - n*xbar*xbar; const Syy=syy - n*ybar*ybar; const Sxy=sxy - n*xbar*ybar;
+  if(Sxx===0||Syy===0) return {a:ybar, b:0, r:0};
+  const b=Sxy/Sxx; const a=ybar - b*xbar; const r=Sxy/Math.sqrt(Sxx*Syy);
+  return {a,b,r};
+}
+
+const backgroundPlugin={ id:'custom_bgcolor', beforeDraw:(chart)=>{ const ctx=chart.ctx; const bg=(document.getElementById('bgColor')?.value)||'#ffffff'; ctx.save(); ctx.fillStyle=bg; ctx.fillRect(0,0,chart.width,chart.height); ctx.restore(); } };
+
+// readable text color over chosen background
+function bestTextColorForBg(hex){
+  const m=/^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex||'#ffffff');
+  const r=parseInt(m[1],16), g=parseInt(m[2],16), b=parseInt(m[3],16);
+  const luma=0.2126*r+0.7152*g+0.0722*b;
+  return luma>180? '#111827' : '#e5e7eb';
+}
+const annotationPlugin={ id:'reg_annotation', afterDraw:(chart)=>{
+  if(!statsText) return;
+  const area=chart.chartArea, ctx=chart.ctx;
+  const fontFamily=document.getElementById('fontFamily')?.value||'sans-serif';
+  const fontSize=parseInt(document.getElementById('fontSize')?.value,10)||12;
+  const bg=(document.getElementById('bgColor')?.value)||'#ffffff';
+  const color=bestTextColorForBg(bg);
+  ctx.save();
+  ctx.font=`${fontSize}px ${fontFamily}`;
+  ctx.fillStyle=color; ctx.textAlign='left'; ctx.textBaseline='top';
+  const x=area.left+8, y=area.top+8;
+  // subtle outline for readability
+  ctx.strokeStyle = color==='#e5e7eb' ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.35)';
+  ctx.lineWidth=3; ctx.strokeText(statsText, x, y);
+  ctx.fillText(statsText, x, y);
+  ctx.restore();
+} };
+
+function applySize(){
+  const wrap=document.querySelector('.chart-wrap');
+  const h=parseInt(document.getElementById('chartH').value,10);
+  if(!isNaN(h)) wrap.style.height=h+'px';
+  const w=document.getElementById('chartW').value;
+  wrap.style.width=w? (w+'px') : '100%';
+}
+
+function drawScatter(){
+  const xcol=document.getElementById('xSelect').value;
+  const ycol=document.getElementById('ySelect').value;
+  if(!xcol||!ycol) return alert('Pick both X and Y numeric columns');
+  const pts=getXY(xcol,ycol); if(pts.length<2) return alert('Need at least 2 numeric XY pairs.');
+
+  const alpha=validAlpha(document.getElementById('opacity').value);
+  const fill=rgba(hexToRgb(document.getElementById('fillColor').value), alpha);
+  const border=document.getElementById('borderColor').value;
+  const radius=Math.max(1, parseInt(document.getElementById('pointRadius').value,10)||4);
+
+  const fontFamily=document.getElementById('fontFamily').value;
+  const fontSize=parseInt(document.getElementById('fontSize').value,10)||12;
+  const title=document.getElementById('titleInput').value || `${ycol} vs ${xcol}`;
+  const xlabel=document.getElementById('xlabelInput').value || xcol;
+  const ylabel=document.getElementById('ylabelInput').value || ycol;
+  const showLegend=document.getElementById('legendDisplay').value==='show';
+  const padding=parseInt(document.getElementById('chartPad').value,10)||0;
+
+  const scatterDataset={ label:`${ycol} vs ${xcol}`, data: pts, showLine:false,
+    backgroundColor:fill, borderColor:border, borderWidth:1, pointRadius:radius };
+
+  applySize(); if(currentChart) currentChart.destroy();
+
+  currentChart=new Chart(document.getElementById('chart'),{
+    type:'scatter',
+    data:{ datasets:[scatterDataset] },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      layout:{ padding: padding },
+      plugins:{
+        legend:{ display: showLegend, labels:{ font:{ family:fontFamily, size:fontSize } } },
+        title:{ display:true, text:title, font:{ family:fontFamily, size:fontSize+2 } },
+        tooltip:{ callbacks:{ label:(ctx)=>`(${ctx.parsed.x}, ${ctx.parsed.y})` },
+                  bodyFont:{ family:fontFamily, size:fontSize } }
+      },
+      scales:{
+        x:{ type:'linear', title:{ display:true, text:xlabel, font:{ family:fontFamily, size:fontSize } },
+            ticks:{ font:{ family:fontFamily, size:fontSize } } },
+        y:{ title:{ display:true, text:ylabel, font:{ family:fontFamily, size:fontSize } },
+            ticks:{ font:{ family:fontFamily, size:fontSize } } }
+      }
+    },
+    plugins:[backgroundPlugin, annotationPlugin]
+  });
+
+  // Add/refresh regression after chart creation
+  refreshRegression();
+}
+
+function refreshColors(){
+  if(!currentChart) return;
+  const alpha=validAlpha(document.getElementById('opacity').value);
+  const fill=rgba(hexToRgb(document.getElementById('fillColor').value), alpha);
+  const border=document.getElementById('borderColor').value;
+  const r=Math.max(1, parseInt(document.getElementById('pointRadius').value,10)||4);
+  const ds=currentChart.data.datasets[0];
+  ds.backgroundColor=fill; ds.borderColor=border; ds.pointRadius=r;
+  currentChart.update();
+}
+
+function refreshPadding(){
+  if(!currentChart) return;
+  currentChart.options.layout = currentChart.options.layout || {};
+  currentChart.options.layout.padding = parseInt(document.getElementById('chartPad').value,10)||0;
+  currentChart.update();
+}
+
+function refreshRegression(){
+  if(!currentChart) return;
+  const mode=document.getElementById('regressionMode').value;
+  const show=document.getElementById('regressionShow').value;
+  const regColor=document.getElementById('regColor').value;
+  const regWidth=Math.max(1, parseInt(document.getElementById('regWidth').value,10)||2);
+
+  const scatter=currentChart.data.datasets[0];
+  const pts=scatter.data||[];
+  statsText='';
+  // Remove any existing regression dataset (assumed at index 1)
+  currentChart.data.datasets=[scatter];
+
+  if(mode==='linear' && pts.length>=2){
+    const stats=linreg(pts);
+    if(stats){
+      const xs=pts.map(p=>p.x);
+      const xmin=Math.min(...xs), xmax=Math.max(...xs);
+      const y1=stats.a + stats.b*xmin; const y2=stats.a + stats.b*xmax;
+      const regDataset={ type:'line', label:'Regression', data:[{x:xmin,y:y1},{x:xmax,y:y2}],
+        borderColor:regColor, backgroundColor:regColor, borderWidth:regWidth, pointRadius:0, tension:0 };
+      currentChart.data.datasets.push(regDataset);
+
+      if(show.includes('eq')){
+        const eq=`y = ${stats.b.toFixed(3)}x ${stats.a>=0?'+':''}${stats.a.toFixed(3)}`;
+        statsText = show.includes('r') ? `${eq}    r = ${stats.r.toFixed(3)}` : eq;
+      } else if(show.includes('r')){
+        statsText = `r = ${stats.r.toFixed(3)}`;
+      }
+    }
+  }
+  currentChart.update();
+}
+
+function downloadPNG(){
+  if(!currentChart) return;
+  const a=document.createElement('a');
+  a.href=currentChart.toBase64Image();
+  a.download='scatter.png';
+  a.click();
+}
+
+const SAMPLE=[
+  {Hours:1, Score:58}, {Hours:2, Score:62}, {Hours:3, Score:67}, {Hours:3.5, Score:70},
+  {Hours:4, Score:72}, {Hours:4.5, Score:74}, {Hours:5, Score:78}, {Hours:5.5, Score:80},
+  {Hours:6, Score:83}, {Hours:6.5, Score:85}, {Hours:7, Score:88}, {Hours:7.5, Score:90}, {Hours:8, Score:92}
+];
+
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('loadBtn').onclick=()=>{ const f=document.getElementById('file').files[0]; if(f) loadFile(f); };
+  document.getElementById('sampleBtn').onclick=()=>{ setData(SAMPLE); };
+  document.getElementById('drawScatterBtn').onclick=drawScatter;
+  document.getElementById('downloadPNGBtn').onclick=downloadPNG;
+  document.getElementById('applySizeBtn').onclick=applySize;
+
+  ['fillColor','borderColor','opacity','pointRadius'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.addEventListener('input',refreshColors);
+    el.addEventListener('change',refreshColors);
+  });
+  ['bgColor'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.addEventListener('input',()=>{ if(currentChart) currentChart.update(); });
+    el.addEventListener('change',()=>{ if(currentChart) currentChart.update(); });
+  });
+  document.getElementById('chartPad').addEventListener('input', refreshPadding);
+
+  // Live regression updates
+  ['regressionMode','regressionShow','regColor','regWidth'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.addEventListener('change', refreshRegression);
+    el.addEventListener('input', refreshRegression);
+  });
+});
+</script>
+</body>
+</html>
