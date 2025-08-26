@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stats Grapher — Module 6 (Descriptive Summary)</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body {background:#0f172a;color:#e5e7eb;font-family:sans-serif;margin:0}
+    .wrap{display:grid;grid-template-columns:320px 1fr;gap:14px;padding:14px}
+    .panel{background:#111827;border:1px solid #1f2937;border-radius:14px}
+    .left{padding:14px}
+    .card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:12px;margin-bottom:12px}
+    label{display:block;font-size:13px;color:#9ca3af;margin-bottom:6px}
+    input,select,button{width:95%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb}
+    button.btn{width:auto;margin-top:6px;background:#14213d;cursor:pointer}
+    button.btn:hover{filter:brightness(1.1)}
+    .preview{max-height:200px;overflow:auto;border:1px solid #374151;border-radius:8px;margin-top:6px}
+    .out{padding:12px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:6px 8px;border-bottom:1px solid #303744;font-size:13px;text-align:left}
+    th{color:#cbd5e1}
+    .controls small{color:#9ca3af;display:block;margin-top:4px}
+    .muted{color:#9ca3af;font-size:12px}
+    .tag{display:inline-block;background:#0b1220;border:1px solid #1f2937;border-radius:999px;padding:4px 8px;font-size:12px;margin-right:6px}
+    .chart-wrap{min-height:80px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="panel left">
+      <div class="card">
+        <label>Upload data (CSV / Excel)</label>
+        <input id="file" type="file" accept=".csv, .xlsx" />
+        <button class="btn" id="loadBtn">Load File</button>
+        <button class="btn" id="sampleBtn">Load Sample</button>
+        <div id="status" class="muted" style="margin-top:6px"></div>
+      </div>
+
+      <div class="card controls">
+        <label>Summary Type</label>
+        <select id="summaryType">
+          <option value="numeric" selected>Numeric Variable</option>
+          <option value="categorical">Categorical Variable</option>
+        </select>
+
+        <div id="numericControls">
+          <label>Numeric Column</label>
+          <select id="numCol"><option value="">—</option></select>
+          <label>Group By (optional)</label>
+          <select id="numGroup"><option value="">— none —</option></select>
+          <small>Computes N, Mean, Median, SD, Min, Q1, Q3, Max, IQR. If grouped, one row per group.</small>
+        </div>
+
+        <div id="catControls" style="display:none">
+          <label>Categorical Column</label>
+          <select id="catCol"><option value="">—</option></select>
+          <label>Group By (optional)</label>
+          <select id="catGroup"><option value="">— none —</option></select>
+          <label>Show</label>
+          <select id="catShow"><option value="count" selected>Counts</option><option value="percent">Percents</option><option value="both">Counts + Percents</option></select>
+        </div>
+
+        <div class="grid2" style="margin-top:8px">
+          <div>
+            <label>Font Family</label>
+            <select id="fontFamily">
+              <option value="sans-serif">Sans-serif</option>
+              <option value="serif">Serif</option>
+              <option value="monospace">Monospace</option>
+              <option value="cursive">Cursive</option>
+            </select>
+          </div>
+          <div>
+            <label>Font Size (px)</label>
+            <input id="fontSize" type="number" value="12" />
+          </div>
+        </div>
+        <button class="btn" id="runBtn">Run Summary</button>
+        <button class="btn" id="downloadBtn">Download Table (CSV)</button>
+      </div>
+
+      <div class="card">
+        <strong>Dataset Preview</strong>
+        <div id="preview" class="preview"></div>
+      </div>
+    </aside>
+
+    <main class="panel">
+      <div class="out">
+        <div id="meta" class="muted"></div>
+        <div id="result" class="chart-wrap"></div>
+      </div>
+    </main>
+  </div>
+
+<script>
+let DATA=[]; let HEADERS=[]; let LAST_TABLE=[]; // for CSV export
+
+function buildTable(rows){
+  if(!rows || rows.length===0) return '<div>No data</div>';
+  const headers=Object.keys(rows[0]);
+  let html='<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>';
+  for(const r of rows){ html+='<tr>'+headers.map(h=>`<td>${r[h]}</td>`).join('')+'</tr>'; }
+  html+='</tbody></table>'; return html;
+}
+
+function buildPreview(rows){
+  if(!rows.length) return '<div>No data loaded</div>';
+  const headers=Object.keys(rows[0]);
+  let html='<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>';
+  for(const r of rows.slice(0,20)) html+='<tr>'+headers.map(h=>`<td>${r[h]}</td>`).join('')+'</tr>';
+  html+='</tbody></table>'; return html;
+}
+
+async function loadFile(file){
+  try{
+    const isExcel=(file.name||'').toLowerCase().endsWith('.xlsx');
+    if(isExcel){
+      const buf=await file.arrayBuffer(); const wb=XLSX.read(buf,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]];
+      setData(XLSX.utils.sheet_to_json(ws,{defval:''}));
+    } else {
+      const text=await file.text(); const wb=XLSX.read(text,{type:'string'}); const ws=wb.Sheets[wb.SheetNames[0]];
+      setData(XLSX.utils.sheet_to_json(ws,{defval:''}));
+    }
+  }catch(e){ console.error(e); document.getElementById('status').textContent='Failed to parse file. Use CSV or XLSX.'; }
+}
+
+function setData(rows){
+  DATA=rows||[]; HEADERS=DATA.length?Object.keys(DATA[0]):[];
+  const numericCols=HEADERS.filter(h=> DATA.some(r=> Number.isFinite(parseFloat(r[h])) ));
+  const catCols=HEADERS.filter(h=> !numericCols.includes(h));
+  const numCol=document.getElementById('numCol');
+  const numGroup=document.getElementById('numGroup');
+  const catCol=document.getElementById('catCol');
+  const catGroup=document.getElementById('catGroup');
+  const optsNum=numericCols.map(h=>`<option value="${h}">${h}</option>`).join('');
+  const optsAll=HEADERS.map(h=>`<option value="${h}">${h}</option>`).join('');
+  numCol.innerHTML='<option value="">—</option>'+optsNum;
+  numGroup.innerHTML='<option value="">— none —</option>'+optsAll;
+  catCol.innerHTML='<option value="">—</option>'+HEADERS.map(h=>`<option value="${h}">${h}</option>`).join('');
+  catGroup.innerHTML='<option value="">— none —</option>'+optsAll;
+
+  document.getElementById('preview').innerHTML=buildPreview(DATA);
+  document.getElementById('status').textContent=`Loaded ${DATA.length} rows / ${HEADERS.length} cols`;
+}
+
+function q(arr,p){ // quantile for sorted arr
+  if(arr.length===0) return NaN; const idx=(arr.length-1)*p; const lo=Math.floor(idx), hi=Math.ceil(idx);
+  if(lo===hi) return arr[lo]; return arr[lo]*(hi-idx)+arr[hi]*(idx-lo);
+}
+
+function numericSummary(col, groupBy){
+  const rows=[];
+  const groups = groupBy? groupValues(groupBy) : { '__ALL__': DATA };
+  for(const g in groups){
+    const vals = groups[g].map(r=> parseFloat(r[col])).filter(v=>Number.isFinite(v));
+    vals.sort((a,b)=>a-b);
+    const n=vals.length;
+    const mean = n? (vals.reduce((a,b)=>a+b,0)/n) : NaN;
+    const median = n? q(vals,0.5) : NaN;
+    const q1 = n? q(vals,0.25) : NaN;
+    const q3 = n? q(vals,0.75) : NaN;
+    const iqr = (isNaN(q1)||isNaN(q3))? NaN : (q3-q1);
+    const min = n? vals[0] : NaN;
+    const max = n? vals[n-1] : NaN;
+    const sd = n>1? Math.sqrt(vals.reduce((s,v)=>s+(v-mean)*(v-mean),0)/(n-1)) : NaN; // sample SD
+    rows.push({
+      Group: groupBy? g : '(all)',
+      N: n,
+      Mean: fix(mean), Median: fix(median), SD: fix(sd),
+      Min: fix(min), Q1: fix(q1), Q3: fix(q3), Max: fix(max), IQR: fix(iqr)
+    });
+  }
+  return rows;
+}
+
+function groupValues(col){
+  const map={}; for(const r of DATA){ const v=r[col]!==undefined? String(r[col]).trim():''; if(v==='') continue; (map[v]=map[v]||[]).push(r); }
+  return map;
+}
+
+function categoricalSummary(col, groupBy, show){
+  const rows=[];
+  if(groupBy){
+    const groups=groupValues(groupBy);
+    for(const g in groups){
+      const counts={}; let total=0;
+      for(const r of groups[g]){ const v=r[col]!==undefined? String(r[col]).trim():''; if(v==='') continue; counts[v]=(counts[v]||0)+1; total++; }
+      const entries=Object.entries(counts).sort((a,b)=> b[1]-a[1]);
+      for(const [k,c] of entries){
+        const pct = total? (100*c/total) : 0;
+        rows.push({Group:g, Category:k, Count:c, Percent: pct.toFixed(1)+'%'});
+      }
+    }
+  } else {
+    const counts={}; let total=0;
+    for(const r of DATA){ const v=r[col]!==undefined? String(r[col]).trim():''; if(v==='') continue; counts[v]=(counts[v]||0)+1; total++; }
+    const entries=Object.entries(counts).sort((a,b)=> b[1]-a[1]);
+    for(const [k,c] of entries){ const pct= total? (100*c/total):0; rows.push({Category:k, Count:c, Percent:pct.toFixed(1)+'%'}); }
+  }
+
+  if(show==='count') return rows.map(r=>{ const o={...r}; delete o.Percent; return o; });
+  if(show==='percent') return rows.map(r=>{ const o={...r}; delete o.Count; return o; });
+  return rows;
+}
+
+function fix(x){ if(x===undefined||x===null||Number.isNaN(x)) return ''; const a=Math.abs(x); if(a>=100) return x.toFixed(1); if(a>=10) return x.toFixed(2); if(a>=1) return x.toFixed(3); return x.toFixed(4); }
+
+function runSummary(){
+  const type=document.getElementById('summaryType').value;
+  const fam=document.getElementById('fontFamily').value;
+  const size=parseInt(document.getElementById('fontSize').value,10)||12;
+  const meta=document.getElementById('meta');
+  const out=document.getElementById('result');
+  out.style.fontFamily=fam; out.style.fontSize=size+'px';
+
+  let table=[]; let title='';
+  if(type==='numeric'){
+    const col=document.getElementById('numCol').value; if(!col) return alert('Pick a numeric column');
+    const group=document.getElementById('numGroup').value;
+    table=numericSummary(col, group||'');
+    title = `Summary of ${col}` + (group? ` by ${group}` : '');
+  } else {
+    const col=document.getElementById('catCol').value; if(!col) return alert('Pick a categorical column');
+    const group=document.getElementById('catGroup').value;
+    const show=document.getElementById('catShow').value;
+    table=categoricalSummary(col, group||'', show);
+    title = `Frequency of ${col}` + (group? ` by ${group}` : '');
+  }
+  LAST_TABLE = table;
+  meta.innerHTML = `<span class="tag">Rows: ${DATA.length}</span>` + `<span class="tag">Columns: ${HEADERS.length}</span>` + (title? ` <span class="tag">${title}</span>`:'');
+  out.innerHTML = buildTable(table);
+}
+
+function downloadCSV(){
+  if(!LAST_TABLE || LAST_TABLE.length===0){ alert('Nothing to download yet. Run a summary first.'); return; }
+  const headers=Object.keys(LAST_TABLE[0]);
+  const escape=(s)=> '"'+String(s).replaceAll('"','""')+'"';
+  const rows=[headers.join(',')];
+  for(const r of LAST_TABLE){ rows.push(headers.map(h=> escape(r[h]!==undefined? r[h]: '') ).join(',')); }
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='summary.csv'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+const SAMPLE=[
+  {Score:88, Height:170.2, Class:'A', Gender:'F'},
+  {Score:92, Height:172.5, Class:'A', Gender:'M'},
+  {Score:75, Height:165.1, Class:'A', Gender:'F'},
+  {Score:81, Height:168.9, Class:'B', Gender:'F'},
+  {Score:96, Height:175.3, Class:'B', Gender:'M'},
+  {Score:67, Height:160.4, Class:'B', Gender:'F'},
+  {Score:73, Height:162.0, Class:'C', Gender:'M'},
+  {Score:85, Height:169.7, Class:'C', Gender:'F'},
+  {Score:90, Height:171.1, Class:'C', Gender:'M'},
+  {Score:78, Height:166.2, Class:'C', Gender:'F'}
+];
+
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('loadBtn').onclick=()=>{ const f=document.getElementById('file').files[0]; if(f) loadFile(f); };
+  document.getElementById('sampleBtn').onclick=()=>{ setData(SAMPLE); };
+  document.getElementById('runBtn').onclick=runSummary;
+  document.getElementById('downloadBtn').onclick=downloadCSV;
+  document.getElementById('summaryType').addEventListener('change',()=>{
+    const t=document.getElementById('summaryType').value;
+    document.getElementById('numericControls').style.display = (t==='numeric')? 'block':'none';
+    document.getElementById('catControls').style.display     = (t==='categorical')? 'block':'none';
+  });
+});
+</script>
+</body>
+</html>
