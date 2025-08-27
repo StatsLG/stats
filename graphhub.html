@@ -30,10 +30,13 @@
 <body>
   <div class="wrap">
     <header>
-      <h1>BCTC Statistics Graph Hub</h1>
+      <h1>BCTC Statistics Hub</h1>
     </header>
 
+
+      <h2 style="font-size:16px;margin:0 0 8px">Graphing Modules</h2>
     <section class="grid">
+      
       <article class="card">
         <h2>Bar Chart</h2>
         <p class="desc">Categorical counts/percent, colors, fonts, axis labels, PNG export.</p>
@@ -77,6 +80,28 @@
       </article>
     </section>
 
+    <section class="panel" style="margin-top:16px">
+      <h2 style="font-size:16px;margin:0 0 8px">Analysis Modules</h2>
+      <div class="grid" style="margin-top:8px">
+
+        <article class="card">
+          <h2>Descriptive Summary</h2>
+          <p class="desc">Numeric summaries (N, mean, median, SD, quartiles, IQR) and categorical counts/percents, with optional group-by and CSV export.</p>
+          <div class="btns">
+            <a class="btn" href="descriptive/summary.html">Open Descriptive Summary</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>One-Sample Mean Test</h2>
+          <p class="desc">One-sample <em>t</em> (σ unknown) or <em>z</em> (σ known) test for a mean, with CI and Cohen’s d, clear decision at α, CSV export.</p>
+          <div class="btns">
+            <a class="btn" href="inference/onemean.html">Open One-Sample Mean</a>
+          </div>
+        </article>
+
+      </div>
+    </section>
     <footer>
       Created by: Luke Garnett
     </footer>

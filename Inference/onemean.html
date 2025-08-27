@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stats Grapher — Module 7 (One‑Sample Mean Test)</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
+  <style>
+    body {background:#0f172a;color:#e5e7eb;font-family:sans-serif;margin:0}
+    .wrap{display:grid;grid-template-columns:320px 1fr;gap:14px;padding:14px}
+    .panel{background:#111827;border:1px solid #1f2937;border-radius:14px}
+    .left{padding:14px}
+    .card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:12px;margin-bottom:12px}
+    label{display:block;font-size:13px;color:#9ca3af;margin-bottom:6px}
+    input,select,button{width:95%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb}
+    input[type="checkbox"]{width:auto;margin-right:6px}
+    button.btn{width:auto;margin-top:6px;background:#14213d;cursor:pointer}
+    button.btn:hover{filter:brightness(1.1)}
+    .preview{max-height:200px;overflow:auto;border:1px solid #374151;border-radius:8px;margin-top:6px}
+    .out{padding:12px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:6px 8px;border-bottom:1px solid #303744;font-size:13px;text-align:left}
+    th{color:#cbd5e1}
+    .muted{color:#9ca3af;font-size:12px}
+    .tag{display:inline-block;background:#0b1220;border:1px solid #1f2937;border-radius:999px;padding:4px 8px;font-size:12px;margin-right:6px}
+    .num{font-variant-numeric:tabular-nums}
+    .hl{background:#0b1220;border:1px solid #1f2937;border-radius:8px;padding:8px;margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="panel left">
+      <div class="card">
+        <label>Upload data (CSV / Excel)</label>
+        <input id="file" type="file" accept=".csv, .xlsx" />
+        <button class="btn" id="loadBtn">Load File</button>
+        <button class="btn" id="sampleBtn">Load Sample</button>
+        <div id="status" class="muted" style="margin-top:6px"></div>
+      </div>
+
+      <div class="card">
+        <strong>One‑Sample Test for a Mean</strong>
+        <label>Numeric Column</label>
+        <select id="numCol"><option value="">—</option></select>
+        <div class="grid2">
+          <div>
+            <label>Null Mean (μ₀)</label>
+            <input id="mu0" type="number" step="any" value="70" />
+          </div>
+          <div>
+            <label>Alternative</label>
+            <select id="alt">
+              <option value="two.sided" selected>Two‑sided (μ ≠ μ₀)</option>
+              <option value="less">Left‑tailed (μ < μ₀)</option>
+              <option value="greater">Right‑tailed (μ > μ₀)</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid2">
+          <div>
+            <label>Confidence Level (%)</label>
+            <input id="conf" type="number" min="50" max="99.9" step="0.1" value="95" />
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:22px">
+            <input id="knownSigma" type="checkbox" />
+            <label for="knownSigma" style="margin:0">Use z‑test (σ known)</label>
+          </div>
+        </div>
+        <div id="sigmaRow" class="grid2" style="display:none">
+          <div>
+            <label>Population σ</label>
+            <input id="sigma" type="number" step="any" value="10" />
+          </div>
+        </div>
+        <button class="btn" id="runBtn">Run Test</button>
+        <button class="btn" id="downloadBtn">Download Results (CSV)</button>
+      </div>
+
+      <div class="card">
+        <strong>Dataset Preview</strong>
+        <div id="preview" class="preview"></div>
+      </div>
+    </aside>
+
+    <main class="panel">
+      <div class="out">
+        <div id="meta" class="muted"></div>
+        <div id="result"></div>
+        <div id="note" class="muted" style="margin-top:8px"></div>
+      </div>
+    </main>
+  </div>
+
+<script>
+let DATA=[]; let HEADERS=[]; let LAST_ROWS=[]; // for CSV
+
+function buildPreview(rows){
+  if(!rows.length) return '<div>No data loaded</div>';
+  const headers=Object.keys(rows[0]);
+  let html='<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>';
+  for(const r of rows.slice(0,20)) html+='<tr>'+headers.map(h=>`<td>${r[h]}</td>`).join('')+'</tr>';
+  html+='</tbody></table>'; return html;
+}
+
+async function loadFile(file){
+  try{
+    const isExcel=(file.name||'').toLowerCase().endsWith('.xlsx');
+    if(isExcel){ const buf=await file.arrayBuffer(); const wb=XLSX.read(buf,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; setData(XLSX.utils.sheet_to_json(ws,{defval:''})); }
+    else { const text=await file.text(); const wb=XLSX.read(text,{type:'string'}); const ws=wb.Sheets[wb.SheetNames[0]]; setData(XLSX.utils.sheet_to_json(ws,{defval:''})); }
+  } catch(e){ console.error(e); document.getElementById('status').textContent='Failed to parse file. Use CSV or XLSX.'; }
+}
+
+function setData(rows){
+  DATA=rows||[]; HEADERS=DATA.length?Object.keys(DATA[0]):[];
+  const numericCols=HEADERS.filter(h=> DATA.some(r=> Number.isFinite(parseFloat(r[h])) ));
+  const numCol=document.getElementById('numCol');
+  numCol.innerHTML='<option value="">—</option>'+numericCols.map(h=>`<option value="${h}">${h}</option>`).join('');
+  document.getElementById('preview').innerHTML=buildPreview(DATA);
+  document.getElementById('status').textContent=`Loaded ${DATA.length} rows / ${HEADERS.length} cols`;
+}
+
+function tSummary(vals){
+  const n=vals.length; const mean=jStat.mean(vals); const sd=jStat.stdev(vals,true); // sample sd
+  return {n, mean, sd, se: sd/Math.sqrt(n)};
+}
+
+function formatNum(x){ if(x===undefined||x===null||Number.isNaN(x)) return ''; const a=Math.abs(x); if(a>=100) return x.toFixed(1); if(a>=10) return x.toFixed(2); if(a>=1) return x.toFixed(3); return x.toFixed(4); }
+
+function runTest(){
+  const col=document.getElementById('numCol').value; if(!col) return alert('Pick a numeric column');
+  const mu0=parseFloat(document.getElementById('mu0').value);
+  const alt=document.getElementById('alt').value;
+  const conf=parseFloat(document.getElementById('conf').value)/100; const alpha=1-conf;
+  const useZ=document.getElementById('knownSigma').checked;
+  const sigma=parseFloat(document.getElementById('sigma').value);
+
+  const vals=[]; for(const r of DATA){ const v=parseFloat(r[col]); if(Number.isFinite(v)) vals.push(v); }
+  if(vals.length<2) return alert('Need at least 2 numeric values.');
+
+  const {n, mean, sd, se}=tSummary(vals);
+  let stat, p, df, ciLo, ciHi, method;
+
+  if(useZ){
+    if(!Number.isFinite(sigma) || sigma<=0) return alert('Enter a valid population σ');
+    const seZ=sigma/Math.sqrt(n);
+    stat=(mean-mu0)/seZ; // z
+    if(alt==='two.sided') p = 2*(1-jStat.normal.cdf(Math.abs(stat),0,1));
+    else if(alt==='less') p = jStat.normal.cdf(stat,0,1);
+    else p = 1-jStat.normal.cdf(stat,0,1);
+    const zcrit=jStat.normal.inv(1-alpha/2,0,1);
+    ciLo=mean - zcrit*seZ; ciHi=mean + zcrit*seZ;
+    df = Infinity; method='One‑sample z‑test (σ known)';
+  } else {
+    stat=(mean-mu0)/se; // t
+    df=n-1;
+    const tcdf=jStat.studentt.cdf(stat, df);
+    if(alt==='two.sided') p = 2*(1-jStat.studentt.cdf(Math.abs(stat), df));
+    else if(alt==='less') p = tcdf;
+    else p = 1-tcdf;
+    const tcrit=jStat.studentt.inv(1-alpha/2, df);
+    ciLo=mean - tcrit*se; ciHi=mean + tcrit*se;
+    method='One‑sample t‑test (σ unknown)';
+  }
+
+  const d=(mean-mu0)/sd; // Cohen's d
+
+  // Build results table
+  const rows=[
+    {Metric:'Method', Value:method},
+    {Metric:'n', Value:n},
+    {Metric:'Sample mean', Value:formatNum(mean)},
+    {Metric:'Sample SD', Value:formatNum(sd)},
+    {Metric:'SE', Value:formatNum(useZ? (sigma/Math.sqrt(n)) : se)},
+    {Metric:'Null mean (μ₀)', Value:formatNum(mu0)},
+    {Metric: useZ? 'z statistic':'t statistic', Value:formatNum(stat)},
+    {Metric:'df', Value: (isFinite(df)? df : '∞')},
+    {Metric:'p‑value', Value:formatNum(p)},
+    {Metric:`${(conf*100).toFixed(1)}% CI for μ`, Value:`[${formatNum(ciLo)}, ${formatNum(ciHi)}]`},
+    {Metric:"Cohen's d", Value:formatNum(d)}
+  ];
+
+  LAST_ROWS = rows;
+
+  // Render meta and results
+  document.getElementById('meta').innerHTML =
+    `<span class="tag">Column: ${col}</span>`+
+    `<span class="tag">Alternative: ${alt.replace('two.sided','two‑sided')}</span>`+
+    `<span class="tag">α = ${(alpha).toFixed(3)}</span>`;
+
+  // Simple decision sentence at α
+  let decision = p < alpha ? 'Reject H₀' : 'Fail to reject H₀';
+  const note = useZ ?
+   'Assumes population standard deviation σ is known and data are independent and approximately normal (or n is large by CLT).' :
+   'Assumes data are independent and approximately normal; uses sample SD and t distribution.';
+
+  const res = document.getElementById('result');
+  res.innerHTML = buildTable(rows) +
+    `<div class="hl">Conclusion at α = ${(alpha).toFixed(3)}: <strong>${decision}</strong>. `+
+    `Observed ${useZ?'z':'t'} = ${formatNum(stat)}, p = ${formatNum(p)}.</div>`;
+  document.getElementById('note').textContent = note;
+}
+
+function buildTable(rows){
+  if(!rows || rows.length===0) return '<div>No results</div>';
+  let html='<table><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>';
+  for(const r of rows){ html+=`<tr><td>${r.Metric}</td><td class="num">${r.Value}</td></tr>`; }
+  html+='</tbody></table>'; return html;
+}
+
+function downloadCSV(){
+  if(!LAST_ROWS || LAST_ROWS.length===0){ alert('Nothing to download yet. Run a test first.'); return; }
+  const headers=['Metric','Value'];
+  const escape=(s)=> '"'+String(s).replaceAll('"','""')+'"';
+  const lines=[headers.join(',')];
+  for(const r of LAST_ROWS){ lines.push(headers.map(h=> escape(r[h]!==undefined? r[h]: '') ).join(',')); }
+  const blob=new Blob([lines.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='one_sample_mean_test.csv'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+const SAMPLE=[
+  {Score: 68},{Score:72},{Score:71},{Score:75},{Score:69},{Score:70},{Score:74},{Score:73},{Score:68},{Score:76},{Score:72},{Score:71}
+];
+
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('loadBtn').onclick=()=>{ const f=document.getElementById('file').files[0]; if(f) loadFile(f); };
+  document.getElementById('sampleBtn').onclick=()=>{ setData(SAMPLE); };
+  document.getElementById('runBtn').onclick=runTest;
+  document.getElementById('downloadBtn').onclick=downloadCSV;
+  document.getElementById('knownSigma').addEventListener('change',()=>{
+    document.getElementById('sigmaRow').style.display = document.getElementById('knownSigma').checked? 'grid':'none';
+  });
+});
+</script>
+</body>
+</html>
