@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pathy Finder (Top-Down)</title>
+  <title>Pathy Finder (Top-Down + Degree Collectible)</title>
   <style>
     :root{ --fg:#e8f0fe; --muted:#9fb3c8; --accent:#52d67a; }
     html,body{height:100%}
@@ -40,20 +40,22 @@
 /*** TWEAKABLES *************************************************************/
 // Path look
 var PATH_ENABLED = true;
-var PATH_WIDTH = 120;           // total road edge width (outer stroke)
-var PATH_EDGE  = "#5c4426";    // darker rim
-var PATH_FILL  = "#b89362";    // inner dirt
-var PATH_CENTER = "#d8c59d";   // dusty center highlight
-var PATH_CENTER_WIDTH = 72;    // keep < PATH_WIDTH
+var PATH_WIDTH = 120;
+var PATH_EDGE  = "#5c4426";
+var PATH_FILL  = "#b89362";
+var PATH_CENTER = "#d8c59d";
+var PATH_CENTER_WIDTH = 72;
 // Path generation / smoothness
-var PATH_STEP = 12;            // px between generated samples (smaller = smoother)
-var PATH_EASE = 0.12;          // how fast currentY approaches targetY (0.08–0.18 nice)
-var PATH_WOBBLE = 0.0;         // tiny sinus wobble amount (0–2)
+var PATH_STEP = 12;
+var PATH_EASE = 0.12;
+var PATH_WOBBLE = 0.0;
 // Forest floor density & motion
-var FLOOR_SPRITES = 140;       // leaves/rocks count
-var FLOOR_SPEED = 2.0;         // floor drift speed (top-down feel)
-// Win condition
-var WIN_SCORE = 10;            // target score to "earn a degree"
+var FLOOR_SPRITES = 140;
+var FLOOR_SPEED = 2.0;
+// Win / degree collectible
+var WIN_SCORE = 10;              // when the degree spawns
+var DEGREE_TYPE = "auto";        // "cap", "diploma", or "auto"
+var STOP_SPAWN_ON_DEGREE = true; // stop new pipes once degree appears
 /***************************************************************************/
 
 window.addEventListener('DOMContentLoaded', function(){
@@ -75,7 +77,6 @@ window.addEventListener('DOMContentLoaded', function(){
 
   // World
   var W = canvas.width, H = canvas.height;
-  var GROUND_H = 0; // top-down: no ground band
 
   // Bird
   var bird = { x: 90, y: H*0.5, r: 14, vy: 0 };
@@ -88,9 +89,18 @@ window.addEventListener('DOMContentLoaded', function(){
   // Sprites (optional)
   var BIRD_IMG_SRC = 'pathfinderheadNOBG.png';
   var PIPE_IMG_SRC = 'log.png';
-  var SPRITES = { bird:new Image(), pipe:new Image(), birdReady:false, pipeReady:false };
+  var CAP_IMG_SRC = 'cap.png';
+  var DIPLOMA_IMG_SRC = 'diploma.png';
+
+  var SPRITES = {
+    bird:new Image(), pipe:new Image(), cap:new Image(), diploma:new Image(),
+    birdReady:false, pipeReady:false, capReady:false, diplomaReady:false
+  };
   if (BIRD_IMG_SRC){ SPRITES.bird.src=BIRD_IMG_SRC; SPRITES.bird.onload=()=>SPRITES.birdReady=true; SPRITES.bird.onerror=()=>{}; }
   if (PIPE_IMG_SRC){ SPRITES.pipe.src=PIPE_IMG_SRC; SPRITES.pipe.onload=()=>SPRITES.pipeReady=true; SPRITES.pipe.onerror=()=>{}; }
+  if (CAP_IMG_SRC){ SPRITES.cap.src=CAP_IMG_SRC; SPRITES.cap.onload=()=>SPRITES.capReady=true; SPRITES.cap.onerror=()=>{}; }
+  if (DIPLOMA_IMG_SRC){ SPRITES.diploma.src=DIPLOMA_IMG_SRC; SPRITES.diploma.onload=()=>SPRITES.diplomaReady=true; SPRITES.diploma.onerror=()=>{}; }
+
   var BIRD_SCALE = 2.0, PIPE_SCALE_X = 1.0;
 
   // State
@@ -308,6 +318,145 @@ window.addEventListener('DOMContentLoaded', function(){
     drawSmooth(PATH_CENTER, PATH_CENTER_WIDTH);
   }
 
+  // ------------------- Degree collectible ---------------------------------
+  var degree = null;           // {x,y,type,size,hitR,sparkles:[...]}
+  var degreeSpawned = false;
+  var degreeCollected = false;
+
+  function chooseDegreeType(){
+    if (DEGREE_TYPE === "auto") return Math.random() < 0.5 ? "cap" : "diploma";
+    return (DEGREE_TYPE === "cap" || DEGREE_TYPE === "diploma") ? DEGREE_TYPE : "cap";
+  }
+
+  function spawnDegree(){
+    degreeSpawned = true;
+    degreeCollected = false;
+    const x = W + 120;
+    const y = getPathYAt(x);
+    const type = chooseDegreeType();
+    const size = 30;
+    const hitR = 18;
+
+    // sparkles that orbit around the degree
+    const sparkles = [];
+    for (let i=0;i<14;i++){
+      sparkles.push({
+        a: (Math.PI*2*i)/14,
+        r: 26 + Math.random()*6,
+        w: 0.02 + Math.random()*0.03,  // angular speed
+        s: 2 + Math.random()*2,        // size
+        yoff: (Math.random()*2-1)*1.5,
+        color: ['#fff2a8','#ffe3b0','#ffffff'][Math.floor(Math.random()*3)]
+      });
+    }
+
+    degree = { x, y, type, size, hitR, sparkles };
+  }
+
+  function updateDegree(){
+    if (!degree) return;
+    degree.x -= PIPE_SPEED;
+
+    // keep it glued to the path center as it scrolls
+    degree.y = getPathYAt(degree.x);
+
+    // update sparkles
+    for (let sp of degree.sparkles){
+      sp.a += sp.w;
+    }
+
+    // offscreen fail-safe
+    if (degree.x < -80) { degree = null; }
+  }
+
+  function drawDegree(){
+    if (!degree) return;
+
+    // draw sparkle ring first
+    for (let sp of degree.sparkles){
+      const sx = degree.x + Math.cos(sp.a) * sp.r;
+      const sy = degree.y + Math.sin(sp.a) * (sp.r*0.45) + sp.yoff;
+      ctx.fillStyle = sp.color;
+      ctx.globalAlpha = 0.9;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy - sp.s);
+      ctx.lineTo(sx + sp.s, sy);
+      ctx.lineTo(sx, sy + sp.s);
+      ctx.lineTo(sx - sp.s, sy);
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.save();
+    ctx.translate(degree.x, degree.y);
+
+    if (degree.type === "cap"){
+      if (SPRITES.capReady){
+        const d = degree.size*1.6;
+        ctx.drawImage(SPRITES.cap, -d/2, -d/2, d, d);
+      } else {
+        drawCapFallback(degree.size);
+      }
+    } else {
+      if (SPRITES.diplomaReady){
+        const d = degree.size*1.6;
+        ctx.drawImage(SPRITES.diploma, -d/2, -d/2, d, d);
+      } else {
+        drawDiplomaFallback(degree.size);
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawCapFallback(s){
+    // mortarboard
+    ctx.save();
+    ctx.rotate(-0.1);
+    ctx.fillStyle = '#1c1c24';
+    ctx.beginPath();
+    ctx.moveTo(-s, 0); ctx.lineTo(0, -s*0.65); ctx.lineTo(s, 0); ctx.lineTo(0, s*0.65); ctx.closePath();
+    ctx.fill();
+    // button
+    ctx.fillStyle = '#333';
+    ctx.beginPath(); ctx.arc(0,0,3,0,Math.PI*2); ctx.fill();
+    // tassel
+    ctx.strokeStyle = '#e5c14a'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.quadraticCurveTo(s*0.5, s*0.15, s*0.2, s*0.9); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawDiplomaFallback(s){
+    // scroll body
+    ctx.fillStyle = '#f4f0d8';
+    roundRect(-s*0.9, -s*0.35, s*1.8, s*0.7, 6, true);
+    // end shadows
+    ctx.fillStyle = '#d7d0b6';
+    roundRect(-s*0.95, -s*0.35, s*0.2, s*0.7, 6, true);
+    roundRect(s*0.75, -s*0.35, s*0.2, s*0.7, 6, true);
+    // ribbon
+    ctx.fillStyle = '#c94b4b';
+    roundRect(-s*0.25, -s*0.18, s*0.5, s*0.36, 4, true);
+  }
+
+  function roundRect(x,y,w,h,r,fill){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y, x+w,y+h, r);
+    ctx.arcTo(x+w,y+h, x,y+h, r);
+    ctx.arcTo(x,y+h, x,y, r);
+    ctx.arcTo(x,y, x+w,y, r);
+    if(fill) ctx.fill(); else ctx.stroke();
+  }
+
+  function birdDegreeCollision(){
+    if (!degree) return false;
+    const dx = bird.x - degree.x;
+    const dy = bird.y - degree.y;
+    const rr = (bird.r + degree.hitR);
+    return (dx*dx + dy*dy) <= rr*rr;
+  }
+
   // ------------------- Game core ------------------------------------------
   function reset(){
     pipes.length = 0;
@@ -315,6 +464,11 @@ window.addEventListener('DOMContentLoaded', function(){
     frame = 0; score = 0; alive = true; started = false;
     won = false;
     confetti.length = 0;
+
+    degree = null;
+    degreeSpawned = false;
+    degreeCollected = false;
+
     initFloor();
     resetPath();
   }
@@ -324,7 +478,7 @@ window.addEventListener('DOMContentLoaded', function(){
     var pipeW = PIPE_W * PIPE_SCALE_X;
     var centerY = getPathYAt(xSpawn + pipeW*0.5);
     var margin = 50;
-    var topHeight = Math.max(margin, Math.min(centerY - GAP_H/2, H - GROUND_H - GAP_H - margin));
+    var topHeight = Math.max(margin, Math.min(centerY - GAP_H/2, H - GAP_H - margin));
     pipes.push({ x:xSpawn, gapY: topHeight, passed:false });
   }
 
@@ -338,35 +492,51 @@ window.addEventListener('DOMContentLoaded', function(){
       advancePath();
       updateFloor();
 
-      if(frame % SPAWN_FRAMES === 0){ spawnPipe(); }
+      // Spawn pipes unless degree is on the field (to keep the pickup clear)
+      if(!degreeSpawned){
+        if(frame % SPAWN_FRAMES === 0){ spawnPipe(); }
+      }
       for(let p of pipes){ p.x -= PIPE_SPEED; }
       while(pipes.length && pipes[0].x + PIPE_W < -20){ pipes.shift(); }
 
+      // scoring
       for(let p of pipes){
         if(!p.passed && p.x + PIPE_W < bird.x - bird.r){
           p.passed = true;
           score++;
           best = Math.max(best, score);
           localStorage.setItem('best_flappy', String(best));
-
-          // Win check
-          if (score >= WIN_SCORE && !won){
-            won = true;
-            alive = false;        // end the run with ceremony
-            spawnConfetti(140);
-          }
         }
       }
 
-      if(bird.y - bird.r < 0){ bird.y = bird.r; bird.vy = 0; }
-      if(bird.y + bird.r > H - GROUND_H){ alive = false; }
+      // Degree spawn condition
+      if (!degreeSpawned && score >= WIN_SCORE){
+        spawnDegree();
+      }
 
-      // collisions
-      for(let pk of pipes){
-        let topRect = { x:pk.x, y:0, w:PIPE_W*PIPE_SCALE_X, h:pk.gapY };
-        let botRect = { x:pk.x, y:pk.gapY + GAP_H, w:PIPE_W*PIPE_SCALE_X, h:H - GROUND_H - (pk.gapY + GAP_H) };
-        if(circleIntersectsRect(bird.x, bird.y, bird.r, topRect) || circleIntersectsRect(bird.x, bird.y, bird.r, botRect)){
-          alive = false; break;
+      // Degree update + collection
+      if (degreeSpawned && degree && !degreeCollected){
+        updateDegree();
+        if (birdDegreeCollision()){
+          degreeCollected = true;
+          won = true;
+          alive = false;        // end with celebration
+          spawnConfetti(160);
+        }
+      }
+
+      // bounds
+      if(bird.y - bird.r < 0){ bird.y = bird.r; bird.vy = 0; }
+      if(bird.y + bird.r > H){ alive = false; }
+
+      // collisions (only if we haven't already won)
+      if (!won){
+        for(let pk of pipes){
+          let topRect = { x:pk.x, y:0, w:PIPE_W*PIPE_SCALE_X, h:pk.gapY };
+          let botRect = { x:pk.x, y:pk.gapY + GAP_H, w:PIPE_W*PIPE_SCALE_X, h:H - (pk.gapY + GAP_H) };
+          if(circleIntersectsRect(bird.x, bird.y, bird.r, topRect) || circleIntersectsRect(bird.x, bird.y, bird.r, botRect)){
+            alive = false; break;
+          }
         }
       }
     }
@@ -390,7 +560,7 @@ window.addEventListener('DOMContentLoaded', function(){
       let pipeW = PIPE_W * PIPE_SCALE_X;
       let topH = p.gapY;
       let botY = p.gapY + GAP_H;
-      let botH = H - GROUND_H - botY;
+      let botH = H - botY;
 
       if (SPRITES.pipeReady){
         // top chunk (flip)
@@ -430,19 +600,27 @@ window.addEventListener('DOMContentLoaded', function(){
       ctx.fillStyle = '#ffd166';
       ctx.beginPath(); ctx.arc(0,0,bird.r,0,Math.PI*2); ctx.fill();
       ctx.fillStyle = '#ff9f1a';
-      ctx.beginPath(); ctx.arc(bird.r*0.6,0, bird.r*0.25, 0, Math.PI*2); ctx.fill(); // "beak" dot
+      ctx.beginPath(); ctx.arc(bird.r*0.6,0, bird.r*0.25, 0, Math.PI*2); ctx.fill();
     }
     ctx.restore();
   }
 
   function drawHUD(){
-    // Score box (only when alive & started, or you can show always)
+    // Score box
     ctx.fillStyle = 'rgba(0,0,0,.25)';
-    ctx.fillRect(8,8,120,56);
+    ctx.fillRect(8,8,180,56);
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 18px system-ui, -apple-system, Segoe UI, Roboto, Arial';
     ctx.fillText('Score: '+score, 16, 32);
     ctx.fillText('Best:  '+best, 16, 56);
+
+    // Hint when degree is out
+    if (degreeSpawned && !won && alive){
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 18px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+      ctx.fillText('🎓 Grab your degree!', W/2, 36);
+      ctx.textAlign = 'left';
+    }
 
     // Start screen
     if(!started){
@@ -509,9 +687,11 @@ window.addEventListener('DOMContentLoaded', function(){
 
   function render(){
     ctx.clearRect(0,0,W,H);
-    drawFloor();             // top-down forest floor
-    if(PATH_ENABLED) drawPath(); // dirt path underneath barriers
+    drawFloor();
+    if(PATH_ENABLED) drawPath();
     drawPipes();
+    // draw degree above pipes so it's always visible
+    drawDegree();
     drawBird();
     drawHUD();
   }
@@ -537,6 +717,7 @@ window.addEventListener('DOMContentLoaded', function(){
   reset();
   loop();
 });
+
   </script>
 </body>
 </html>
