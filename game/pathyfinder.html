@@ -3,15 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fatty Bird</title>
+  <title>Pathy Finder</title>
   <style>
     :root{
       --bg:#0e1b2a; --fg:#e8f0fe; --muted:#9fb3c8; --accent:#52d67a;
     }
     html,body{height:100%}
-    body{margin:0; background:linear-gradient(180deg,#1b2a41 0%,#0e1b2a 100%); color:var(--fg); font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial; display:grid; place-items:center}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#1b2a41 0%,#0e1b2a 100%);
+      color:var(--fg);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;
+      display:grid; place-items:center
+    }
     .wrap{display:flex; flex-direction:column; gap:.75rem; align-items:center}
-    canvas{background:linear-gradient(180deg,#6ec1ff 0%, #bde0ff 60%, #e6f4ff 100%); border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.35); touch-action:none}
+    /* sky-ish canvas tint; we'll fully paint the scene each frame */
+    canvas{
+      background:linear-gradient(180deg,#a8d8ff 0%, #dff1ff 60%, #f1fbff 100%);
+      border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.35); touch-action:none
+    }
     .hud{display:flex; gap:.75rem; align-items:center; justify-content:center; flex-wrap:wrap; opacity:.95}
     .btn{appearance:none; border:0; border-radius:999px; padding:.6rem 1rem; font-weight:700; color:#00121f; background:var(--accent); box-shadow:0 8px 18px rgba(82,214,122,.35); cursor:pointer}
     .btn:active{transform:translateY(1px)}
@@ -31,7 +41,7 @@
   <script>
   "use strict";
   window.addEventListener('DOMContentLoaded', function(){
-    // Debug helper overlay
+    // Debug overlay
     var errorOverlay = document.createElement('div');
     var eoStyle = errorOverlay.style;
     eoStyle.position = 'fixed';
@@ -48,7 +58,7 @@
     document.body.appendChild(errorOverlay);
     function showError(msg){ errorOverlay.textContent = msg; errorOverlay.style.display = 'block'; console.error(msg); }
 
-    // Canvas setup
+    // Canvas
     var canvas = document.getElementById('game');
     if(!canvas){ showError('Canvas #game not found'); return; }
     var ctx = canvas.getContext('2d');
@@ -57,7 +67,7 @@
     // World
     var W = canvas.width;
     var H = canvas.height;
-    var GROUND_H = 60;
+    var GROUND_H = 70;
 
     // Bird
     var bird = { x: 90, y: H*0.4, r: 14, vy: 0 };
@@ -72,9 +82,27 @@
     var PIPE_SPEED = 2.4;
     var SPAWN_FRAMES = 95;
 
+    // Trail / Path config
+    var PATH_ENABLED = true;
+    var PATH_WIDTH = 72;
+    var PATH_EDGE = '#6b4f2a';   // dark brown edge
+    var PATH_FILL = '#a78456';   // lighter inner dirt
+    var PATH_CENTER = '#d8bf93'; // dusty center highlight
+    var PATH_CENTER_WIDTH = 30;
+
+    // Forest/parallax config
+    var FOREST_TREES_FAR_SPACING = 90;
+    var FOREST_TREES_NEAR_SPACING = 140;
+    var FOREST_SPEED_FAR = 0.8;   // px/frame
+    var FOREST_SPEED_NEAR = 1.4;  // px/frame
+    var HILLS_SPEED = 0.6;
+    var forestOffsetFar = 0;
+    var forestOffsetNear = 0;
+    var hillsOffset = 0;
+
     // Sprites
-    var BIRD_IMG_SRC = 'fbfnobg.png'; // change path if needed
-    var PIPE_IMG_SRC = 'swungnobg.png'; // change path if needed
+    var BIRD_IMG_SRC = 'pathfinderheadNOBG.png'; // change path if needed
+    var PIPE_IMG_SRC = 'log.png'; // change path if needed
     var SPRITES = { bird: new Image(), pipe: new Image(), birdReady:false, pipeReady:false };
     if (BIRD_IMG_SRC) {
       SPRITES.bird.src = BIRD_IMG_SRC;
@@ -100,6 +128,7 @@
       pipes.length = 0;
       bird.y = H*0.45; bird.vy = 0;
       frame = 0; score = 0; alive = true; started = false;
+      forestOffsetFar = 0; forestOffsetNear = 0; hillsOffset = 0;
     }
 
     function spawnPipe(){
@@ -134,6 +163,7 @@
         if(bird.y - bird.r < 0){ bird.y = bird.r; bird.vy = 0; }
         if(bird.y + bird.r > H - GROUND_H){ alive = false; }
 
+        // collisions
         for(var k=0;k<pipes.length;k++){
           var pk = pipes[k];
           var topRect = { x:pk.x, y:0, w:PIPE_W*PIPE_SCALE_X, h:pk.gapY };
@@ -142,6 +172,11 @@
             alive = false; break;
           }
         }
+
+        // parallax
+        hillsOffset = (hillsOffset + HILLS_SPEED) % (W*2);
+        forestOffsetFar = (forestOffsetFar + FOREST_SPEED_FAR) % FOREST_TREES_FAR_SPACING;
+        forestOffsetNear = (forestOffsetNear + FOREST_SPEED_NEAR) % FOREST_TREES_NEAR_SPACING;
       }
       frame++;
     }
@@ -154,11 +189,104 @@
       return (dx*dx + dy*dy) < r*r;
     }
 
-    // Drawing
-    function drawBackground(){
-      var t = frame * 0.3;
-      drawCloud((W - (t % (W+120))) - 120, 90, 1.0);
-      drawCloud((W - ((t+200) % (W+160))) - 160, 160, 0.8);
+    // --- Drawing -------------------------------------------------------------
+
+    function drawSky(){
+      var g = ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0, '#aee1ff');     // soft sky
+      g.addColorStop(0.6, '#dff3ff');
+      g.addColorStop(1, '#f6fbff');
+      ctx.fillStyle = g;
+      ctx.fillRect(0,0,W,H);
+    }
+
+    function drawHills(){
+      // distant green-blue rolling hills
+      ctx.save();
+      ctx.translate(-hillsOffset, 0);
+
+      function hill(yBase, amp, color, width){
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(-W, H - yBase);
+        for(var x=-W; x<=W*3; x+=width){
+          var y = Math.sin((x)*0.004) * amp + (H - yBase);
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(W*3, H);
+        ctx.lineTo(-W, H);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      hill(GROUND_H + 200, 16, '#b9e4c7', 8);
+      hill(GROUND_H + 150, 22, '#a6dbb9', 8);
+      ctx.restore();
+    }
+
+    function drawForest(){
+      // far tree line (smaller, bluer/greener)
+      var baseYFar = H - GROUND_H - 115;
+      for(var x=-FOREST_TREES_FAR_SPACING; x<=W+FOREST_TREES_FAR_SPACING; x+=FOREST_TREES_FAR_SPACING){
+        var tx = x - forestOffsetFar;
+        drawEvergreen(tx, baseYFar, 34, '#7ecba3', '#5aa07f', 0.9);
+      }
+      // near tree line (bigger, greener)
+      var baseYNear = H - GROUND_H - 70;
+      for(var x2=-FOREST_TREES_NEAR_SPACING; x2<=W+FOREST_TREES_NEAR_SPACING; x2+=FOREST_TREES_NEAR_SPACING){
+        var tx2 = x2 - forestOffsetNear;
+        drawEvergreen(tx2, baseYNear, 56, '#58b985', '#3f8e67', 0.95);
+      }
+    }
+
+    function drawEvergreen(x, baseY, h, c1, c2, shade){
+      // simple layered triangle pine
+      ctx.save();
+      ctx.translate(x, baseY);
+      // trunk
+      ctx.fillStyle = 'rgba(90,62,42,0.9)';
+      ctx.fillRect(-3, -h*0.12, 6, h*0.12);
+      // layered foliage
+      var w1 = h*0.9, w2 = h*0.72, w3 = h*0.54;
+      triangle(0, -h*0.10, w1, h*0.38, c1);
+      triangle(0, -h*0.34, w2, h*0.34, c1);
+      triangle(0, -h*0.60, w3, h*0.32, c2);
+      // slight shade
+      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = '#000';
+      triangle(w3*0.12, -h*0.60, w3*0.5, h*0.32, '#000');
+      ctx.globalAlpha = 1.0;
+      ctx.restore();
+    }
+    function triangle(cx, topY, width, height, color){
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(cx, topY);
+      ctx.lineTo(cx - width/2, topY + height);
+      ctx.lineTo(cx + width/2, topY + height);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawGround(){
+      // grassy ground band
+      var g = ctx.createLinearGradient(0, H-GROUND_H, 0, H);
+      g.addColorStop(0,'#5fbf6b');
+      g.addColorStop(1,'#3e8f4b');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, H-GROUND_H, W, GROUND_H);
+
+      // little grass tufts
+      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+      ctx.lineWidth = 1;
+      for(var i=0;i<20;i++){
+        var gx = ((i*23 + frame*2) % (W+40)) - 20;
+        var gy = H - 8 - Math.sin((i*13 + frame)*0.1)*1.2;
+        ctx.beginPath();
+        ctx.moveTo(gx, gy);
+        ctx.quadraticCurveTo(gx-3, gy-6, gx, gy-10);
+        ctx.stroke();
+      }
     }
 
     function drawCloud(x, y, s){
@@ -168,6 +296,15 @@
       ctx.ellipse(x+30*s, y-10*s, 30*s, 20*s, 0, 0, Math.PI*2);
       ctx.ellipse(x-30*s, y-8*s, 28*s, 18*s, 0, 0, Math.PI*2);
       ctx.fill();
+    }
+    function drawBackground(){
+      drawSky();
+      drawHills();
+      drawForest();
+      // a few soft clouds above trees
+      var t = frame * 0.3;
+      drawCloud((W - (t % (W+120))) - 120, 90, 1.0);
+      drawCloud((W - ((t+200) % (W+160))) - 160, 160, 0.8);
     }
 
     function drawPipes(){
@@ -179,11 +316,13 @@
         var botH = H - GROUND_H - botY;
 
         if (SPRITES.pipeReady) {
+          // flip for top
           ctx.save();
           ctx.translate(p.x + pipeW/2, topH/2);
           ctx.scale(1, -1);
           ctx.drawImage(SPRITES.pipe, -pipeW/2, -topH/2, pipeW, topH);
           ctx.restore();
+          // bottom
           ctx.drawImage(SPRITES.pipe, p.x, botY, pipeW, botH);
         } else {
           ctx.fillStyle = getPipeGradient(p.x);
@@ -197,12 +336,66 @@
         }
       }
     }
-
     function getPipeGradient(x){
       var g = ctx.createLinearGradient(x,0,x+PIPE_W,0);
       g.addColorStop(0,'#1e854e');
       g.addColorStop(1,'#2ecc71');
       return g;
+    }
+
+    // Draw the brown path threading the gaps
+    function drawPath(){
+      if(!PATH_ENABLED) return;
+
+      var pipeW = PIPE_W * PIPE_SCALE_X;
+      var pts = [];
+
+      // collect visible gap centers
+      for(var i=0;i<pipes.length;i++){
+        var p = pipes[i];
+        if(p.x + pipeW < -140 || p.x > W + 160) continue; // off-screen margin
+        pts.push({ x: p.x + pipeW*0.5, y: p.gapY + GAP_H*0.5 });
+      }
+      pts.sort(function(a,b){ return a.x - b.x; });
+
+      if(pts.length === 0){
+        // default straight path across screen
+        pts = [{x:-60, y:H*0.5}, {x:W+140, y:H*0.5}];
+      } else {
+        // extend to edges so it enters/exits cleanly
+        var firstY = pts[0].y;
+        var lastY = pts[pts.length-1].y;
+        pts.unshift({x:-60, y:firstY});
+        pts.push({x:W+140, y:lastY});
+      }
+
+      // helper to draw a smoothed polyline with quadratic curves
+      function drawSmooth(strokeStyle, width){
+        ctx.strokeStyle = strokeStyle;
+        ctx.lineWidth = width;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for(var i=0;i<pts.length-1;i++){
+          var p0 = pts[i];
+          var p1 = pts[i+1];
+          var mx = (p0.x + p1.x) / 2;
+          var my = (p0.y + p1.y) / 2;
+          ctx.quadraticCurveTo(p0.x, p0.y, mx, my);
+        }
+        // final segment to last point
+        var L = pts.length - 1;
+        ctx.quadraticCurveTo(pts[L-1].x, pts[L-1].y, pts[L].x, pts[L].y);
+        ctx.stroke();
+      }
+
+      // outer dark edge (gives definition)
+      drawSmooth(PATH_EDGE, PATH_WIDTH);
+      // main dirt fill (slightly thinner)
+      drawSmooth(PATH_FILL, PATH_WIDTH - 6);
+      // dusty center highlight
+      drawSmooth(PATH_CENTER, PATH_CENTER_WIDTH);
     }
 
     function drawBird(){
@@ -243,11 +436,6 @@
       ctx.restore();
     }
 
-    function drawGround(){
-      ctx.fillStyle = '#3e4c59';
-      ctx.fillRect(0, H-GROUND_H, W, GROUND_H);
-    }
-
     function drawHUD(){
       ctx.fillStyle = 'rgba(0,0,0,.25)';
       ctx.fillRect(8,8,112,56);
@@ -262,10 +450,10 @@
         ctx.fillStyle = '#fff';
         ctx.font = 'bold 26px system-ui, -apple-system, Segoe UI, Roboto, Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('Welcome to Fatty Bird!', W/2, H/2 - 36);
+        ctx.fillText('Welcome to Pathy Finder!', W/2, H/2 - 36);
         ctx.fillText('Tap / Click / Space to start', W/2, H/2 - 12);
         ctx.font = '16px system-ui, -apple-system, Segoe UI, Roboto, Arial';
-        ctx.fillText('Fly through the gaps!', W/2, H/2 + 16);
+        ctx.fillText('Follow the path through the forest!', W/2, H/2 + 16);
         ctx.textAlign = 'left';
       }
 
@@ -284,7 +472,8 @@
 
     function render(){
       ctx.clearRect(0,0,W,H);
-      drawBackground();
+      drawBackground();   // sky, hills, trees, clouds
+      if(PATH_ENABLED) drawPath(); // trail behind barriers
       drawPipes();
       drawBird();
       drawGround();
@@ -321,3 +510,4 @@
   </script>
 </body>
 </html>
+
