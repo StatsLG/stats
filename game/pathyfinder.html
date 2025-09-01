@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pathy Finder</title>
+  <title>Pathy Finder (Top-Down)</title>
   <style>
     :root{ --fg:#e8f0fe; --muted:#9fb3c8; --accent:#52d67a; }
     html,body{height:100%}
@@ -14,8 +14,7 @@
     }
     .wrap{display:flex; flex-direction:column; gap:.75rem; align-items:center}
     canvas{
-      /* we fully paint each frame; this is just a safety color */
-      background:#254228;
+      background:#254228; /* fully painted each frame; safety color */
       border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.35);
       touch-action:none
     }
@@ -27,7 +26,7 @@
 </head>
 <body>
   <div class="wrap">
-    <canvas id="game" width="420" height="640" aria-label="Pathy Finder"></canvas>
+    <canvas id="game" width="420" height="640" aria-label="Pathy Finder top-down"></canvas>
     <div class="hud">
       <button id="flapBtn" class="btn" title="Space/Click/Tap">Flap</button>
       <button id="restartBtn" class="btn" title="Enter to restart">Restart</button>
@@ -49,10 +48,12 @@ var PATH_CENTER_WIDTH = 72;    // keep < PATH_WIDTH
 // Path generation / smoothness
 var PATH_STEP = 12;            // px between generated samples (smaller = smoother)
 var PATH_EASE = 0.12;          // how fast currentY approaches targetY (0.08–0.18 nice)
-var PATH_WOBBLE = 0.0;         // small sinus wobble amount (0–2)
-// Forest floor density
-var FLOOR_SPRITES = 140;       // leaves/rocks count (performance-friendly)
+var PATH_WOBBLE = 0.0;         // tiny sinus wobble amount (0–2)
+// Forest floor density & motion
+var FLOOR_SPRITES = 140;       // leaves/rocks count
 var FLOOR_SPEED = 2.0;         // floor drift speed (top-down feel)
+// Win condition
+var WIN_SCORE = 10;            // target score to "earn a degree"
 /***************************************************************************/
 
 window.addEventListener('DOMContentLoaded', function(){
@@ -80,22 +81,62 @@ window.addEventListener('DOMContentLoaded', function(){
   var bird = { x: 90, y: H*0.5, r: 14, vy: 0 };
   var GRAVITY = 0.45, FLAP = -7.6, MAX_FALL = 12;
 
-  // Barriers (kept vertical to mimic logs/bush walls from top-down)
+  // Barriers (vertical hedges/logs)
   var pipes = [];
   var PIPE_W = 66, GAP_H = 160, PIPE_SPEED = 2.4, SPAWN_FRAMES = 95;
 
-  // Sprites (optional—leave as-is or swap to a top-down marker)
+  // Sprites (optional)
   var BIRD_IMG_SRC = 'pathfinderheadNOBG.png';
   var PIPE_IMG_SRC = 'log.png';
   var SPRITES = { bird:new Image(), pipe:new Image(), birdReady:false, pipeReady:false };
-  if (BIRD_IMG_SRC){ SPRITES.bird.src=BIRD_IMG_SRC; SPRITES.bird.onload=()=>SPRITES.birdReady=true; }
-  if (PIPE_IMG_SRC){ SPRITES.pipe.src=PIPE_IMG_SRC; SPRITES.pipe.onload=()=>SPRITES.pipeReady=true; }
+  if (BIRD_IMG_SRC){ SPRITES.bird.src=BIRD_IMG_SRC; SPRITES.bird.onload=()=>SPRITES.birdReady=true; SPRITES.bird.onerror=()=>{}; }
+  if (PIPE_IMG_SRC){ SPRITES.pipe.src=PIPE_IMG_SRC; SPRITES.pipe.onload=()=>SPRITES.pipeReady=true; SPRITES.pipe.onerror=()=>{}; }
   var BIRD_SCALE = 2.0, PIPE_SCALE_X = 1.0;
 
   // State
   var frame=0, score=0, best=+(localStorage.getItem('best_flappy')||'0'), alive=true, started=false;
+  var won = false;
 
-  // Top-down forest floor sprites (leaves/rocks) for motion parallax
+  // Confetti
+  var confetti = [];
+  function spawnConfetti(n){
+    confetti.length = 0;
+    for (let i = 0; i < n; i++){
+      confetti.push({
+        x: Math.random() * W,
+        y: -20 - Math.random() * 60,
+        vx: (Math.random() * 2 - 1) * 1.5,
+        vy: 2 + Math.random() * 2.5,
+        vr: (Math.random() * 2 - 1) * 0.1,
+        r: Math.random() * Math.PI * 2,
+        size: 3 + Math.random() * 3,
+        color: ['#ffd166','#ef476f','#06d6a0','#118ab2','#8338ec'][Math.floor(Math.random()*5)]
+      });
+    }
+  }
+  function updateConfetti(){
+    for (let c of confetti){
+      c.x += c.vx;
+      c.y += c.vy;
+      c.r += c.vr;
+      if (c.y > H + 30){
+        c.y = -30;
+        c.x = Math.random() * W;
+      }
+    }
+  }
+  function drawConfetti(){
+    for (let c of confetti){
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate(c.r);
+      ctx.fillStyle = c.color;
+      ctx.fillRect(-c.size/2, -c.size/2, c.size, c.size);
+      ctx.restore();
+    }
+  }
+
+  // Top-down forest floor sprites
   var floor = [];
   function initFloor(){
     floor.length = 0;
@@ -126,14 +167,13 @@ window.addEventListener('DOMContentLoaded', function(){
     }
   }
   function drawFloor(){
-    // base grass with subtle mottling
     let g = ctx.createLinearGradient(0,0,0,H);
     g.addColorStop(0,'#2f5a33');
     g.addColorStop(1,'#224528');
     ctx.fillStyle = g;
     ctx.fillRect(0,0,W,H);
 
-    // faint noise speckles (procedural)
+    // faint speckles
     ctx.globalAlpha = 0.06;
     ctx.fillStyle = '#ffffff';
     for(let i=0;i<80;i++){
@@ -159,7 +199,7 @@ window.addEventListener('DOMContentLoaded', function(){
       }else if(s.t==='rock'){
         ctx.fillStyle = '#8d8f8f';
         rockShape(s.s);
-      }else{ // mushroom/flower splash
+      }else{ // mush/flower
         ctx.fillStyle = '#d4c05b';
         rockShape(s.s*0.7);
         ctx.fillStyle = '#c94b4b';
@@ -193,7 +233,7 @@ window.addEventListener('DOMContentLoaded', function(){
   }
 
   // -------- Persistent PATH (only extends on the right) --------------------
-  var pathPts = [];       // [{x,y}] in screen space; we shift left each frame
+  var pathPts = [];       // [{x,y}] screen space; shift left each frame
   var currentY = H*0.5;   // evolving y
   var targetY  = H*0.5;   // slowly changing target
   var targetTimer = 0;
@@ -209,18 +249,15 @@ window.addEventListener('DOMContentLoaded', function(){
     }
   }
   function pushPathPoint(x){
-    // occasionally move the target, clamped to playfield
     if(targetTimer<=0){
       targetTimer = 18 + (Math.random()*18|0);
       targetY += (Math.random()*2-1) * 80; // step
-      let minY = 60;
-      let maxY = H-60;
+      let minY = 60, maxY = H-60;
       if(targetY < minY) targetY = minY + (minY-targetY)*0.3;
       if(targetY > maxY) targetY = maxY - (targetY-maxY)*0.3;
     }
     targetTimer--;
 
-    // ease current toward target; optional tiny wobble
     currentY += (targetY - currentY) * PATH_EASE;
     if(PATH_WOBBLE>0){
       currentY += Math.sin((x+frame)*0.02) * PATH_WOBBLE;
@@ -228,11 +265,8 @@ window.addEventListener('DOMContentLoaded', function(){
     pathPts.push({x:x, y:currentY});
   }
   function advancePath(){
-    // move left
     for(let p of pathPts){ p.x -= PIPE_SPEED; }
-    // cull left
     while(pathPts.length && pathPts[0].x < -120){ pathPts.shift(); }
-    // fill right
     let lastX = pathPts.length ? pathPts[pathPts.length-1].x : -60;
     while(lastX <= W+180){
       lastX += PATH_STEP;
@@ -240,7 +274,6 @@ window.addEventListener('DOMContentLoaded', function(){
     }
   }
   function getPathYAt(x){
-    // linear interpolation across pathPts
     for(let i=0;i<pathPts.length-1;i++){
       let a = pathPts[i], b = pathPts[i+1];
       if(x >= a.x && x <= b.x){
@@ -248,14 +281,11 @@ window.addEventListener('DOMContentLoaded', function(){
         return a.y + (b.y - a.y)*t;
       }
     }
-    // fallback
-    if(pathPts.length) return pathPts[pathPts.length-1].y;
-    return H*0.5;
+    return pathPts.length ? pathPts[pathPts.length-1].y : H*0.5;
   }
   function drawPath(){
     if(!PATH_ENABLED || pathPts.length<2) return;
 
-    // use a smoothed path via quadratic segments over the persistent points
     function drawSmooth(strokeStyle, width){
       ctx.strokeStyle = strokeStyle;
       ctx.lineWidth = width;
@@ -268,14 +298,11 @@ window.addEventListener('DOMContentLoaded', function(){
         let mx = (p0.x + p1.x)/2, my = (p0.y + p1.y)/2;
         ctx.quadraticCurveTo(p0.x, p0.y, mx, my);
       }
-      ctx.quadraticCurveTo(
-        pathPts[pathPts.length-1].x, pathPts[pathPts.length-1].y,
-        pathPts[pathPts.length-1].x, pathPts[pathPts.length-1].y
-      );
+      let L = pathPts.length-1;
+      ctx.quadraticCurveTo(pathPts[L-1].x, pathPts[L-1].y, pathPts[L].x, pathPts[L].y);
       ctx.stroke();
     }
 
-    // draw bottom-most first
     drawSmooth(PATH_EDGE, PATH_WIDTH);
     drawSmooth(PATH_FILL, Math.max(1, PATH_WIDTH*0.8));
     drawSmooth(PATH_CENTER, PATH_CENTER_WIDTH);
@@ -286,16 +313,17 @@ window.addEventListener('DOMContentLoaded', function(){
     pipes.length = 0;
     bird.y = H*0.5; bird.vy = 0;
     frame = 0; score = 0; alive = true; started = false;
+    won = false;
+    confetti.length = 0;
     initFloor();
     resetPath();
   }
 
   function spawnPipe(){
-    // Align NEW barrier's gap center to the path near its spawn x
-    var margin = 50;
     var xSpawn = W + 10;
     var pipeW = PIPE_W * PIPE_SCALE_X;
     var centerY = getPathYAt(xSpawn + pipeW*0.5);
+    var margin = 50;
     var topHeight = Math.max(margin, Math.min(centerY - GAP_H/2, H - GROUND_H - GAP_H - margin));
     pipes.push({ x:xSpawn, gapY: topHeight, passed:false });
   }
@@ -304,28 +332,32 @@ window.addEventListener('DOMContentLoaded', function(){
 
   function update(){
     if(alive && started){
-      // physics
       bird.vy = Math.min(bird.vy + GRAVITY, MAX_FALL);
       bird.y += bird.vy;
 
-      // path and floor advance first (persistent, not re-solved on left)
       advancePath();
       updateFloor();
 
-      // pipes
       if(frame % SPAWN_FRAMES === 0){ spawnPipe(); }
       for(let p of pipes){ p.x -= PIPE_SPEED; }
       while(pipes.length && pipes[0].x + PIPE_W < -20){ pipes.shift(); }
 
-      // scoring
       for(let p of pipes){
         if(!p.passed && p.x + PIPE_W < bird.x - bird.r){
-          p.passed = true; score++; best = Math.max(best, score);
+          p.passed = true;
+          score++;
+          best = Math.max(best, score);
           localStorage.setItem('best_flappy', String(best));
+
+          // Win check
+          if (score >= WIN_SCORE && !won){
+            won = true;
+            alive = false;        // end the run with ceremony
+            spawnConfetti(140);
+          }
         }
       }
 
-      // bounds
       if(bird.y - bird.r < 0){ bird.y = bird.r; bird.vy = 0; }
       if(bird.y + bird.r > H - GROUND_H){ alive = false; }
 
@@ -338,6 +370,10 @@ window.addEventListener('DOMContentLoaded', function(){
         }
       }
     }
+
+    // keep confetti animating on win screen
+    if (won) { updateConfetti(); }
+
     frame++;
   }
 
@@ -366,13 +402,13 @@ window.addEventListener('DOMContentLoaded', function(){
         // bottom chunk
         ctx.drawImage(SPRITES.pipe, p.x, botY, pipeW, botH);
       } else {
-        // top-down hedge/wall colors
+        // hedge/wall colors
         let g = ctx.createLinearGradient(p.x,0,p.x+pipeW,0);
         g.addColorStop(0,'#2d6b3b'); g.addColorStop(1,'#3c8d4c');
         ctx.fillStyle = g;
         ctx.fillRect(p.x, 0, pipeW, topH);
         ctx.fillRect(p.x, botY, pipeW, botH);
-        // shadow lip
+        // shadow lips
         ctx.fillStyle = 'rgba(0,0,0,.10)';
         ctx.fillRect(p.x-2, topH-8, pipeW+4, 8);
         ctx.fillRect(p.x-2, botY, pipeW+4, 8);
@@ -400,63 +436,81 @@ window.addEventListener('DOMContentLoaded', function(){
   }
 
   function drawHUD(){
+    // Score box (only when alive & started, or you can show always)
     ctx.fillStyle = 'rgba(0,0,0,.25)';
-    ctx.fillRect(8,8,112,56);
+    ctx.fillRect(8,8,120,56);
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 18px system-ui, -apple-system, Segoe UI, Roboto, Arial';
     ctx.fillText('Score: '+score, 16, 32);
     ctx.fillText('Best:  '+best, 16, 56);
 
+    // Start screen
     if(!started){
       ctx.fillStyle = 'rgba(0,0,0,.35)';
       ctx.fillRect(0,0,W,H);
       ctx.fillStyle = '#fff';
-      ctx.font = 'bold 26px system-ui, -apple-system, Segoe UI, Roboto, Arial';
       ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = 'bold 26px system-ui, -apple-system, Segoe UI, Roboto, Arial';
       ctx.fillText('Welcome to Pathy Finder!', W/2, H/2 - 36);
-      ctx.fillText('Tap / Click / Space to start', W/2, H/2 - 12);
       ctx.font = '16px system-ui, -apple-system, Segoe UI, Roboto, Arial';
-      ctx.fillText('Follow the path through the forest floor!', W/2, H/2 + 16);
+      ctx.fillText('Follow the path through the forest floor!', W/2, H/2 - 6);
+      ctx.fillText('Tap / Click / Space to start', W/2, H/2 + 24);
       ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
     }
 
-  if (!alive) {
-  ctx.fillStyle = 'rgba(0,0,0,.45)';
-  ctx.fillRect(0, 0, W, H);
+    // End screens
+    if(!alive){
+      ctx.fillStyle = 'rgba(0,0,0,.45)';
+      ctx.fillRect(0,0,W,H);
 
-  ctx.fillStyle = '#fff';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+      // Confetti above overlay if won
+      if (won) { drawConfetti(); }
 
-  // Headline
-  ctx.font = 'bold 28px system-ui, -apple-system, Segoe UI, Roboto, Arial';
-  ctx.fillText('Oh no!', W/2, H/2 - 60);
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
 
-  // Friendly lines
-  ctx.font = '20px system-ui, -apple-system, Segoe UI, Roboto, Arial';
-  const lines = [
-    "Sometimes things don't go the way we hoped.",
-    "That's okay!",
-    "Dust yourself off and try again!"
-  ];
-  const lineHeight = 26;
-  lines.forEach((t, i) => {
-    ctx.fillText(t, W/2, H/2 - 20 + i*lineHeight);
-  });
+      if (won) {
+        // WIN SCREEN
+        ctx.font = 'bold 30px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+        ctx.fillText('🎓 Degree Earned!', W/2, H/2 - 70);
 
-  // Prompt
-  ctx.font = '20px system-ui, -apple-system, Segoe UI, Roboto, Arial';
-  ctx.fillText('Press Enter or click Restart', W/2, H/2 + 70);
+        ctx.font = '20px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+        const lines = [
+          "You navigated the whole path.",
+          "Pathfinder would be proud!"
+        ];
+        const lh = 26;
+        lines.forEach((t,i)=> ctx.fillText(t, W/2, H/2 - 24 + i*lh));
 
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'alphabetic';
-}
+      } else {
+        // POSITIVE GAME-OVER
+        ctx.font = 'bold 28px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+        ctx.fillText('Oh no!', W/2, H/2 - 70);
+        ctx.font = '20px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+        const lines = [
+          "Sometimes things don't go the way we hoped.",
+          "That's okay!",
+          "Dust yourself off and try again!"
+        ];
+        const lh = 26;
+        lines.forEach((t,i)=> ctx.fillText(t, W/2, H/2 - 24 + i*lh));
+      }
+
+      ctx.font = '20px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+      ctx.fillText('Press Enter or click Restart', W/2, H/2 + 84);
+
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+    }
   }
 
   function render(){
     ctx.clearRect(0,0,W,H);
-    drawFloor();           // top-down forest floor
-    if(PATH_ENABLED) drawPath(); // brown road UNDER the barriers
+    drawFloor();             // top-down forest floor
+    if(PATH_ENABLED) drawPath(); // dirt path underneath barriers
     drawPipes();
     drawBird();
     drawHUD();
