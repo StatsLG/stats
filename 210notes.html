@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCTC Statistics</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Add MathJax script here -->
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <h2>Stats Class</h2>
+            <button class="font-button increase-font">Increase Font Size</button>
+            <button class="font-button decrease-font">Decrease Font Size</button>
+        </div>
+        <button class="toggle-button">☰ Menu</button>
+        <div class="right-panel">
+            <h2>STA210U Dev Page</h2>
+            <p>
+                This is the main hub for STA210U content that I am converting to zero cost. <br>
+                <a href="https://statslg.github.io/stats/testing">TEST PAGE LINK</a>
+            </p>
+            
+            <h2>Unit Overview</h2>
+            <ol type="I">
+                <li>Introduction and Data Collection</li>
+                <ol type="A">
+                    <li><a href="https://statslg.github.io/stats/section1/intro">Introduction To Statistics</a></li>
+                    <li><a href="https://statslg.github.io/stats/section1/sampling">Sampling</a></li>
+                    <li><a href="https://statslg.github.io/stats/section1/designstudy">Conducting A Study</a></li>
+                </ol>
+                <li>Descriptive Statistics</li>
+                <ol type="A">
+                    <li>Graphs and Variables for Univariate Data</li>
+                    <li>Numerical Descriptions for Univariate Data</li>
+                    <li>Bivariate Data</li>
+                    <li><a href="https://statslg.github.io/stats/linereg">Linear Correlation and Regression</a></li>
+                </ol>
+                <li>Probability</li>
+                <ol type="A">
+                    <li>Probability Basics</li>
+                    <li>Dichotomous Tests and Discrete Probability Distributions</li>
+                    <ol type="1">
+                        <li><a href="https://statslg.github.io/stats/dichtests">Dichotomous Tests</a></li>
+                        <li><a href="https://statslg.github.io/stats/discrete">Valid Discrete Probability Distributions</a></li>
+                        <li><a href="https://statslg.github.io/stats/discreteev">Mean of a Discrete Probability Distribution (Expected Value)</a></li>
+                        <li><a href="https://statslg.github.io/stats/discretesd">Standard Deviation of a Discrete Probability Distribution</a></li>
+                    </ol>
+                    <li>Continuous Probability Distributions</li>
+                    <ol type="1">
+                        <li><a href="https://statslg.github.io/stats/cont">Density Curves</a></li>
+                        <li><a href="https://statslg.github.io/stats/normaldist">Normal distribution</a></li>
+                        <li><a href="https://statslg.github.io/stats/emprules">Finding Probability for a Normal Distribution</a></li>
+                    </ol>
+                </ol>
+                <li>Inferential Statistics</li>
+                <ol type="A">
+                    <li>Sampling Distributions</li>
+                    <ol type="1">
+                        <li><a href="https://statslg.github.io/stats/unbiasedest">Unbiased Estimator with a Small Amount of Error</a></li>
+                        <li><a href="https://statslg.github.io/stats/sampxbar">Sampling Distribution of \(\bar{x}\)</a></li>
+                        <li><a href="https://statslg.github.io/stats/sampphat">Sampling Distribution of \(\hat{p}\)</a></li>
+                    </ol>
+                    <li>Confidence Intervals</li>
+                    <ol type="1">
+                        <li><a href="https://statslg.github.io/stats/intsetup">General Confidence Interval Setup</a></li>
+                        <li><a href="https://statslg.github.io/stats/intxbar">Intervals for \(\bar{x}\)</a></li>
+                        <li><a href="https://statslg.github.io/stats/intphat">Intervals for  \(\hat{p}\)</a></li>
+                    </ol>
+                    <li>Hypothesis Testing</li>
+                    <ol type="1">
+                        <li><a href="https://statslg.github.io/stats/hypothsetup">General Hypothesis Test Setup</a></li>
+                        <li><a href="https://statslg.github.io/stats/testmu">Hypothesis Testing for \(\bar{x}\)</a></li>
+                        <li><a href="https://statslg.github.io/stats/testp">Hypothesis Testing for  \(\hat{p}\)</a></li>
+                    </ol>
+                </ol>
+            </ol>
+
+            <h2>Quick Links</h2>
+            <a class="nws-simulator-embed" data-nws-src="https://www.numworks.com/simulator/embed/" data-nws-width="368px" data-nws-height="720px">Open a NumWorks calculator</a>
+            <script src="https://www.numworks.com/simulator/embed.js"></script>
+            <a href="#resources" class="calculator-button">Additional Resources</a>
+        </div>
+    </div>
+    <footer>
+        <p>© By Luke Garnett - Bluegrass Community And Technical College | Created on March 15, 2025</p>
+    </footer>
+
+    <script>
+        // Toggle left panel
+        const toggleButton = document.querySelector('.toggle-button');
+        const container = document.querySelector('.container');
+        const leftPanel = document.querySelector('.left-panel');
+
+        toggleButton.addEventListener('click', () => {
+            container.classList.toggle('minimized');
+            leftPanel.classList.toggle('minimized');
+        });
+
+        // Font size controls
+        const increaseFontBtn = document.querySelector('.increase-font');
+        const decreaseFontBtn = document.querySelector('.decrease-font');
+        const rightPanel = document.querySelector('.right-panel');
+
+        increaseFontBtn.addEventListener('click', () => {
+            let style = window.getComputedStyle(rightPanel);
+            let fontSize = parseFloat(style.fontSize);
+            rightPanel.style.fontSize = (fontSize + 2) + 'px';
+        });
+
+        decreaseFontBtn.addEventListener('click', () => {
+            let style = window.getComputedStyle(rightPanel);
+            let fontSize = parseFloat(style.fontSize);
+            rightPanel.style.fontSize = (fontSize - 2) + 'px';
+        });
+    </script>
+</body>
+</html>
