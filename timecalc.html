@@ -6,75 +6,95 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root{
-      --bg:#0f172a;        /* slate-900 */
-      --panel:#111827;     /* gray-900  */
-      --card:#1f2937;      /* gray-800  */
-      --muted:#9ca3af;     /* gray-400  */
-      --text:#e5e7eb;      /* gray-200  */
-      --accent:#60a5fa;    /* blue-400  */
-      --good:#34d399;      /* green-400 */
-      --warn:#f59e0b;      /* amber-500 */
-      --bad:#f87171;       /* red-400   */
+      --bg:#0f172a; --panel:#111827; --card:#111827; --muted:#9ca3af; --text:#e5e7eb;
+      --accent:#60a5fa; --good:#34d399; --warn:#f59e0b; --bad:#f87171; --line:#243043;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
       background:linear-gradient(180deg, var(--bg), #0b1224 40%, var(--bg));
-      color:var(--text); display:flex; align-items:center; justify-content:center; padding:24px;
+      color:var(--text); display:flex; align-items:center; justify-content:center; padding:16px;
     }
     .wrap{width:min(1000px,100%); margin:auto}
     .card{
-      background:rgba(17,24,39,.8); border:1px solid #243043; border-radius:18px;
-      box-shadow:0 10px 30px rgba(0,0,0,.35); padding:22px;
-      backdrop-filter:saturate(1.2) blur(6px);
+      background:rgba(17,24,39,.86); border:1px solid var(--line); border-radius:18px;
+      box-shadow:0 10px 30px rgba(0,0,0,.35); padding:18px; backdrop-filter:saturate(1.1) blur(6px);
     }
-    h1{margin:0 0 6px; font-size:clamp(20px,3.2vw,28px); letter-spacing:.2px}
-    p.sub{margin:0 0 16px; color:var(--muted); font-size:14px}
-    .grid{display:grid; gap:12px; grid-template-columns:1fr 120px 1fr}
-    .row{display:flex; gap:10px; align-items:center}
+    h1{margin:0 0 6px; font-size:clamp(18px,4vw,28px)}
+    p.sub{margin:0 0 14px; color:var(--muted); font-size:clamp(12px,2.5vw,14px)}
     label{font-size:12px; color:var(--muted)}
     input, select{
-      width:100%; padding:12px 12px; border-radius:12px; border:1px solid #273349;
-      background:#0c1527; color:var(--text); outline:none; font-size:16px;
+      width:100%; padding:14px 12px; border-radius:12px; border:1px solid #273349;
+      background:#0c1527; color:var(--text); outline:none; font-size:16px; min-height:48px;
     }
     input::placeholder{color:#6b7280}
-    .tools{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;}
+
+    /* --- Layout Grids --- */
+    .grid{
+      display:grid; gap:12px;
+      grid-template-columns: 1fr 140px 1fr; /* desktop/tablet */
+      align-items:end;
+    }
+    .tools{
+      display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;
+    }
     button{
-      padding:11px 14px; border-radius:12px; border:1px solid #2b3751; background:#0d1a33;
-      color:var(--text); cursor:pointer; font-weight:600; letter-spacing:.2px;
+      padding:14px 14px; border-radius:12px; border:1px solid #2b3751; background:#0d1a33;
+      color:var(--text); cursor:pointer; font-weight:600; letter-spacing:.2px; min-height:48px;
+      width:auto;
     }
     button:hover{border-color:#39507e}
     button.primary{background:#133058; border-color:#365f9e; box-shadow:0 6px 16px rgba(96,165,250,.18)}
     button.good{background:#0f2f29; border-color:#1a7a63}
     button.warn{background:#2d2410; border-color:#996c0d}
+
     .result{
       margin-top:16px; padding:16px; border-radius:14px; background:#0b162c; border:1px solid #203152;
       display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
     }
-    .result strong{font-size:22px; letter-spacing:.4px}
-    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;}
+    .result strong{font-size:clamp(18px,4vw,22px); letter-spacing:.4px}
     .note{font-size:12px; color:var(--muted)}
+
     .hint{margin-top:8px; font-size:12px; color:var(--muted)}
     .switch{
-      display:flex;
-      align-items:center;
-      gap:6px;
-      font-size:13px;
-      color:var(--muted);
-      margin-top:6px;  /* ensures checkbox sits neatly under B input */
-      user-select:none;
+      display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted);
+      margin-top:8px; user-select:none;
     }
     .footer{margin-top:14px; font-size:12px; color:#91a4c9}
     .pill{display:inline-block; padding:2px 8px; border:1px solid #2c3a5c; border-radius:999px; font-size:11px; color:#a8c5ff}
-    /* Presets panel */
-    .presets{
-      margin-top:18px; padding:14px; border-radius:14px; background:#0b1326; border:1px solid #213258;
+
+    /* --- Presets panel --- */
+    .presets{ margin-top:16px; border:1px solid #213258; border-radius:14px; overflow:hidden; }
+    .presets > summary{
+      list-style:none; cursor:pointer; padding:12px 14px; background:#0b1326; font-weight:700;
+      border-bottom:1px solid #213258; outline:none;
     }
-    .presets h2{margin:0 0 10px; font-size:16px}
-    .preset-grid{display:grid; gap:10px; grid-template-columns:1fr 1fr 140px}
-    .quick-buttons{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
-    .mini{padding:8px 10px; font-size:13px; border-radius:10px}
+    .presets[open] > summary{ border-bottom:1px solid #213258 }
+    .presets h2{ margin:0; font-size:16px }
+    .preset-body{ padding:14px; background:#0b1326 }
+    .preset-grid{ display:grid; gap:10px; grid-template-columns:1fr 1fr auto; align-items:end; }
+    .quick-buttons{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px }
+    .mini{ padding:10px 12px; font-size:13px; border-radius:10px }
+
+    /* --- Mobile (<=640px) --- */
+    @media (max-width: 640px){
+      body{ padding:10px }
+      .card{ padding:14px }
+      .grid{ grid-template-columns: 1fr; } /* stack A, op, B */
+      .tools{ flex-direction:column; }
+      .tools button{ width:100%; }
+      .result{ flex-direction:column; align-items:flex-start; }
+      .preset-grid{ grid-template-columns:1fr; }
+      .mini{ width:calc(50% - 4px); } /* 2-up quick buttons */
+      .presets > summary{ font-size:15px; }
+    }
+
+    /* --- Large screens --- */
+    @media (min-width: 1000px){
+      .wrap{ width:min(1100px,100%) }
+    }
   </style>
 </head>
 <body>
@@ -83,26 +103,21 @@
       <h1>XC / T&F Time Calculator</h1>
       <p class="sub">Enter times as <span class="pill">MM:SS.00</span> (also accepts <span class="pill">SS.00</span> or <span class="pill">M:SS</span>). Results round to hundredths.</p>
 
+      <!-- Inputs -->
       <div class="grid" id="calcGrid">
-        <!-- A (time) -->
         <div>
           <label for="timeA">Time A</label>
           <input id="timeA" class="mono" placeholder="e.g., 04:32.18 or 272.18" inputmode="decimal" />
         </div>
-
-        <!-- operator -->
         <div>
           <label for="op">Operation</label>
           <select id="op">
-            <option value="/">÷</option>
             <option value="+">+</option>
             <option value="-">−</option>
             <option value="*">×</option>
-            
+            <option value="/">÷</option>
           </select>
         </div>
-
-        <!-- B (time or number) -->
         <div>
           <label for="bInput">B Value</label>
           <input id="bInput" class="mono" placeholder="for × or ÷ use a number (e.g., 4)" inputmode="decimal" />
@@ -113,6 +128,7 @@
         </div>
       </div>
 
+      <!-- Actions -->
       <div class="tools">
         <button class="primary" id="btnCalc">Calculate</button>
         <button id="btnSwap" title="Swap A and B (only for + / −)">Swap A ↔ B</button>
@@ -120,66 +136,68 @@
         <button class="warn" id="btnClear">Clear</button>
       </div>
 
-      <!-- PRESETS -->
-      <div class="presets">
-        <h2>Presets (Splits & Pace)</h2>
-        <div class="preset-grid">
-          <div>
-            <label for="raceDist">Race distance</label>
-            <select id="raceDist">
-              <option value="400">400 m</option>
-              <option value="800">800 m</option>
-              <option value="1000">1000 m</option>
-              <option value="1500">1500 m</option>
-              <option value="1600" selected>1600 m</option>
-              <option value="1609.344">1 Mile (1609.344 m)</option>
-              <option value="3200">3200 m / 2-mile</option>
-              <option value="5000">5K (5000 m)</option>
-              <option value="8000">8K (8000 m)</option>
-              <option value="10000">10K (10000 m)</option>
-              <option value="21097.5">Half Marathon (21097.5 m)</option>
-              <option value="42195">Marathon (42195 m)</option>
-            </select>
+      <!-- Presets (collapsible on mobile) -->
+      <details class="presets" open>
+        <summary><h2>Presets (Splits & Pace)</h2></summary>
+        <div class="preset-body">
+          <div class="preset-grid">
+            <div>
+              <label for="raceDist">Race distance</label>
+              <select id="raceDist">
+                <option value="400">400 m</option>
+                <option value="800">800 m</option>
+                <option value="1000">1000 m</option>
+                <option value="1500">1500 m</option>
+                <option value="1600" selected>1600 m</option>
+                <option value="1609.344">1 Mile (1609.344 m)</option>
+                <option value="3200">3200 m / 2-mile</option>
+                <option value="5000">5K (5000 m)</option>
+                <option value="8000">8K (8000 m)</option>
+                <option value="10000">10K (10000 m)</option>
+                <option value="21097.5">Half Marathon (21097.5 m)</option>
+                <option value="42195">Marathon (42195 m)</option>
+              </select>
+            </div>
+            <div>
+              <label for="splitUnit">Split size</label>
+              <select id="splitUnit">
+                <option value="200">Per 200 m</option>
+                <option value="400" selected>Per 400 m (track lap)</option>
+                <option value="800">Per 800 m</option>
+                <option value="1200">Per 1200 m</option>
+                <option value="1000">Per kilometer</option>
+                <option value="1609.344">Per mile</option>
+              </select>
+            </div>
+            <div>
+              <button class="primary" id="btnUsePreset" style="width:100%">Use preset</button>
+            </div>
           </div>
-          <div>
-            <label for="splitUnit">Split size</label>
-            <select id="splitUnit">
-              <option value="200">Per 200 m</option>
-              <option value="400" selected>Per 400 m (track lap)</option>
-              <option value="800">Per 800 m</option>
-              <option value="1200">Per 1200 m</option>
-              <option value="1000">Per kilometer</option>
-              <option value="1609.344">Per mile</option>
-            </select>
+
+          <div class="quick-buttons">
+            <!-- Track & mid-distance -->
+            <button class="mini" data-preset="800|400">800 → per 400</button>
+            <button class="mini" data-preset="1000|200">1000 → per 200</button>
+            <button class="mini" data-preset="1000|400">1000 → per 400</button>
+            <button class="mini" data-preset="1500|300">1500 → per 300</button>
+            <button class="mini" data-preset="1600|400">1600 → per 400</button>
+            <!-- XC & roads -->
+            <button class="mini" data-preset="5000|1000">5K → per km</button>
+            <button class="mini" data-preset="5000|1609.344">5K → per mile</button>
+            <button class="mini" data-preset="8000|1000">8K → per km</button>
+            <button class="mini" data-preset="8000|1609.344">8K → per mile</button>
+            <button class="mini" data-preset="10000|1000">10K → per km</button>
+            <button class="mini" data-preset="10000|1609.344">10K → per mile</button>
+            <button class="mini" data-preset="21097.5|1609.344">Half → per mile</button>
+            <button class="mini" data-preset="21097.5|1000">Half → per km</button>
+            <button class="mini" data-preset="42195|1609.344">Marathon → per mile</button>
+            <button class="mini" data-preset="42195|1000">Marathon → per km</button>
           </div>
-          <div class="row">
-            <button class="primary" id="btnUsePreset">Use preset</button>
-          </div>
+          <div class="hint">Enter the <b>total race time</b> in “Time A”, choose a race distance and split size, then click <b>Use preset</b>. It computes the average split as A ÷ (# of splits).</div>
         </div>
+      </details>
 
-        <div class="quick-buttons">
-          <!-- Track & mid-distance -->
-          <button class="mini" data-preset="800|400">800 → per 400</button>
-          <button class="mini" data-preset="1000|200">1000 → per 200</button>
-          <button class="mini" data-preset="1000|400">1000 → per 400</button>
-          <button class="mini" data-preset="1500|300">1500 → per 300</button>
-          <button class="mini" data-preset="1600|400">1600 → per 400</button>
-          <!-- XC & roads -->
-          <button class="mini" data-preset="5000|1000">5K → per km</button>
-          <button class="mini" data-preset="5000|1609.344">5K → per mile</button>
-          <button class="mini" data-preset="8000|1000">8K → per km</button>
-          <button class="mini" data-preset="8000|1609.344">8K → per mile</button>
-          <button class="mini" data-preset="10000|1000">10K → per km</button>
-          <button class="mini" data-preset="10000|1609.344">10K → per mile</button>
-          <button class="mini" data-preset="21097.5|1609.344">Half → per mile</button>
-          <button class="mini" data-preset="21097.5|1000">Half → per km</button>
-          <button class="mini" data-preset="42195|1609.344">Marathon → per mile</button>
-          <button class="mini" data-preset="42195|1000">Marathon → per km</button>
-        </div>
-
-        <div class="hint">Enter the <b>total race time</b> in “Time A”, choose a race distance and split size, then click <b>Use preset</b>. It will compute <i>average split</i> as A ÷ (# of splits).</div>
-      </div>
-
+      <!-- Output -->
       <div class="result">
         <div>
           <div class="note">Result</div>
