@@ -132,6 +132,7 @@
                 <option value="1609.344">1 Mile</option>
                 <option value="3200">3200 m / 2-mile</option>
                 <option value="5000">5K</option>
+                <option value="6000">6K</option>
                 <option value="8000">8K</option>
                 <option value="10000">10K</option>
                 <option value="21097.5">Half Marathon</option>
@@ -151,14 +152,19 @@
             </div>
             <div><button class="primary" id="btnUsePreset" style="width:100%">Use preset</button></div>
           </div>
+
           <div class="quick-buttons">
+            <!-- Track & mid-distance -->
             <button class="mini" data-preset="800|400">800 → per 400</button>
             <button class="mini" data-preset="1000|200">1000 → per 200</button>
             <button class="mini" data-preset="1000|400">1000 → per 400</button>
             <button class="mini" data-preset="1500|300">1500 → per 300</button>
             <button class="mini" data-preset="1600|400">1600 → per 400</button>
+            <!-- XC & roads -->
             <button class="mini" data-preset="5000|1000">5K → per km</button>
             <button class="mini" data-preset="5000|1609.344">5K → per mile</button>
+            <button class="mini" data-preset="6000|1000">6K → per km</button>
+            <button class="mini" data-preset="6000|1609.344">6K → per mile</button>
             <button class="mini" data-preset="8000|1000">8K → per km</button>
             <button class="mini" data-preset="8000|1609.344">8K → per mile</button>
             <button class="mini" data-preset="10000|1000">10K → per km</button>
@@ -168,6 +174,8 @@
             <button class="mini" data-preset="42195|1609.344">Marathon → per mile</button>
             <button class="mini" data-preset="42195|1000">Marathon → per km</button>
           </div>
+
+          <div class="hint">Enter the <b>total race time</b> in “Time A”, choose a race distance and split size, then click <b>Use preset</b>. It computes the average split as A ÷ (# of splits).</div>
         </div>
       </details>
 
@@ -224,7 +232,6 @@
           splitUnitSel=document.getElementById('splitUnit'),
           btnUsePreset=document.getElementById('btnUsePreset');
 
-    // Default modes based on op
     function syncBModeWithOp(){
       if(op.value==='+'||op.value==='-'){ bIsTime.checked=true; bInput.placeholder='e.g., 00:30.00'; }
       else{ bIsTime.checked=false; bInput.placeholder='e.g., 4 (laps/miles/reps)'; }
