@@ -55,6 +55,13 @@
     .footer{margin-top:14px; font-size:12px; color:#91a4c9}
     .pill{display:inline-block; padding:2px 8px; border:1px solid #2c3a5c; border-radius:999px; font-size:11px; color:#a8c5ff}
 
+    /* Stats inside the Result panel */
+    .stats{
+      display:flex; gap:16px; flex-wrap:wrap; align-items:center;
+      font-size:12px; color:var(--muted);
+    }
+    .stats strong{ color:var(--text); font-size:13px; }
+
     /* Presets */
     .presets{ margin-top:16px; border:1px solid #213258; border-radius:14px; overflow:hidden; }
     .presets > summary{ list-style:none; cursor:pointer; padding:12px 14px; background:#0b1326; font-weight:700; border-bottom:1px solid #213258; outline:none; }
@@ -116,10 +123,17 @@
         <button class="warn" id="btnClear">Clear</button>
       </div>
 
-      <!-- Output (moved ABOVE presets) -->
+      <!-- Output (above presets) -->
       <div class="result">
-        <div><div class="note">Result</div><strong class="mono" id="out">—</strong></div>
+        <div>
+          <div class="note">Result</div>
+          <strong class="mono" id="out">—</strong>
+        </div>
         <div class="note" id="detail">Enter values and press Calculate (or hit Enter).</div>
+        <div class="stats">
+          <div>Page visits: <strong id="pv">—</strong></div>
+          <div>Unique visitors: <strong id="uv">—</strong></div>
+        </div>
       </div>
 
       <!-- Presets -->
@@ -330,7 +344,55 @@
     bIsTime.addEventListener('change', ()=>{
       bInput.placeholder = bIsTime.checked ? 'e.g., 00:30.00' : 'e.g., 4 (laps/miles/reps)';
     });
+
+    // ---- Simple counters (CountAPI) ----
+    // Change COUNT_NS to a unique string for your site if you want a fresh bucket
+    const COUNT_NS = 'xc-tf-time-calc-v1';
+    const PV_KEY   = 'pageviews';
+    const UV_KEY   = 'uniques';
+
+    function makeVisitorId(){
+      try{ if (crypto && crypto.randomUUID) return crypto.randomUUID(); }catch{}
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c=>{
+        const r = Math.random()*16|0, v = c==='x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+      });
+    }
+    async function updatePageViews(){
+      try{
+        const r = await fetch(`https://api.countapi.xyz/hit/${COUNT_NS}/${PV_KEY}`);
+        const data = await r.json();
+        document.getElementById('pv').textContent = Number(data.value).toLocaleString();
+      }catch{ document.getElementById('pv').textContent = '—'; }
+    }
+    async function updateUniques(){
+      const storeKey = 'xc_tf_calc_visitor_id';
+      let vid = localStorage.getItem(storeKey);
+      if(!vid){ vid = makeVisitorId(); localStorage.setItem(storeKey, vid); }
+      const marker = `visitor_${vid}`;
+
+      let seen = false;
+      try{
+        const chk = await fetch(`https://api.countapi.xyz/get/${COUNT_NS}/${marker}`);
+        seen = chk.ok;
+      }catch{}
+
+      try{
+        if(!seen){
+          await fetch(`https://api.countapi.xyz/create?namespace=${encodeURIComponent(COUNT_NS)}&key=${encodeURIComponent(marker)}&value=1`);
+          const uHit = await fetch(`https://api.countapi.xyz/hit/${COUNT_NS}/${UV_KEY}`).then(r=>r.json());
+          document.getElementById('uv').textContent = Number(uHit.value).toLocaleString();
+        }else{
+          const uGet = await fetch(`https://api.countapi.xyz/get/${COUNT_NS}/${UV_KEY}`).then(r=>r.json());
+          document.getElementById('uv').textContent = Number(uGet.value).toLocaleString();
+        }
+      }catch{
+        document.getElementById('uv').textContent = '—';
+      }
+    }
+    // Initialize counters
+    updatePageViews();
+    updateUniques();
   </script>
 </body>
 </html>
-
