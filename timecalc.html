@@ -116,6 +116,12 @@
         <button class="warn" id="btnClear">Clear</button>
       </div>
 
+      <!-- Output (moved ABOVE presets) -->
+      <div class="result">
+        <div><div class="note">Result</div><strong class="mono" id="out">—</strong></div>
+        <div class="note" id="detail">Enter values and press Calculate (or hit Enter).</div>
+      </div>
+
       <!-- Presets -->
       <details class="presets" open>
         <summary><h2>Presets (Splits & Pace)</h2></summary>
@@ -178,12 +184,6 @@
           <div class="hint">Enter the <b>total race time</b> in “Time A”, choose a race distance and split size, then click <b>Use preset</b>. It computes the average split as A ÷ (# of splits).</div>
         </div>
       </details>
-
-      <!-- Output -->
-      <div class="result">
-        <div><div class="note">Result</div><strong class="mono" id="out">—</strong></div>
-        <div class="note" id="detail">Enter values and press Calculate (or hit Enter).</div>
-      </div>
 
       <div class="hint">
         Tips: “Add”/“Subtract” expects time ↔ time. “Multiply”/“Divide” expects time ↔ number (laps, reps, miles).
@@ -333,3 +333,4 @@
   </script>
 </body>
 </html>
+
