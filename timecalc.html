@@ -31,15 +31,9 @@
     input::placeholder{color:#6b7280}
     .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;}
 
-    /* --- Layout Grids --- */
-    .grid{
-      display:grid; gap:12px;
-      grid-template-columns: 1fr 140px 1fr; /* desktop/tablet */
-      align-items:end;
-    }
-    .tools{
-      display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;
-    }
+    /* Layout */
+    .grid{display:grid; gap:12px; grid-template-columns: 1fr 140px 1fr; align-items:end;}
+    .tools{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
     button{
       padding:14px 14px; border-radius:12px; border:1px solid #2b3751; background:#0d1a33;
       color:var(--text); cursor:pointer; font-weight:600; letter-spacing:.2px; min-height:48px;
@@ -56,44 +50,30 @@
     }
     .result strong{font-size:clamp(18px,4vw,22px); letter-spacing:.4px}
     .note{font-size:12px; color:var(--muted)}
-
     .hint{margin-top:8px; font-size:12px; color:var(--muted)}
-    .switch{
-      display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted);
-      margin-top:8px; user-select:none;
-    }
+    .switch{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); margin-top:8px; user-select:none;}
     .footer{margin-top:14px; font-size:12px; color:#91a4c9}
     .pill{display:inline-block; padding:2px 8px; border:1px solid #2c3a5c; border-radius:999px; font-size:11px; color:#a8c5ff}
 
-    /* --- Presets panel --- */
+    /* Presets */
     .presets{ margin-top:16px; border:1px solid #213258; border-radius:14px; overflow:hidden; }
-    .presets > summary{
-      list-style:none; cursor:pointer; padding:12px 14px; background:#0b1326; font-weight:700;
-      border-bottom:1px solid #213258; outline:none;
-    }
+    .presets > summary{ list-style:none; cursor:pointer; padding:12px 14px; background:#0b1326; font-weight:700; border-bottom:1px solid #213258; outline:none; }
     .presets[open] > summary{ border-bottom:1px solid #213258 }
-    .presets h2{ margin:0; font-size:16px }
     .preset-body{ padding:14px; background:#0b1326 }
     .preset-grid{ display:grid; gap:10px; grid-template-columns:1fr 1fr auto; align-items:end; }
     .quick-buttons{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px }
     .mini{ padding:10px 12px; font-size:13px; border-radius:10px }
 
-    /* --- Mobile (<=640px) --- */
+    /* Mobile */
     @media (max-width: 640px){
       body{ padding:10px }
       .card{ padding:14px }
-      .grid{ grid-template-columns: 1fr; } /* stack A, op, B */
+      .grid{ grid-template-columns: 1fr; }
       .tools{ flex-direction:column; }
       .tools button{ width:100%; }
       .result{ flex-direction:column; align-items:flex-start; }
       .preset-grid{ grid-template-columns:1fr; }
-      .mini{ width:calc(50% - 4px); } /* 2-up quick buttons */
-      .presets > summary{ font-size:15px; }
-    }
-
-    /* --- Large screens --- */
-    @media (min-width: 1000px){
-      .wrap{ width:min(1100px,100%) }
+      .mini{ width:calc(50% - 4px); }
     }
   </style>
 </head>
@@ -104,10 +84,10 @@
       <p class="sub">Enter times as <span class="pill">MM:SS.00</span> (also accepts <span class="pill">SS.00</span> or <span class="pill">M:SS</span>). Results round to hundredths.</p>
 
       <!-- Inputs -->
-      <div class="grid" id="calcGrid">
+      <div class="grid">
         <div>
           <label for="timeA">Time A</label>
-          <input id="timeA" class="mono" placeholder="e.g., 04:32.18 or 272.18" inputmode="decimal" />
+          <input id="timeA" class="mono" type="text" inputmode="text" placeholder="e.g., 04:32.18 or 272.18" />
         </div>
         <div>
           <label for="op">Operation</label>
@@ -115,12 +95,12 @@
             <option value="+">+</option>
             <option value="-">−</option>
             <option value="*">×</option>
-            <option value="/">÷</option>
+            <option value="/" selected>÷</option>
           </select>
         </div>
         <div>
           <label for="bInput">B Value</label>
-          <input id="bInput" class="mono" placeholder="for × or ÷ use a number (e.g., 4)" inputmode="decimal" />
+          <input id="bInput" class="mono" type="text" inputmode="text" placeholder="for × or ÷ use a number (e.g., 4)" />
           <div class="switch" title="For ÷ you may divide by a number, or choose time÷time to get a ratio.">
             <input type="checkbox" id="bIsTime" />
             <span>“B” is a time</span>
@@ -136,7 +116,7 @@
         <button class="warn" id="btnClear">Clear</button>
       </div>
 
-      <!-- Presets (collapsible on mobile) -->
+      <!-- Presets -->
       <details class="presets" open>
         <summary><h2>Presets (Splits & Pace)</h2></summary>
         <div class="preset-body">
@@ -149,39 +129,34 @@
                 <option value="1000">1000 m</option>
                 <option value="1500">1500 m</option>
                 <option value="1600" selected>1600 m</option>
-                <option value="1609.344">1 Mile (1609.344 m)</option>
+                <option value="1609.344">1 Mile</option>
                 <option value="3200">3200 m / 2-mile</option>
-                <option value="5000">5K (5000 m)</option>
-                <option value="8000">8K (8000 m)</option>
-                <option value="10000">10K (10000 m)</option>
-                <option value="21097.5">Half Marathon (21097.5 m)</option>
-                <option value="42195">Marathon (42195 m)</option>
+                <option value="5000">5K</option>
+                <option value="8000">8K</option>
+                <option value="10000">10K</option>
+                <option value="21097.5">Half Marathon</option>
+                <option value="42195">Marathon</option>
               </select>
             </div>
             <div>
               <label for="splitUnit">Split size</label>
               <select id="splitUnit">
                 <option value="200">Per 200 m</option>
-                <option value="400" selected>Per 400 m (track lap)</option>
+                <option value="400" selected>Per 400 m</option>
                 <option value="800">Per 800 m</option>
                 <option value="1200">Per 1200 m</option>
                 <option value="1000">Per kilometer</option>
                 <option value="1609.344">Per mile</option>
               </select>
             </div>
-            <div>
-              <button class="primary" id="btnUsePreset" style="width:100%">Use preset</button>
-            </div>
+            <div><button class="primary" id="btnUsePreset" style="width:100%">Use preset</button></div>
           </div>
-
           <div class="quick-buttons">
-            <!-- Track & mid-distance -->
             <button class="mini" data-preset="800|400">800 → per 400</button>
             <button class="mini" data-preset="1000|200">1000 → per 200</button>
             <button class="mini" data-preset="1000|400">1000 → per 400</button>
             <button class="mini" data-preset="1500|300">1500 → per 300</button>
             <button class="mini" data-preset="1600|400">1600 → per 400</button>
-            <!-- XC & roads -->
             <button class="mini" data-preset="5000|1000">5K → per km</button>
             <button class="mini" data-preset="5000|1609.344">5K → per mile</button>
             <button class="mini" data-preset="8000|1000">8K → per km</button>
@@ -193,257 +168,159 @@
             <button class="mini" data-preset="42195|1609.344">Marathon → per mile</button>
             <button class="mini" data-preset="42195|1000">Marathon → per km</button>
           </div>
-          <div class="hint">Enter the <b>total race time</b> in “Time A”, choose a race distance and split size, then click <b>Use preset</b>. It computes the average split as A ÷ (# of splits).</div>
         </div>
       </details>
 
       <!-- Output -->
       <div class="result">
-        <div>
-          <div class="note">Result</div>
-          <strong class="mono" id="out">—</strong>
-        </div>
+        <div><div class="note">Result</div><strong class="mono" id="out">—</strong></div>
         <div class="note" id="detail">Enter values and press Calculate (or hit Enter).</div>
       </div>
 
       <div class="hint">
-        Tips: “Add”/“Subtract” expects time ↔ time. “Multiply”/“Divide” expects time ↔ number (laps, reps, miles).  
+        Tips: “Add”/“Subtract” expects time ↔ time. “Multiply”/“Divide” expects time ↔ number (laps, reps, miles).
         For ratios (time ÷ time → scalar), toggle “B is a time.”
-      </div>
-
-      <div class="footer">
-        Parsing rules: if there’s a colon (<code>:</code>) we read <span class="pill">minutes:seconds.fraction</span>.  
-        If there’s no colon, we read it as total seconds. Output is always <span class="pill">MM:SS.00</span> (hundredths).
       </div>
     </div>
   </div>
 
   <script>
-    // ---------- Parsing & formatting utilities (centisecond math) ----------
-    function parseTimeToCentiseconds(str) {
-      if (typeof str !== 'string') return NaN;
-      const s = str.trim();
-      if (!s) return NaN;
-      if (!s.includes(':')) {
-        const seconds = Number(s);
-        if (!isFinite(seconds)) return NaN;
-        return Math.round(seconds * 100);
-      }
-      const parts = s.split(':');
-      if (parts.length !== 2) return NaN;
-      const minutes = Number(parts[0].trim());
-      const seconds = Number(parts[1].trim());
-      if (!Number.isFinite(minutes) || !isFinite(seconds)) return NaN;
-      return Math.round((minutes * 60 + seconds) * 100);
+    // ---- Parsing / formatting (centiseconds) ----
+    function parseTimeToCentiseconds(str){
+      if(typeof str!=='string') return NaN;
+      const s=str.trim(); if(!s) return NaN;
+      if(!s.includes(':')){ const sec=Number(s); return isFinite(sec)?Math.round(sec*100):NaN; }
+      const parts=s.split(':'); if(parts.length!==2) return NaN;
+      const m=Number(parts[0].trim()), sec=Number(parts[1].trim());
+      if(!isFinite(m)||!isFinite(sec)) return NaN;
+      return Math.round((m*60+sec)*100);
+    }
+    function formatCentiseconds(cs){
+      if(!Number.isFinite(cs)) return '—';
+      const sign=cs<0?'-':'';
+      let x=Math.abs(Math.round(cs));
+      const totalS=Math.floor(x/100), hundredths=x%100;
+      const m=Math.floor(totalS/60), s=totalS%60;
+      return `${sign}${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(hundredths).padStart(2,'0')}`;
+    }
+    function parseSmartB(str,bIsTimeChecked){
+      const raw=(str??'').trim(); if(!raw) return {kind:bIsTimeChecked?'time':'number', value:NaN};
+      if(bIsTimeChecked||raw.includes(':')){ const t=parseTimeToCentiseconds(raw); if(Number.isFinite(t)) return {kind:'time', value:t}; if(bIsTimeChecked) return {kind:'time', value:NaN}; }
+      const num=Number(raw); return {kind:'number', value:isFinite(num)?num:NaN};
     }
 
-    function formatCentiseconds(cs) {
-      if (!Number.isFinite(cs)) return '—';
-      const sign = cs < 0 ? '-' : '';
-      let x = Math.abs(Math.round(cs));
-      const totalSeconds = Math.floor(x / 100);
-      const hundredths = x % 100;
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-      const mm = String(minutes).padStart(2, '0');
-      const ss = String(seconds).padStart(2, '0');
-      const hh = String(hundredths).padStart(2, '0');
-      return `${sign}${mm}:${ss}.${hh}`;
-    }
+    // ---- DOM ----
+    const timeA=document.getElementById('timeA'),
+          op=document.getElementById('op'),
+          bInput=document.getElementById('bInput'),
+          bIsTime=document.getElementById('bIsTime'),
+          btnCalc=document.getElementById('btnCalc'),
+          btnSwap=document.getElementById('btnSwap'),
+          btnCopy=document.getElementById('btnCopy'),
+          btnClear=document.getElementById('btnClear'),
+          outEl=document.getElementById('out'),
+          detail=document.getElementById('detail'),
+          raceDistSel=document.getElementById('raceDist'),
+          splitUnitSel=document.getElementById('splitUnit'),
+          btnUsePreset=document.getElementById('btnUsePreset');
 
-    function parseSmartB(inputStr, bIsTimeChecked) {
-      const raw = (inputStr ?? '').trim();
-      if (!raw) return { kind: bIsTimeChecked ? 'time' : 'number', value: NaN };
-      if (bIsTimeChecked || raw.includes(':')) {
-        const tcs = parseTimeToCentiseconds(raw);
-        if (Number.isFinite(tcs)) return { kind: 'time', value: tcs };
-        if (bIsTimeChecked) return { kind: 'time', value: NaN };
-      }
-      const num = Number(raw);
-      return { kind: 'number', value: isFinite(num) ? num : NaN };
-    }
-
-    // ---------- DOM wiring ----------
-    const timeA   = document.getElementById('timeA');
-    const op      = document.getElementById('op');
-    const bInput  = document.getElementById('bInput');
-    const bIsTime = document.getElementById('bIsTime');
-    const btnCalc = document.getElementById('btnCalc');
-    const btnSwap = document.getElementById('btnSwap');
-    const btnCopy = document.getElementById('btnCopy');
-    const btnClear= document.getElementById('btnClear');
-    const outEl   = document.getElementById('out');
-    const detail  = document.getElementById('detail');
-
-    const raceDistSel = document.getElementById('raceDist');
-    const splitUnitSel= document.getElementById('splitUnit');
-    const btnUsePreset= document.getElementById('btnUsePreset');
-
-    // Default: +/− ⇒ B is time; ×/÷ ⇒ number
-    function syncBModeWithOp() {
-      if (op.value === '+' || op.value === '-') {
-        bIsTime.checked = true;
-        bInput.placeholder = 'e.g., 00:30.00';
-      } else {
-        bIsTime.checked = false;
-        bInput.placeholder = 'e.g., 4 (laps/miles/reps)';
-      }
+    // Default modes based on op
+    function syncBModeWithOp(){
+      if(op.value==='+'||op.value==='-'){ bIsTime.checked=true; bInput.placeholder='e.g., 00:30.00'; }
+      else{ bIsTime.checked=false; bInput.placeholder='e.g., 4 (laps/miles/reps)'; }
     }
     syncBModeWithOp();
     op.addEventListener('change', syncBModeWithOp);
 
-    function showResult(display, details, isError) {
-      outEl.textContent = display;
-      detail.textContent = details;
-      detail.style.color = isError ? 'var(--bad)' : 'var(--muted)';
+    function showResult(display,details,isError){
+      outEl.textContent=display;
+      detail.textContent=details;
+      detail.style.color=isError?'var(--bad)':'var(--muted)';
     }
 
-    function explain(A_cs, opVal, B) {
-      const A = formatCentiseconds(A_cs);
-      if (opVal === '+' || opVal === '-') {
-        const Bf = formatCentiseconds(B.value);
-        return `Computed ${A} ${opVal} ${Bf}`;
-      }
-      if (opVal === '*') return `Computed ${A} × ${B.value}`;
-      if (opVal === '/') {
-        if (B.kind === 'number') return `Computed ${A} ÷ ${B.value}`;
-        const Bf = formatCentiseconds(B.value);
-        const r = (A_cs / B.value).toFixed(2);
-        return `Computed ${A} ÷ ${Bf} = ${r} (ratio)`;
-      }
-      return '';
-    }
+    function calculate(){
+      const opVal=op.value, A_cs=parseTimeToCentiseconds(timeA.value);
+      if(!Number.isFinite(A_cs)){ showResult('—','Please enter a valid Time A.',true); return; }
+      const B=parseSmartB(bInput.value,bIsTime.checked);
 
-    function calculate() {
-      const opVal = op.value;
-      const A_cs = parseTimeToCentiseconds(timeA.value);
-      if (!Number.isFinite(A_cs)) {
-        showResult('—', 'Please enter a valid Time A (MM:SS.00 or seconds).', true);
+      if(opVal==='+'||opVal==='-'){
+        if(B.kind!=='time'||!Number.isFinite(B.value)){ showResult('—','For + / −, “B” must be a valid time.',true); return; }
+        const res=(opVal==='+')?(A_cs+B.value):(A_cs-B.value);
+        showResult(formatCentiseconds(res),`Computed ${formatCentiseconds(A_cs)} ${opVal} ${formatCentiseconds(B.value)}`,false);
         return;
       }
-      const B = parseSmartB(bInput.value, bIsTime.checked);
-
-      if (opVal === '+' || opVal === '-') {
-        if (B.kind !== 'time' || !Number.isFinite(B.value)) {
-          showResult('—', 'For + / −, “B” must be a valid time.', true);
-          return;
-        }
-        const res = (opVal === '+') ? (A_cs + B.value) : (A_cs - B.value);
-        showResult(formatCentiseconds(res), explain(A_cs, opVal, B), false);
+      if(opVal==='*'){
+        if(B.kind!=='number'||!Number.isFinite(B.value)){ showResult('—','For ×, enter a number.',true); return; }
+        const res=Math.round(A_cs*B.value);
+        showResult(formatCentiseconds(res),`Computed ${formatCentiseconds(A_cs)} × ${B.value}`,false);
         return;
       }
-
-      if (opVal === '*') {
-        if (B.kind !== 'number' || !Number.isFinite(B.value)) {
-          showResult('—', 'For ×, enter a number in “B” (e.g., laps or reps).', true);
+      if(opVal==='/'){
+        if(B.kind==='number'){
+          if(!Number.isFinite(B.value)||B.value===0){ showResult('—','For ÷ by number, enter nonzero.',true); return; }
+          const res=Math.round(A_cs/B.value);
+          showResult(formatCentiseconds(res),`Computed ${formatCentiseconds(A_cs)} ÷ ${B.value}`,false);
           return;
-        }
-        const res = Math.round(A_cs * B.value);
-        showResult(formatCentiseconds(res), explain(A_cs, opVal, B), false);
-        return;
-      }
-
-      if (opVal === '/') {
-        if (B.kind === 'number') {
-          if (!Number.isFinite(B.value) || B.value === 0) {
-            showResult('—', 'For ÷ by number, “B” must be a nonzero number.', true);
-            return;
-          }
-          const res = Math.round(A_cs / B.value);
-          showResult(formatCentiseconds(res), explain(A_cs, opVal, B), false);
-          return;
-        } else {
-          if (!Number.isFinite(B.value) || B.value === 0) {
-            showResult('—', 'For time ÷ time, “B” must be a nonzero time.', true);
-            return;
-          }
-          const ratio = (A_cs / B.value);
-          showResult(formatCentiseconds(A_cs), `Ratio A÷B = ${ratio.toFixed(2)} (unitless); A shown left for reference.`, false);
+        }else{
+          if(!Number.isFinite(B.value)||B.value===0){ showResult('—','For time ÷ time, enter nonzero.',true); return; }
+          const ratio=A_cs/B.value;
+          showResult(formatCentiseconds(A_cs),`Ratio A÷B = ${ratio.toFixed(2)}`,false);
           return;
         }
       }
     }
 
-    // ---------- Presets logic ----------
-    function applyPreset(distanceMeters, splitMeters) {
-      const dist = Number(distanceMeters);
-      const split = Number(splitMeters);
-      if (!isFinite(dist) || !isFinite(split) || split <= 0) {
-        showResult(outEl.textContent, 'Invalid preset selection.', true);
-        return;
-      }
-      const segments = dist / split; // may be fractional (e.g., 5K per mile)
-      op.value = '/';
-      syncBModeWithOp();
-      bInput.value = segments.toFixed(6).replace(/\.?0+$/,''); // tidy trailing zeros
-      bIsTime.checked = false;
+    // Presets
+    function applyPreset(distanceMeters,splitMeters){
+      const dist=Number(distanceMeters), split=Number(splitMeters);
+      if(!isFinite(dist)||!isFinite(split)||split<=0){ showResult(outEl.textContent,'Invalid preset.',true); return; }
+      const segments=dist/split;
+      op.value='/'; syncBModeWithOp();
+      bInput.value=segments.toFixed(6).replace(/\.?0+$/,'');
+      bIsTime.checked=false;
       calculate();
     }
-
-    btnUsePreset.addEventListener('click', () => {
-      applyPreset(raceDistSel.value, splitUnitSel.value);
-    });
-
-    // Quick buttons
-    document.querySelectorAll('.quick-buttons .mini').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const [d, s] = (btn.getAttribute('data-preset')||'').split('|');
-        raceDistSel.value = d;
-        splitUnitSel.value = s;
-        applyPreset(d, s);
+    btnUsePreset.addEventListener('click',()=>applyPreset(raceDistSel.value,splitUnitSel.value));
+    document.querySelectorAll('.quick-buttons .mini').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const [d,s]=btn.getAttribute('data-preset').split('|');
+        raceDistSel.value=d; splitUnitSel.value=s; applyPreset(d,s);
       });
     });
 
     // Buttons
     btnCalc.addEventListener('click', calculate);
-    btnClear.addEventListener('click', () => {
-      timeA.value = '';
-      bInput.value = '';
-      outEl.textContent = '—';
-      detail.textContent = 'Cleared.';
-      detail.style.color = 'var(--muted)';
-      syncBModeWithOp();
-      timeA.focus();
+    btnClear.addEventListener('click', ()=>{
+      timeA.value=''; bInput.value='';
+      outEl.textContent='—'; detail.textContent='Cleared.'; detail.style.color='var(--muted)';
+      syncBModeWithOp(); timeA.focus();
     });
-    btnCopy.addEventListener('click', async () => {
-      const val = outEl.textContent.trim();
-      if (!val || val === '—') { showResult('—', 'Nothing to copy yet.', true); return; }
-      try {
+    btnCopy.addEventListener('click', async ()=>{
+      const val=outEl.textContent.trim();
+      if(!val||val==='—'){ showResult('—','Nothing to copy.',true); return; }
+      try{
         await navigator.clipboard.writeText(val);
-        detail.textContent = `Copied ${val} to clipboard.`;
-        detail.style.color = 'var(--good)';
-        setTimeout(()=>{ detail.style.color='var(--muted)' }, 1200);
-      } catch {
-        detail.textContent = 'Copy failed (browser permissions).';
-        detail.style.color = 'var(--bad)';
+        detail.textContent=`Copied ${val}`; detail.style.color='var(--good)';
+        setTimeout(()=>detail.style.color='var(--muted)',1200);
+      }catch{
+        detail.textContent='Copy failed (permissions).'; detail.style.color='var(--bad)';
       }
     });
-    btnSwap.addEventListener('click', () => {
-      if (op.value !== '+' && op.value !== '-') {
-        showResult(outEl.textContent, 'Swap is available only for + / −.', true);
-        return;
-      }
-      const B = parseSmartB(bInput.value, true);
-      if (B.kind !== 'time' || !Number.isFinite(B.value)) {
-        showResult(outEl.textContent, 'To swap, enter a valid time in “B”.', true);
-        return;
-      }
-      const aStr = timeA.value;
-      timeA.value = bInput.value;
-      bInput.value = aStr;
-      showResult(outEl.textContent, 'Swapped A and B.', false);
+    btnSwap.addEventListener('click', ()=>{
+      if(op.value!=='+'&&op.value!=='-'){ showResult(outEl.textContent,'Swap is available only for + / −.',true); return; }
+      const B=parseSmartB(bInput.value,true);
+      if(B.kind!=='time'||!Number.isFinite(B.value)){ showResult(outEl.textContent,'To swap, enter a valid time in “B”.',true); return; }
+      const aStr=timeA.value; timeA.value=bInput.value; bInput.value=aStr;
+      showResult(outEl.textContent,'Swapped A and B.',false);
     });
 
-    // Keyboard: Enter to calculate
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        calculate();
-      }
+    // Enter key = calculate
+    document.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter'){ e.preventDefault(); calculate(); }
     });
 
     // Toggle placeholder when "B is time" changes
-    bIsTime.addEventListener('change', () => {
+    bIsTime.addEventListener('change', ()=>{
       bInput.placeholder = bIsTime.checked ? 'e.g., 00:30.00' : 'e.g., 4 (laps/miles/reps)';
     });
   </script>
