@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stats Grapher — Module 8 (Box & Whisker)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-boxplot@4.3.0/dist/chartjs-chart-boxplot.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body {background:#0f172a;color:#e5e7eb;font-family:sans-serif;margin:0}
+    .wrap{display:grid;grid-template-columns:320px 1fr;gap:14px;padding:14px}
+    .panel{background:#111827;border:1px solid #1f2937;border-radius:14px}
+    .left{padding:14px}
+    .card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:12px;margin-bottom:12px}
+    label{display:block;font-size:13px;color:#9ca3af;margin-bottom:6px}
+    input,select{width:95%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb}
+    .btn{margin-top:6px;padding:8px 10px;background:#14213d;color:#e5e7eb;border:none;border-radius:8px;cursor:pointer}
+    .btn:hover{filter:brightness(1.1)}
+    .preview{max-height:200px;overflow:auto;border:1px solid #374151;border-radius:8px;margin-top:6px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:4px 6px;border-bottom:1px solid #303744;font-size:13px}
+    .chart-wrap{height:520px;width:100%}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="panel left">
+      <div class="card">
+        <label>Upload data (CSV / Excel)</label>
+        <input id="file" type="file" accept=".csv, .xlsx" />
+        <button class="btn" id="loadBtn">Load File</button>
+        <button class="btn" id="sampleBtn">Load Sample</button>
+      </div>
+
+      <div class="card">
+        <label>Numeric Column</label>
+        <select id="numCol"><option value="">—</option></select>
+        <label>Group By (optional)</label>
+        <select id="groupCol"><option value="">— none —</option></select>
+        <label>Chart Title</label><input id="titleInput" type="text" placeholder="Boxplot Title" />
+        <button class="btn" id="drawBtn">Draw Boxplot</button>
+        <button class="btn" id="downloadPNGBtn">Download PNG</button>
+      </div>
+
+      <div class="card">
+        <strong>Dataset Preview</strong>
+        <div id="preview" class="preview"></div>
+      </div>
+    </aside>
+
+    <main class="panel">
+      <div class="chart-wrap"><canvas id="chart"></canvas></div>
+    </main>
+  </div>
+
+<script>
+let DATA=[]; let HEADERS=[]; let currentChart=null;
+
+function buildTable(rows){ if(!rows.length) return '<div>No data</div>'; const headers=Object.keys(rows[0]); let html='<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>'; for(const r of rows.slice(0,20)) html+='<tr>'+headers.map(h=>`<td>${r[h]}</td>`).join('')+'</tr>'; html+='</tbody></table>'; return html; }
+
+async function loadFile(file){ const buf=await file.arrayBuffer(); const wb=XLSX.read(buf,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; setData(XLSX.utils.sheet_to_json(ws,{defval:''})); }
+
+function setData(rows){ DATA=rows; HEADERS=rows.length?Object.keys(rows[0]):[]; const numCols=HEADERS.filter(h=> DATA.some(r=> !isNaN(parseFloat(r[h])) )); const numSel=document.getElementById('numCol'); const grpSel=document.getElementById('groupCol'); numSel.innerHTML='<option value="">—</option>'+numCols.map(h=>`<option value="${h}">${h}</option>`).join(''); grpSel.innerHTML='<option value="">— none —</option>'+HEADERS.map(h=>`<option value="${h}">${h}</option>`).join(''); document.getElementById('preview').innerHTML=buildTable(DATA); }
+
+function groupValues(col){ const map={}; for(const r of DATA){ const v=col? String(r[col]).trim(): '(all)'; if(r && v!==''){ (map[v]=map[v]||[]).push(r); } } return map; }
+
+function drawBox(){ const num=document.getElementById('numCol').value; if(!num) return alert('Pick a numeric column'); const group=document.getElementById('groupCol').value; const groups=groupValues(group); const labels=Object.keys(groups); const datasets=[{ label:num, data:labels.map(g=> groups[g].map(r=> parseFloat(r[num])).filter(v=>!isNaN(v))) }]; if(currentChart) currentChart.destroy(); currentChart=new Chart(document.getElementById('chart'),{ type:'boxplot', data:{ labels:labels, datasets:datasets }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ title:{ display:true, text: document.getElementById('titleInput').value||'Boxplot'} } } }); }
+
+function downloadPNG(){ if(!currentChart) return; const a=document.createElement('a'); a.href=currentChart.toBase64Image(); a.download='boxplot.png'; a.click(); }
+
+const SAMPLE=[ {Class:'A', Score:72}, {Class:'A', Score:75}, {Class:'A', Score:70}, {Class:'A', Score:68}, {Class:'B', Score:80}, {Class:'B', Score:85}, {Class:'B', Score:78}, {Class:'C', Score:90}, {Class:'C', Score:92}, {Class:'C', Score:88} ];
+
+window.addEventListener('DOMContentLoaded',()=>{ document.getElementById('loadBtn').onclick=()=>{ const f=document.getElementById('file').files[0]; if(f) loadFile(f); }; document.getElementById('sampleBtn').onclick=()=>{ setData(SAMPLE); }; document.getElementById('drawBtn').onclick=drawBox; document.getElementById('downloadPNGBtn').onclick=downloadPNG; });
+</script>
+</body>
+</html>
