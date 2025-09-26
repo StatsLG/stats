@@ -112,7 +112,7 @@
 <body>
   <header>
     <h1>Team Timer</h1>
-    <div class="sub">Per-person split timing with one-tap allocation</div>
+    <div class="sub">Per-person split timing with one-tap splits</div>
   </header>
 
   <nav class="tabs" role="tablist" aria-label="Team Timer Tabs">
@@ -149,14 +149,14 @@
           <div class="clock" aria-live="polite">
             <div id="elapsed" class="mono">00:00.00</div>
             <small>
-              Per-person splits: each button press adds time since that person’s last split.
+              Per-person splits.
             </small>
           </div>
           <div class="controls">
             <button class="btn ok" id="start-pause">Start</button>
             <button class="btn warn" id="lap-alloc" title="Record an Unassigned split">Lap (Unassigned)</button>
             <button class="btn ghost" id="reset">Reset Stopwatch</button>
-            <button class="btn ghost" id="undo">Undo Last Allocation</button>
+            <button class="btn ghost" id="undo">Undo Last Split</button>
             <button class="btn danger" id="clear-totals">Clear Totals</button>
             <button class="btn" id="export-totals">Export Totals CSV</button>
             <button class="btn" id="export-splits">Export Splits CSV</button>
@@ -165,8 +165,8 @@
         </div>
 
         <div class="card">
-          <h2>Allocate time</h2>
-          <p class="hint">Buttons are vertical for mobile. The most recently pressed moves to the bottom.</p>
+          <h2>Split time</h2>
+          <p class="hint">The most recently pressed moves to the bottom.</p>
           <div class="alloc-grid" id="alloc-grid"></div>
         </div>
 
@@ -176,7 +176,7 @@
             <thead>
               <tr>
                 <th>Name</th>
-                <th class="right">Allocations</th>
+                <th class="right">Laps</th>
                 <th class="right">Total Time</th>
               </tr>
             </thead>
@@ -438,7 +438,7 @@
   // ---------- Allocation & Splits (Per-Person) ----------
   function allocateTo(name){
     if(!running){
-      alert('Start the stopwatch before allocating time.');
+      alert('Start the stopwatch before getting splits.');
       return;
     }
     const elapsed = getElapsedMs();
