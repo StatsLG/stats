@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Team Timer — Per-Person Splits</title>
+<style>
+  :root{
+    --bg:#0f172a; --panel:#111827; --muted:#94a3b8; --text:#e5e7eb;
+    --accent:#22c55e; --accent-2:#38bdf8; --warn:#f59e0b; --danger:#ef4444;
+    --ring: rgba(56,189,248,.35); --card:#0b1220; --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --radius: 16px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: radial-gradient(1200px 600px at 20% -10%, #0b1530 0%, var(--bg) 40%, #070b16 100%);
+    color:var(--text); min-height:100dvh; display:flex; flex-direction:column; gap:16px;
+  }
+  header{ padding:18px 20px 0; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+  h1{margin:0; font-weight:700; letter-spacing:.3px; font-size: clamp(20px, 3.2vw, 28px);}
+  .sub{color:var(--muted); font-size:.95rem}
+  .tabs{ display:flex; gap:8px; padding:0 20px; flex-wrap:wrap; }
+  .tab-btn{
+    appearance:none; border:none; background:linear-gradient(180deg, #0f1a33, #0b1220);
+    color:var(--text); padding:10px 14px; border-radius:999px; cursor:pointer;
+    box-shadow: inset 0 0 0 1px rgba(148,163,184,.25), 0 8px 18px rgba(0,0,0,.25);
+    transition:.2s transform,.2s background,.2s box-shadow;
+  }
+  .tab-btn[aria-selected="true"]{
+    background: linear-gradient(180deg, #0f2338, #0b1c2b);
+    box-shadow: inset 0 0 0 2px var(--ring), 0 12px 24px rgba(0,0,0,.35);
+  }
+  .tab-btn:active{ transform: translateY(1px) }
+  main{ padding: 0 20px 24px; }
+  .panel{
+    background: linear-gradient(180deg, #0d1424, var(--panel));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow), inset 0 0 0 1px rgba(148,163,184,.10);
+    padding:18px;
+  }
+  .grid{ display:grid; gap:14px; }
+  @media (min-width: 1000px){
+    .setup-grid{ grid-template-columns: 1.2fr 1fr; align-items:start; }
+    .timer-grid{ grid-template-columns: 1fr 1fr; }
+  }
+  .card{
+    background: linear-gradient(180deg, #0b1220, var(--card));
+    border-radius: 14px; padding:14px; box-shadow: inset 0 0 0 1px rgba(148,163,184,.08);
+  }
+  h2{margin:4px 0 12px 0; font-size:1.1rem; color:#eaf2ff}
+  label{ display:block; font-size:.9rem; color:var(--muted); margin-bottom:6px; }
+  input[type="text"]{
+    width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(148,163,184,.25);
+    background:#0a1220; color:var(--text); outline:none;
+  }
+  input[type="text"]:focus{ border-color: var(--accent-2); box-shadow: 0 0 0 4px var(--ring) }
+  .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .btn{
+    appearance:none; border:none; cursor:pointer; padding:10px 12px; border-radius:12px; color:#06111b; font-weight:600;
+    background: linear-gradient(180deg, #e9f8ff, #cfeaff);
+    box-shadow: inset 0 0 0 1px rgba(12,44,66,.25), 0 8px 18px rgba(0,0,0,.25);
+    transition:.18s transform,.18s filter,.18s opacity;
+  }
+  .btn:active{ transform: translateY(1px) }
+  .btn.ghost{ background: transparent; color:var(--text); box-shadow: inset 0 0 0 1px rgba(148,163,184,.25); }
+  .btn.danger{ background: linear-gradient(180deg, #ffe9e9, #ffd2d2); color:#3c0a0a }
+  .btn.warn{ background: linear-gradient(180deg, #fff4da, #ffe7b3); color:#3a2400 }
+  .btn.ok{ background: linear-gradient(180deg, #d9ffe8, #b6ffd2); color:#0f3a25 }
+  .pill{ font-size:.8rem; padding:6px 10px; border-radius:999px; background:#0a1626; color:var(--muted) }
+  .names-list{ display:flex; flex-direction:column; gap:8px; max-height:50vh; overflow:auto; padding-right:4px}
+  .name-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px;
+    border-radius:12px; background:#0b1424; box-shadow: inset 0 0 0 1px rgba(148,163,184,.10);
+  }
+  .name-item .left{ display:flex; align-items:center; gap:8px; min-width:0 }
+  .tag{ background:#0e2338; color:#cde9ff; font-weight:700; border-radius:8px; padding:4px 8px; font-size:.85rem; }
+  .name{ font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .timer-wrap{ display:flex; flex-direction:column; gap:14px }
+  .clock{
+    font-variant-numeric: tabular-nums;
+    text-align:center; font-weight:800; letter-spacing:.5px;
+    font-size: clamp(32px, 7.5vw, 64px);
+    padding:12px 10px; border-radius:14px;
+    background: radial-gradient(800px 200px at 50% -50%, #16355a 0, #0b1220 50%); 
+    box-shadow: inset 0 0 0 1px rgba(56,189,248,.25);
+  }
+  .clock small{ display:block; font-size: clamp(11px, 1.8vw, 13px); color:var(--muted); margin-top:6px }
+  .controls{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  /* Vertical allocation buttons (mobile-friendly) */
+  .alloc-grid{ display:grid; gap:10px; grid-template-columns: 1fr; }
+  .alloc-btn{
+    width:100%;
+    background: linear-gradient(180deg, #eafff2, #d2ffe4); color:#0f3a25;
+    border-radius:14px; padding:14px 12px; font-weight:800; cursor:pointer; border:none;
+    box-shadow: inset 0 0 0 1px rgba(10,76,48,.2), 0 10px 18px rgba(0,0,0,.25);
+    transition:.15s transform;
+  }
+  .alloc-btn:active{ transform: translateY(1px) }
+  table{ width:100%; border-collapse:collapse; font-size:.95rem }
+  th, td{ padding:10px 8px; text-align:left; border-bottom:1px solid rgba(148,163,184,.15) }
+  th{ color:#cfe2ff; font-weight:700 }
+  tfoot td{ font-weight:800 }
+  .muted{ color:var(--muted) }
+  .right{ text-align:right }
+  .tiny{ font-size:.8rem }
+  .hint{ color:var(--muted); font-size:.9rem }
+  .spacer{ flex:1 }
+  .mono{ font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Team Timer</h1>
+    <div class="sub">Per-person split timing with one-tap allocation</div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Team Timer Tabs">
+    <button class="tab-btn" role="tab" id="tab-setup" aria-controls="panel-setup" aria-selected="true">Team Setup</button>
+    <button class="tab-btn" role="tab" id="tab-timer" aria-controls="panel-timer" aria-selected="false">Timer & Allocation</button>
+    <span class="spacer"></span>
+    <span class="pill tiny" id="team-count">0 teammates</span>
+  </nav>
+
+  <main>
+    <!-- SETUP TAB -->
+    <section id="panel-setup" class="panel grid setup-grid" role="tabpanel" aria-labelledby="tab-setup">
+      <div class="card">
+        <h2>Add teammates</h2>
+        <label for="name-input">Name</label>
+        <div class="row">
+          <input id="name-input" type="text" placeholder="e.g., Alex" />
+          <button class="btn" id="add-name">Add</button>
+          <button class="btn ghost" id="import-names">Import (CSV / lines)</button>
+        </div>
+        <p class="hint" style="margin-top:8px">Tip: Paste a list of names using the Import button. Duplicates are ignored.</p>
+      </div>
+      <div class="card">
+        <h2>Current team</h2>
+        <div class="names-list" id="names-list"></div>
+      </div>
+    </section>
+
+    <!-- TIMER TAB -->
+    <section id="panel-timer" class="panel" role="tabpanel" aria-labelledby="tab-timer" hidden>
+      <div class="grid timer-grid">
+        <div class="timer-wrap card">
+          <h2>Stopwatch</h2>
+          <div class="clock" aria-live="polite">
+            <div id="elapsed" class="mono">00:00.00</div>
+            <small>
+              Per-person splits: each button press adds time since that person’s last split.
+            </small>
+          </div>
+          <div class="controls">
+            <button class="btn ok" id="start-pause">Start</button>
+            <button class="btn warn" id="lap-alloc" title="Record an Unassigned split">Lap (Unassigned)</button>
+            <button class="btn ghost" id="reset">Reset Stopwatch</button>
+            <button class="btn ghost" id="undo">Undo Last Allocation</button>
+            <button class="btn danger" id="clear-totals">Clear Totals</button>
+            <button class="btn" id="export-totals">Export Totals CSV</button>
+            <button class="btn" id="export-splits">Export Splits CSV</button>
+            <button class="btn ghost" id="clear-splits">Clear Splits</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Allocate time</h2>
+          <p class="hint">Buttons are vertical for mobile. The most recently pressed moves to the bottom.</p>
+          <div class="alloc-grid" id="alloc-grid"></div>
+        </div>
+
+        <div class="card">
+          <h2>Totals</h2>
+          <table id="totals-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th class="right">Allocations</th>
+                <th class="right">Total Time</th>
+              </tr>
+            </thead>
+            <tbody id="totals-body"></tbody>
+            <tfoot>
+              <tr>
+                <td>All teammates</td>
+                <td class="right" id="alloc-count">0</td>
+                <td class="right mono" id="grand-total">00:00.00</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="card">
+          <h2>Recent Splits (last 25)</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>When</th>
+                <th>Name</th>
+                <th class="right">Split</th>
+                <th class="right">Elapsed @ Split</th>
+              </tr>
+            </thead>
+            <tbody id="splits-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+<script>
+(() => {
+  // ---------- Storage Keys ----------
+  const LS_KEYS = {
+    TEAM: 'team_timer_names_v1',
+    TOTALS: 'team_timer_totals_v1',
+    SPLITS: 'team_timer_splits_v1',
+    ORDER: 'team_timer_alloc_order_v1',
+    LAST: 'team_timer_last_by_name_v1' // NEW: per-person last split (in elapsed ms)
+  };
+
+  // ---------- State ----------
+  let names = loadJSON(LS_KEYS.TEAM, []);
+  let totals = loadJSON(LS_KEYS.TOTALS, {});   // { name: {ms, count} }
+  let splits = loadJSON(LS_KEYS.SPLITS, []);   // [{id, ts, name, ms, elapsed}]
+  let allocOrder = loadJSON(LS_KEYS.ORDER, names.slice());
+  let lastBy = loadJSON(LS_KEYS.LAST, {});     // { name: elapsed_ms_at_last_split }
+
+  // Stopwatch state
+  let running = false;
+  let startTime = 0;
+  let previouslyElapsed = 0;
+  let rafId = null;
+
+  // Undo stack: each entry { name, deltaMs, splitId, prevLast }
+  const undoStack = [];
+
+  // ---------- Helpers ----------
+  const $ = (sel) => document.querySelector(sel);
+
+  function loadJSON(key, fallback){
+    try { const v = JSON.parse(localStorage.getItem(key)); return (v ?? fallback); }
+    catch { return fallback; }
+  }
+  function saveJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+
+  function fmt(ms){
+    const sign = ms < 0 ? '-' : '';
+    ms = Math.max(0, Math.abs(ms));
+    const centi = Math.floor((ms % 1000) / 10);
+    const s = Math.floor(ms / 1000);
+    const m = Math.floor(s / 60);
+    const ss = (s % 60).toString().padStart(2,'0');
+    const mm = m.toString().padStart(2,'0');
+    return `${sign}${mm}:${ss}.${centi.toString().padStart(2,'0')}`;
+  }
+  function now(){ return performance.now(); }
+  function getElapsedMs(){ return running ? (now() - startTime) : previouslyElapsed; }
+
+  function ensurePerson(name){
+    if(!totals[name]) totals[name] = { ms:0, count:0 };
+    if(!allocOrder.includes(name)) allocOrder.push(name);
+    if(!(name in lastBy)) lastBy[name] = getElapsedMs(); // start counting from "now" for new people
+  }
+  function syncAllocOrderToNames(){
+    allocOrder = allocOrder.filter(n => names.includes(n));
+    names.forEach(n => { if(!allocOrder.includes(n)) allocOrder.push(n); });
+    saveJSON(LS_KEYS.ORDER, allocOrder);
+  }
+  function moveToBottomInAllocOrder(name){
+    allocOrder = allocOrder.filter(n => n !== name).concat(name);
+    saveJSON(LS_KEYS.ORDER, allocOrder);
+  }
+  function updateTeamCount(){
+    $("#team-count").textContent = `${names.length} teammate${names.length===1?'':'s'}`;
+  }
+
+  // ---------- UI Builders ----------
+  function renderNamesList(){
+    const list = $("#names-list");
+    list.innerHTML = '';
+    if(names.length === 0){
+      list.innerHTML = '<div class="hint">No teammates yet. Add some on the left.</div>';
+      return;
+    }
+    names.forEach((n, idx) => {
+      const item = document.createElement('div');
+      item.className = 'name-item';
+      item.innerHTML = `
+        <div class="left">
+          <span class="tag">${idx+1}</span>
+          <span class="name" title="${n}">${n}</span>
+        </div>
+        <div class="row">
+          <button class="btn ghost tiny-btn" data-move="up" data-idx="${idx}" title="Move up">▲</button>
+          <button class="btn ghost tiny-btn" data-move="down" data-idx="${idx}" title="Move down">▼</button>
+          <button class="btn danger tiny-btn" data-remove="${idx}" title="Remove">Remove</button>
+        </div>`;
+      list.appendChild(item);
+    });
+
+    list.querySelectorAll('[data-remove]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const i = +btn.getAttribute('data-remove');
+        const name = names[i];
+        if(confirm(`Remove "${name}"? This does not delete their totals or splits.`)){
+          names.splice(i,1);
+          saveJSON(LS_KEYS.TEAM, names);
+          syncAllocOrderToNames();
+          renderAll();
+        }
+      });
+    });
+    list.querySelectorAll('[data-move]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const i = +btn.getAttribute('data-idx');
+        const dir = btn.getAttribute('data-move');
+        const j = dir === 'up' ? i-1 : i+1;
+        if(j < 0 || j >= names.length) return;
+        [names[i], names[j]] = [names[j], names[i]];
+        saveJSON(LS_KEYS.TEAM, names);
+        syncAllocOrderToNames();
+        renderAll();
+      });
+    });
+  }
+
+  function renderAllocGrid(){
+    const grid = $("#alloc-grid");
+    grid.innerHTML = '';
+    if(allocOrder.length === 0){
+      grid.innerHTML = '<p class="hint">No teammates yet. Add some in the Team Setup tab.</p>';
+      return;
+    }
+    allocOrder.forEach(n => {
+      if(!names.includes(n)) return;
+      const btn = document.createElement('button');
+      btn.className = 'alloc-btn';
+      btn.textContent = n;
+      btn.addEventListener('click', () => allocateTo(n));
+      grid.appendChild(btn);
+    });
+  }
+
+  function renderTotals(){
+    const body = $("#totals-body");
+    body.innerHTML = '';
+    let grand = 0, count=0;
+
+    names.forEach(n => ensurePerson(n)); // ensure exists in totals & lastBy
+
+    const extra = Object.keys(totals).filter(k => !names.includes(k));
+    const all = [...names, ...extra];
+
+    all.forEach(n => {
+      const t = totals[n] ?? {ms:0,count:0};
+      grand += t.ms; count += t.count;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${n === '_Unassigned' ? '<span class="muted">Unassigned</span>' : n}</td>
+        <td class="right">${t.count}</td>
+        <td class="right mono">${fmt(t.ms)}</td>`;
+      body.appendChild(tr);
+    });
+
+    $("#grand-total").textContent = fmt(grand);
+    $("#alloc-count").textContent = count;
+  }
+
+  function renderClocks(){
+    $("#elapsed").textContent = fmt(getElapsedMs());
+  }
+
+  function renderSplits(){
+    const body = $("#splits-body");
+    body.innerHTML = '';
+    const recent = splits.slice(-25).reverse();
+    recent.forEach((s, i) => {
+      const tr = document.createElement('tr');
+      const when = new Date(s.ts).toLocaleString();
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td class="muted">${when}</td>
+        <td>${s.name === '_Unassigned' ? '<span class="muted">Unassigned</span>' : s.name}</td>
+        <td class="right mono">${fmt(s.ms)}</td>
+        <td class="right mono">${fmt(s.elapsed)}</td>`;
+      body.appendChild(tr);
+    });
+  }
+
+  function renderAll(){
+    updateTeamCount();
+    renderNamesList();
+    renderAllocGrid();
+    renderTotals();
+    renderSplits();
+  }
+
+  // ---------- Stopwatch Loop ----------
+  function tick(){
+    renderClocks();
+    if(running) rafId = requestAnimationFrame(tick);
+  }
+  function start(){
+    if(running) return;
+    running = true;
+    const t = now();
+    startTime = t - previouslyElapsed;
+
+    // Initialize per-person lastBy if missing (start from "now")
+    names.forEach(n => { if(!(n in lastBy)) lastBy[n] = getElapsedMs(); });
+    saveJSON(LS_KEYS.LAST, lastBy);
+
+    $("#start-pause").textContent = 'Pause';
+    tick();
+  }
+  function pause(){
+    if(!running) return;
+    running = false;
+    previouslyElapsed = now() - startTime;
+    cancelAnimationFrame(rafId);
+    $("#start-pause").textContent = 'Resume';
+    renderClocks();
+  }
+  function resetStopwatch(){
+    running = false;
+    cancelAnimationFrame(rafId);
+    startTime = 0;
+    previouslyElapsed = 0;
+    lastBy = {};                    // reset per-person last-split anchors
+    saveJSON(LS_KEYS.LAST, lastBy);
+    $("#start-pause").textContent = 'Start';
+    renderClocks();
+  }
+
+  // ---------- Allocation & Splits (Per-Person) ----------
+  function allocateTo(name){
+    if(!running){
+      alert('Start the stopwatch before allocating time.');
+      return;
+    }
+    const elapsed = getElapsedMs();
+    ensurePerson(name);
+    const prevLast = lastBy[name] ?? 0;
+    const rawDelta = elapsed - prevLast;
+    const delta = Math.max(0, Math.round(rawDelta));
+    if(delta <= 1){ return; } // ignore micro-taps / duplicates
+
+    // Update totals
+    totals[name].ms += delta;
+    totals[name].count += 1;
+    saveJSON(LS_KEYS.TOTALS, totals);
+
+    // Record split
+    const split = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+      ts: Date.now(),
+      name,
+      ms: delta,
+      elapsed: Math.round(elapsed)
+    };
+    splits.push(split);
+    saveJSON(LS_KEYS.SPLITS, splits);
+
+    // Move per-person anchor to now
+    lastBy[name] = elapsed;
+    saveJSON(LS_KEYS.LAST, lastBy);
+
+    // Undo info
+    undoStack.push({ name, deltaMs: delta, splitId: split.id, prevLast });
+
+    // Move button to bottom and refresh UI
+    moveToBottomInAllocOrder(name);
+    renderTotals();
+    renderClocks();
+    renderAllocGrid();
+    renderSplits();
+  }
+
+  function lapUnassigned(){
+    allocateTo('_Unassigned');
+  }
+
+  function undoLast(){
+    const last = undoStack.pop();
+    if(!last){ alert('Nothing to undo.'); return; }
+    ensurePerson(last.name);
+
+    // Revert totals
+    totals[last.name].ms = Math.max(0, totals[last.name].ms - last.deltaMs);
+    totals[last.name].count = Math.max(0, totals[last.name].count - 1);
+    saveJSON(LS_KEYS.TOTALS, totals);
+
+    // Remove corresponding split
+    const idx = splits.findIndex(s => s.id === last.splitId);
+    if(idx !== -1){ splits.splice(idx,1); saveJSON(LS_KEYS.SPLITS, splits); }
+
+    // Restore that person's last-split anchor
+    lastBy[last.name] = last.prevLast ?? 0;
+    saveJSON(LS_KEYS.LAST, lastBy);
+
+    renderTotals();
+    renderSplits();
+  }
+
+  function clearTotals(){
+    if(!confirm('Clear all totals (does NOT remove names or splits)?')) return;
+    totals = {};
+    saveJSON(LS_KEYS.TOTALS, totals);
+    renderTotals();
+  }
+
+  // ---------- Exports ----------
+  function exportTotalsCSV(){
+    const rows = [['Name','Allocations','Total_ms','Total_formatted']];
+    const extra = Object.keys(totals).filter(k => !names.includes(k));
+    const keys = [...names, ...extra];
+    keys.forEach(n => {
+      const t = totals[n] ?? {ms:0,count:0};
+      rows.push([n, t.count, t.ms, fmt(t.ms)]);
+    });
+    downloadCSV(rows, `team-timer-totals-${isoStamp()}.csv`);
+  }
+
+  function exportSplitsCSV(){
+    const rows = [['Timestamp_ISO','Local_Time','Name','Split_ms','Split_formatted','Elapsed_ms','Elapsed_formatted']];
+    splits.forEach(s => {
+      const iso = new Date(s.ts).toISOString();
+      const local = new Date(s.ts).toLocaleString();
+      rows.push([iso, local, s.name === '_Unassigned' ? 'Unassigned' : s.name, s.ms, fmt(s.ms), s.elapsed, fmt(s.elapsed)]);
+    });
+    downloadCSV(rows, `team-timer-splits-${isoStamp()}.csv`);
+  }
+
+  function downloadCSV(rows, filename){
+    const csv = rows.map(r => r.map(x => {
+      const str = String(x);
+      return /[",\n]/.test(str) ? `"${str.replace(/"/g,'""')}"` : str;
+    }).join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  function isoStamp(){ return new Date().toISOString().replace(/[:.]/g,'-'); }
+
+  // ---------- Tabs ----------
+  function showTab(which){
+    const setup = $("#panel-setup");
+    const timer = $("#panel-timer");
+    const tabSetup = $("#tab-setup");
+    const tabTimer = $("#tab-timer");
+    const showSetup = which === 'setup';
+    setup.hidden = !showSetup;
+    timer.hidden = showSetup;
+    tabSetup.setAttribute('aria-selected', showSetup ? 'true' : 'false');
+    tabTimer.setAttribute('aria-selected', showSetup ? 'false' : 'true');
+  }
+
+  // ---------- Events ----------
+  $("#tab-setup").addEventListener('click', () => showTab('setup'));
+  $("#tab-timer").addEventListener('click', () => showTab('timer'));
+
+  $("#add-name").addEventListener('click', () => {
+    const input = $("#name-input");
+    const v = input.value.trim();
+    if(!v) return;
+    if(names.includes(v)){ alert('That name is already on the team.'); return; }
+    names.push(v);
+    saveJSON(LS_KEYS.TEAM, names);
+    ensurePerson(v); // initializes totals + lastBy[v] = now
+    syncAllocOrderToNames();
+    saveJSON(LS_KEYS.TOTALS, totals);
+    saveJSON(LS_KEYS.LAST, lastBy);
+    input.value = '';
+    renderAll();
+  });
+
+  $("#name-input").addEventListener('keydown', e => { if(e.key === 'Enter') $("#add-name").click(); });
+
+  $("#import-names").addEventListener('click', async () => {
+    const text = prompt("Paste names separated by new lines or commas:");
+    if(!text) return;
+    const items = text.split(/[\n,]/).map(s => s.trim()).filter(Boolean);
+    let added = 0;
+    for(const n of items){
+      if(!names.includes(n)){ names.push(n); ensurePerson(n); added++; }
+    }
+    if(added === 0) alert('No new names were added (duplicates ignored).');
+    saveJSON(LS_KEYS.TEAM, names);
+    saveJSON(LS_KEYS.TOTALS, totals);
+    saveJSON(LS_KEYS.LAST, lastBy);
+    syncAllocOrderToNames();
+    renderAll();
+  });
+
+  $("#start-pause").addEventListener('click', () => running ? pause() : start());
+  $("#reset").addEventListener('click', resetStopwatch);
+  $("#lap-alloc").addEventListener('click', lapUnassigned);
+  $("#undo").addEventListener('click', undoLast);
+  $("#clear-totals").addEventListener('click', clearTotals);
+  $("#export-totals").addEventListener('click', exportTotalsCSV);
+  $("#export-splits").addEventListener('click', exportSplitsCSV);
+  $("#clear-splits").addEventListener('click', () => {
+    if(!confirm('Clear ALL stored splits? Totals remain unchanged.')) return;
+    splits = [];
+    saveJSON(LS_KEYS.SPLITS, splits);
+    renderSplits();
+  });
+
+  // ---------- Init ----------
+  syncAllocOrderToNames();
+  names.forEach(ensurePerson); // makes sure lastBy has entries for existing names
+  renderAll();
+  renderClocks();
+})();
+</script>
+</body>
+</html>
