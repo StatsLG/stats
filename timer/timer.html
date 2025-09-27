@@ -17,6 +17,9 @@
     background: radial-gradient(1200px 600px at 20% -10%, #0b1530 0%, var(--bg) 40%, #070b16 100%);
     color:var(--text); min-height:100dvh; display:flex; flex-direction:column; gap:16px;
   }
+  /* Ensure hidden panels actually disappear everywhere */
+  [hidden]{ display:none !important; }
+
   header{ padding:18px 20px 0; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
   h1{margin:0; font-weight:700; letter-spacing:.3px; font-size: clamp(20px, 3.2vw, 28px);}
   .sub{color:var(--muted); font-size:.95rem}
@@ -117,7 +120,7 @@
 
   <nav class="tabs" role="tablist" aria-label="Team Timer Tabs">
     <button class="tab-btn" role="tab" id="tab-setup" aria-controls="panel-setup" aria-selected="true">Team Setup</button>
-    <button class="tab-btn" role="tab" id="tab-timer" aria-controls="panel-timer" aria-selected="false">Timer</button>
+    <button class="tab-btn" role="tab" id="tab-timer" aria-controls="panel-timer" aria-selected="false">Timer & Allocation</button>
     <span class="spacer"></span>
     <span class="pill tiny" id="team-count">0 teammates</span>
   </nav>
@@ -148,9 +151,7 @@
           <h2>Stopwatch</h2>
           <div class="clock" aria-live="polite">
             <div id="elapsed" class="mono">00:00.00</div>
-            <small>
-              Per-person splits.
-            </small>
+            <small>Per-person splits.</small>
           </div>
           <div class="controls">
             <button class="btn ok" id="start-pause">Start</button>
@@ -158,8 +159,8 @@
             <button class="btn ghost" id="reset">Reset Stopwatch</button>
             <button class="btn ghost" id="undo">Undo Last Split</button>
             <button class="btn danger" id="clear-totals">Clear Totals</button>
-            <button class="btn" id="export-totals">Export Totals CSV</button>
-            <button class="btn" id="export-splits">Export Splits CSV</button>
+            <!-- Single export button -->
+            <button class="btn" id="export-csv">Export CSV (Splits + Elapsed)</button>
             <button class="btn ghost" id="clear-splits">Clear Splits</button>
           </div>
         </div>
@@ -218,7 +219,7 @@
     TOTALS: 'team_timer_totals_v1',
     SPLITS: 'team_timer_splits_v1',
     ORDER: 'team_timer_alloc_order_v1',
-    LAST: 'team_timer_last_by_name_v1' // NEW: per-person last split (in elapsed ms)
+    LAST: 'team_timer_last_by_name_v1' // per-person last split (in elapsed ms)
   };
 
   // ---------- State ----------
@@ -308,6 +309,8 @@
         if(confirm(`Remove "${name}"? This does not delete their totals or splits.`)){
           names.splice(i,1);
           saveJSON(LS_KEYS.TEAM, names);
+          delete lastBy[name]; // tidy per-person anchor
+          saveJSON(LS_KEYS.LAST, lastBy);
           syncAllocOrderToNames();
           renderAll();
         }
@@ -512,18 +515,7 @@
     renderTotals();
   }
 
-  // ---------- Exports ----------
-  function exportTotalsCSV(){
-    const rows = [['Name','Allocations','Total_ms','Total_formatted']];
-    const extra = Object.keys(totals).filter(k => !names.includes(k));
-    const keys = [...names, ...extra];
-    keys.forEach(n => {
-      const t = totals[n] ?? {ms:0,count:0};
-      rows.push([n, t.count, t.ms, fmt(t.ms)]);
-    });
-    downloadCSV(rows, `team-timer-totals-${isoStamp()}.csv`);
-  }
-
+  // ---------- Export (single CSV: Splits + Elapsed) ----------
   function exportSplitsCSV(){
     const rows = [['Timestamp_ISO','Local_Time','Name','Split_ms','Split_formatted','Elapsed_ms','Elapsed_formatted']];
     splits.forEach(s => {
@@ -603,8 +595,7 @@
   $("#lap-alloc").addEventListener('click', lapUnassigned);
   $("#undo").addEventListener('click', undoLast);
   $("#clear-totals").addEventListener('click', clearTotals);
-  $("#export-totals").addEventListener('click', exportTotalsCSV);
-  $("#export-splits").addEventListener('click', exportSplitsCSV);
+  document.getElementById('export-csv').addEventListener('click', exportSplitsCSV);
   $("#clear-splits").addEventListener('click', () => {
     if(!confirm('Clear ALL stored splits? Totals remain unchanged.')) return;
     splits = [];
@@ -617,6 +608,8 @@
   names.forEach(ensurePerson); // makes sure lastBy has entries for existing names
   renderAll();
   renderClocks();
+  // Ensure initial tab visibility is correctly applied
+  showTab('setup');
 })();
 </script>
 </body>
