@@ -1,192 +1,85 @@
-/* ================================
-   BCTC Brand Style Sheet
-   ================================ */
-
-/* ---- Colors (from brand guide) ---- */
-:root {
-  --blue: #00467f;    /* PMS 541 */
-  --gold: #e7a614;    /* PMS 131 */
-  --grey-light: #f5f5f5;
-  --grey-mid: #bbb;
-  --grey-dark: #444;
-  --bg: #ffffff;
-  --panel: #f9f9f9;
-  --card: #fdfdfd;
-  --text: #111;
-  --muted: #666;
-  --radius: 12px;
-  --shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-/* ---- Base ---- */
-html, body {
-  margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.4;
-}
-
-/* Panels & Cards */
-.wrap {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 16px;
-  padding: 16px;
-}
-.panel {
-  background: var(--panel);
-  border: 1px solid var(--grey-mid);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-.left {
-  padding: 14px;
-}
-.card {
-  background: var(--card);
-  border: 1px solid var(--grey-mid);
-  border-radius: var(--radius);
-  padding: 12px;
-  margin-bottom: 12px;
-  box-shadow: var(--shadow);
-}
-
-/* ---- Labels ---- */
-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--blue);
-  margin-bottom: 6px;
-}
-
-/* ---- Inputs & Selects ---- */
+/* === Forms & Controls (improve visibility) === */
 input,
 select,
 textarea {
   width: 95%;
   padding: 8px;
   border-radius: 8px;
-  border: 2px solid var(--grey-mid);   /* always visible border */
-  background: #ffffff;
-  color: var(--text);
+  border: 1px solid #ccc;      /* light neutral border */
+  background: #ffffff;         /* white background for contrast */
+  color: #111;                 /* dark text for readability */
   font-size: 14px;
-  transition: border-color .2s ease, box-shadow .2s ease;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: #000;                  /* solid black on focus */
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
 }
 
 input[type="color"] {
   height: 40px;
   padding: 0;
-  border: 2px solid var(--grey-mid);
-  background: transparent;
+  border: none;
+  background: transparent;     /* keep color picker clean */
 }
 
-/* ---- Buttons ---- */
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #00467f;              /* KCTCS official blue */
+  margin-bottom: 6px;
+}
+
 .btn {
   margin-top: 6px;
   padding: 8px 10px;
-  background: var(--blue);
+  background: #00467f;         /* KCTCS blue */
   color: #fff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  transition: background .2s ease, color .2s ease;
 }
 .btn:hover {
-  background: var(--gold);
+  background: #e7a614;         /* KCTCS gold on hover */
   color: #111;
 }
 
-/* ---- Dataset Preview ---- */
-.preview {
-  max-height: 200px;
-  overflow: auto;
-  border: 1px solid var(--grey-mid);
-  border-radius: 8px;
-  margin-top: 6px;
-  background: #fff;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-th, td {
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--grey-mid);
-  font-size: 13px;
-  color: var(--text);
-}
-th {
-  background: var(--blue);
-  color: #fff;
-  text-align: left;
-}
-
-/* ---- Chart Container ---- */
-.chart-wrap {
-  height: 520px;
-  width: 100%;
-  background: #fff;
-  border-radius: var(--radius);
-  border: 1px solid var(--grey-mid);
-  box-shadow: var(--shadow);
-}
-
-/* ===== HARD-FIX for input borders (always visible + black on focus) ===== */
-:root {
-  --field-border: #bbb;     /* mid grey */
-  --field-bg: #ffffff;
-  --field-ink: #111;
-}
-
-/* High specificity + !important so it beats old styles/resets */
-body .wrap .panel input,
-body .wrap .panel select,
-body .wrap .panel textarea,
-body .card input,
-body .card select,
-body .card textarea {
+/* === Forms & Controls (improve visibility) === */
+input,
+select,
+textarea {
   width: 95%;
   padding: 8px;
-  border: 2px solid var(--field-border) !important;  /* always visible */
-  border-radius: 8px !important;
-  background: var(--field-bg) !important;
-  color: var(--field-ink) !important;
-  font-size: 14px !important;
-  appearance: none;
-  -webkit-appearance: none;
-  background-clip: padding-box;
-  box-shadow: none !important;                        /* kill shadow-only borders */
-  outline: none !important;
+  border-radius: 8px;
+  border: 1px solid #ccc;      /* light neutral border */
+  background: #ffffff;         /* white background for contrast */
+  color: #111;                 /* dark text for readability */
+  font-size: 14px;
 }
 
-/* Focus: force solid black border */
-body .wrap .panel input:focus,
-body .wrap .panel select:focus,
-body .wrap .panel textarea:focus,
-body .card input:focus,
-body .card select:focus,
-body .card textarea:focus {
-  border-color: #000 !important;                      /* black when active */
-  box-shadow: 0 0 0 2px rgba(0,0,0,0.06) !important;  /* subtle focus ring */
-  outline: none !important;
-}
-
-/* Color picker still gets a visible edge */
-body .wrap .panel input[type="color"],
-body .card input[type="color"] {
+input[type="color"] {
   height: 40px;
   padding: 0;
-  border: 2px solid var(--field-border) !important;
-  background: transparent !important;
+  border: none;
+  background: transparent;     /* keep color picker clean */
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #00467f;              /* KCTCS official blue */
+  margin-bottom: 6px;
+}
+
+.btn {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: #00467f;         /* KCTCS blue */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn:hover {
+  background: #e7a614;         /* KCTCS gold on hover */
+  color: #111;
 }
