@@ -238,24 +238,32 @@ textarea {
   width: 95%;
   padding: 8px;
   border-radius: 8px;
-  border: 1px solid #ccc;      /* light neutral border */
-  background: #ffffff;         /* white background for contrast */
-  color: #111;                 /* dark text for readability */
+  border: 1px solid #bbb;      /* medium grey outline by default */
+  background: #ffffff;         /* white background */
+  color: #111;                 /* dark text */
   font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #000;          /* solid black when active */
+  outline: none;               /* remove default blue halo */
 }
 
 input[type="color"] {
   height: 40px;
   padding: 0;
-  border: none;
-  background: transparent;     /* keep color picker clean */
+  border: none;                /* no box border around color picker */
+  background: transparent;
 }
 
 label {
   display: block;
   font-size: 13px;
   font-weight: 600;
-  color: #00467f;              /* KCTCS official blue */
+  color: #00467f;              /* KCTCS blue */
   margin-bottom: 6px;
 }
 
