@@ -1,29 +1,79 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Stats Grapher — Modules Hub</title>
+  <title>BCTC Statistics Hub</title>
   <style>
     :root{
-      --bg:#0f172a; --panel:#111827; --card:#1f2937; --border:#1f2937; 
-      --text:#e5e7eb; --muted:#9ca3af; --btn:#14213d;
+      /* Brand */
+      --brand-blue: #00467f;  /* KCTCS Blue */
+      --brand-gold: #e7a614;  /* KCTCS Gold */
+
+      /* Theme */
+      --bg:#0f172a; 
+      --panel:#111827; 
+      --card:#1f2937; 
+      --border:#1f2937; 
+      --text:#e5e7eb; 
+      --muted:#9ca3af;
     }
-    body{margin:0;background:var(--bg);color:var(--text);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif}
+
+    /* Base */
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif
+    }
     .wrap{max-width:1100px;margin:0 auto;padding:20px}
-    header{margin-bottom:18px}
-    h1{font-size:22px;margin:0}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
-    .card{background:var(--card);border:1px solid #374151;border-radius:14px;
-      padding:16px;display:flex;flex-direction:column;gap:10px}
+    header{margin-bottom:18px;border-bottom:2px solid var(--brand-gold);padding-bottom:8px}
+    h1{font-size:22px;margin:0;color:var(--brand-blue)}
+    h2{font-size:16px;margin:0 0 8px}
+
+    /* Grid of cards */
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:14px
+    }
+    .card{
+      background:var(--card);
+      border:2px solid var(--brand-gold);     /* Gold outline on boxes */
+      border-radius:14px;
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:10px
+    }
     .card h2{font-size:18px;margin:0}
     .desc{color:var(--muted);font-size:14px;line-height:1.45}
     .btns{margin-top:auto}
-    a.btn{display:inline-block;padding:10px 12px;border-radius:10px;
-      border:1px solid #374151;background:var(--btn);color:var(--text);
-      text-decoration:none}
-    a.btn:hover{filter:brightness(1.1)}
+
+    /* Buttons: Blue fill, Gold border */
+    a.btn{
+      display:inline-block;
+      padding:10px 12px;
+      border-radius:10px;
+      border:2px solid var(--brand-gold);
+      background:var(--brand-blue);
+      color:#fff;
+      text-decoration:none
+    }
+    a.btn:hover{
+      filter:brightness(1.05);
+      box-shadow:0 0 0 3px rgba(231,166,20,0.25)
+    }
+
+    /* Section divider panel (optional wrapper) */
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px;
+      margin-top:16px
+    }
+
     footer{margin-top:20px;color:var(--muted);font-size:12px}
   </style>
 </head>
@@ -33,13 +83,11 @@
       <h1>BCTC Statistics Hub</h1>
     </header>
 
-
-      <h2 style="font-size:16px;margin:0 0 8px">Graphing Modules</h2>
+    <h2>Graphing Modules</h2>
     <section class="grid">
-      
       <article class="card">
         <h2>Bar Chart</h2>
-        <p class="desc">Create and export a bar chart..</p>
+        <p class="desc">Create and export a bar chart.</p>
         <div class="btns">
           <a class="btn" href="graphing/barchart.html">Create a Bar Chart</a>
         </div>
@@ -47,7 +95,7 @@
 
       <article class="card">
         <h2>Pie Chart</h2>
-        <p class="desc">Create and export a pie or donute chart.</p>
+        <p class="desc">Create and export a pie or donut chart.</p>
         <div class="btns">
           <a class="btn" href="graphing/piechart.html">Create a Pie Chart</a>
         </div>
@@ -61,7 +109,7 @@
         </div>
       </article>
 
-            <article class="card">
+      <article class="card">
         <h2>Box Plot</h2>
         <p class="desc">Create and export both one-way and two-way boxplots.</p>
         <div class="btns">
@@ -77,20 +125,18 @@
         </div>
       </article>
 
-
       <article class="card">
         <h2>Grouped Bar Chart</h2>
-        <p class="desc">Create and exports a bar chart grouped by another variable</p>
+        <p class="desc">Create and export a bar chart grouped by another variable.</p>
         <div class="btns">
           <a class="btn" href="graphing/barchart2way.html">Create a Grouped Bar</a>
         </div>
       </article>
     </section>
 
-    <section class="panel" style="margin-top:16px">
-      <h2 style="font-size:16px;margin:0 0 8px">Analysis Modules</h2>
+    <section class="panel">
+      <h2>Analysis Modules</h2>
       <div class="grid" style="margin-top:8px">
-
         <article class="card">
           <h2>Descriptive Summary</h2>
           <p class="desc">Numeric summaries (N, mean, median, SD, quartiles, IQR) and categorical counts/percents, with optional group-by and CSV export.</p>
@@ -106,9 +152,9 @@
             <a class="btn" href="inference/onemean.html">Open One-Sample Mean</a>
           </div>
         </article>
-
       </div>
     </section>
+
     <footer>
       Created by: Luke Garnett
     </footer>
