@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BCTC Statistics Hub — StatsLG</title>
+  <meta name="description" content="StatsLG: notes, graphing tools, and analysis labs for learning statistics at BCTC." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) ===== -->
+    <aside class="sidebar" aria-label="Site navigation">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-title">BCTC Statistics Hub</div>
+      </div>
+
+      <div class="nav-section">
+        <h3>Graphing</h3>
+        <nav class="nav">
+          <a href="/graphing/barchart.html">Bar Chart</a>
+          <a href="/graphing/piechart.html">Pie / Donut</a>
+          <a href="/graphing/histogram.html">Histogram</a>
+          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+          <a href="/graphing/barchart2way.html">Grouped Bar</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Analysis</h3>
+        <nav class="nav">
+          <a href="/descriptive/summary.html">Descriptive Summary</a>
+          <a href="stats/inference/onemean.html">One-Sample Mean Test</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Notes & Extras</h3>
+        <nav class="nav">
+          <a href="/sta210u/">STA 210U</a>
+          <a href="/sta220/">STA 220</a>
+          <a href="/sta296u/">STA 296U</a>
+          <a href="/game/pathyfinder.html">Pathy Finder</a>
+        </nav>
+      </div>
+
+      <div class="footer-note">
+        © <span id="yr"></span> StatsLG - Luke Garnett
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT (CLEAN & SIMPLE) ===== -->
+    <main>
+      <header>
+        <h1>Welcome</h1>
+        <p>Use the left panel to jump straight to graphing tools, analysis modules, or class notes.</p>
+      </header>
+
+      <section class="section">
+        <h2>Graphing Modules</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Bar Chart</h3>
+            <p>Create and export a bar chart.</p>
+            <div class="btns"><a class="btn" href="/graphing/barchart.html">Open</a></div>
+          </article>
+          <article class="card">
+            <h3>Pie / Donut</h3>
+            <p>Slice labels, legend control, PNG export.</p>
+            <div class="btns"><a class="btn" href="/graphing/piechart.html">Open</a></div>
+          </article>
+          <article class="card">
+            <h3>Histogram</h3>
+            <p>Auto binning + manual bins/bin width.</p>
+            <div class="btns"><a class="btn" href="/graphing/histogram.html">Open</a></div>
+          </article>
+          <article class="card">
+            <h3>Box &amp; Whisker</h3>
+            <p>Grouped or overall, outliers, PNG export.</p>
+            <div class="btns"><a class="btn" href="/graphing/boxplot.html">Open</a></div>
+          </article>
+          <article class="card">
+            <h3>Scatter + Regression</h3>
+            <p>Best-fit line, equation, r.</p>
+            <div class="btns"><a class="btn" href="/graphing/scatterplot.html">Open</a></div>
+          </article>
+          <article class="card">
+            <h3>Grouped Bar</h3>
+            <p>Count/Percent, grouped or stacked.</p>
+            <div class="btns"><a class="btn" href="/graphing/barchart2way.html">Open</a></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Analysis Modules</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Descriptive Summary</h3>
+            <p>Numerical &amp; categorical summaries, CSV export.</p>
+            <div class="btns"><a class="btn" href="/descriptive/summary.html">Open</a></div>
+          </article>
+          <article class="card">
+            <h3>One-Sample Mean Test</h3>
+            <p>t/z test for a mean with CI.</p>
+            <div class="btns"><a class="btn" href="/inference/onemean.html">Open</a></div>
+          </article>
+        </div>
+      </section>
+
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Footer year + last updated
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>
