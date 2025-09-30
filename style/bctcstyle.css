@@ -238,7 +238,7 @@ textarea {
   width: 95%;
   padding: 8px;
   border-radius: 8px;
-  border: 1px solid #bbb;      /* medium grey outline by default */
+  border-color: 1px solid #757575;      /* medium grey outline by default */
   background: #ffffff;         /* white background */
   color: #111;                 /* dark text */
   font-size: 14px;
