@@ -1,8 +1,8 @@
 /* =========================================================
-   StatsLG / BCTC — Brand CSS
+   StatsLG / BCTC — Brand CSS (FULL UPDATED)
    - KCTCS Blue (PMS 541): #00467f
    - KCTCS Gold (PMS 131): #e7a614
-   - Works for the Hub + Graphing/Analysis modules
+   - Shared for Hub + Graphing/Analysis modules
    ========================================================= */
 
 /* ---------- CSS Variables (Light baseline) ---------- */
@@ -21,7 +21,7 @@
   --panel: #f5f7fb;
   --card: #ffffff;
 
-  /* Controls */
+  /* Controls (defaults; overridden by hard-fix at bottom) */
   --input-bg: #ffffff;
   --input-border: #d1d5db;
   --input-ink: #111827;
@@ -69,7 +69,7 @@ body{
 a{ color: inherit; text-decoration: none }
 a:focus-visible{ outline:3px solid var(--kctcs-gold); outline-offset:3px; border-radius:6px }
 
-/* ---------- Layout: Two-Column (Sidebar + Main) ---------- */
+/* ---------- Layout: Two-Column (Sidebar + Main for hub) ---------- */
 .layout{
   display: grid;
   grid-template-columns: var(--sidebar-w) 1fr;
@@ -79,7 +79,7 @@ a:focus-visible{ outline:3px solid var(--kctcs-gold); outline-offset:3px; border
   .layout{ grid-template-columns: 1fr }
 }
 
-/* ---------- Sidebar (Left Panel) ---------- */
+/* ---------- Sidebar (Left Panel for hub) ---------- */
 .sidebar{
   background: var(--kctcs-blue);
   color: var(--kctcs-gold);
@@ -113,7 +113,7 @@ a:focus-visible{ outline:3px solid var(--kctcs-gold); outline-offset:3px; border
 .nav-divider{ height:1px; background: rgba(231,166,20,.4); margin:10px 0 }
 .sidebar .footer-note{ margin-top:auto; color:#fff; font-size:12px; opacity:.85 }
 
-/* ---------- Main Area ---------- */
+/* ---------- Main Area (hub) ---------- */
 main{ padding:24px; max-width:1100px }
 .header{
   border-bottom: 4px solid var(--kctcs-gold);
@@ -151,8 +151,10 @@ main{ padding:24px; max-width:1100px }
   background: var(--btn-bg);
   color: var(--btn-ink);
   font-weight:700;
+  transition: box-shadow .15s ease, transform .02s ease, background .15s ease, color .15s ease;
 }
 .btn:hover{ box-shadow:0 0 0 4px rgba(231,166,20,.22) }
+.btn:active{ transform: translateY(1px) }
 .btn.outline{
   background: transparent;
   color: var(--kctcs-blue);
@@ -164,7 +166,7 @@ main{ padding:24px; max-width:1100px }
   color: var(--ink);
 }
 
-/* ---------- Forms / Inputs ---------- */
+/* ---------- Forms / Inputs (baseline; hard-fix override at bottom) ---------- */
 label{ display:block; font-size:13px; color: var(--muted); margin-bottom:6px }
 input, select, textarea{
   width: 100%;
@@ -190,7 +192,7 @@ fieldset{ border:1px solid var(--rule); border-radius:10px; padding:10px 12px }
   border: 1px solid var(--rule);
 }
 
-/* ---------- Chart module layout helpers ---------- */
+/* ---------- Chart module layout helpers (left controls + right chart) ---------- */
 .wrap{
   display:grid;
   grid-template-columns: 320px 1fr;
@@ -200,11 +202,52 @@ fieldset{ border:1px solid var(--rule); border-radius:10px; padding:10px 12px }
 .left{ padding:14px }
 .preview{
   max-height:200px; overflow:auto;
-  border:1px solid var(--rule); border-radius:8px; margin-top:6px
+  border:1px solid var(--rule); border-radius:8px; margin-top:6px;
+  background: #fff;
 }
 .table{ width:100%; border-collapse:collapse }
 .table th,.table td{ padding:4px 6px; border-bottom:1px solid var(--rule); font-size:13px }
-.chart-wrap{ height:520px; width:100% }
+.chart-wrap{
+  height:520px; width:100%;
+  background: #fff;
+  border-radius: var(--radius);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow-1);
+}
+
+/* ---------- Small layout helpers used by module pages ---------- */
+.row{
+  display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;
+}
+.row > div{ flex:1 1 140px; }
+
+.row3{
+  display:grid; grid-template-columns: 1fr 1fr auto; gap:12px; align-items:end;
+}
+@media (max-width: 720px){
+  .row3{ grid-template-columns: 1fr; }
+}
+
+.checkline{
+  display:flex; align-items:center; gap:8px; padding-bottom: 2px;
+}
+
+/* muted text utility used by modules */
+.muted{ color: var(--muted); }
+
+/* ---------- Preview table (dataset) ---------- */
+table{ width:100%; border-collapse:collapse }
+th, td{
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 13px;
+  color: var(--ink);
+}
+th{
+  background: var(--kctcs-blue);
+  color: #fff;
+  text-align: left;
+}
 
 /* ---------- Utilities ---------- */
 .text-muted{ color: var(--muted) }
@@ -231,4 +274,53 @@ footer.site-footer{
   .btn{ display:none }
 }
 
+/* =========================================================
+   HARD-FIX for input borders (always visible + black on focus)
+   (Place at the very end so it wins the cascade)
+   ========================================================= */
+:root{
+  --field-border: #bbb;   /* mid grey */
+  --field-bg: #ffffff;
+  --field-ink: #111;
+}
 
+/* High specificity + !important to defeat old inline/legacy rules */
+body .wrap .panel input,
+body .wrap .panel select,
+body .wrap .panel textarea,
+body .card input,
+body .card select,
+body .card textarea{
+  width: 95%;
+  padding: 8px;
+  border: 2px solid var(--field-border) !important;  /* always visible */
+  border-radius: 8px !important;
+  background: var(--field-bg) !important;
+  color: var(--field-ink) !important;
+  font-size: 14px !important;
+  appearance: none; -webkit-appearance: none;
+  background-clip: padding-box;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Focus: solid black border + subtle ring */
+body .wrap .panel input:focus,
+body .wrap .panel select:focus,
+body .wrap .panel textarea:focus,
+body .card input:focus,
+body .card select:focus,
+body .card textarea:focus{
+  border-color: #000 !important;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.06) !important;
+  outline: none !important;
+}
+
+/* Color picker: visible edge */
+body .wrap .panel input[type="color"],
+body .card input[type="color"]{
+  height: 40px;
+  padding: 0;
+  border: 2px solid var(--field-border) !important;
+  background: transparent !important;
+}
