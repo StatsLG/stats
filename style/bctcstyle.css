@@ -141,3 +141,52 @@ th {
   border: 1px solid var(--grey-mid);
   box-shadow: var(--shadow);
 }
+
+/* ===== HARD-FIX for input borders (always visible + black on focus) ===== */
+:root {
+  --field-border: #bbb;     /* mid grey */
+  --field-bg: #ffffff;
+  --field-ink: #111;
+}
+
+/* High specificity + !important so it beats old styles/resets */
+body .wrap .panel input,
+body .wrap .panel select,
+body .wrap .panel textarea,
+body .card input,
+body .card select,
+body .card textarea {
+  width: 95%;
+  padding: 8px;
+  border: 2px solid var(--field-border) !important;  /* always visible */
+  border-radius: 8px !important;
+  background: var(--field-bg) !important;
+  color: var(--field-ink) !important;
+  font-size: 14px !important;
+  appearance: none;
+  -webkit-appearance: none;
+  background-clip: padding-box;
+  box-shadow: none !important;                        /* kill shadow-only borders */
+  outline: none !important;
+}
+
+/* Focus: force solid black border */
+body .wrap .panel input:focus,
+body .wrap .panel select:focus,
+body .wrap .panel textarea:focus,
+body .card input:focus,
+body .card select:focus,
+body .card textarea:focus {
+  border-color: #000 !important;                      /* black when active */
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.06) !important;  /* subtle focus ring */
+  outline: none !important;
+}
+
+/* Color picker still gets a visible edge */
+body .wrap .panel input[type="color"],
+body .card input[type="color"] {
+  height: 40px;
+  padding: 0;
+  border: 2px solid var(--field-border) !important;
+  background: transparent !important;
+}
