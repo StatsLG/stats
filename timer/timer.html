@@ -6,40 +6,73 @@
 <title>Team Timer — Per-Person Splits</title>
 <style>
   :root{
-    --bg:#0f172a; --panel:#111827; --muted:#94a3b8; --text:#e5e7eb;
-    --accent:#22c55e; --accent-2:#38bdf8; --warn:#f59e0b; --danger:#ef4444;
-    --ring: rgba(56,189,248,.35); --card:#0b1220; --shadow: 0 10px 30px rgba(0,0,0,.35);
-    --radius: 16px;
+    /* Base (light) */
+    --bg:#f7f9fc;
+    --panel:#ffffff;
+    --card:#ffffff;
+    --text:#0f172a;          /* near-black */
+    --muted:#64748b;         /* slate-500 */
+    --rule:#e5e7eb;          /* light border */
+    --shadow: 0 6px 24px rgba(15,23,42,.08);
+    --radius:16px;
+
+    /* Accents / states */
+    --accent:#0ea5e9;        /* sky-500 */
+    --accent-2:#22c55e;      /* green-500 */
+    --warn:#d97706;          /* amber-600 */
+    --danger:#dc2626;        /* red-600 */
+    --ring: rgba(14,165,233,.25);
+
+    /* Controls */
+    --field-bg:#ffffff;
+    --field-border:#cbd5e1;  /* slate-300 */
+    --field-ink:#0f172a;
   }
+
   *{box-sizing:border-box}
   body{
-    margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    background: radial-gradient(1200px 600px at 20% -10%, #0b1530 0%, var(--bg) 40%, #070b16 100%);
-    color:var(--text); min-height:100dvh; display:flex; flex-direction:column; gap:16px;
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height:100dvh;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
   }
-  /* Ensure hidden panels actually disappear everywhere */
   [hidden]{ display:none !important; }
 
-  header{ padding:18px 20px 0; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
-  h1{margin:0; font-weight:700; letter-spacing:.3px; font-size: clamp(20px, 3.2vw, 28px);}
-  .sub{color:var(--muted); font-size:.95rem}
+  /* Header */
+  header{
+    padding:18px 20px 0;
+    display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
+  }
+  h1{ margin:0; font-weight:800; letter-spacing:.2px; font-size: clamp(20px, 3.2vw, 28px); }
+  .sub{ color:var(--muted); font-size:.95rem }
+
+  /* Tabs */
   .tabs{ display:flex; gap:8px; padding:0 20px; flex-wrap:wrap; }
   .tab-btn{
-    appearance:none; border:none; background:linear-gradient(180deg, #0f1a33, #0b1220);
-    color:var(--text); padding:10px 14px; border-radius:999px; cursor:pointer;
-    box-shadow: inset 0 0 0 1px rgba(148,163,184,.25), 0 8px 18px rgba(0,0,0,.25);
-    transition:.2s transform,.2s background,.2s box-shadow;
+    appearance:none; border:1px solid var(--field-border);
+    background:#fff; color:var(--text);
+    padding:10px 14px; border-radius:999px; cursor:pointer;
+    box-shadow: 0 1px 1px rgba(15,23,42,.04);
+    transition:.2s transform,.2s background,.2s box-shadow,.2s border-color;
   }
+  .tab-btn:hover{ border-color:#94a3b8; }
   .tab-btn[aria-selected="true"]{
-    background: linear-gradient(180deg, #0f2338, #0b1c2b);
-    box-shadow: inset 0 0 0 2px var(--ring), 0 12px 24px rgba(0,0,0,.35);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--ring);
   }
   .tab-btn:active{ transform: translateY(1px) }
+
+  /* Layout */
   main{ padding: 0 20px 24px; }
   .panel{
-    background: linear-gradient(180deg, #0d1424, var(--panel));
+    background: var(--panel);
     border-radius: var(--radius);
-    box-shadow: var(--shadow), inset 0 0 0 1px rgba(148,163,184,.10);
+    box-shadow: var(--shadow);
+    border:1px solid var(--rule);
     padding:18px;
   }
   .grid{ display:grid; gap:14px; }
@@ -47,70 +80,118 @@
     .setup-grid{ grid-template-columns: 1.2fr 1fr; align-items:start; }
     .timer-grid{ grid-template-columns: 1fr 1fr; }
   }
+
+  /* Cards */
   .card{
-    background: linear-gradient(180deg, #0b1220, var(--card));
-    border-radius: 14px; padding:14px; box-shadow: inset 0 0 0 1px rgba(148,163,184,.08);
+    background: var(--card);
+    border-radius: 14px;
+    padding:14px;
+    border:1px solid var(--rule);
+    box-shadow: 0 1px 2px rgba(15,23,42,.06);
   }
-  h2{margin:4px 0 12px 0; font-size:1.1rem; color:#eaf2ff}
+  h2{ margin:4px 0 12px 0; font-size:1.1rem; color:#0b1320; }
+
+  /* Forms */
   label{ display:block; font-size:.9rem; color:var(--muted); margin-bottom:6px; }
   input[type="text"]{
-    width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(148,163,184,.25);
-    background:#0a1220; color:var(--text); outline:none;
+    width:100%; padding:12px 14px; border-radius:12px;
+    border:1.5px solid var(--field-border);
+    background:var(--field-bg); color:var(--field-ink);
+    outline:none;
+    transition: border-color .15s, box-shadow .15s;
   }
-  input[type="text"]:focus{ border-color: var(--accent-2); box-shadow: 0 0 0 4px var(--ring) }
+  input[type="text"]:focus{
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--ring);
+  }
   .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+
+  /* Buttons */
   .btn{
-    appearance:none; border:none; cursor:pointer; padding:10px 12px; border-radius:12px; color:#06111b; font-weight:600;
-    background: linear-gradient(180deg, #e9f8ff, #cfeaff);
-    box-shadow: inset 0 0 0 1px rgba(12,44,66,.25), 0 8px 18px rgba(0,0,0,.25);
-    transition:.18s transform,.18s filter,.18s opacity;
+    appearance:none; border:1px solid var(--field-border);
+    cursor:pointer; padding:10px 12px; border-radius:12px;
+    color:#0b1320; font-weight:700; background:#ffffff;
+    box-shadow: 0 1px 2px rgba(15,23,42,.06);
+    transition:.18s transform,.18s filter,.18s opacity,.18s border-color,.18s background;
   }
+  .btn:hover{ border-color:#94a3b8; background:#f8fafc; }
   .btn:active{ transform: translateY(1px) }
-  .btn.ghost{ background: transparent; color:var(--text); box-shadow: inset 0 0 0 1px rgba(148,163,184,.25); }
-  .btn.danger{ background: linear-gradient(180deg, #ffe9e9, #ffd2d2); color:#3c0a0a }
-  .btn.warn{ background: linear-gradient(180deg, #fff4da, #ffe7b3); color:#3a2400 }
-  .btn.ok{ background: linear-gradient(180deg, #d9ffe8, #b6ffd2); color:#0f3a25 }
-  .pill{ font-size:.8rem; padding:6px 10px; border-radius:999px; background:#0a1626; color:var(--muted) }
-  .names-list{ display:flex; flex-direction:column; gap:8px; max-height:50vh; overflow:auto; padding-right:4px}
+
+  .btn.ghost{
+    background: transparent;
+    color:var(--text);
+    border:1px dashed var(--field-border);
+  }
+  .btn.ok{
+    background:#e6f9f1; color:#064e3b; border-color:#9ae6b4;
+  }
+  .btn.warn{
+    background:#fff4e5; color:#7c3b0a; border-color:#f6c76a;
+  }
+  .btn.danger{
+    background:#fff1f1; color:#7f1d1d; border-color:#f5a5a5;
+  }
+
+  .pill{
+    font-size:.8rem; padding:6px 10px; border-radius:999px;
+    background:#eef2f7; color:#0b1320; border:1px solid var(--rule);
+  }
+
+  /* Lists */
+  .names-list{ display:flex; flex-direction:column; gap:8px; max-height:50vh; overflow:auto; padding-right:4px }
   .name-item{
     display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px;
-    border-radius:12px; background:#0b1424; box-shadow: inset 0 0 0 1px rgba(148,163,184,.10);
+    border-radius:12px; background:#ffffff; border:1px solid var(--rule);
   }
   .name-item .left{ display:flex; align-items:center; gap:8px; min-width:0 }
-  .tag{ background:#0e2338; color:#cde9ff; font-weight:700; border-radius:8px; padding:4px 8px; font-size:.85rem; }
+  .tag{
+    background:#e6f1ff; color:#0b4aa8; font-weight:800; border-radius:8px; padding:4px 8px; font-size:.85rem;
+    border:1px solid #c7defe;
+  }
   .name{ font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  /* Timer */
   .timer-wrap{ display:flex; flex-direction:column; gap:14px }
   .clock{
     font-variant-numeric: tabular-nums;
     text-align:center; font-weight:800; letter-spacing:.5px;
     font-size: clamp(32px, 7.5vw, 64px);
     padding:12px 10px; border-radius:14px;
-    background: radial-gradient(800px 200px at 50% -50%, #16355a 0, #0b1220 50%); 
-    box-shadow: inset 0 0 0 1px rgba(56,189,248,.25);
+    background: #ffffff;
+    border:1px solid var(--rule);
+    box-shadow: inset 0 0 0 1px rgba(15,23,42,.04);
   }
   .clock small{ display:block; font-size: clamp(11px, 1.8vw, 13px); color:var(--muted); margin-top:6px }
+
   .controls{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
-  /* Vertical allocation buttons (mobile-friendly) */
+
+  /* Allocation buttons */
   .alloc-grid{ display:grid; gap:10px; grid-template-columns: 1fr; }
   .alloc-btn{
     width:100%;
-    background: linear-gradient(180deg, #eafff2, #d2ffe4); color:#0f3a25;
-    border-radius:14px; padding:14px 12px; font-weight:800; cursor:pointer; border:none;
-    box-shadow: inset 0 0 0 1px rgba(10,76,48,.2), 0 10px 18px rgba(0,0,0,.25);
-    transition:.15s transform;
+    background:#f1f9ff; color:#0b3a53;
+    border-radius:14px; padding:14px 12px; font-weight:800; cursor:pointer; border:1px solid #cfe3f5;
+    box-shadow: 0 1px 2px rgba(15,23,42,.06);
+    transition:.15s transform,.15s background,.15s border-color;
   }
+  .alloc-btn:hover{ background:#e9f4ff; border-color:#9ec7ec; }
   .alloc-btn:active{ transform: translateY(1px) }
-  table{ width:100%; border-collapse:collapse; font-size:.95rem }
-  th, td{ padding:10px 8px; text-align:left; border-bottom:1px solid rgba(148,163,184,.15) }
-  th{ color:#cfe2ff; font-weight:700 }
+
+  /* Tables */
+  table{ width:100%; border-collapse:collapse; font-size:.95rem; background:#fff; border:1px solid var(--rule); border-radius:12px; overflow:hidden; }
+  th, td{ padding:10px 8px; text-align:left; border-bottom:1px solid var(--rule) }
+  th{ background:#f1f5f9; color:#0b1320; font-weight:800 }
   tfoot td{ font-weight:800 }
-  .muted{ color:var(--muted) }
   .right{ text-align:right }
-  .tiny{ font-size:.8rem }
-  .hint{ color:var(--muted); font-size:.9rem }
-  .spacer{ flex:1 }
   .mono{ font-variant-numeric: tabular-nums; }
+
+  /* Utility */
+  .muted{ color:var(--muted) }
+  .tiny{ font-size:.8rem }
+  .spacer{ flex:1 }
+  .hint{ color:var(--muted); font-size:.9rem }
 </style>
+
 </head>
 <body>
   <header>
