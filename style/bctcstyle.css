@@ -230,3 +230,46 @@ footer.site-footer{
   .layout{ grid-template-columns: 1fr }
   .btn{ display:none }
 }
+
+/* === Forms & Controls (improve visibility) === */
+input,
+select,
+textarea {
+  width: 95%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;      /* light neutral border */
+  background: #ffffff;         /* white background for contrast */
+  color: #111;                 /* dark text for readability */
+  font-size: 14px;
+}
+
+input[type="color"] {
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;     /* keep color picker clean */
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #00467f;              /* KCTCS official blue */
+  margin-bottom: 6px;
+}
+
+.btn {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: #00467f;         /* KCTCS blue */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn:hover {
+  background: #e7a614;         /* KCTCS gold on hover */
+  color: #111;
+}
