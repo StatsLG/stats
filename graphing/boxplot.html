@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Stats Grapher — Module 8 (Box & Whisker)</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-boxplot@4.3.0/dist/chartjs-chart-boxplot.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     body {background:#0f172a;color:#e5e7eb;font-family:sans-serif;margin:0}
@@ -15,12 +14,17 @@
     .card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:12px;margin-bottom:12px}
     label{display:block;font-size:13px;color:#9ca3af;margin-bottom:6px}
     input,select{width:95%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb}
+    input[type="color"]{height:40px;padding:0}
     .btn{margin-top:6px;padding:8px 10px;background:#14213d;color:#e5e7eb;border:none;border-radius:8px;cursor:pointer}
     .btn:hover{filter:brightness(1.1)}
     .preview{max-height:200px;overflow:auto;border:1px solid #374151;border-radius:8px;margin-top:6px}
     table{width:100%;border-collapse:collapse}
     th,td{padding:4px 6px;border-bottom:1px solid #303744;font-size:13px}
     .chart-wrap{height:520px;width:100%}
+    .muted{color:#9ca3af;font-size:12px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .row3{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
+    .checkline{display:flex;align-items:center;gap:8px;margin-top:6px}
   </style>
 </head>
 <body>
@@ -31,6 +35,7 @@
         <input id="file" type="file" accept=".csv, .xlsx" />
         <button class="btn" id="loadBtn">Load File</button>
         <button class="btn" id="sampleBtn">Load Sample</button>
+        <div id="status" class="muted" style="margin-top:6px"></div>
       </div>
 
       <div class="card">
@@ -38,9 +43,48 @@
         <select id="numCol"><option value="">—</option></select>
         <label>Group By (optional)</label>
         <select id="groupCol"><option value="">— none —</option></select>
+
         <label>Chart Title</label><input id="titleInput" type="text" placeholder="Boxplot Title" />
+        <label>X-Axis Label</label><input id="xlabelInput" type="text" placeholder="X Axis Label" />
+        <label>Y-Axis Label</label><input id="ylabelInput" type="text" placeholder="Y Axis Label" />
+
+        <div class="row3">
+          <div><label>Y-Min (auto)</label><input id="yMin" type="number" step="any" placeholder="auto" /></div>
+          <div><label>Y-Max (auto)</label><input id="yMax" type="number" step="any" placeholder="auto" /></div>
+          <div class="checkline"><input id="yZero" type="checkbox" /><label for="yZero" style="margin:0">Force Y=0</label></div>
+        </div>
+
         <button class="btn" id="drawBtn">Draw Boxplot</button>
         <button class="btn" id="downloadPNGBtn">Download PNG</button>
+      </div>
+
+      <div class="card">
+        <label>Box Fill</label><input id="fillColor" type="color" value="#60a5fa" />
+        <label>Box Border</label><input id="borderColor" type="color" value="#1f2937" />
+        <label>Outlier Color</label><input id="outlierColor" type="color" value="#f87171" />
+        <label>Fill Opacity</label><input id="opacity" type="number" min="0" max="1" step="0.1" value="0.8" />
+        <label>Graph Background</label><input id="bgColor" type="color" value="#ffffff" />
+        <div class="row">
+          <div>
+            <label>Chart Height (px)</label><input id="chartH" type="number" value="520" />
+          </div>
+          <div>
+            <label>Chart Width (px)</label><input id="chartW" type="number" value="800" />
+          </div>
+        </div>
+        <button class="btn" id="applySizeBtn">Apply Size</button>
+      </div>
+
+      <div class="card">
+        <label>Font Family</label>
+        <select id="fontFamily">
+          <option value="sans-serif">Sans-serif</option>
+          <option value="serif">Serif</option>
+          <option value="monospace">Monospace</option>
+          <option value="cursive">Cursive</option>
+        </select>
+        <label>Font Size (px)</label>
+        <input id="fontSize" type="number" value="12" />
       </div>
 
       <div class="card">
@@ -55,23 +99,353 @@
   </div>
 
 <script>
-let DATA=[]; let HEADERS=[]; let currentChart=null;
+let DATA = [];
+let HEADERS = [];
+let currentChart = null;
 
-function buildTable(rows){ if(!rows.length) return '<div>No data</div>'; const headers=Object.keys(rows[0]); let html='<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>'; for(const r of rows.slice(0,20)) html+='<tr>'+headers.map(h=>`<td>${r[h]}</td>`).join('')+'</tr>'; html+='</tbody></table>'; return html; }
+function setStatus(msg){ document.getElementById('status').innerHTML = msg||''; }
 
-async function loadFile(file){ const buf=await file.arrayBuffer(); const wb=XLSX.read(buf,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; setData(XLSX.utils.sheet_to_json(ws,{defval:''})); }
+function validAlpha(a){
+  let x = parseFloat(a);
+  if(isNaN(x)) x = 0.8;
+  if(x < 0) x = 0; if(x > 1) x = 1;
+  return x;
+}
 
-function setData(rows){ DATA=rows; HEADERS=rows.length?Object.keys(rows[0]):[]; const numCols=HEADERS.filter(h=> DATA.some(r=> !isNaN(parseFloat(r[h])) )); const numSel=document.getElementById('numCol'); const grpSel=document.getElementById('groupCol'); numSel.innerHTML='<option value="">—</option>'+numCols.map(h=>`<option value="${h}">${h}</option>`).join(''); grpSel.innerHTML='<option value="">— none —</option>'+HEADERS.map(h=>`<option value="${h}">${h}</option>`).join(''); document.getElementById('preview').innerHTML=buildTable(DATA); }
+function hexToRgba(hex, alpha=1){
+  const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex || '#60a5fa');
+  const a = validAlpha(alpha);
+  if(!m) return `rgba(96,165,250,${a})`;
+  const r = parseInt(m[1],16), g = parseInt(m[2],16), b = parseInt(m[3],16);
+  return `rgba(${r},${g},${b},${a})`;
+}
 
-function groupValues(col){ const map={}; for(const r of DATA){ const v=col? String(r[col]).trim(): '(all)'; if(r && v!==''){ (map[v]=map[v]||[]).push(r); } } return map; }
+function buildTable(rows){
+  if(!rows.length) return '<div>No data loaded</div>';
+  const headers = Object.keys(rows[0]);
+  let html = '<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>';
+  for(const r of rows.slice(0,20)){
+    html+='<tr>'+headers.map(h=>`<td>${r[h]}</td>`).join('')+'</tr>';
+  }
+  html+='</tbody></table>';
+  return html;
+}
 
-function drawBox(){ const num=document.getElementById('numCol').value; if(!num) return alert('Pick a numeric column'); const group=document.getElementById('groupCol').value; const groups=groupValues(group); const labels=Object.keys(groups); const datasets=[{ label:num, data:labels.map(g=> groups[g].map(r=> parseFloat(r[num])).filter(v=>!isNaN(v))) }]; if(currentChart) currentChart.destroy(); currentChart=new Chart(document.getElementById('chart'),{ type:'boxplot', data:{ labels:labels, datasets:datasets }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ title:{ display:true, text: document.getElementById('titleInput').value||'Boxplot'} } } }); }
+async function loadFile(file){
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf,{type:'array'});
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    setData(XLSX.utils.sheet_to_json(ws,{defval:''}));
+  }catch(e){
+    console.error(e);
+    setStatus('Failed to parse file. Use CSV or XLSX.');
+  }
+}
 
-function downloadPNG(){ if(!currentChart) return; const a=document.createElement('a'); a.href=currentChart.toBase64Image(); a.download='boxplot.png'; a.click(); }
+function setData(rows){
+  DATA = rows || [];
+  HEADERS = rows.length?Object.keys(rows[0]):[];
+  const numericCols = HEADERS.filter(h => DATA.some(r => Number.isFinite(parseNumber(r[h])) ));
+  document.getElementById('numCol').innerHTML = '<option value="">—</option>' + numericCols.map(h=>`<option value="${h}">${h}</option>`).join('');
+  document.getElementById('groupCol').innerHTML = '<option value="">— none —</option>' + HEADERS.map(h=>`<option value="${h}">${h}</option>`).join('');
+  document.getElementById('preview').innerHTML = buildTable(DATA);
+  setStatus(`Loaded ${DATA.length} rows / ${HEADERS.length} cols`);
+}
 
-const SAMPLE=[ {Class:'A', Score:72}, {Class:'A', Score:75}, {Class:'A', Score:70}, {Class:'A', Score:68}, {Class:'B', Score:80}, {Class:'B', Score:85}, {Class:'B', Score:78}, {Class:'C', Score:90}, {Class:'C', Score:92}, {Class:'C', Score:88} ];
+// forgiving numeric parser
+function parseNumber(v){
+  if(v===null || v===undefined) return NaN;
+  if(typeof v === 'number') return Number.isFinite(v) ? v : NaN;
+  const s = String(v).trim().replace(/[$%]/g,'').replace(/,/g,'').replace(/\s+/g,'');
+  const x = parseFloat(s);
+  return Number.isFinite(x) ? x : NaN;
+}
 
-window.addEventListener('DOMContentLoaded',()=>{ document.getElementById('loadBtn').onclick=()=>{ const f=document.getElementById('file').files[0]; if(f) loadFile(f); }; document.getElementById('sampleBtn').onclick=()=>{ setData(SAMPLE); }; document.getElementById('drawBtn').onclick=drawBox; document.getElementById('downloadPNGBtn').onclick=downloadPNG; });
+function groupMap(col){
+  const out = new Map();
+  for(const r of DATA){
+    const key = col ? (String(r[col] ?? '').trim() || '(missing)') : '(all)';
+    if(!out.has(key)) out.set(key, []);
+    out.get(key).push(r);
+  }
+  return out;
+}
+
+function quantile(sorted, p){
+  const n = sorted.length;
+  if(n===0) return NaN;
+  const idx = (n-1)*p;
+  const lo = Math.floor(idx), hi = Math.ceil(idx);
+  return (lo===hi) ? sorted[lo] : (sorted[lo]*(hi-idx) + sorted[hi]*(idx-lo));
+}
+
+function computeBoxStats(vals){
+  const v = vals.slice().sort((a,b)=>a-b);
+  const n = v.length;
+  if(n===0) return null;
+  const q1 = quantile(v,0.25), med = quantile(v,0.5), q3 = quantile(v,0.75);
+  const iqr = q3 - q1;
+  const lowerFence = q1 - 1.5*iqr;
+  const upperFence = q3 + 1.5*iqr;
+  let lo = v[0], hi = v[n-1];
+  for(let i=0;i<n;i++){ if(v[i] >= lowerFence){ lo = v[i]; break; } }
+  for(let i=n-1;i>=0;i--){ if(v[i] <= upperFence){ hi = v[i]; break; } }
+  const outliers = v.filter(x => x < lo || x > hi);
+  return { min: v[0], q1, median: med, q3, max: v[n-1], whiskerLow: lo, whiskerHigh: hi, outliers };
+}
+
+// background painter
+const backgroundPlugin = {
+  id: 'custom_bgcolor',
+  beforeDraw: (chart) => {
+    const ctx = chart.ctx;
+    const bg = (document.getElementById('bgColor')?.value) || '#ffffff';
+    ctx.save(); ctx.fillStyle = bg; ctx.fillRect(0,0,chart.width,chart.height); ctx.restore();
+  }
+};
+
+// box/whisker drawer
+const boxDrawer = {
+  id: 'box_drawer',
+  afterDatasetsDraw(chart){
+    const ds = chart.data.datasets[0];
+    if(!ds || !Array.isArray(ds._boxStats)) return;
+
+    const {ctx, scales:{x,y}} = chart;
+    const fill = ds._fill || 'rgba(96,165,250,0.8)';
+    const border = ds._border || '#1f2937';
+    const outlierColor = ds._outlier || '#f87171';
+    const lineW = 1;
+
+    const step = (x.getPixelForTick(1) - x.getPixelForTick(0)) || 60;
+    const bw = Math.min(40, Math.max(20, step - 20));
+    const half = bw/2;
+
+    ctx.save();
+    ctx.lineWidth = lineW;
+    ctx.strokeStyle = border;
+    ctx.fillStyle = fill;
+
+    ds._boxStats.forEach((s, i)=>{
+      if(!s) return;
+      const xc = x.getPixelForValue(i);
+      const yQ1 = y.getPixelForValue(s.q1);
+      const yQ3 = y.getPixelForValue(s.q3);
+      const yMed = y.getPixelForValue(s.median);
+      const yLo  = y.getPixelForValue(s.whiskerLow);
+      const yHi  = y.getPixelForValue(s.whiskerHigh);
+
+      // whiskers
+      ctx.beginPath();
+      ctx.moveTo(xc, yLo); ctx.lineTo(xc, yQ1);
+      ctx.moveTo(xc, yQ3); ctx.lineTo(xc, yHi);
+      ctx.stroke();
+
+      // caps
+      ctx.beginPath();
+      ctx.moveTo(xc - half/1.5, yLo); ctx.lineTo(xc + half/1.5, yLo);
+      ctx.moveTo(xc - half/1.5, yHi); ctx.lineTo(xc + half/1.5, yHi);
+      ctx.stroke();
+
+      // box
+      const top = Math.min(yQ1, yQ3);
+      const height = Math.abs(yQ3 - yQ1);
+      ctx.beginPath();
+      ctx.rect(xc - half, top, bw, height);
+      ctx.fill();
+      ctx.stroke();
+
+      // median
+      ctx.beginPath();
+      ctx.moveTo(xc - half, yMed); ctx.lineTo(xc + half, yMed);
+      ctx.stroke();
+
+      // outliers
+      if(s.outliers && s.outliers.length){
+        ctx.fillStyle = outlierColor;
+        s.outliers.forEach(v=>{
+          const yy = y.getPixelForValue(v);
+          ctx.beginPath(); ctx.arc(xc, yy, 3, 0, Math.PI*2); ctx.fill();
+        });
+        ctx.fillStyle = fill;
+      }
+    });
+
+    ctx.restore();
+  }
+};
+
+function computeColors(){
+  const fillHex = document.getElementById('fillColor').value;
+  const borderHex = document.getElementById('borderColor').value;
+  const outlierHex = document.getElementById('outlierColor').value;
+  const alpha = validAlpha(document.getElementById('opacity').value);
+  const bgHex = document.getElementById('bgColor').value || '#ffffff';
+  return { fill: hexToRgba(fillHex, alpha), border: borderHex, outlier: outlierHex, bg: bgHex };
+}
+
+function applySize(){
+  const wrap=document.querySelector('.chart-wrap');
+  const h=parseInt(document.getElementById('chartH').value,10);
+  if(!isNaN(h)) wrap.style.height=h+'px';
+  const w=document.getElementById('chartW').value;
+  wrap.style.width = w ? (w+'px') : '100%';
+}
+
+function computeYRange(stats){
+  const manualMin = parseFloat(document.getElementById('yMin').value);
+  const manualMax = parseFloat(document.getElementById('yMax').value);
+  const forceZero = document.getElementById('yZero').checked;
+
+  let lo = Math.min(...stats.map(s=>s.whiskerLow));
+  let hi = Math.max(...stats.map(s=>s.whiskerHigh));
+  if(!isFinite(lo) || !isFinite(hi)) { lo = 0; hi = 1; }
+
+  // pad by 5% range
+  let pad = (hi - lo) * 0.05;
+  if(!isFinite(pad) || pad === 0) pad = 1;
+
+  let minY = isFinite(manualMin) ? manualMin : lo - pad;
+  let maxY = isFinite(manualMax) ? manualMax : hi + pad;
+
+  if(forceZero) minY = Math.min(0, minY); // include 0 if requested
+  if(minY === maxY){ maxY = minY + 1; }  // avoid degenerate scale
+  return {minY, maxY};
+}
+
+function drawBox(){
+  const num = document.getElementById('numCol').value;
+  if(!num) return alert('Pick a numeric column');
+  const group = document.getElementById('groupCol').value;
+
+  const gmap = groupMap(group);
+  const labels = [];
+  const arrays = [];
+  let totalVals = 0;
+
+  for(const [g, rows] of gmap.entries()){
+    const vals = rows.map(r => parseNumber(r[num])).filter(Number.isFinite);
+    if(vals.length > 0){
+      labels.push(g);
+      arrays.push(vals);
+      totalVals += vals.length;
+    }
+  }
+  if(arrays.length === 0){
+    setStatus('No numeric values were found for the selected column/group. Try a different column or remove grouping.');
+    alert('No numeric values found after parsing. Check your selections or data format.');
+    return;
+  }
+
+  const statsPerGroup = arrays.map(v => computeBoxStats(v));
+  const medians = statsPerGroup.map(s => s.median);
+
+  const {fill,border,outlier} = computeColors();
+  applySize();
+  if(currentChart) currentChart.destroy();
+
+  const fontFamily=document.getElementById('fontFamily').value;
+  const fontSize=parseInt(document.getElementById('fontSize').value,10)||12;
+
+  const chartTitle=document.getElementById('titleInput').value || 'Box & Whisker';
+  const xlabel=document.getElementById('xlabelInput').value || (group ? group : '');
+  const ylabel=document.getElementById('ylabelInput').value || num;
+
+  const {minY, maxY} = computeYRange(statsPerGroup);
+
+  currentChart=new Chart(document.getElementById('chart'),{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{
+        label:num,
+        data: medians,
+        backgroundColor:'rgba(0,0,0,0)',
+        borderColor:'rgba(0,0,0,0)',
+        borderWidth:0,
+        _boxStats: statsPerGroup,
+        _fill: fill,
+        _border: border,
+        _outlier: outlier
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        title:{display:true,text:chartTitle,font:{family:fontFamily,size:fontSize+2}},
+        tooltip:{
+          callbacks:{
+            label:(ctx)=>{
+              const s = ctx.dataset._boxStats?.[ctx.dataIndex];
+              if(!s) return ctx.formattedValue;
+              return [
+                `min: ${s.min}`,
+                `Q1 : ${s.q1}`,
+                `med: ${s.median}`,
+                `Q3 : ${s.q3}`,
+                `max: ${s.max}`
+              ];
+            }
+          },
+          bodyFont:{family:fontFamily,size:fontSize}
+        }
+      },
+      scales:{
+        x:{title:{display:!!xlabel,text:xlabel,font:{family:fontFamily,size:fontSize}},
+           ticks:{font:{family:fontFamily,size:fontSize}}},
+        y:{title:{display:!!ylabel,text:ylabel,font:{family:fontFamily,size:fontSize}},
+           ticks:{font:{family:fontFamily,size:fontSize}},
+           min: minY,
+           max: maxY}
+      }
+    },
+    plugins:[backgroundPlugin, boxDrawer]
+  });
+
+  setStatus(`<span class="muted">Groups: ${labels.length} · Values: ${totalVals}${group? ` · Grouped by: ${group}`:''}</span>`);
+}
+
+function refreshColors(){
+  if(!currentChart) return;
+  const {fill,border,outlier} = computeColors();
+  const ds = currentChart.data.datasets[0];
+  ds._fill = fill; ds._border = border; ds._outlier = outlier;
+  currentChart.update();
+}
+function refreshBg(){ if(currentChart) currentChart.update(); }
+
+function downloadPNG(){
+  if(!currentChart) return;
+  const a=document.createElement('a');
+  a.href=currentChart.toBase64Image();
+  a.download='boxplot.png';
+  a.click();
+}
+
+const SAMPLE=[
+  {Class:'A', Score:'72'}, {Class:'A', Score:'75'}, {Class:'A', Score:'70'}, {Class:'A', Score:'68'},
+  {Class:'B', Score:'80'}, {Class:'B', Score:'85'}, {Class:'B', Score:'78'},
+  {Class:'C', Score:'90'}, {Class:'C', Score:'92'}, {Class:'C', Score:'88'}
+];
+
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('loadBtn').onclick=()=>{const f=document.getElementById('file').files[0];if(f) loadFile(f)};
+  document.getElementById('sampleBtn').onclick=()=>{setData(SAMPLE)};
+  document.getElementById('drawBtn').onclick=drawBox;
+  document.getElementById('downloadPNGBtn').onclick=downloadPNG;
+  document.getElementById('applySizeBtn').onclick=applySize;
+
+  // Live color & background updates
+  ['fillColor','borderColor','opacity','outlierColor'].forEach(id=>{
+    const el = document.getElementById(id);
+    el.addEventListener('input', refreshColors);
+    el.addEventListener('change', refreshColors);
+  });
+  document.getElementById('bgColor').addEventListener('input', refreshBg);
+  document.getElementById('bgColor').addEventListener('change', refreshBg);
+});
 </script>
 </body>
 </html>
