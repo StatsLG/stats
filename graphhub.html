@@ -6,75 +6,102 @@
   <title>BCTC Statistics Hub</title>
   <style>
     :root{
-      /* Brand */
-      --brand-blue: #00467f;  /* KCTCS Blue */
-      --brand-gold: #e7a614;  /* KCTCS Gold */
+      /* KCTCS brand primaries */
+      --kctcs-blue: #00467f;   /* PMS 541 */
+      --kctcs-gold: #e7a614;   /* PMS 131 */
 
-      /* Theme */
-      --bg:#0f172a; 
-      --panel:#111827; 
-      --card:#1f2937; 
-      --border:#1f2937; 
-      --text:#e5e7eb; 
-      --muted:#9ca3af;
+      /* Neutral foundation (light UI with strong contrast) */
+      --bg: #ffffff;
+      --panel: #f5f7fb;
+      --card: #ffffff;
+      --ink: #0f172a;          /* near-black body text */
+      --muted: #4b5563;        /* secondary text */
+      --rule: #e5e7eb;         /* subtle separators */
     }
 
-    /* Base */
+    /* Base layout */
+    * { box-sizing: border-box; }
     body{
       margin:0;
       background:var(--bg);
-      color:var(--text);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif
+      color:var(--ink);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, sans-serif;
+      line-height: 1.45;
     }
-    .wrap{max-width:1100px;margin:0 auto;padding:20px}
-    header{margin-bottom:18px;border-bottom:2px solid var(--brand-gold);padding-bottom:8px}
-    h1{font-size:22px;margin:0;color:var(--brand-blue)}
-    h2{font-size:16px;margin:0 0 8px}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px}
+    header{
+      margin-bottom:18px;
+      padding-bottom:12px;
+      border-bottom:4px solid var(--kctcs-gold);
+    }
+    h1{
+      font-size:24px;
+      margin:0;
+      color: var(--kctcs-blue);
+      letter-spacing: .2px;
+    }
+    h2{
+      font-size:18px;
+      margin: 10px 0 8px;
+      color: var(--kctcs-blue);
+    }
 
-    /* Grid of cards */
+    /* Card grid */
     .grid{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-      gap:14px
+      gap:16px;
     }
     .card{
       background:var(--card);
-      border:2px solid var(--brand-gold);     /* Gold outline on boxes */
+      border:2px solid var(--kctcs-gold);     /* Gold outline on boxes */
       border-radius:14px;
       padding:16px;
       display:flex;
       flex-direction:column;
-      gap:10px
+      gap:10px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
     }
-    .card h2{font-size:18px;margin:0}
-    .desc{color:var(--muted);font-size:14px;line-height:1.45}
+    .card h2{font-size:18px;margin:0;color:var(--ink)}
+    .desc{color:var(--muted);font-size:14px}
     .btns{margin-top:auto}
 
-    /* Buttons: Blue fill, Gold border */
+    /* Buttons: Blue fill, Gold border/hover */
     a.btn{
       display:inline-block;
       padding:10px 12px;
       border-radius:10px;
-      border:2px solid var(--brand-gold);
-      background:var(--brand-blue);
-      color:#fff;
-      text-decoration:none
+      border:2px solid var(--kctcs-gold);
+      background:var(--kctcs-blue);
+      color:#ffffff;
+      text-decoration:none;
+      font-weight:600;
+      transition: box-shadow .15s ease, transform .02s ease;
     }
     a.btn:hover{
-      filter:brightness(1.05);
-      box-shadow:0 0 0 3px rgba(231,166,20,0.25)
+      box-shadow:0 0 0 4px color-mix(in srgb, var(--kctcs-gold) 25%, transparent);
     }
+    a.btn:active{ transform: translateY(1px); }
 
-    /* Section divider panel (optional wrapper) */
+    /* Soft panel wrapper for sections below the first */
     .panel{
-      background:var(--panel);
-      border:1px solid var(--border);
+      background: var(--panel);
+      border:1px solid var(--rule);
       border-radius:14px;
       padding:14px;
-      margin-top:16px
+      margin-top:16px;
     }
 
-    footer{margin-top:20px;color:var(--muted);font-size:12px}
+    footer{
+      margin-top:20px;
+      color:var(--muted);
+      font-size:12px
+    }
+
+    /* Small accessibility tweaks */
+    @media (prefers-reduced-motion: reduce) {
+      a.btn { transition: none; }
+    }
   </style>
 </head>
 <body>
@@ -111,7 +138,7 @@
 
       <article class="card">
         <h2>Box Plot</h2>
-        <p class="desc">Create and export both one-way and two-way boxplots.</p>
+        <p class="desc">Create and export one-way or grouped boxplots.</p>
         <div class="btns">
           <a class="btn" href="graphing/boxplot.html">Create a Boxplot</a>
         </div>
@@ -119,7 +146,7 @@
 
       <article class="card">
         <h2>Scatter Plot</h2>
-        <p class="desc">Create and export a scatterplot with linear regression line and equation.</p>
+        <p class="desc">Create and export a scatterplot with linear regression and equation.</p>
         <div class="btns">
           <a class="btn" href="graphing/scatterplot.html">Create a Scatter + Regression</a>
         </div>
@@ -147,7 +174,7 @@
 
         <article class="card">
           <h2>One-Sample Mean Test</h2>
-          <p class="desc">One-sample <em>t</em> (σ unknown) or <em>z</em> (σ known) test for a mean, with CI, and CSV export.</p>
+          <p class="desc">One-sample <em>t</em> (σ unknown) or <em>z</em> (σ known) test for a mean, with CI and CSV export.</p>
           <div class="btns">
             <a class="btn" href="inference/onemean.html">Open One-Sample Mean</a>
           </div>
@@ -161,3 +188,4 @@
   </div>
 </body>
 </html>
+
