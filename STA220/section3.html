@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Section 3 | StatsLG</title>
+  <meta name="description" content="Section 3: Variability and relative standing — STA220 notes on StatsLG." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM USER TEMPLATE ===== -->
+<aside class="sidebar" aria-label="Site navigation">
+  <div class="brand">
+    <div class="brand-logo" aria-hidden="true"></div>
+    <div class="brand-title">BCTC Statistics Hub</div>
+  </div>
+
+  <div class="nav-section">
+    <h3>Graphing</h3>
+    <nav class="nav">
+      <a href="/graphing/barchart.html">Bar Chart</a>
+      <a href="/graphing/piechart.html">Pie / Donut</a>
+      <a href="/graphing/histogram.html">Histogram</a>
+      <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+      <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+      <a href="/graphing/barchart2way.html">Grouped Bar</a>
+    </nav>
+  </div>
+
+  <div class="divider" role="separator"></div>
+
+  <div class="nav-section">
+    <h3>Analysis</h3>
+    <nav class="nav">
+      <a href="/descriptive/summary.html">Descriptive Summary</a>
+      <a href="/inference/onemean.html">One-Sample Mean Test</a>
+    </nav>
+  </div>
+
+  <div class="divider" role="separator"></div>
+
+  <div class="nav-section">
+    <h3>Notes & Extras</h3>
+    <nav class="nav">
+      <a href="/STA210U/">STA 210U</a>
+      <a href="/STA220/">STA 220</a>
+      <a href="/STA296U/">STA 296U</a>
+      <a href="/game/pathyfinder.html">Pathy Finder</a>
+    </nav>
+  </div>
+
+  <div class="footer-note">
+    © <span id="yr"></span> StatsLG - Luke Garnett
+  </div>
+</aside>
+    <main>
+      
+      <header>
+        <h1>Section 3 — Variability and Relative Standing</h1>
+        <p>How to quantify spread: range, variance, and standard deviation; why dispersion matters even when centers match.</p>
+      </header>
+      
+    <section class="section">
+      <h2>On this page</h2>
+      <div class="grid">
+        <article class="card"><a href="#dispersion"><strong>1.</strong> Measures of Dispersion</a></article>
+<article class="card"><a href="#range"><strong>2.</strong> Range</a></article>
+<article class="card"><a href="#variance"><strong>3.</strong> Variance & SD</a></article>
+      </div>
+    </section>
+    
+      
+    <section id="dispersion" class="section">
+      <h2>Measures of Dispersion</h2>
+      
+  <p>Measures of <strong>spread</strong> complement measures of center. Two data sets can share mean/median/mode yet differ in variability.</p>
+
+    </section>
+    
+    <section id="range" class="section">
+      <h2>Sample Range</h2>
+      
+  <p><strong>Range</strong> = High − Low; easy but highly sensitive to extremes.</p>
+
+    </section>
+    
+    <section id="variance" class="section">
+      <h2>Sample Variance and Standard Deviation</h2>
+      
+  <p>Variance measures the average squared distance from the mean. Two equivalent formulas:</p>
+  <ul>
+    <li>Conceptual: <code>s^2 = \frac{\sum (x - \bar{x})^2}{n-1}</code></li>
+    <li>Computational: <code>s^2 = \frac{n\sum x^2 - (\sum x)^2}{n(n-1)}</code></li>
+  </ul>
+  <p>Key facts: involves all data points; expressed in squared units; never negative; larger values ⇒ more variability. Also, <code>\sum (x-\bar{x}) = 0</code>.</p>
+
+    </section>
+    
+    
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>
