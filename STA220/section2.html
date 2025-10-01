@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Section 2 | StatsLG</title>
+  <meta name="description" content="Section 2: Describing data with graphs — STA220 notes on StatsLG." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM USER TEMPLATE ===== -->
+<aside class="sidebar" aria-label="Site navigation">
+  <div class="brand">
+    <div class="brand-logo" aria-hidden="true"></div>
+    <div class="brand-title">BCTC Statistics Hub</div>
+  </div>
+
+  <div class="nav-section">
+    <h3>Graphing</h3>
+    <nav class="nav">
+      <a href="/graphing/barchart.html">Bar Chart</a>
+      <a href="/graphing/piechart.html">Pie / Donut</a>
+      <a href="/graphing/histogram.html">Histogram</a>
+      <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+      <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+      <a href="/graphing/barchart2way.html">Grouped Bar</a>
+    </nav>
+  </div>
+
+  <div class="divider" role="separator"></div>
+
+  <div class="nav-section">
+    <h3>Analysis</h3>
+    <nav class="nav">
+      <a href="/descriptive/summary.html">Descriptive Summary</a>
+      <a href="/inference/onemean.html">One-Sample Mean Test</a>
+    </nav>
+  </div>
+
+  <div class="divider" role="separator"></div>
+
+  <div class="nav-section">
+    <h3>Notes & Extras</h3>
+    <nav class="nav">
+      <a href="/STA210U/">STA 210U</a>
+      <a href="/STA220/">STA 220</a>
+      <a href="/STA296U/">STA 296U</a>
+      <a href="/game/pathyfinder.html">Pathy Finder</a>
+    </nav>
+  </div>
+
+  <div class="footer-note">
+    © <span id="yr"></span> StatsLG - Luke Garnett
+  </div>
+</aside>
+    <main>
+      
+      <header>
+        <h1>Section 2 — Methods for Describing Sets of Data</h1>
+        <p>Descriptive statistics via graphs: bar charts for categorical data and several displays for quantitative data (stem‑and‑leaf, frequency tables, histograms).</p>
+      </header>
+      
+    <section class="section">
+      <h2>On this page</h2>
+      <div class="grid">
+        <article class="card"><a href="#qualitative"><strong>1.</strong> Graphing Qualitative Data</a></article>
+<article class="card"><a href="#quantitative"><strong>2.</strong> Graphing Quantitative Data</a></article>
+<article class="card"><a href="#stemplot"><strong>3.</strong> Stem-and-Leaf</a></article>
+<article class="card"><a href="#freqdist"><strong>4.</strong> Frequency Distributions</a></article>
+<article class="card"><a href="#hist"><strong>5.</strong> Histograms</a></article>
+      </div>
+    </section>
+    
+      
+    <section id="qualitative" class="section">
+      <h2>Graphing Qualitative Data</h2>
+      
+  <p>Use a <strong>bar chart</strong> for qualitative (categorical) variables. Bars compare frequencies or percentages for categories; order along the x‑axis is arbitrary.</p>
+  <ul>
+    <li>Bars are uniform width and evenly spaced; x‑axis has no numeric meaning.</li>
+    <li>Height/length of bar encodes the value; viewers notice tallest bars first.</li>
+  </ul>
+
+    </section>
+    
+    <section id="quantitative" class="section">
+      <h2>Graphing Quantitative Data</h2>
+      
+  <p>Goal: reveal the <strong>distribution</strong> and identify <em>extreme values</em> (outliers) and overall <em>shape</em>.</p>
+  <p><strong>Extreme value (outlier):</strong> an observation separated from the rest by a noticeable gap.</p>
+
+    </section>
+    
+    <section id="stemplot" class="section">
+      <h2>Stem-and-Leaf</h2>
+      
+  <ul>
+    <li>Split values into stems (leading digits) and leaves (trailing digit).</li>
+    <li>Lets you recover original data while seeing shape and possible outliers.</li>
+  </ul>
+
+    </section>
+    
+    <section id="freqdist" class="section">
+      <h2>Frequency Distributions</h2>
+      
+  <ul>
+    <li>Group quantitative data into classes (5–15 classes, equal width, non‑overlapping).</li>
+    <li>Useful for large data sets; original values are not retained after grouping.</li>
+    <li>Class midpoint: halfway between class boundaries.</li>
+  </ul>
+
+    </section>
+    
+    <section id="hist" class="section">
+      <h2>Histograms</h2>
+      
+  <ul>
+    <li>x‑axis is quantitative; bar width has numeric meaning and <em>bars touch</em>.</li>
+    <li>Displays the frequency distribution; x‑axis ticks often show class midpoints.</li>
+  </ul>
+
+    </section>
+    
+    
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>
