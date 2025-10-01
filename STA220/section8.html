@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Section 8 | Confidence Intervals (Single Sample)</title>
+  <meta name="description" content="Section 8: Confidence Intervals Based on a Single Sample — STA220 notes on StatsLG." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- MathJax (LaTeX) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM YOUR TEMPLATE ===== -->
+    <aside class="sidebar" aria-label="Site navigation">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-title">BCTC Statistics Hub</div>
+      </div>
+
+      <div class="nav-section">
+        <h3>Graphing</h3>
+        <nav class="nav">
+          <a href="/graphing/barchart.html">Bar Chart</a>
+          <a href="/graphing/piechart.html">Pie / Donut</a>
+          <a href="/graphing/histogram.html">Histogram</a>
+          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+          <a href="/graphing/barchart2way.html">Grouped Bar</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Analysis</h3>
+        <nav class="nav">
+          <a href="/descriptive/summary.html">Descriptive Summary</a>
+          <a href="/inference/onemean.html">One-Sample Mean Test</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Notes & Extras</h3>
+        <nav class="nav">
+          <a href="/STA210U/">STA 210U</a>
+          <a href="/STA220/">STA 220</a>
+          <a href="/STA296U/">STA 296U</a>
+          <a href="/game/pathyfinder.html">Pathy Finder</a>
+        </nav>
+      </div>
+
+      <div class="footer-note">
+        © <span id="yr"></span> StatsLG - Luke Garnett
+      </div>
+    </aside>
+
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
+    <main>
+      <header>
+        <h1>Section 8 — Confidence Intervals Based on a Single Sample</h1>
+        <p>Build confidence intervals (CIs) for a population mean \( \mu \) and a population proportion \( p \). We connect confidence level \(1-\alpha\), critical values \(z_{\alpha/2}\) or \(t_{\alpha/2,\;df}\), and standard errors to the familiar “statistic ± margin of error” form.</p>
+      </header>
+
+      <!-- On this page -->
+      <section class="section">
+        <h2>On this page</h2>
+        <div class="grid">
+          <article class="card"><a href="#confidence">Confidence, Tails, and \( \alpha \)</a></article>
+          <article class="card"><a href="#zcrit">Common \(z_{\alpha/2}\) Values</a></article>
+          <article class="card"><a href="#point-vs-interval">Point vs Interval Estimates</a></article>
+          <article class="card"><a href="#mu-known">CI for \( \mu \) (known \( \sigma \))</a></article>
+          <article class="card"><a href="#relationships">How \(n\), confidence, and variability affect \(E\)</a></article>
+          <article class="card"><a href="#known-ex">Worked Example (known \( \sigma \))</a></article>
+          <article class="card"><a href="#mu-unknown">CI for \( \mu \) (unknown \( \sigma \), t-distribution)</a></article>
+          <article class="card"><a href="#t-notes">Using the t Table</a></article>
+          <article class="card"><a href="#t-ex1">t Critical Example</a></article>
+          <article class="card"><a href="#t-ex2">Worked t-Interval Examples</a></article>
+          <article class="card"><a href="#phat">CI for a Proportion \(p\) (large \(n\))</a></article>
+          <article class="card"><a href="#n-plan">Planning \(n\): Sample Size for a Target Margin</a></article>
+        </div>
+      </section>
+
+      <!-- Confidence, tails -->
+      <section id="confidence" class="section">
+        <h2>Confidence, Tails, and \( \alpha \)</h2>
+        <ul>
+          <li><strong>Level of significance</strong> \( \alpha \): chance we’re wrong.</li>
+          <li><strong>Confidence level</strong> \(1-\alpha\): chance we’re correct.</li>
+          <li><strong>One-tailed test</strong>: error in one tail; <strong>two-tailed</strong>: \(\alpha/2\) in each tail.</li>
+          <li>When constructing <strong>confidence intervals</strong>, we <em>always</em> use two tails (possible error on both sides).</li>
+        </ul>
+        <p>If the sampling distribution is normal, the critical values are \(z_{\alpha}\) (one tail) and \(z_{\alpha/2}\) (two tails), where the tail area equals the subscript.</p>
+      </section>
+
+      <!-- Common z criticals -->
+      <section id="zcrit" class="section">
+        <h2>Common \(z_{\alpha/2}\) Values</h2>
+        <div class="grid">
+          <article class="card"><p>90%: \(z_{\alpha/2}=z_{.05}=1.645\)</p></article>
+          <article class="card"><p>95%: \(z_{\alpha/2}=z_{.025}=1.96\)</p></article>
+          <article class="card"><p>99%: \(z_{\alpha/2}=z_{.005}=2.576\)</p></article>
+        </div>
+        <p>Example: at 95% confidence, the central area is 0.95, so 2.5% lies in each tail → between \(-1.96\) and \(1.96\) there is 95% of the area.</p>
+        <div class="card soft">
+          <h3>Why not 100%?</h3>
+          <p>To capture 100% of a normal curve, \(z_{\alpha/2}\to\infty\); the CI would be \((-\infty,\infty)\), which is useless. Useful CIs have confidence &lt; 100%.</p>
+        </div>
+      </section>
+
+      <!-- Point vs interval -->
+      <section id="point-vs-interval" class="section">
+        <h2>Point vs Interval Estimates</h2>
+        <p>A sample mean \( \bar{x} \) is a <strong>point estimate</strong> of \( \mu \), but for continuous models \(P(\bar{x}=\mu)=0\). We prefer <strong>interval estimates</strong> (confidence intervals) to reflect uncertainty: <em>statistic ± margin of error</em>.</p>
+      </section>
+
+      <!-- CI for mu known sigma -->
+      <section id="mu-known" class="section">
+        <h2>CI for \( \mu \) with Known \( \sigma \)</h2>
+        <p>When \( \sigma \) is known, the standardized statistic
+          \[
+            Z=\frac{\bar{x}-\mu}{\sigma/\sqrt{n}}
+          \]
+          is (approximately) standard normal. Using the middle \(1-\alpha\) area:
+          \[
+            P\!\left(-z_{\alpha/2}<Z<z_{\alpha/2}\right)=1-\alpha.
+          \]
+        </p>
+        <p>Algebra (solve for \( \mu \)) yields:
+          \[
+            P\!\left(\bar{x}-z_{\alpha/2}\frac{\sigma}{\sqrt{n}}
+            \;<\; \mu \;<\;
+            \bar{x}+z_{\alpha/2}\frac{\sigma}{\sqrt{n}}\right)=1-\alpha.
+          \]
+          The <strong>margin of error</strong> is \(E=z_{\alpha/2}\frac{\sigma}{\sqrt{n}} = z\left(\frac{\sigma}{\sqrt{n}}\right)\).
+        </p>
+      </section>
+
+      <!-- Relationships -->
+      <section id="relationships" class="section">
+        <h2>How \(n\), Confidence, and Variability Affect \(E\)</h2>
+        <ul>
+          <li>Increase \(n\) ⟶ \(E\) decreases ⟶ narrower CI.</li>
+          <li>Increase confidence \((1-\alpha)\) ⟶ \(z_{\alpha/2}\) increases ⟶ \(E\) increases ⟶ wider CI.</li>
+          <li>Increase population variability \((\sigma)\) ⟶ \(E\) increases ⟶ wider CI.</li>
+        </ul>
+      </section>
+
+      <!-- Worked example known sigma -->
+      <section id="known-ex" class="section">
+        <h2>Worked Example — Known \( \sigma \)</h2>
+        <div class="card soft">
+          <h3>Visa account unpaid balances</h3>
+          <p>\(n=100\), \( \bar{x}=645\), \( \sigma=132\).</p>
+          <div class="grid">
+            <article class="card">
+              <h4>95% CI</h4>
+              <p>\(E=1.96\left(\frac{132}{\sqrt{100}}\right)=25.87\)</p>
+              <p>\(645\pm25.87=(619.13,\ 670.87)\)</p>
+              <p class="muted">Interpretation: We are 95% confident the mean unpaid balance is between \$619.13 and \$670.87.</p>
+            </article>
+            <article class="card">
+              <h4>99% CI</h4>
+              <p>\(E=2.576\left(\frac{132}{\sqrt{100}}\right)=34.00\)</p>
+              <p>\(645\pm34.00=(611.00,\ 679.00)\)</p>
+              <p class="muted">Interpretation: We are 99% confident the mean unpaid balance is between \$611.00 and \$679.00.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- CI for mu unknown sigma (t) -->
+      <section id="mu-unknown" class="section">
+        <h2>CI for \( \mu \) with Unknown \( \sigma \) (t-Distribution)</h2>
+        <p>Replace \( \sigma \) by the sample SD \(s\). Then
+          \[
+            t=\frac{\bar{x}-\mu}{s/\sqrt{n}}
+          \]
+          has a t-distribution with \(df=n-1\) (exact if sampling from a normal population; for large \(n\), t \(\approx\) z).</p>
+        <p>Two-tailed t-interval:
+          \[
+            E=t_{\alpha/2,\;df}\left(\frac{s}{\sqrt{n}}\right),\qquad
+            \bar{x}\pm E.
+          \]
+        </p>
+      </section>
+
+      <!-- t table notes -->
+      <section id="t-notes" class="section">
+        <h2>Using the t Table</h2>
+        <ul>
+          <li>Notation: \(t_{\alpha,\;df}\) (one tail) and \(t_{\alpha/2,\;df}\) (two tails).</li>
+          <li>Degrees of freedom \(df=n-1\).</li>
+          <li>For \(df=1\) to \(30\), exact rows; for \(30<df\le120\), use the closest row; for \(df>120\), use the bottom row (\(df=\infty\)), which equals the corresponding z values.</li>
+        </ul>
+      </section>
+
+      <!-- t critical example -->
+      <section id="t-ex1" class="section">
+        <h2>Example — Find a Two-Tailed t Critical</h2>
+        <p>Sample size \(n=11\), 95% confidence: \(\alpha/2=0.025\), \(df=10\). From the table: \(t_{.025,\;10}=2.228\).</p>
+      </section>
+
+      <!-- t worked examples -->
+      <section id="t-ex2" class="section">
+        <h2>Worked t-Interval Examples</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Tire mileage (thousands of miles)</h3>
+            <p>Sample: 42, 36, 46, 43, 41, 35, 43, 45, 40, 39</p>
+            <p>\(n=10\), \( \bar{x}=41\), \(s=3.590\); 95% confidence → \(\alpha/2=0.025\), \(df=9\), \(t_{.025,9}=2.262\).</p>
+            <p>\(E=2.262\left(\frac{3.590}{\sqrt{10}}\right)=2.568\)</p>
+            <p>CI: \(41\pm 2.568=(38.432,\ 43.568)\)</p>
+            <p class="muted">Interpretation: We are 95% confident the mean tire mileage is between 38,432 and 43,568 miles.</p>
+          </article>
+          <article class="card">
+            <h3>Apple weights (oz.)</h3>
+            <p>\(n=20\), \( \bar{x}=9.2\), \(s=1.1\); 99% confidence → \(\alpha/2=0.005\), \(df=19\), \(t_{.005,19}=2.861\).</p>
+            <p>\(E=2.861\left(\frac{1.1}{\sqrt{20}}\right)=0.704\)</p>
+            <p>CI: \(9.2\pm 0.704=(8.496,\ 9.904)\)</p>
+            <p class="muted">Interpretation: We are 99% confident the mean apple weight is between 8.496 and 9.904 oz.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- CI for p -->
+      <section id="phat" class="section">
+        <h2>CI for a Proportion \( p \) (large \(n\))</h2>
+        <p>For large samples, \( \displaystyle Z=\frac{\hat{p}-p}{\sqrt{pq/n}} \) is approximately standard normal. We estimate \(p\) and \(q=1-p\) by \( \hat{p} \) and \( \hat{q}=1-\hat{p} \).</p>
+        <p>Margin of error and CI:
+          \[
+            E=z_{\alpha/2}\sqrt{\frac{\hat{p}\,\hat{q}}{n}},\qquad
+            \hat{p}\pm E.
+          \]
+        </p>
+        <div class="card soft">
+          <h3>Worked Example — Voters</h3>
+          <p>Survey: \(n=1200\), “Republican” responses = 540 → \(\hat{p}=540/1200=0.45\), \(\hat{q}=0.55\); 95% → \(z_{\alpha/2}=1.96\).</p>
+          <p>\(E=1.96\sqrt{\frac{(0.45)(0.55)}{1200}}=0.028\) (2.8%)</p>
+          <p>CI: \(45\%\pm2.8\%=(42.2\%,\,47.8\%)\)</p>
+          <p class="muted">Interpretation: We are 95% confident the true percentage is between 42.2% and 47.8%.</p>
+        </div>
+      </section>
+
+      <!-- Planning n -->
+      <section id="n-plan" class="section">
+        <h2>Planning \(n\): Sample Size for a Target Margin</h2>
+        <p>Solve \(E=z_{\alpha/2}\dfrac{\sigma}{\sqrt{n}}\) for \(n\):
+          \[
+            n=\left(\frac{z_{\alpha/2}\,\sigma}{E}\right)^2.
+          \]
+          (When planning, \( \sigma \) is estimated via a pilot study or prior data.) Always round <em>up</em>.
+        </p>
+        <div class="card soft">
+          <h3>Worked Example — Physician hours</h3>
+          <p>Target: 99% confidence (\(z_{.005}=2.576\)), margin \(E=1\) hour, SD estimate \( \sigma=11.97\).</p>
+          <p>\(n=\left(\dfrac{2.576\cdot 11.97}{1}\right)^2=950.779 \Rightarrow 951\) (round up)</p>
+        </div>
+      </section>
+
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>

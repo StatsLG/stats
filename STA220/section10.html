@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Section 10 | Simple Linear Regression</title>
+  <meta name="description" content="Section 10: Simple Linear Regression — STA220 notes on StatsLG." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- MathJax (LaTeX) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM YOUR TEMPLATE ===== -->
+    <aside class="sidebar" aria-label="Site navigation">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-title">BCTC Statistics Hub</div>
+      </div>
+
+      <div class="nav-section">
+        <h3>Graphing</h3>
+        <nav class="nav">
+          <a href="/graphing/barchart.html">Bar Chart</a>
+          <a href="/graphing/piechart.html">Pie / Donut</a>
+          <a href="/graphing/histogram.html">Histogram</a>
+          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+          <a href="/graphing/barchart2way.html">Grouped Bar</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Analysis</h3>
+        <nav class="nav">
+          <a href="/descriptive/summary.html">Descriptive Summary</a>
+          <a href="/inference/onemean.html">One-Sample Mean Test</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Notes & Extras</h3>
+        <nav class="nav">
+          <a href="/STA210U/">STA 210U</a>
+          <a href="/STA220/">STA 220</a>
+          <a href="/STA296U/">STA 296U</a>
+          <a href="/game/pathyfinder.html">Pathy Finder</a>
+        </nav>
+      </div>
+
+      <div class="footer-note">
+        © <span id="yr"></span> StatsLG - Luke Garnett
+      </div>
+    </aside>
+
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
+    <main>
+      <header>
+        <h1>Section 10 — Simple Linear Regression</h1>
+        <p>Identify correlation from a scatterplot, compute the Pearson \(r\), build the least-squares regression line \( \hat y=b_0+b_1x \), interpret \(R^2\), make predictions, compute residuals, and avoid common pitfalls (extrapolation &amp; outliers).</p>
+      </header>
+
+      <!-- On this page -->
+      <section class="section">
+        <h2>On this page</h2>
+        <div class="grid">
+          <article class="card"><a href="#graphical">Identify Correlation Graphically</a></article>
+          <article class="card"><a href="#types">Kinds of Correlation</a></article>
+          <article class="card"><a href="#pearson">The Correlation Coefficient \(r\)</a></article>
+          <article class="card"><a href="#drugbp">Example: Drug Dosage &amp; Blood Pressure</a></article>
+          <article class="card"><a href="#causation">Why Correlation ≠ Causation</a></article>
+          <article class="card"><a href="#model">The Simple Linear Regression Model</a></article>
+          <article class="card"><a href="#least">Least-Squares Line: \(b_1, b_0\)</a></article>
+          <article class="card"><a href="#fit">Fitting, Prediction, &amp; Residuals</a></article>
+          <article class="card"><a href="#rsq">\(R^2\) and Software Output</a></article>
+          <article class="card"><a href="#cautions">Cautions: Interpolation, Extrapolation, Outliers</a></article>
+        </div>
+      </section>
+
+      <!-- Identify correlation graphically -->
+      <section id="graphical" class="section">
+        <h2>Identify Correlation Graphically</h2>
+        <p>A <strong>scatterplot</strong> displays the relationship between two quantitative variables:
+          \(x\) on the horizontal axis (independent / explanatory) and \(y\) on the vertical axis (dependent / response).
+          In data, multiple individuals can share the same \(x\) but have different \(y\), so we look for <em>patterns</em>, not a single function that passes through all points.</p>
+      </section>
+
+      <!-- Types of correlation -->
+      <section id="types" class="section">
+        <h2>Kinds of Correlation</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Perfect Positive Linear</h3>
+            <p>All points exactly on a line with positive slope.</p>
+          </article>
+          <article class="card">
+            <h3>Perfect Negative Linear</h3>
+            <p>All points exactly on a line with negative slope.</p>
+          </article>
+          <article class="card">
+            <h3>Positive Linear</h3>
+            <p>Points cluster about a line with positive slope (typical in practice).</p>
+          </article>
+          <article class="card">
+            <h3>Negative Linear</h3>
+            <p>Points cluster about a line with negative slope.</p>
+          </article>
+          <article class="card">
+            <h3>Non-Linear</h3>
+            <p>Clear pattern but not linear (e.g., quadratic). For this class, call it non-linear.</p>
+          </article>
+          <article class="card">
+            <h3>No Correlation</h3>
+            <p>No apparent pattern; \(r\) near 0 for linear association.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Pearson r -->
+      <section id="pearson" class="section">
+        <h2>The Pearson Correlation Coefficient \(r\)</h2>
+        <p>\(r\) measures the <em>direction</em> (sign) and <em>strength</em> (magnitude) of a <strong>linear</strong> relationship. Range: \(-1 \le r \le 1\).</p>
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Variance components</h3>
+          <p>
+            \[
+              SS_X=\sum(x-\bar x)^2,\quad
+              SS_Y=\sum(y-\bar y)^2,\quad
+              S_{XY}=\sum(x-\bar x)(y-\bar y).
+            \]
+          </p>
+          <p>
+            \[
+              r=\frac{S_{XY}}{\sqrt{SS_X\,SS_Y}}
+               \;=\;
+              \frac{\sum(x-\bar x)(y-\bar y)}
+                   {\sqrt{\sum(x-\bar x)^2\;\sum(y-\bar y)^2}}
+               \;=\;
+              \frac{n\sum xy-\left(\sum x\right)\!\left(\sum y\right)}
+                   {\sqrt{\big(n\sum x^2-(\sum x)^2\big)\,\big(n\sum y^2-(\sum y)^2\big)}}.
+            \]
+          </p>
+        </div>
+
+        <div class="card soft" style="margin-top:12px;">
+          <h3 style="margin:.2rem 0 .4rem;">Derivation snippets (as used in class)</h3>
+          <p>
+            \[
+            SS_X=\sum(x-\bar x)^2
+                =\sum x^2-\frac{(\sum x)^2}{n},\qquad
+            SS_Y=\sum(y-\bar y)^2
+                =\sum y^2-\frac{(\sum y)^2}{n},
+            \]
+            \[
+            S_{XY}=\sum(x-\bar x)(y-\bar y)
+                  =\sum xy-\frac{(\sum x)(\sum y)}{n}.
+            \]
+          </p>
+        </div>
+
+        <div class="grid" style="margin-top:12px;">
+          <article class="card">
+            <h3>Interpretation</h3>
+            <ul>
+              <li>\(r>0\): \(x\) and \(y\) rise together (positive slope).</li>
+              <li>\(r<0\): one rises as the other falls (negative slope).</li>
+              <li>\(|r|\) close to 1: strong linear fit. Rule of thumb here: strong if \(|r|\ge 0.75\).</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Reminder</h3>
+            <p>\(r\) only measures <em>linear</em> association; a strong non-linear relationship can still have \(r\approx0\).</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Drug dosage example -->
+      <section id="drugbp" class="section">
+        <h2>Example — Dosage of Drug (x) &amp; Reduction in Blood Pressure (y)</h2>
+        <div class="preview" role="region" aria-label="Drug dosage and blood pressure table">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>x (dosage)</th><th>y (reduction)</th><th>\(x^2\)</th><th>\(y^2\)</th><th>\(xy\)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>100</td><td>10</td><td>10,000</td><td>100</td><td>1,000</td></tr>
+              <tr><td>200</td><td>18</td><td>40,000</td><td>324</td><td>3,600</td></tr>
+              <tr><td>300</td><td>32</td><td>90,000</td><td>1,024</td><td>9,600</td></tr>
+              <tr><td>400</td><td>44</td><td>160,000</td><td>1,936</td><td>17,600</td></tr>
+              <tr><td>500</td><td>56</td><td>250,000</td><td>3,136</td><td>28,000</td></tr>
+              <tr><th>\(\sum x=1500\)</th><th>\(\sum y=160\)</th><th>\(\sum x^2=550{,}000\)</th><th>\(\sum y^2=6{,}520\)</th><th>\(\sum xy=59{,}800\)</th></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid" style="margin-top:12px;">
+          <article class="card">
+            <h3>Compute \(r\)</h3>
+            <p>
+              \[
+                r=\frac{5(59{,}800)-(1500)(160)}
+                         {\sqrt{\big(5(550{,}000)-(1500)^2\big)\,\big(5(6{,}520)-(160)^2\big)}}
+                 \;=\; \frac{59{,}000}{\sqrt{(500{,}000)(7{,}000)}}
+                 \;=\; 0.99728.
+              \]
+            </p>
+            <p>Very strong positive linear association (close to 1).</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Correlation not causation -->
+      <section id="causation" class="section">
+        <h2>Correlation Does Not Imply Causation</h2>
+        <p>Example: ice cream consumption and assaults both rise in summer—strong \(r\) but due to a lurking variable (temperature). Correlation alone never proves cause–effect.</p>
+      </section>
+
+      <!-- The model -->
+      <section id="model" class="section">
+        <h2>The Simple Linear Regression Model</h2>
+        <p><strong>Regression</strong>: predict a response \(y\) from an explanatory \(x\).</p>
+        <p><strong>Linear regression model:</strong> \( \hat y=b_0+b_1x \).
+          Here \(b_1\) is the slope and \(b_0\) is the \(y\)-intercept.
+          Variation in \(y\) around the line appears as vertical distances (“errors”).</p>
+        <p>Only use a linear model when the scatterplot and \(r\) suggest a strong linear relationship.</p>
+      </section>
+
+      <!-- Least-squares -->
+      <section id="least" class="section">
+        <h2>Least-Squares Line: Formulas</h2>
+        <p><strong>Method of Least Squares:</strong> choose the line that minimizes the sum of squared vertical distances.</p>
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Closed forms</h3>
+          <p>
+            \[
+              b_1=\frac{S_{XY}}{SS_X}
+                 =\frac{\sum(x-\bar x)(y-\bar y)}{\sum(x-\bar x)^2}
+                 =\frac{n\sum xy-(\sum x)(\sum y)}{\,n\sum x^2-(\sum x)^2\,},
+            \]
+            \[
+              b_0=\bar y-b_1\bar x
+                 =\frac{\sum y-b_1\sum x}{n}.
+            \]
+          </p>
+          <p class="muted">Note: the numerator of \(b_1\) matches the numerator of \(r\); their signs always agree.</p>
+        </div>
+      </section>
+
+      <!-- Fit, prediction, residual -->
+      <section id="fit" class="section">
+        <h2>Fitting, Prediction, &amp; Residuals</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Fit for Drug–BP data</h3>
+            <p>
+              \[
+                b_1=\frac{59{,}000}{500{,}000}=0.118,\qquad
+                b_0=\frac{160-0.118(1500)}{5}=-3.4.
+              \]
+              Regression equation: \( \hat y=-3.4+0.118x \).
+            </p>
+          </article>
+          <article class="card">
+            <h3>Predict</h3>
+            <p>At \(x=250\): \( \hat y=-3.4+0.118(250)=26.1\).</p>
+          </article>
+          <article class="card">
+            <h3>Residual</h3>
+            <p>Residual \(e=y-\hat y\). For the point \((400,44)\):</p>
+            <p>\(e=44-(-3.4+0.118\cdot 400)=44-43.8=0.2\) (point is 0.2 above the line).</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- R-squared -->
+      <section id="rsq" class="section">
+        <h2>\(R^2\) and Software Output</h2>
+        <p>\(R^2\) (0–100%) is the percent of variation in \(y\) explained by the model. For simple linear regression, \(R^2=r^2\).</p>
+        <ul>
+          <li>Drug–BP example: \(r=0.99728 \Rightarrow R^2\approx 99.5\%\).</li>
+          <li>From output, you can recover \(r=\pm\sqrt{R^2}\) — choose sign from the slope: positive slope ⇒ \(r>0\), negative ⇒ \(r<0\).</li>
+        </ul>
+      </section>
+
+      <!-- Cautions -->
+      <section id="cautions" class="section">
+        <h2>Cautions: Interpolation, Extrapolation, Outliers</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Interpolation vs Extrapolation</h3>
+            <p><strong>Interpolation</strong>: predict within observed \(x\)-range (appropriate).</p>
+            <p><strong>Extrapolation</strong>: predict beyond that range (unsafe with a basic model).</p>
+          </article>
+          <article class="card">
+            <h3>Extreme Values (Outliers)</h3>
+            <p>\(r\) and the least-squares line are highly sensitive to outliers.</p>
+            <ul>
+              <li>Example 1: \(R^2=0.0\%\Rightarrow r=0\) (no linear relationship).</li>
+              <li>Example 2: Add one extreme point → \(R^2=77.9\%\Rightarrow r=\sqrt{.779}=.883\) (apparently “strong” due entirely to the outlier).</li>
+            </ul>
+            <p>Investigate and consider removing extreme points before concluding a relationship.</p>
+          </article>
+        </div>
+      </section>
+
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>

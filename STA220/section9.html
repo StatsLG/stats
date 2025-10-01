@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Section 9 | Hypothesis Tests (Single Sample)</title>
+  <meta name="description" content="Section 9: Hypothesis tests based on a single sample — STA220 notes on StatsLG." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- MathJax (LaTeX) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM YOUR TEMPLATE ===== -->
+    <aside class="sidebar" aria-label="Site navigation">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-title">BCTC Statistics Hub</div>
+      </div>
+
+      <div class="nav-section">
+        <h3>Graphing</h3>
+        <nav class="nav">
+          <a href="/graphing/barchart.html">Bar Chart</a>
+          <a href="/graphing/piechart.html">Pie / Donut</a>
+          <a href="/graphing/histogram.html">Histogram</a>
+          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+          <a href="/graphing/barchart2way.html">Grouped Bar</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Analysis</h3>
+        <nav class="nav">
+          <a href="/descriptive/summary.html">Descriptive Summary</a>
+          <a href="/inference/onemean.html">One-Sample Mean Test</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Notes & Extras</h3>
+        <nav class="nav">
+          <a href="/STA210U/">STA 210U</a>
+          <a href="/STA220/">STA 220</a>
+          <a href="/STA296U/">STA 296U</a>
+          <a href="/game/pathyfinder.html">Pathy Finder</a>
+        </nav>
+      </div>
+
+      <div class="footer-note">
+        © <span id="yr"></span> StatsLG - Luke Garnett
+      </div>
+    </aside>
+
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
+    <main>
+      <header>
+        <h1>Section 9 — Hypothesis Tests Based on a Single Sample</h1>
+        <p>Set up statistical hypotheses, understand decision errors and power, and run tests for a single population mean (\( \mu \)) with known or unknown \( \sigma \), as well as a single population proportion (\( p \)) for large samples. Both the traditional “critical region” approach and the p-value approach are shown.</p>
+      </header>
+
+      <!-- On this page -->
+      <section class="section">
+        <h2>On this page</h2>
+        <div class="grid">
+          <article class="card"><a href="#setup">General Setup & Vocabulary</a></article>
+          <article class="card"><a href="#errors">Decision Errors (Type I/II), Confidence & Power</a></article>
+          <article class="card"><a href="#table">Decision Table & Tradeoffs</a></article>
+          <article class="card"><a href="#steps">5 Steps of a Hypothesis Test</a></article>
+          <article class="card"><a href="#z-known">Test for \( \mu \) with Known \( \sigma \) (Z)</a></article>
+          <article class="card"><a href="#ex-math">Example: Math Competency (Left-Tailed Z)</a></article>
+          <article class="card"><a href="#pvalue">p-Value Approach</a></article>
+          <article class="card"><a href="#t-unknown">Test for \( \mu \) with Unknown \( \sigma \) (t)</a></article>
+          <article class="card"><a href="#ex-grapenuts">Example: Grape Nuts (Two-Tailed t) + 95% CI</a></article>
+          <article class="card"><a href="#ex-metal">Example: Metal Components \(>\,4.5\) (Right-Tailed t)</a></article>
+          <article class="card"><a href="#ex-lex">Example: Lexington Income \(<\$50{,}000\) (Left-Tailed t)</a></article>
+          <article class="card"><a href="#ex-pigs">Example: Pig Weight Change \( \neq 200 \) (Two-Tailed t)</a></article>
+          <article class="card"><a href="#prop">Test for a Proportion \( p \) (Large \( n \), Z)</a></article>
+          <article class="card"><a href="#ex-prop">Examples: Cancer Remission; Vanilla Wafers</a></article>
+        </div>
+      </section>
+
+      <!-- Setup -->
+      <section id="setup" class="section">
+        <h2>General Setup of a Hypothesis Test</h2>
+        <p><strong>Statistical hypotheses</strong> are statements about population parameters, e.g. \( \mu>160 \) or \( p<0.01 \).</p>
+        <ul>
+          <li><strong>Alternative hypothesis</strong> \(H_a\): the claim we want to prove.</li>
+          <li><strong>Null hypothesis</strong> \(H_0\): a contradicting statement tested against \(H_a\).</li>
+        </ul>
+        <p>We test \(H_0\). After sampling, decide to <em>Reject \(H_0\)</em> (in favor of \(H_a\)) or <em>Fail to Reject \(H_0\)</em>.</p>
+      </section>
+
+      <!-- Errors / Power -->
+      <section id="errors" class="section">
+        <h2>Errors, Confidence, and Power</h2>
+        <ul>
+          <li><strong>Type I error</strong>: Reject \(H_0\) when \(H_0\) is true (probability \( \alpha \)).</li>
+          <li><strong>Type II error</strong>: Fail to Reject \(H_0\) when \(H_0\) is false (probability \( \beta \)).</li>
+          <li><strong>Power</strong>: \(1-\beta\), probability of correctly rejecting a false \(H_0\).</li>
+          <li><strong>Confidence level</strong>: \(1-\alpha\). If \( \alpha=0.05\), concluding \(H_a\) corresponds to 95% confidence.</li>
+          <li>Making \( \alpha \) smaller (holding all else fixed) makes \( \beta \) larger. Increasing <strong>sample size</strong> is how to reduce both.</li>
+        </ul>
+      </section>
+
+      <!-- Decision table -->
+      <section id="table" class="section">
+        <h2>Decision Table & Tradeoffs</h2>
+        <div class="preview" role="region" aria-label="Decision table with errors and probabilities">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Decision from the test</th>
+                <th>\(H_0\) is false</th>
+                <th>\(H_0\) is true</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>Reject \(H_0\)</th>
+                <td>Correct (Power \(=1-\beta\))</td>
+                <td>Type I error (\(\alpha\))</td>
+              </tr>
+              <tr>
+                <th>Fail to Reject \(H_0\)</th>
+                <td>Type II error (\(\beta\))</td>
+                <td>Correct (Confidence \(=1-\alpha\))</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 5 steps -->
+      <section id="steps" class="section">
+        <h2>5 Steps of a Hypothesis Test</h2>
+        <ol>
+          <li>State \(H_a\) and \(H_0\).</li>
+          <li>Specify the <strong>critical region</strong> (depends on \(H_a\) and \( \alpha \)).</li>
+          <li>Compute the <strong>test statistic</strong>.</li>
+          <li>Make the decision (reject / fail to reject).</li>
+          <li>Interpret the result in context.</li>
+        </ol>
+      </section>
+
+      <!-- mu known sigma -->
+      <section id="z-known" class="section">
+        <h2>Test of Hypothesis for \( \mu \) with Known \( \sigma \) (Z)</h2>
+        <p>When \( \sigma \) is known, the sampling distribution is standard normal:
+          \[
+            Z \;=\; \frac{\bar{x}-\mu}{\sigma/\sqrt{n}}.
+          \]
+        </p>
+      </section>
+
+      <!-- Example Z known -->
+      <section id="ex-math" class="section">
+        <h2>Example — Math Competency of Elementary Education Majors</h2>
+        <p>Claim: mean score \(<35\). Use \( \alpha=0.05\). Given \( n=165,\ \bar{x}=32.91,\ \sigma=9.5\).</p>
+        <ol>
+          <li>\(H_a:\mu<35\);\; \(H_0:\mu\ge 35\).</li>
+          <li>Left-tailed Z test; reject if \(Z\le -1.645\) (critical region has area \( \alpha \) on the left).</li>
+          <li>\(\displaystyle Z=\frac{32.91-35}{9.5/\sqrt{165}}=-2.83\).</li>
+          <li>Since \(-2.83\le-1.645\), <strong>Reject \(H_0\)</strong>.</li>
+          <li>Conclude (95% confidence) the mean score is less than 35.</li>
+        </ol>
+      </section>
+
+      <!-- p-value approach -->
+      <section id="pvalue" class="section">
+        <h2>The p-Value Approach</h2>
+        <p><strong>p-value</strong>: the smallest \( \alpha \) for which \(H_0\) would be rejected (area consistent with the observed test statistic).</p>
+        <p><em>Decision rule:</em> If p-value \(\le \alpha\) → Reject \(H_0\); otherwise → Fail to Reject \(H_0\).</p>
+        <div class="card soft">
+          <h3>Example (same data)</h3>
+          <p>Left tail area at \(Z=-2.83\): \( \text{p-value}=P(Z\le-2.83)=0.0023 \). Since \(0.0023\le0.05\), reject \(H_0\). Matches the traditional method.</p>
+        </div>
+      </section>
+
+      <!-- mu unknown sigma -->
+      <section id="t-unknown" class="section">
+        <h2>Test of Hypothesis for \( \mu \) with Unknown \( \sigma \) (t)</h2>
+        <p>Replace \( \sigma \) by the sample SD \( s \), giving a t-statistic with \( df=n-1 \):
+          \[
+            t \;=\; \frac{\bar{x}-\mu}{s/\sqrt{n}}.
+          \]
+        </p>
+      </section>
+
+      <!-- Grape Nuts example -->
+      <section id="ex-grapenuts" class="section">
+        <h2>Example — Post Grape Nuts (Two-Tailed t) &amp; Matching CI</h2>
+        <p>Prove packages are <em>not</em> 24 oz. Use \( \alpha=0.05\). Given \( n=100,\ \bar{x}=23.94,\ s=0.13\).</p>
+        <ol>
+          <li>\(H_a:\mu\ne24\);\; \(H_0:\mu=24\).</li>
+          <li>Two-tailed t, reject if \( t\le -1.984\) or \( t\ge 1.984\) (use \(df=99\) or nearest).</li>
+          <li>\(\displaystyle t=\frac{23.94-24}{0.13/\sqrt{100}}=-4.615\) → <strong>Reject \(H_0\)</strong>.</li>
+          <li>95% CI: \(E=t_{.025,\,df}\,(s/\sqrt{n})=1.984\cdot(0.13/10)=0.026\). CI \(=23.94\pm0.026=(23.914,\ 23.966)\).</li>
+          <li>Consistency: since 24 is outside the CI, the two-tailed test at \( \alpha=0.05\) agrees.</li>
+        </ol>
+      </section>
+
+      <!-- Metal components -->
+      <section id="ex-metal" class="section">
+        <h2>Example — Metal Components (Right-Tailed t)</h2>
+        <p>Claim: population mean \(>\,4.5\) oz. Use \( \alpha=0.05\). Given \( n=10,\ \bar{x}=4.59,\ s=0.504\).</p>
+        <ol>
+          <li>\(H_a:\mu>4.5\);\; \(H_0:\mu\le4.5\).</li>
+          <li>Right-tailed t; reject if \( t\ge1.833\) (with \(df=9\)).</li>
+          <li>\(\displaystyle t=\frac{4.59-4.5}{0.504/\sqrt{10}}=0.565\).</li>
+          <li>\(0.565<1.833\) → <strong>Fail to Reject \(H_0\)</strong>.</li>
+          <li>Insufficient evidence that the mean \(>\,4.5\) oz.</li>
+        </ol>
+      </section>
+
+      <!-- Lexington income -->
+      <section id="ex-lex" class="section">
+        <h2>Example — Lexington Household Income (Left-Tailed t)</h2>
+        <p>Claim: mean income \(<\$50{,}000\). Use \( \alpha=0.05\). Given \( n=100,\ \bar{x}=\$40{,}571,\ s=\$8{,}316\).</p>
+        <ol>
+          <li>\(H_a:\mu<50{,}000\);\; \(H_0:\mu\ge50{,}000\).</li>
+          <li>Left-tailed t; reject if \( t\le -1.661\) (with \(df=99\)).</li>
+          <li>\(\displaystyle t=\frac{40571-50000}{8316/\sqrt{100}}=-11.338\).</li>
+          <li>\(-11.338\le -1.661\) → <strong>Reject \(H_0\)</strong>.</li>
+          <li>Conclude (95% confidence) the mean is less than \$50,000.</li>
+        </ol>
+      </section>
+
+      <!-- Pigs -->
+      <section id="ex-pigs" class="section">
+        <h2>Example — Pig Weight Change (Two-Tailed t)</h2>
+        <p>Claim: average weight change differs from 200 lb. Use \( \alpha=0.05\). Given \( n=24,\ \bar{x}=197.2,\ s=9.8\).</p>
+        <ol>
+          <li>\(H_a:\mu\ne200\);\; \(H_0:\mu=200\).</li>
+          <li>Two-tailed t; reject if \( t\le -2.069\) or \( t\ge 2.069\) (with \(df=23\)).</li>
+          <li>\(\displaystyle t=\frac{197.2-200}{9.8/\sqrt{24}}=-1.400\).</li>
+          <li>\(-2.069< -1.400 < 2.069\) → <strong>Fail to Reject \(H_0\)</strong>.</li>
+          <li>Insufficient evidence of a change from 200 lb.</li>
+        </ol>
+      </section>
+
+      <!-- proportion test -->
+      <section id="prop" class="section">
+        <h2>Test of Hypothesis for a Proportion \( p \) (Large \( n \))</h2>
+        <p>For sufficiently large \( n \), use a Z test with the null proportion \( p \) and \( q=1-p \):
+          \[
+            Z \;=\; \frac{\hat{p}-p}{\sqrt{pq/n}}.
+          \]
+        </p>
+      </section>
+
+      <!-- proportion examples -->
+      <section id="ex-prop" class="section">
+        <h2>Examples — Proportions</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Cancer Remission (Right-Tailed)</h3>
+            <p>Current method \(p=0.20\). New method: 26 of 100 remissions (\(\hat p=0.26\)). \( \alpha=0.05\).</p>
+            <ol>
+              <li>\(H_a:p>0.20\);\; \(H_0:p\le0.20\).</li>
+              <li>Reject if \( Z\ge1.645\).</li>
+              <li>\(\displaystyle Z=\frac{0.26-0.20}{\sqrt{(0.20)(0.80)/100}}=1.5\).</li>
+              <li>\(1.5<1.645\) → <strong>Fail to Reject \(H_0\)</strong>.</li>
+              <li>Insufficient evidence the new method is better.</li>
+            </ol>
+          </article>
+          <article class="card">
+            <h3>Vanilla Wafers (Left-Tailed)</h3>
+            <p>Question: Is \(p<0.50\)? Sample: 42 of 250 choose Murray’s (\(\hat p=0.168\)). \( \alpha=0.05\).</p>
+            <ol>
+              <li>\(H_a:p<0.50\);\; \(H_0:p\ge0.50\).</li>
+              <li>Reject if \( Z\le -1.645\).</li>
+              <li>\(\displaystyle Z=\frac{0.168-0.50}{\sqrt{(0.50)(0.50)/250}}=-10.499\).</li>
+              <li>\(-10.499\le -1.645\) → <strong>Reject \(H_0\)</strong>.</li>
+              <li>Conclude (95% confidence) less than 50% prefer Murray’s.</li>
+            </ol>
+          </article>
+        </div>
+      </section>
+
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>

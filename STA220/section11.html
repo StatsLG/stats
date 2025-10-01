@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Section 11 | Inferences Based on Two Samples</title>
+  <meta name="description" content="Section 11: Inferences Based on Two Samples — STA220 notes on StatsLG." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- MathJax (LaTeX) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM YOUR TEMPLATE ===== -->
+    <aside class="sidebar" aria-label="Site navigation">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-title">BCTC Statistics Hub</div>
+      </div>
+
+      <div class="nav-section">
+        <h3>Graphing</h3>
+        <nav class="nav">
+          <a href="/graphing/barchart.html">Bar Chart</a>
+          <a href="/graphing/piechart.html">Pie / Donut</a>
+          <a href="/graphing/histogram.html">Histogram</a>
+          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+          <a href="/graphing/barchart2way.html">Grouped Bar</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Analysis</h3>
+        <nav class="nav">
+          <a href="/descriptive/summary.html">Descriptive Summary</a>
+          <a href="/inference/onemean.html">One-Sample Mean Test</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Notes & Extras</h3>
+        <nav class="nav">
+          <a href="/STA210U/">STA 210U</a>
+          <a href="/STA220/">STA 220</a>
+          <a href="/STA296U/">STA 296U</a>
+          <a href="/game/pathyfinder.html">Pathy Finder</a>
+        </nav>
+      </div>
+
+      <div class="footer-note">
+        © <span id="yr"></span> StatsLG - Luke Garnett
+      </div>
+    </aside>
+
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
+    <main>
+      <header>
+        <h1>Section 11 — Inferences Based on Two Samples</h1>
+        <p>We compare two population means \( \mu_1 \) and \( \mu_2 \). The correct method depends on the <strong>design</strong>: <em>dependent (paired)</em> samples or <em>independent</em> samples. For each design we cover hypotheses, test statistics, critical regions, and confidence intervals.</p>
+      </header>
+
+      <!-- On this page -->
+      <section class="section">
+        <h2>On this page</h2>
+        <div class="grid">
+          <article class="card"><a href="#design">Design: Dependent vs Independent Samples</a></article>
+          <article class="card"><a href="#dep-notation">Dependent (Paired) Samples — Notation &amp; Setup</a></article>
+          <article class="card"><a href="#dep-test">Dependent Samples — t Test &amp; CI</a></article>
+          <article class="card"><a href="#dep-example">Example: New Product Display (Paired)</a></article>
+          <article class="card"><a href="#dep-ci">Paired 95% CI — Worked</a></article>
+          <article class="card"><a href="#indep-notation">Independent Samples — Notation &amp; Concept</a></article>
+          <article class="card"><a href="#indep-pooled">Independent (Equal Variances) — Pooled t Test &amp; CI</a></article>
+          <article class="card"><a href="#indep-example">Example: Fuel Additive (Independent)</a></article>
+          <article class="card"><a href="#indep-ci">Independent 95% CI — Worked</a></article>
+          <article class="card"><a href="#unequal">If Variances Are Unequal (Note)</a></article>
+          <article class="card"><a href="#tips">Choosing a Design &amp; Practical Tips</a></article>
+        </div>
+      </section>
+
+      <!-- Design -->
+      <section id="design" class="section">
+        <h2>Design: Dependent vs Independent Samples</h2>
+        <p><strong>Independent samples:</strong> values in one sample are unrelated to those in the other (e.g., randomly assign different subjects to two teaching methods; randomized drug vs placebo arms).</p>
+        <p><strong>Dependent (paired) samples:</strong> subjects are intentionally paired to be alike, or the same subject receives both treatments. Pairing reduces subject-to-subject variability, improving precision when that variability is large relative to expected treatment differences.</p>
+      </section>
+
+      <!-- Dependent notation -->
+      <section id="dep-notation" class="section">
+        <h2>Dependent (Paired) Samples — Notation &amp; Setup</h2>
+        <p>Let pair \(j\) have measurements \(x_{1j}\) (treatment 1) and \(x_{2j}\) (treatment 2). Define the difference</p>
+        <p>\[
+          d_j = x_{1j} - x_{2j}.
+        \]</p>
+        <p>We analyze the set of differences \(d_1,\dots,d_n\). The difference mean and variance estimate</p>
+        <ul>
+          <li>\(\mu_d=\mu_1-\mu_2\) (parameter of interest),</li>
+          <li>point estimate \( \bar d=\bar x_1-\bar x_2 \),</li>
+          <li>sample SD \( s_d \).</li>
+        </ul>
+
+        <div class="preview" role="region" aria-label="Paired data and notation">
+          <table class="table">
+            <thead>
+              <tr><th>Pair</th><th>Treatment 1</th><th>Treatment 2</th><th>Difference</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>\(x_{11}\)</td><td>\(x_{21}\)</td><td>\(d_1=x_{11}-x_{21}\)</td></tr>
+              <tr><td>2</td><td>\(x_{12}\)</td><td>\(x_{22}\)</td><td>\(d_2=x_{12}-x_{22}\)</td></tr>
+              <tr><td>3</td><td>\(x_{13}\)</td><td>\(x_{23}\)</td><td>\(d_3=x_{13}-x_{23}\)</td></tr>
+              <tr><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td></tr>
+              <tr><td>n</td><td>\(x_{1n}\)</td><td>\(x_{2n}\)</td><td>\(d_n=x_{1n}-x_{2n}\)</td></tr>
+              <tr><th>Sample Mean</th><th>\(\bar x_1\)</th><th>\(\bar x_2\)</th><th>\(\bar d=\bar x_1-\bar x_2\)</th></tr>
+              <tr><th>Sample Variance</th><th>\(s_1^2\)</th><th>\(s_2^2\)</th><th>\(s_d^2\)</th></tr>
+              <tr><th>Sample SD</th><th>\(s_1\)</th><th>\(s_2\)</th><th>\(s_d\)</th></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card soft" style="margin-top:12px;">
+          <h3>Interpreting \( \mu_d \)</h3>
+          <ul>
+            <li>If \( \mu_d>0 \Rightarrow \mu_1>\mu_2 \)</li>
+            <li>If \( \mu_d<0 \Rightarrow \mu_1<\mu_2 \)</li>
+            <li>If \( \mu_d\ne 0 \Rightarrow \mu_1\ne \mu_2 \)</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Dependent test & CI -->
+      <section id="dep-test" class="section">
+        <h2>Dependent Samples — t Test &amp; Confidence Interval</h2>
+        <p>Test statistic (df \(=n-1\)):</p>
+        <p>\[
+          t \;=\; \frac{\bar d - \mu_d}{\,s_d/\sqrt{n}\,}.
+        \]</p>
+        <p>Two-sided \(100(1-\alpha)\%\) CI for \( \mu_d \):</p>
+        <p>\[
+          \bar d \;\pm\; t_{\alpha/2,\;n-1}\,\frac{s_d}{\sqrt{n}}.
+        \]</p>
+      </section>
+
+      <!-- Dependent example -->
+      <section id="dep-example" class="section">
+        <h2>Example — New Product Display (Paired)</h2>
+        <p>Goal: show the new display <em>increases</em> sales (right-tailed test at \( \alpha=0.05\)). \(n=6\) pairs of stores; response is cases sold in one month.</p>
+
+        <div class="preview" role="region" aria-label="New vs Traditional display sales (paired)">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Pair</th><th>New (T1)</th><th>Traditional (T2)</th><th>Difference \(d\)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>13</td><td>11</td><td>2</td></tr>
+              <tr><td>2</td><td>31</td><td>29</td><td>2</td></tr>
+              <tr><td>3</td><td>20</td><td>21</td><td>-1</td></tr>
+              <tr><td>4</td><td>19</td><td>17</td><td>2</td></tr>
+              <tr><td>5</td><td>42</td><td>39</td><td>3</td></tr>
+              <tr><td>6</td><td>26</td><td>22</td><td>4</td></tr>
+              <tr><th colspan="4">Summary: \( \bar d=2,\; s_d^2=2.8,\; s_d=1.6733 \)</th></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid" style="margin-top:12px;">
+          <article class="card">
+            <h3>Hypotheses &amp; Critical Region</h3>
+            <p>\(H_a:\mu_d>0\) (equivalently \( \mu_1>\mu_2 \)), \(H_0:\mu_d\le 0\).</p>
+            <p>Right-tailed t test, \(df=5\): reject if \(t\ge 2.015\).</p>
+          </article>
+          <article class="card">
+            <h3>Test Statistic</h3>
+            <p>\[
+              t=\frac{2-0}{1.6733/\sqrt{6}}=2.928.
+            \]</p>
+            <p>\(2.928\ge 2.015\) → <strong>Reject \(H_0\)</strong>.</p>
+            <p>Conclude with 95% confidence that the new display increases sales.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Dependent CI -->
+      <section id="dep-ci" class="section">
+        <h2>Paired 95% Confidence Interval — Worked</h2>
+        <p>Margin \( E=t_{\alpha/2,5}\dfrac{s_d}{\sqrt{n}} = 2.571\cdot\dfrac{1.6733}{\sqrt{6}}=1.756.\)</p>
+        <p>\[
+          \bar d \pm E \;=\; 2\pm1.756 \;=\; (0.244,\;3.756).
+        \]</p>
+        <p>Interpretation: we are 95% confident the mean increase is between 0.244 and 3.756 cases.</p>
+      </section>
+
+      <!-- Independent notation -->
+      <section id="indep-notation" class="section">
+        <h2>Independent Samples — Notation &amp; Concept</h2>
+        <div class="preview" role="region" aria-label="Independent samples notation">
+          <table class="table">
+            <thead>
+              <tr>
+                <th></th><th>Treatment 1</th><th>Treatment 2</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th>Sample Size</th><td>\(n_1\)</td><td>\(n_2\)</td></tr>
+              <tr><th>Data</th><td>\(x_{11},x_{12},\dots,x_{1n_1}\)</td><td>\(x_{21},x_{22},\dots,x_{2n_2}\)</td></tr>
+              <tr><th>Sample Mean</th><td>\(\bar x_1\)</td><td>\(\bar x_2\)</td></tr>
+              <tr><th>Sample Variance</th><td>\(s_1^2\)</td><td>\(s_2^2\)</td></tr>
+              <tr><th>Sample SD</th><td>\(s_1\)</td><td>\(s_2\)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The point estimate of \( \mu_1-\mu_2 \) is \( \bar x_1-\bar x_2 \) with standard error \( \sqrt{\sigma_1^2/n_1+\sigma_2^2/n_2} \). For <em>large</em> \(n_1,n_2\), the standardized statistic</p>
+        <p>\[
+          Z=\frac{(\bar x_1-\bar x_2)-(\mu_1-\mu_2)}{\sqrt{\sigma_1^2/n_1+\sigma_2^2/n_2}}
+        \]
+        </p>
+        <p>is approximately standard normal (in practice, population variances are unknown, see below).</p>
+      </section>
+
+      <!-- Independent pooled t -->
+      <section id="indep-pooled" class="section">
+        <h2>Independent Samples (Equal Variances) — Pooled t Test &amp; CI</h2>
+        <p>Assume \( \sigma_1^2=\sigma_2^2 \). Use the pooled variance</p>
+        <p>\[
+          s_p^2=\frac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2},
+        \]
+        </p>
+        <p>then the test statistic (df \(=n_1+n_2-2\)) is</p>
+        <p>\[
+          t=\frac{(\bar x_1-\bar x_2)-(\mu_1-\mu_2)}{\sqrt{s_p^2/n_1+s_p^2/n_2}}.
+        \]</p>
+        <p>A two-sided \(100(1-\alpha)\%\) CI is</p>
+        <p>\[
+          (\bar x_1-\bar x_2)\ \pm\ t_{\alpha/2,\;n_1+n_2-2}\ \sqrt{s_p^2/n_1+s_p^2/n_2}.
+        \]</p>
+      </section>
+
+      <!-- Independent example -->
+      <section id="indep-example" class="section">
+        <h2>Example — Fuel Additive (Independent)</h2>
+        <p>Compare MPG with additive (T1) vs without (T2). \(n_1=n_2=5\). Use \( \alpha=0.05\) to test if the additive <em>increases</em> mileage.</p>
+        <div class="preview" role="region" aria-label="Fuel additive data">
+          <table class="table">
+            <thead>
+              <tr>
+                <th></th><th>With Additive (T1)</th><th>Without Additive (T2)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th>Data</th><td>26.3, 27.4, 25.1, 26.8, 27.1</td><td>24.5, 25.4, 23.7, 25.9, 25.7</td></tr>
+              <tr><th>Means</th><td>\(\bar x_1=26.54\)</td><td>\(\bar x_2=25.04\)</td></tr>
+              <tr><th>Variances</th><td>\(s_1^2=0.813\)</td><td>\(s_2^2=0.848\)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid" style="margin-top:12px;">
+          <article class="card">
+            <h3>Hypotheses &amp; Critical Region</h3>
+            <p>\(H_a:\mu_1-\mu_2>0\) (equivalently \( \mu_1>\mu_2 \)), \(H_0:\mu_1-\mu_2\le 0\).</p>
+            <p>Right-tailed pooled t test, \(df=8\): reject if \(t\ge 1.860\).</p>
+          </article>
+          <article class="card">
+            <h3>Compute \(s_p^2\), Statistic, Decision</h3>
+            <p>\[
+              s_p^2=\frac{(5-1)(0.813)+(5-1)(0.848)}{5+5-2}=0.8305.
+            \]</p>
+            <p>\[
+              t=\frac{(26.54-25.04)-0}{\sqrt{0.8305/5+0.8305/5}}=2.603.
+            \]</p>
+            <p>\(2.603\ge1.860\) → <strong>Reject \(H_0\)</strong>. Conclude (95% confidence) the additive improves mileage.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Independent CI -->
+      <section id="indep-ci" class="section">
+        <h2>Independent 95% Confidence Interval — Worked</h2>
+        <p>Margin \( E=t_{\alpha/2,8}\sqrt{s_p^2/n_1+s_p^2/n_2}=2.306\cdot\sqrt{0.8305/5+0.8305/5}=1.329.\)</p>
+        <p>\[
+          (\bar x_1-\bar x_2)\pm E = (26.54-25.04)\pm1.329
+          \;=\; 1.50\pm1.329 \;=\; (0.171,\;2.829).
+        \]</p>
+        <p>Interpretation: we are 95% confident the additive increases MPG by between 0.171 and 2.829 miles.</p>
+      </section>
+
+      <!-- Unequal variances note -->
+      <section id="unequal" class="section">
+        <h2>If Variances Are Unequal (Note)</h2>
+        <p>If \( \sigma_1^2\ne\sigma_2^2 \), do not pool. A reasonable statistic is</p>
+        <p>\[
+          t=\frac{(\bar x_1-\bar x_2)-(\mu_1-\mu_2)}
+                 {\sqrt{s_1^2/n_1+s_2^2/n_2}},
+        \]
+        </p>
+        <p>whose exact distribution is complicated for small samples (Welch’s t uses an approximate df formula). For large \(n_1,n_2\), the distribution is well-approximated by normal. In this course, you will <strong>assume equal variances</strong> for problems unless stated otherwise.</p>
+      </section>
+
+      <!-- Tips -->
+      <section id="tips" class="section">
+        <h2>Choosing a Design &amp; Practical Tips</h2>
+        <ul>
+          <li>When subject-to-subject variability is large relative to expected treatment differences, consider a <strong>paired design</strong> to reduce error.</li>
+          <li>Always align your critical region (left/right/two-tailed) with the <strong>direction in \(H_a\)</strong>.</li>
+          <li>Report both a test decision and an <strong>interpreted CI</strong> to convey effect size and uncertainty.</li>
+        </ul>
+      </section>
+
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Footer year + last updated
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>
