@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Sections Index</title>
+  <meta name="description" content="STA220 section notes index — statsLG." />
+  <link rel="stylesheet" href="../style/bctcsyle.css">
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar (reuses your site styles) -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-title">statsLG</div>
+      </div>
+
+      <div class="nav-group">
+        <h3>Courses</h3>
+        <nav class="nav">
+          <a href="/sta210u/">STA210U</a>
+          <a href="/sta220/">STA220</a>
+          <a href="/sta296u/">STA296U</a>
+        </nav>
+      </div>
+
+      <div class="nav-group">
+        <h3>Tools</h3>
+        <nav class="nav">
+          <a href="/tools/stats-grapher.html">Stats Grapher</a>
+          <a href="/tools/box-and-whisker.html">Box &amp; Whisker</a>
+          <a href="/tools/time-calculator.html">XC/TF Time Calc</a>
+        </nav>
+      </div>
+
+      <div class="nav-group">
+        <h3>Other</h3>
+        <nav class="nav">
+          <a href="/acknowledgements/">Acknowledgements</a>
+          <a href="/contact/">Contact</a>
+        </nav>
+      </div>
+
+      <div class="footer-note">© <span id="year"></span> statsLG</div>
+    </aside>
+
+    <!-- Main -->
+    <main>
+      <header class="header">
+        <h1>STA220 — Sections</h1>
+        <p class="subtitle">All course sections in one place. Click a card to open that section.</p>
+      </header>
+
+      <!-- Search / filter (optional) -->
+      <section class="section">
+        <div class="row">
+          <div>
+            <label for="search">Filter sections</label>
+            <input id="search" type="text" placeholder="e.g., sampling, probability, Section 3…" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Cards -->
+      <section class="section">
+        <div id="cards" class="grid"></div>
+      </section>
+
+      <footer class="site-footer">
+        <p class="text-muted">Tip: Keep this file updated by editing the sections list in the script below.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Update footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ----- Editable sections list -----
+    // Add new sections here as you publish them to this STA220 folder.
+    // file: is relative to STA220/ (this index's location)
+    const sections = [
+      {
+        id: "section1",
+        title: "Section 1 — Introduction to Statistics and Data Collection",
+        desc: "What statistics is, core vocabulary (population, sample, statistic, parameter), descriptive vs inferential, and sources of error.",
+        file: "section1.html",
+        updated: "2025-10-01"
+      },
+      // Example placeholders—remove or replace when ready:
+      // { id: "section2", title: "Section 2 — Graphs & Summaries", desc: "Visual summaries and numeric measures.", file: "section2.html", updated: "2025-10-07" },
+      // { id: "section3", title: "Section 3 — Probability Basics", desc: "Sample spaces, rules, independence.", file: "section3.html", updated: "2025-10-14" },
+    ];
+
+    // ----- Render cards -----
+    const cards = document.getElementById('cards');
+
+    function render(list){
+      cards.innerHTML = "";
+      list.forEach(s => {
+        const card = document.createElement('div');
+        card.className = "card";
+        card.innerHTML = `
+          <h3>${s.title}</h3>
+          <p class="muted">${s.desc || ""}</p>
+          <div class="btns">
+            <a class="btn" href="${s.file}">Open</a>
+            <span class="muted" style="margin-left:8px;">Updated: ${s.updated || "—"}</span>
+          </div>
+        `;
+        cards.appendChild(card);
+      });
+    }
+    render(sections);
+
+    // ----- Simple client-side filter -----
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if(!q){ render(sections); return; }
+      const filtered = sections.filter(s =>
+        (s.title && s.title.toLowerCase().includes(q)) ||
+        (s.desc && s.desc.toLowerCase().includes(q)) ||
+        (s.id && s.id.toLowerCase().includes(q))
+      );
+      render(filtered);
+    });
+  </script>
+</body>
+</html>
