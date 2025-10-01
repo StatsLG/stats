@@ -3,57 +3,67 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>STA220 — Home</title>
-  <meta name="description" content="STA220 section notes index — statsLG." />
-  <link rel="stylesheet" href="../style/bctcsyle.css">
-
+  <title>STA220 — Home | StatsLG</title>
+  <meta name="description" content="STA220 section notes index — StatsLG." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
 </head>
 <body>
-  <div class="layout">
-    <!-- Sidebar (reuses your site styles) -->
-    <aside class="sidebar">
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM YOUR TEMPLATE ===== -->
+    <aside class="sidebar" aria-label="Site navigation">
       <div class="brand">
-        <div class="brand-logo"></div>
-        <div class="brand-title">statsLG</div>
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-title">BCTC Statistics Hub</div>
       </div>
 
-      <div class="nav-group">
-        <h3>Courses</h3>
+      <div class="nav-section">
+        <h3>Graphing</h3>
         <nav class="nav">
-          <a href="/sta210u/">STA210U</a>
-          <a href="/sta220/">STA220</a>
-          <a href="/sta296u/">STA296U</a>
+          <a href="/graphing/barchart.html">Bar Chart</a>
+          <a href="/graphing/piechart.html">Pie Chart</a>
+          <a href="/graphing/histogram.html">Histogram</a>
+          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+          <a href="/graphing/barchart2way.html">Grouped Bar</a>
         </nav>
       </div>
 
-      <div class="nav-group">
-        <h3>Tools</h3>
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Analysis</h3>
         <nav class="nav">
-          <a href="/tools/stats-grapher.html">Stats Grapher</a>
-          <a href="/tools/box-and-whisker.html">Box &amp; Whisker</a>
-          <a href="/tools/time-calculator.html">XC/TF Time Calc</a>
+          <a href="/descriptive/summary.html">Descriptive Summary</a>
+          <a href="/inference/onemean.html">One-Sample Mean Test</a>
         </nav>
       </div>
 
-      <div class="nav-group">
-        <h3>Other</h3>
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Notes & Extras</h3>
         <nav class="nav">
-          <a href="/acknowledgements/">Acknowledgements</a>
-          <a href="/contact/">Contact</a>
+          <a href="/STA210U/">STA 210U</a>
+          <a href="/STA220/">STA 220</a>
+          <a href="/STA296U/">STA 296U</a>
+          <a href="/game/pathyfinder.html">Pathy Finder</a>
         </nav>
       </div>
 
-      <div class="footer-note">© <span id="year"></span> statsLG</div>
+      <div class="footer-note">
+        © <span id="yr"></span> StatsLG - Luke Garnett
+      </div>
     </aside>
 
-    <!-- Main -->
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
     <main>
-      <header class="header">
-        <h1>STA220 — Sections</h1>
-        <p class="subtitle">All course sections in one place. Click a card to open that section.</p>
+      <header>
+        <h1>STA220 — Statistics</h1>
+        <p class="subtitle">NOTES</p>
       </header>
 
-      <!-- Search / filter (optional) -->
+      <!-- Search / filter -->
       <section class="section">
         <div class="row">
           <div>
@@ -63,24 +73,25 @@
         </div>
       </section>
 
-      <!-- Cards -->
+      <!-- Section cards -->
       <section class="section">
         <div id="cards" class="grid"></div>
       </section>
 
-      <footer class="site-footer">
-        <p class="text-muted">Tip: Keep this file updated by editing the sections list in the script below.</p>
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
       </footer>
     </main>
   </div>
 
   <script>
-    // Update footer year
-    document.getElementById('year').textContent = new Date().getFullYear();
+    // Sidebar footer year + page last modified (same behavior as your template)
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
 
     // ----- Editable sections list -----
-    // Add new sections here as you publish them to this STA220 folder.
-    // file: is relative to STA220/ (this index's location)
+    // Files are relative to STA220/ (this page's folder)
     const sections = [
       {
         id: "section1",
@@ -89,7 +100,7 @@
         file: "section1.html",
         updated: "2025-10-01"
       },
-      // Example placeholders—remove or replace when ready:
+      // Add more sections here:
       // { id: "section2", title: "Section 2 — Graphs & Summaries", desc: "Visual summaries and numeric measures.", file: "section2.html", updated: "2025-10-07" },
       // { id: "section3", title: "Section 3 — Probability Basics", desc: "Sample spaces, rules, independence.", file: "section3.html", updated: "2025-10-14" },
     ];
@@ -100,7 +111,7 @@
     function render(list){
       cards.innerHTML = "";
       list.forEach(s => {
-        const card = document.createElement('div');
+        const card = document.createElement('article');
         card.className = "card";
         card.innerHTML = `
           <h3>${s.title}</h3>
