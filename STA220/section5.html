@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Section 5 | Discrete Probability Distributions</title>
+  <meta name="description" content="Section 5: Discrete Probability Distributions — STA220 notes on StatsLG." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- MathJax (LaTeX) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM YOUR TEMPLATE ===== -->
+    <aside class="sidebar" aria-label="Site navigation">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-title">BCTC Statistics Hub</div>
+      </div>
+
+      <div class="nav-section">
+        <h3>Graphing</h3>
+        <nav class="nav">
+          <a href="/graphing/barchart.html">Bar Chart</a>
+          <a href="/graphing/piechart.html">Pie / Donut</a>
+          <a href="/graphing/histogram.html">Histogram</a>
+          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+          <a href="/graphing/barchart2way.html">Grouped Bar</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Analysis</h3>
+        <nav class="nav">
+          <a href="/descriptive/summary.html">Descriptive Summary</a>
+          <a href="/inference/onemean.html">One-Sample Mean Test</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Notes & Extras</h3>
+        <nav class="nav">
+          <a href="/STA210U/">STA 210U</a>
+          <a href="/STA220/">STA 220</a>
+          <a href="/STA296U/">STA 296U</a>
+          <a href="/game/pathyfinder.html">Pathy Finder</a>
+        </nav>
+      </div>
+
+      <div class="footer-note">
+        © <span id="yr"></span> StatsLG - Luke Garnett
+      </div>
+    </aside>
+
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
+    <main>
+      <header>
+        <h1>Section 5 — Discrete Probability Distributions</h1>
+        <p>A <strong>random variable</strong> takes values according to a probability model. Here we focus on <strong>discrete</strong> random variables and their distributions, expected value (mean), and variability (variance and standard deviation). We end with the important <strong>binomial</strong> model and shortcuts.</p>
+      </header>
+
+      <!-- On this page -->
+      <section class="section">
+        <h2>On this page</h2>
+        <div class="grid">
+          <article class="card"><a href="#rv">Random Variables: Discrete vs Continuous</a></article>
+          <article class="card"><a href="#valid">Valid Discrete Distribution — Checklist</a></article>
+          <article class="card"><a href="#coin2">Example: Two Coin Flips</a></article>
+          <article class="card"><a href="#meanvar">Population Mean &amp; Variance (Discrete)</a></article>
+          <article class="card"><a href="#equiv">Variance — Conceptual vs Computational</a></article>
+          <article class="card"><a href="#nosquare">Why not drop the square?</a></article>
+          <article class="card"><a href="#die">Example: One Die — \( \mu, \sigma^2, \sigma \)</a></article>
+          <article class="card"><a href="#life">Example: Life Insurance Payout</a></article>
+          <article class="card"><a href="#binom">Binomial Distribution — Properties</a></article>
+          <article class="card"><a href="#tree3">Illustration with \(n=3\)</a></article>
+          <article class="card"><a href="#binomform">Binomial Formula \(P(X=x)\)</a></article>
+          <article class="card"><a href="#binomex">Binomial Examples</a></article>
+          <article class="card"><a href="#ineq">Inequalities via Complement</a></article>
+          <article class="card"><a href="#binommean">Binomial \( \mu, \sigma^2, \sigma \)</a></article>
+          <article class="card"><a href="#mcq">Example: 100-item MCQ (4 choices)</a></article>
+        </div>
+      </section>
+
+      <!-- Random variables -->
+      <section id="rv" class="section">
+        <h2>Random Variables: Discrete vs Continuous</h2>
+        <p><strong>Discrete:</strong> values are separated points on the number line; finite or countable outcomes (typically <em>counts</em>).</p>
+        <ul>
+          <li># of students in a course</li>
+          <li># of flips until first tail</li>
+        </ul>
+        <p><strong>Continuous:</strong> values fill intervals on the number line; uncountably many outcomes (typically <em>measurements</em>).</p>
+        <ul>
+          <li>Height of a person</li>
+          <li>Distance traveled to work</li>
+        </ul>
+        <p>For discrete \(X\), we assign a probability to every possible value \(x\).</p>
+      </section>
+
+      <!-- Valid discrete distribution -->
+      <section id="valid" class="section">
+        <h2>Valid Discrete Distribution — Checklist</h2>
+        <ol>
+          <li>\(x\) is discrete (finite or countable outcomes).</li>
+          <li>\(0 \le P(x) \le 1\) for all \(x\).</li>
+          <li>\(\sum P(x) = 1\).</li>
+        </ol>
+      </section>
+
+      <!-- Two coin flips -->
+      <section id="coin2" class="section">
+        <h2>Example: Two Coin Flips</h2>
+        <p>Flip a fair coin twice; \(x=\) # of tails. Outcomes: \(\{HH, HT, TH, TT\}\).</p>
+        <div class="card soft">
+          <div class="preview" role="region" aria-label="Two-flip distribution table">
+            <table class="table">
+              <thead><tr><th>\(x\)</th><th>\(P(x)\)</th></tr></thead>
+              <tbody>
+                <tr><td>0</td><td>\(1/4\)</td></tr>
+                <tr><td>1</td><td>\(1/2\)</td></tr>
+                <tr><td>2</td><td>\(1/4\)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p>Checks: probabilities in \([0,1]\), and \(1/4+1/2+1/4=1\).</p>
+      </section>
+
+      <!-- Mean & variance -->
+      <section id="meanvar" class="section">
+        <h2>Population Mean &amp; Variance (Discrete)</h2>
+        <p><strong>Expected value (mean):</strong> \(\displaystyle \mu=\sum x\,P(x)\).</p>
+        <p><strong>Variance:</strong> two equivalent forms
+          \[
+            \sigma^2=\sum (x-\mu)^2 P(x)
+            \quad=\quad
+            \sum x^2 P(x) - \mu^2
+          \]
+          and <strong>standard deviation:</strong> \(\sigma=\sqrt{\sigma^2}\).
+        </p>
+      </section>
+
+      <!-- Equivalence proof -->
+      <section id="equiv" class="section">
+        <h2>Variance — Conceptual vs Computational</h2>
+        <p>Show that \(\sum (x-\mu)^2 P(x)=\sum x^2 P(x)-\mu^2\):</p>
+        <p>
+        \[
+        \begin{aligned}
+          \sum (x-\mu)^2 P(x)
+          &= \sum (x^2-2\mu x+\mu^2)P(x) \\
+          &= \sum x^2P(x) - 2\mu \sum xP(x) + \mu^2\sum P(x) \\
+          &= \sum x^2P(x) - 2\mu(\mu) + \mu^2(1) \\
+          &= \sum x^2P(x) - \mu^2.
+        \end{aligned}
+        \]
+        </p>
+      </section>
+
+      <!-- Why not drop the square -->
+      <section id="nosquare" class="section">
+        <h2>Why not drop the square?</h2>
+        <p>
+          \(\displaystyle \sum (x-\mu)P(x)
+          = \sum xP(x) - \mu\sum P(x)
+          = \mu - \mu = 0.\)
+          Without squaring, positives and negatives cancel.
+        </p>
+      </section>
+
+      <!-- Die example -->
+      <section id="die" class="section">
+        <h2>Example: One Die — \( \mu, \sigma^2, \sigma \)</h2>
+        <div class="card soft">
+          <div class="preview" role="region" aria-label="Die distribution table">
+            <table class="table">
+              <thead><tr><th>\(x\)</th><th>\(P(x)\)</th><th>\(x\cdot P(x)\)</th><th>\(x^2\)</th><th>\(x^2\cdot P(x)\)</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>\(1/6\)</td><td>1/6</td><td>1</td><td>1/6</td></tr>
+                <tr><td>2</td><td>\(1/6\)</td><td>2/6</td><td>4</td><td>4/6</td></tr>
+                <tr><td>3</td><td>\(1/6\)</td><td>3/6</td><td>9</td><td>9/6</td></tr>
+                <tr><td>4</td><td>\(1/6\)</td><td>4/6</td><td>16</td><td>16/6</td></tr>
+                <tr><td>5</td><td>\(1/6\)</td><td>5/6</td><td>25</td><td>25/6</td></tr>
+                <tr><td>6</td><td>\(1/6\)</td><td>6/6</td><td>36</td><td>36/6</td></tr>
+                <tr><th>Totals</th><th>1</th><th>3.5</th><th>—</th><th>91/6</th></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>\(\mu=\sum xP(x)=3.5\)</p>
+          <p>\(\sigma^2=\sum x^2P(x)-\mu^2=15.167-12.25=2.917\)</p>
+          <p>\(\sigma=\sqrt{2.917}\approx1.708\)</p>
+        </div>
+      </section>
+
+      <!-- Life insurance example -->
+      <section id="life" class="section">
+        <h2>Example: Life Insurance Payout</h2>
+        <p>One-year term policy with payout \(x \in \{0,\$100{,}000\}\); probabilities \(P(0)=0.995,\;P(100000)=0.005\).</p>
+        <div class="card soft">
+          <div class="preview" role="region" aria-label="Life insurance distribution">
+            <table class="table">
+              <thead><tr><th>\(x\)</th><th>\(P(x)\)</th><th>\(x\cdot P(x)\)</th><th>\(x^2\)</th><th>\(x^2\cdot P(x)\)</th></tr></thead>
+              <tbody>
+                <tr><td>\$0</td><td>0.995</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td>\$100{,}000</td><td>0.005</td><td>500</td><td>10,000,000,000</td><td>50,000,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <ul>
+            <li>\(\mu=\sum xP(x)=\$500\) (break-even, ignoring overhead)</li>
+            <li>\(\sigma^2=\sum x^2P(x)-\mu^2=50{,}000{,}000-250{,}000=49{,}750{,}000\)</li>
+            <li>\(\sigma=\sqrt{49{,}750{,}000}\approx 7053.37\)</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Binomial -->
+      <section id="binom" class="section">
+        <h2>Binomial Distribution — Properties</h2>
+        <ul>
+          <li>\(n\) identical, independent trials.</li>
+          <li>Each trial → success \(S\) or failure \(F\).</li>
+          <li>\(P(S)=p,\;P(F)=q=1-p\) (same each trial).</li>
+          <li>Random variable \(X=\) # of successes in \(n\) trials.</li>
+        </ul>
+      </section>
+
+      <!-- Illustration n=3 -->
+      <section id="tree3" class="section">
+        <h2>Illustration with \(n=3\)</h2>
+        <p>Outcomes via tree diagram (not equally likely unless \(p=1/2\)); use multiplication rule:</p>
+        <div class="grid">
+          <article class="card"><p>\(SSS\Rightarrow p^3\)</p></article>
+          <article class="card"><p>\(SSF\Rightarrow p^2 q\)</p></article>
+          <article class="card"><p>\(SFS\Rightarrow p^2 q\)</p></article>
+          <article class="card"><p>\(SFF\Rightarrow p q^2\)</p></article>
+          <article class="card"><p>\(FSS\Rightarrow p^2 q\)</p></article>
+          <article class="card"><p>\(FSF\Rightarrow p q^2\)</p></article>
+          <article class="card"><p>\(FFS\Rightarrow p q^2\)</p></article>
+          <article class="card"><p>\(FFF\Rightarrow q^3\)</p></article>
+        </div>
+        <p>Therefore \(P(X=0)=q^3,\;P(X=1)=3pq^2,\;P(X=2)=3p^2q,\;P(X=3)=p^3\).</p>
+      </section>
+
+      <!-- Binomial formula -->
+      <section id="binomform" class="section">
+        <h2>Binomial Formula</h2>
+        <p>\[
+          P(X=x)=\binom{n}{x} p^{\,x} q^{\,n-x}
+        \]</p>
+      </section>
+
+      <!-- Binomial examples -->
+      <section id="binomex" class="section">
+        <h2>Binomial Examples</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>10 fair coin flips; \(P(X=7)\)</h3>
+            <p>\(n=10,\;p=1/2\)</p>
+            <p>\(P= \binom{10}{7}(1/2)^{7}(1/2)^{3}= \binom{10}{7}/2^{10}\approx 0.117\)</p>
+          </article>
+          <article class="card">
+            <h3>5 die rolls; \(X=\#\) of sixes; \(P(X=2)\)</h3>
+            <p>\(n=5,\;p=1/6\)</p>
+            <p>\(P=\binom{5}{2}(1/6)^2(5/6)^3 \approx 0.161\)</p>
+          </article>
+          <article class="card">
+            <h3>Cancer remission</h3>
+            <p>Remission in \(1/4\) of patients; 3 patients; \(P(X=2)\).</p>
+            <p>\(n=3,\;p=1/4\Rightarrow P=\binom{3}{2}(1/4)^2(3/4)^1\approx 0.1406\)</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Inequalities -->
+      <section id="ineq" class="section">
+        <h2>Inequalities via the Complement</h2>
+        <p>For \(X\sim\text{Bin}(n=8,p=0.4)\), compute \(P(X\le 6)\) via complement:</p>
+        <p>
+          \(P(X>6)=P(X=7)+P(X=8)
+           = \binom{8}{7}0.4^{7}0.6^{1} + \binom{8}{8}0.4^{8}0.6^{0}
+           \approx 0.007864 + 0.000655 = 0.008519\).
+        </p>
+        <p>\(P(X\le 6)=1-0.008519=0.991481\).</p>
+      </section>
+
+      <!-- Binomial mean/sd -->
+      <section id="binommean" class="section">
+        <h2>Binomial Mean &amp; Standard Deviation</h2>
+        <p>\(\mu = np,\qquad \sigma^2 = npq,\qquad \sigma=\sqrt{npq}\).</p>
+      </section>
+
+      <!-- MCQ example -->
+      <section id="mcq" class="section">
+        <h2>Example: 100-item MCQ (4 choices)</h2>
+        <p>Random guessing; \(n=100,\;p=1/4,\;q=3/4\).</p>
+        <ul>
+          <li>\(\mu=np=100\cdot \tfrac14=25\) (expected correct \(=25\%\)).</li>
+          <li>\(\sigma^2=npq=100\cdot \tfrac14\cdot \tfrac34=18.75\).</li>
+          <li>\(\sigma=\sqrt{18.75}\approx 4.330\).</li>
+        </ul>
+      </section>
+
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>
