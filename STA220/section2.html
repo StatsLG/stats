@@ -7,6 +7,21 @@
   <meta name="description" content="Section 2: Methods for Describing Sets of Data — STA220 notes on StatsLG." />
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- MathJax (LaTeX) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
 </head>
 <body>
   <div class="wrap">
@@ -180,14 +195,14 @@ Stem | Leaves
               <tr><th>Weight (lb)</th><th>Frequency</th></tr>
             </thead>
             <tbody>
-              <tr><td>130 ≤ w &lt; 140</td><td>1</td></tr>
-              <tr><td>140 ≤ w &lt; 150</td><td>1</td></tr>
-              <tr><td>150 ≤ w &lt; 160</td><td>4</td></tr>
-              <tr><td>160 ≤ w &lt; 170</td><td>4</td></tr>
-              <tr><td>170 ≤ w &lt; 180</td><td>3</td></tr>
-              <tr><td>180 ≤ w &lt; 190</td><td>0</td></tr>
-              <tr><td>190 ≤ w &lt; 200</td><td>0</td></tr>
-              <tr><td>200 ≤ w &lt; 210</td><td>1</td></tr>
+              <tr><td>\(130 \le w &lt; 140\)</td><td>1</td></tr>
+              <tr><td>\(140 \le w &lt; 150\)</td><td>1</td></tr>
+              <tr><td>\(150 \le w &lt; 160\)</td><td>4</td></tr>
+              <tr><td>\(160 \le w &lt; 170\)</td><td>4</td></tr>
+              <tr><td>\(170 \le w &lt; 180\)</td><td>3</td></tr>
+              <tr><td>\(180 \le w &lt; 190\)</td><td>0</td></tr>
+              <tr><td>\(190 \le w &lt; 200\)</td><td>0</td></tr>
+              <tr><td>\(200 \le w &lt; 210\)</td><td>1</td></tr>
               <tr><th>Total</th><th>14</th></tr>
             </tbody>
           </table>
@@ -234,7 +249,7 @@ Stem | Leaves
           </ul>
         </div>
 
-        <h3>Useful Properties (c a constant)</h3>
+        <h3>Useful Properties (\(c\) a constant)</h3>
         <ul>
           <li>\(\sum (c\,x) = c \sum x\)</li>
           <li>\(\sum c = n\,c\)</li>
@@ -249,9 +264,10 @@ Stem | Leaves
               <tr><td>\(\sum 4x\)</td><td>\(4\sum x = 4\cdot 9 = 36\)</td><td>Pull out constant</td></tr>
               <tr><td>\(\sum (x+3)\)</td><td>\(\sum x + 4\cdot 3 = 9 + 12 = 21\)</td><td>Linearity</td></tr>
               <tr><td>\(\sum (x+34)\)</td><td>\(\sum x + 4\cdot 34 = 9 + 136 = 145\)</td><td>Linearity</td></tr>
-              <tr><td>\(\sum (34 + x)^2\)</td>
-                  <td>\(4\cdot 34^2 + 68\sum x + \sum x^2 = 4\cdot 1156 + 68\cdot 9 + 23 = 5259\)</td>
-                  <td>Expand square; use \(\sum x^2 = 2^2+3^2+1^2+3^2=23\)</td>
+              <tr>
+                <td>\(\sum (34 + x)^2\)</td>
+                <td>\(4\cdot 34^2 + 68\sum x + \sum x^2 = 4\cdot 1156 + 68\cdot 9 + 23 = 5259\)</td>
+                <td>Expand square; use \(\sum x^2 = 2^2+3^2+1^2+3^2=23\)</td>
               </tr>
             </tbody>
           </table>
@@ -274,7 +290,7 @@ Stem | Leaves
         </div>
 
         <h3>Sample Median</h3>
-        <p>Order data; if \(n\) odd, middle value; if \(n\) even, average of two middle values.</p>
+        <p>Order data; if \(n\) is odd, the middle value; if \(n\) is even, the average of the two middle values.</p>
         <ul>
           <li>2,3,1,3 → ordered 1,2,3,3 → \(\tilde{x} = (2+3)/2 = 2.5\)</li>
           <li>2,3,1,3,10 → ordered 1,2,3,3,10 → \(\tilde{x} = 3\)</li>
@@ -294,7 +310,7 @@ Stem | Leaves
         <p>Most frequent value(s). 2,3,1,3 → mode = 3 (unchanged if data become 2,3,1,3,10). Mode can be unstable (may not exist or may be multiple), but it <em>can</em> be used with qualitative data (e.g., “average student is female” means the mode is female).</p>
 
         <h3>Sample Midrange</h3>
-        <p>\(\dfrac{\text{Low}+\text{High}}{2}\). For 2,3,1,3 → midrange = (1+3)/2 = 2. For 2,3,1,3,10 → midrange = (1+10)/2 = 5.5. Midrange depends entirely on extremes and is rarely a good measure (except under perfect symmetry).</p>
+        <p>\(\dfrac{\text{Low}+\text{High}}{2}\). For 2,3,1,3 → midrange \(=\,(1+3)/2 = 2\). For 2,3,1,3,10 → midrange \(=\,(1+10)/2 = 5.5\). Midrange depends entirely on extremes and is rarely a good measure (except under perfect symmetry).</p>
       </section>
 
       <footer>
@@ -310,3 +326,4 @@ Stem | Leaves
   </script>
 </body>
 </html>
+
