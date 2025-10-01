@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Sampling Distribution Applet (n=3)</title>
+  <meta name="description" content="Applet to visualize a sampling distribution from a population of 10, all samples of size 3." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- MathJax for a couple formulas -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+
+  <style>
+    /* Tiny helpers for visuals */
+    .chart {
+      width: 100%;
+      height: 340px;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      background: #fff;
+      display: block;
+    }
+    .mini {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .scroll {
+      max-height: 220px; overflow: auto; background: #fff;
+      border: 1px solid var(--rule); border-radius: 8px; padding: 8px;
+    }
+    .nums { display:grid; grid-template-columns: repeat(5, 1fr); gap:8px }
+    .nums input { width:100%; text-align: center }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .statgrid { display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:12px }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) ===== -->
+    <aside class="sidebar" aria-label="Site navigation">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-title">BCTC Statistics Hub</div>
+      </div>
+
+      <div class="nav-section">
+        <h3>Graphing</h3>
+        <nav class="nav">
+          <a href="/graphing/barchart.html">Bar Chart</a>
+          <a href="/graphing/piechart.html">Pie / Donut</a>
+          <a href="/graphing/histogram.html">Histogram</a>
+          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+          <a href="/graphing/barchart2way.html">Grouped Bar</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Analysis</h3>
+        <nav class="nav">
+          <a href="/descriptive/summary.html">Descriptive Summary</a>
+          <a href="/inference/onemean.html">One-Sample Mean Test</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Notes & Extras</h3>
+        <nav class="nav">
+          <a href="/STA210U/">STA 210U</a>
+          <a href="/STA220/">STA 220</a>
+          <a href="/STA296U/">STA 296U</a>
+          <a href="/game/pathyfinder.html">Pathy Finder</a>
+        </nav>
+      </div>
+
+      <div class="footer-note">
+        © <span id="yr"></span> StatsLG - Luke Garnett
+      </div>
+    </aside>
+
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
+    <main>
+      <header>
+        <h1>Sampling Distribution Applet — \(N=10\), all samples of size \(n=3\)</h1>
+        <p>Edit the population of 10 below, then compare the <strong>population distribution</strong> to the <strong>sampling distribution of \(\bar x\)</strong> over all \(\binom{10}{3}=120\) combinations (without replacement).</p>
+      </header>
+
+      <section class="section wrap" style="grid-template-columns: 360px 1fr;">
+        <!-- ===== LEFT: Controls ===== -->
+        <div class="panel pad left">
+          <h2 style="margin-top:0;">Population (10 values)</h2>
+          <p class="mini">Tip: values can repeat; decimals allowed.</p>
+          <div class="nums" id="inputs"></div>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn" id="btnUpdate">Update</button>
+            <button class="btn outline" id="btnRandom">Randomize</button>
+            <button class="btn ghost" id="btnEven">Evenly spaced</button>
+            <button class="btn ghost" id="btnReset">Reset example</button>
+          </div>
+
+          <hr class="rule" style="margin:12px 0;">
+          <div class="row">
+            <div>
+              <label>Sample size \(n\)</label>
+              <input type="number" id="nInput" value="3" min="2" max="5" />
+            </div>
+            <div>
+              <label>Bin width (means)</label>
+              <input type="number" id="binWidth" value="0.5" step="0.1" />
+            </div>
+          </div>
+
+          <div class="checkline" style="margin-top:8px;">
+            <input type="checkbox" id="showSamples">
+            <label for="showSamples" style="margin:0;">Show all samples & means (scroll)</label>
+          </div>
+
+          <div id="samplesBox" class="scroll mono" style="display:none; margin-top:8px;"></div>
+        </div>
+
+        <!-- ===== RIGHT: Charts & Stats ===== -->
+        <div class="panel pad">
+          <div class="statgrid">
+            <div class="card">
+              <h3 style="margin-top:0;">Population (N=<span id="N"></span>)</h3>
+              <div class="mini">Values: <span id="popVals" class="mono"></span></div>
+              <div class="mini">Mean \( \mu \): <span id="mu"></span></div>
+              <div class="mini">SD \( \sigma \): <span id="sigma"></span></div>
+            </div>
+            <div class="card">
+              <h3 style="margin-top:0;">Sampling Dist. of \( \bar x \) (all combos)</h3>
+              <div class="mini">#Samples: <span id="numSamples"></span></div>
+              <div class="mini">Empirical \( \mu_{\bar x} \): <span id="meanXbar"></span></div>
+              <div class="mini">Empirical \( s_{\bar x} \): <span id="sdXbar"></span></div>
+              <div class="mini">Theory \( \text{SE}=\frac{\sigma}{\sqrt{n}}\sqrt{\frac{N-n}{N-1}} \): <span id="seTheory"></span></div>
+            </div>
+          </div>
+
+          <div class="grid" style="margin-top:12px;">
+            <div class="card">
+              <h3 style="margin-top:0;">Population Distribution (discrete)</h3>
+              <svg id="popChart" class="chart" viewBox="0 0 640 340" aria-label="Population distribution chart"></svg>
+            </div>
+            <div class="card">
+              <h3 style="margin-top:0;">Sampling Distribution of \( \bar x \) (n=<span id="nLabel">3</span>)</h3>
+              <svg id="meanChart" class="chart" viewBox="0 0 640 340" aria-label="Sampling distribution chart"></svg>
+            </div>
+          </div>
+
+          <div class="card soft" style="margin-top:12px;">
+            <h3 style="margin:.2rem 0 .4rem;">Notes</h3>
+            <ul class="mini">
+              <li>We enumerate all unique <em>combinations</em> of size \(n\) (order doesn’t matter, no replacement).</li>
+              <li>For finite populations, the theoretical SE includes the finite population correction (FPC): \( \sqrt{(N-n)/(N-1)} \).</li>
+              <li>With enough symmetry or repetition in the population, the sampling distribution can be surprisingly tight around \( \mu \).</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Footer year + last updated
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
+
+    // ===== Utilities =====
+    const fmt = (x, d=3) => Number.isFinite(x) ? x.toFixed(d) : '—';
+    const clone = a => JSON.parse(JSON.stringify(a));
+    const sum = a => a.reduce((s,v)=>s+v,0);
+    const mean = a => sum(a)/a.length;
+    const variance = a => {
+      const m = mean(a);
+      return a.length ? sum(a.map(v => (v-m)*(v-m)))/a.length : NaN; // population variance
+    };
+    const sd = a => Math.sqrt(variance(a));
+    const uniqueSort = a => Array.from(new Set(a)).sort((x,y)=>x-y);
+
+    // All k-combinations of array (without replacement)
+    function combinations(arr, k){
+      const res = [];
+      const n = arr.length;
+      const idx = Array.from({length:k}, (_,i)=>i);
+      function pushCombo() { res.push(idx.map(i => arr[i])); }
+      if(k===0){ return [[]]; }
+      if(k>n){ return []; }
+      pushCombo();
+      while(true){
+        let i = k-1;
+        while(i>=0 && idx[i] === n-k+i) i--;
+        if(i<0) break;
+        idx[i]++;
+        for(let j=i+1; j<k; j++) idx[j] = idx[j-1]+1;
+        pushCombo();
+      }
+      return res;
+    }
+
+    // Discrete bar chart (exact categories)
+    function drawDiscreteBar(svgId, values, options={}){
+      const svg = document.getElementById(svgId);
+      const W=640, H=340, pad={l:50,r:10,t:18,b:40};
+      svg.innerHTML = '';
+      if(!values.length) return;
+      const cats = uniqueSort(values);
+      const counts = cats.map(c => values.filter(v=>v===c).length);
+      const maxCount = Math.max(...counts);
+
+      // Scales
+      const innerW = W - pad.l - pad.r;
+      const innerH = H - pad.t - pad.b;
+      const barW = innerW / cats.length;
+      const y = c => pad.t + innerH * (1 - c/maxCount);
+
+      // Axes (simple)
+      // y-axis ticks at integers up to maxCount
+      for(let t=0;t<=maxCount;t++){
+        const yTick = pad.t + innerH * (1 - t/maxCount);
+        const line = `<line x1="${pad.l-4}" y1="${yTick}" x2="${W-pad.r}" y2="${yTick}" stroke="#e5e7eb" />`;
+        const text = `<text x="${pad.l-8}" y="${yTick+4}" font-size="11" text-anchor="end" fill="#6b7280">${t}</text>`;
+        svg.insertAdjacentHTML('beforeend', line+text);
+      }
+
+      // Bars
+      cats.forEach((c, i)=>{
+        const x = pad.l + i*barW + 4;
+        const h = innerH * (counts[i]/maxCount);
+        const yTop = pad.t + innerH - h;
+        svg.insertAdjacentHTML('beforeend',
+          `<rect x="${x}" y="${yTop}" width="${Math.max(2,barW-8)}" height="${h}"
+                 fill="var(--kctcs-blue)"></rect>`);
+        // x labels
+        svg.insertAdjacentHTML('beforeend',
+          `<text x="${pad.l + i*barW + barW/2}" y="${H-12}" font-size="11" text-anchor="middle" fill="#374151">${String(c)}</text>`);
+      });
+    }
+
+    // Histogram (bin width w)
+    function drawHistogram(svgId, values, w){
+      const svg = document.getElementById(svgId);
+      const W=640, H=340, pad={l:50,r:10,t:18,b:40};
+      svg.innerHTML = '';
+      if(!values.length || !isFinite(w) || w<=0) return;
+
+      const minV = Math.min(...values), maxV = Math.max(...values);
+      const start = Math.floor(minV/w)*w;
+      const end = Math.ceil(maxV/w)*w;
+      const bins = [];
+      for(let edge=start; edge<end + 1e-9; edge+=w){
+        bins.push({x0: edge, x1: edge+w, c:0});
+      }
+      values.forEach(v=>{
+        let b = Math.floor((v - start)/w);
+        if(b<0) b=0;
+        if(b>=bins.length) b=bins.length-1; // edge case
+        bins[b].c++;
+      });
+      const maxC = Math.max(...bins.map(b=>b.c));
+
+      const innerW = W - pad.l - pad.r;
+      const innerH = H - pad.t - pad.b;
+      const barW = innerW / bins.length;
+
+      // y ticks
+      for(let t=0;t<=maxC;t++){
+        const yTick = pad.t + innerH * (1 - t/maxC);
+        const line = `<line x1="${pad.l-4}" y1="${yTick}" x2="${W-pad.r}" y2="${yTick}" stroke="#e5e7eb" />`;
+        const text = `<text x="${pad.l-8}" y="${yTick+4}" font-size="11" text-anchor="end" fill="#6b7280">${t}</text>`;
+        svg.insertAdjacentHTML('beforeend', line+text);
+      }
+
+      // bars + x labels
+      bins.forEach((b,i)=>{
+        const h = innerH * (b.c/maxC);
+        const yTop = pad.t + innerH - h;
+        const x = pad.l + i*barW + 2;
+        svg.insertAdjacentHTML('beforeend',
+          `<rect x="${x}" y="${yTop}" width="${Math.max(2,barW-4)}" height="${h}"
+                 fill="var(--kctcs-gold)" stroke="rgba(0,0,0,.06)"></rect>`);
+        const mid = ((b.x0 + b.x1)/2).toFixed(2);
+        svg.insertAdjacentHTML('beforeend',
+          `<text x="${pad.l + i*barW + barW/2}" y="${H-12}" font-size="11" text-anchor="middle" fill="#374151">${mid}</text>`);
+      });
+    }
+
+    // ===== App state =====
+    const N = 10;
+    const defaultPop = [4,6,7,7,8,9,10,10,12,13];
+    let pop = defaultPop.slice();
+    let n = 3;
+
+    // Build inputs
+    const inputsDiv = document.getElementById('inputs');
+    for(let i=0;i<N;i++){
+      const el = document.createElement('input');
+      el.type = 'number';
+      el.step = '0.1';
+      el.value = pop[i];
+      el.dataset.idx = i;
+      el.addEventListener('input', ()=>{ pop[+el.dataset.idx] = parseFloat(el.value); });
+      inputsDiv.appendChild(el);
+    }
+
+    // UI elements
+    const NEl = document.getElementById('N');
+    const muEl = document.getElementById('mu');
+    const sigmaEl = document.getElementById('sigma');
+    const nLabel = document.getElementById('nLabel');
+    const numSamplesEl = document.getElementById('numSamples');
+    const meanXbarEl = document.getElementById('meanXbar');
+    const sdXbarEl = document.getElementById('sdXbar');
+    const seTheoryEl = document.getElementById('seTheory');
+    const popValsEl = document.getElementById('popVals');
+    const samplesBox = document.getElementById('samplesBox');
+
+    function refresh(){
+      // sanitize & read inputs
+      pop = Array.from(inputsDiv.querySelectorAll('input')).map(i=>parseFloat(i.value)).filter(v=>Number.isFinite(v));
+      if(pop.length!==N){ return; }
+
+      const mu = mean(pop);
+      const sig = sd(pop);
+      const binW = parseFloat(document.getElementById('binWidth').value) || 0.5;
+      n = Math.max(2, Math.min(N-1, parseInt(document.getElementById('nInput').value)||3));
+      nLabel.textContent = n;
+
+      // All combinations of indices
+      const idx = Array.from({length:N}, (_,i)=>i);
+      const combosIdx = combinations(idx, n);
+      const samples = combosIdx.map(c => c.map(i => pop[i]));
+      const xbars = samples.map(s => mean(s));
+
+      // Stats
+      const mbar = mean(xbars);
+      const sdbar = sd(xbars);
+      const seTheory = sig/Math.sqrt(n) * Math.sqrt((N-n)/(N-1));
+
+      // UI write
+      NEl.textContent = N;
+      muEl.textContent = fmt(mu, 4);
+      sigmaEl.textContent = fmt(sig, 4);
+      numSamplesEl.textContent = combosIdx.length.toLocaleString();
+      meanXbarEl.textContent = fmt(mbar, 4);
+      sdXbarEl.textContent = fmt(sdbar, 4);
+      seTheoryEl.textContent = fmt(seTheory, 4);
+      popValsEl.textContent = '[' + pop.map(v=>fmt(v,2)).join(', ') + ']';
+
+      // Charts
+      drawDiscreteBar('popChart', pop);
+      drawHistogram('meanChart', xbars, binW);
+
+      // Optional list
+      const show = document.getElementById('showSamples').checked;
+      samplesBox.style.display = show ? 'block' : 'none';
+      if(show){
+        const items = samples.map((s,i)=> `${String(i+1).padStart(3,' ')}. [${s.join(', ')}]  →  x̄=${fmt(xbars[i],4)}`);
+        samplesBox.textContent = items.join('\n');
+      }
+    }
+
+    // Buttons
+    document.getElementById('btnUpdate').addEventListener('click', refresh);
+    document.getElementById('btnRandom').addEventListener('click', ()=>{
+      // random integers 1..20, sorted-ish
+      const r = Array.from({length:N}, ()=> Math.round(1 + Math.random()*19)).sort((a,b)=>a-b);
+      inputsDiv.querySelectorAll('input').forEach((el,i)=>{ el.value = r[i]; });
+      refresh();
+    });
+    document.getElementById('btnEven').addEventListener('click', ()=>{
+      // evenly spaced between 5 and 25
+      const a=5, b=25, step=(b-a)/(N-1);
+      const r = Array.from({length:N}, (_,i)=> +(a + i*step).toFixed(2));
+      inputsDiv.querySelectorAll('input').forEach((el,i)=>{ el.value = r[i]; });
+      refresh();
+    });
+    document.getElementById('btnReset').addEventListener('click', ()=>{
+      inputsDiv.querySelectorAll('input').forEach((el,i)=>{ el.value = defaultPop[i]; });
+      document.getElementById('nInput').value = 3;
+      document.getElementById('binWidth').value = 0.5;
+      document.getElementById('showSamples').checked = false;
+      refresh();
+    });
+    document.getElementById('showSamples').addEventListener('change', refresh);
+    document.getElementById('nInput').addEventListener('input', refresh);
+    document.getElementById('binWidth').addEventListener('input', refresh);
+
+    // First draw
+    refresh();
+  </script>
+</body>
+</html>
