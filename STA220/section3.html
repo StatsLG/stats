@@ -3,110 +3,339 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>STA220 — Section 3 | StatsLG</title>
-  <meta name="description" content="Section 3: Variability and relative standing — STA220 notes on StatsLG." />
+  <title>STA220 — Section 3 | Variability and Relative Standing</title>
+  <meta name="description" content="Section 3: Variability and Relative Standing — STA220 notes on StatsLG." />
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- MathJax (LaTeX) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
 </head>
 <body>
   <div class="wrap">
-    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM USER TEMPLATE ===== -->
-<aside class="sidebar" aria-label="Site navigation">
-  <div class="brand">
-    <div class="brand-logo" aria-hidden="true"></div>
-    <div class="brand-title">BCTC Statistics Hub</div>
-  </div>
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM YOUR TEMPLATE ===== -->
+    <aside class="sidebar" aria-label="Site navigation">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-title">BCTC Statistics Hub</div>
+      </div>
 
-  <div class="nav-section">
-    <h3>Graphing</h3>
-    <nav class="nav">
-      <a href="/graphing/barchart.html">Bar Chart</a>
-      <a href="/graphing/piechart.html">Pie / Donut</a>
-      <a href="/graphing/histogram.html">Histogram</a>
-      <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
-      <a href="/graphing/scatterplot.html">Scatter + Regression</a>
-      <a href="/graphing/barchart2way.html">Grouped Bar</a>
-    </nav>
-  </div>
+      <div class="nav-section">
+        <h3>Graphing</h3>
+        <nav class="nav">
+          <a href="/graphing/barchart.html">Bar Chart</a>
+          <a href="/graphing/piechart.html">Pie / Donut</a>
+          <a href="/graphing/histogram.html">Histogram</a>
+          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+          <a href="/graphing/barchart2way.html">Grouped Bar</a>
+        </nav>
+      </div>
 
-  <div class="divider" role="separator"></div>
+      <div class="divider" role="separator"></div>
 
-  <div class="nav-section">
-    <h3>Analysis</h3>
-    <nav class="nav">
-      <a href="/descriptive/summary.html">Descriptive Summary</a>
-      <a href="/inference/onemean.html">One-Sample Mean Test</a>
-    </nav>
-  </div>
+      <div class="nav-section">
+        <h3>Analysis</h3>
+        <nav class="nav">
+          <a href="/descriptive/summary.html">Descriptive Summary</a>
+          <a href="/inference/onemean.html">One-Sample Mean Test</a>
+        </nav>
+      </div>
 
-  <div class="divider" role="separator"></div>
+      <div class="divider" role="separator"></div>
 
-  <div class="nav-section">
-    <h3>Notes & Extras</h3>
-    <nav class="nav">
-      <a href="/STA210U/">STA 210U</a>
-      <a href="/STA220/">STA 220</a>
-      <a href="/STA296U/">STA 296U</a>
-      <a href="/game/pathyfinder.html">Pathy Finder</a>
-    </nav>
-  </div>
+      <div class="nav-section">
+        <h3>Notes & Extras</h3>
+        <nav class="nav">
+          <a href="/STA210U/">STA 210U</a>
+          <a href="/STA220/">STA 220</a>
+          <a href="/STA296U/">STA 296U</a>
+          <a href="/game/pathyfinder.html">Pathy Finder</a>
+        </nav>
+      </div>
 
-  <div class="footer-note">
-    © <span id="yr"></span> StatsLG - Luke Garnett
-  </div>
-</aside>
+      <div class="footer-note">
+        © <span id="yr"></span> StatsLG - Luke Garnett
+      </div>
+    </aside>
+
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
     <main>
-      
       <header>
         <h1>Section 3 — Variability and Relative Standing</h1>
-        <p>How to quantify spread: range, variance, and standard deviation; why dispersion matters even when centers match.</p>
+        <p>A <strong>measure of dispersion</strong> tells how spread out the data are. Two data sets can have the same mean/median/mode yet very different variability—so we always pair a measure of <em>center</em> with a measure of <em>spread</em>.</p>
       </header>
-      
-    <section class="section">
-      <h2>On this page</h2>
-      <div class="grid">
-        <article class="card"><a href="#dispersion"><strong>1.</strong> Measures of Dispersion</a></article>
-<article class="card"><a href="#range"><strong>2.</strong> Range</a></article>
-<article class="card"><a href="#variance"><strong>3.</strong> Variance & SD</a></article>
-      </div>
-    </section>
-    
-      
-    <section id="dispersion" class="section">
-      <h2>Measures of Dispersion</h2>
-      
-  <p>Measures of <strong>spread</strong> complement measures of center. Two data sets can share mean/median/mode yet differ in variability.</p>
 
-    </section>
-    
-    <section id="range" class="section">
-      <h2>Sample Range</h2>
-      
-  <p><strong>Range</strong> = High − Low; easy but highly sensitive to extremes.</p>
+      <!-- On this page -->
+      <section class="section">
+        <h2>On this page</h2>
+        <div class="grid">
+          <article class="card"><a href="#range">Sample Range</a></article>
+          <article class="card"><a href="#variance">Sample Variance \(s^2\)</a></article>
+          <article class="card"><a href="#sumzero">Why not average the raw distances?</a></article>
+          <article class="card"><a href="#sd">Sample Standard Deviation \(s\)</a></article>
+          <article class="card"><a href="#z">Standard Deviation as a Unit (z-scores)</a></article>
+          <article class="card"><a href="#empirical">Empirical Rule (68–95–99.7)</a></article>
+          <article class="card"><a href="#position">Measures of Position</a></article>
+          <article class="card"><a href="#quartiles">Quartiles &amp; IQR</a></article>
+          <article class="card"><a href="#boxplot">Box &amp; Whisker Plots</a></article>
+          <article class="card"><a href="#shapes">Identifying Shape from Boxplots</a></article>
+          <article class="card"><a href="#tread">Example: Tread Design vs Stopping Distance</a></article>
+        </div>
+      </section>
 
-    </section>
-    
-    <section id="variance" class="section">
-      <h2>Sample Variance and Standard Deviation</h2>
-      
-  <p>Variance measures the average squared distance from the mean. Two equivalent formulas:</p>
-  <ul>
-    <li>Conceptual: <code>s^2 = \frac{\sum (x - \bar{x})^2}{n-1}</code></li>
-    <li>Computational: <code>s^2 = \frac{n\sum x^2 - (\sum x)^2}{n(n-1)}</code></li>
-  </ul>
-  <p>Key facts: involves all data points; expressed in squared units; never negative; larger values ⇒ more variability. Also, <code>\sum (x-\bar{x}) = 0</code>.</p>
+      <!-- Scenario: same centers, different spreads -->
+      <section class="section">
+        <h2>Same Center, Different Spread</h2>
+        <p>Two distributions can have identical mean, median, mode, and midrange, but one be more variable. That’s why dispersion matters when describing a data set.</p>
+      </section>
 
-    </section>
-    
-    
+      <!-- Range -->
+      <section id="range" class="section">
+        <h2>Sample Range</h2>
+        <p>Distance between highest and lowest data values: \(\text{Range} = \text{High} - \text{Low}\).</p>
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Example — Years of Experience</h3>
+          <p>Data: 1, 30, 22, 10, 5 → Range \(= 30 - 1 = 29\).</p>
+        </div>
+        <ul>
+          <li>Easy to compute.</li>
+          <li><strong>Totally sensitive to extremes</strong> (uses only the two outer points).</li>
+        </ul>
+      </section>
+
+      <!-- Variance -->
+      <section id="variance" class="section">
+        <h2>Sample Variance \(s^2\)</h2>
+        <p>Average <em>squared</em> distance from the mean.</p>
+        <div class="row">
+          <div>
+            <p><strong>Conceptual formula</strong></p>
+            <p>\[
+              s^2 \;=\; \frac{\sum (x-\bar{x})^2}{n-1}
+            \]</p>
+          </div>
+          <div>
+            <p><strong>Computational formula</strong></p>
+            <p>\[
+              s^2 \;=\; \frac{n\sum x^2 - (\sum x)^2}{n(n-1)}
+            \]</p>
+          </div>
+        </div>
+        <p>The numerator \(\sum (x-\bar{x})^2\) is the <strong>sum of squares</strong> (SS or SS<sub>X</sub>). The two formulas are algebraically equivalent; the computational version is often easier by hand.</p>
+
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Example — Years of Experience</h3>
+          <p>Data: 1, 30, 22, 10, 5</p>
+          <div class="preview">
+            <table class="table">
+              <thead><tr><th>\(x\)</th><th>\(x^2\)</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>1</td></tr>
+                <tr><td>30</td><td>900</td></tr>
+                <tr><td>22</td><td>484</td></tr>
+                <tr><td>10</td><td>100</td></tr>
+                <tr><td>5</td><td>25</td></tr>
+                <tr><th>\(\sum x\)</th><th>\(\sum x^2\)</th></tr>
+                <tr><td><strong>68</strong></td><td><strong>1510</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>\[
+            s^2 \;=\; \frac{5(1510) - 68^2}{5(5-1)} \;=\; \frac{7550 - 4624}{20}
+            \;=\; \frac{2926}{20} \;=\; 146.3
+          \]</p>
+        </div>
+
+        <h3>Variance characteristics</h3>
+        <ul>
+          <li>Involves <em>all</em> data points directly.</li>
+          <li>Units are <strong>squared</strong> → can be hard to interpret.</li>
+          <li>Never negative.</li>
+          <li>Larger \(s^2\) ⇒ more variability.</li>
+        </ul>
+      </section>
+
+      <!-- Why not average raw deviations -->
+      <section id="sumzero" class="section">
+        <h2>Why not average the raw distances?</h2>
+        <p>If you try \(\tfrac{1}{n}\sum (x-\bar{x})\), it’s always 0 (positives and negatives cancel around the mean). Algebraically,
+          \(\sum (x-\bar{x}) = \sum x - n\bar{x} = 0\).
+          Squaring prevents the cancellation.</p>
+      </section>
+
+      <!-- Standard deviation -->
+      <section id="sd" class="section">
+        <h2>Sample Standard Deviation \(s\)</h2>
+        <p>\(s = \sqrt{s^2}\). Same units as the data and the most common measure of spread.</p>
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Example — Years of Experience</h3>
+          <p>\(s = \sqrt{146.3} \approx 12.095\).</p>
+        </div>
+      </section>
+
+      <!-- z-scores -->
+      <section id="z" class="section">
+        <h2>Standard Deviation as a Unit (z-scores)</h2>
+        <p>\(z = \dfrac{x-\bar{x}}{s}\) measures how many standard deviations an observation is above/below the mean.</p>
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Example</h3>
+          <p>Suppose \(\bar{x}=79\) and \(s=9\).</p>
+          <ul>
+            <li>For \(x=88\): \(z=\dfrac{88-79}{9}=1\) → 1 SD above mean.</li>
+            <li>For \(x=63\): \(z=\dfrac{63-79}{9}=-\dfrac{16}{9}\approx -1.778\) → 1.778 SD below mean.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Empirical rule -->
+      <section id="empirical" class="section">
+        <h2>Empirical Rule (mound-shaped distributions)</h2>
+        <ul>
+          <li>\(\approx 68\%\) within \((\bar{x}-s,\;\bar{x}+s)\)</li>
+          <li>\(\approx 95\%\) within \((\bar{x}-2s,\;\bar{x}+2s)\)</li>
+          <li>\(\approx 99.7\%\) within \((\bar{x}-3s,\;\bar{x}+3s)\)</li>
+        </ul>
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Example — “12 oz.” Pepsi cans</h3>
+          <p>\(\bar{x}=12\ \text{oz},\ s=0.1\ \text{oz}\)</p>
+          <ul>
+            <li>68%: \((11.9,\ 12.1)\)</li>
+            <li>95%: \((11.8,\ 12.2)\)</li>
+            <li>99.7%: \((11.7,\ 12.3)\)</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Measures of position -->
+      <section id="position" class="section">
+        <h2>Measures of Position</h2>
+        <p><strong>Percentiles</strong> give the percent below an observation (e.g., 95th percentile means better than 95% of peers).</p>
+        <p><strong>Quartiles</strong> split data into four equal parts.</p>
+        <ul>
+          <li>\(Q_1\) (25th percentile): 25% below, 75% above.</li>
+          <li>\(Q_2\) (50th percentile, the median \(\tilde{x}\)): 50% below/above.</li>
+          <li>\(Q_3\) (75th percentile): 75% below, 25% above.</li>
+        </ul>
+        <h3>Procedure</h3>
+        <ol>
+          <li>Order the data (smallest to largest).</li>
+          <li>Find \(\tilde{x}=Q_2\).</li>
+          <li>\(Q_1\): median of the lower half (not including \(Q_2\)).</li>
+          <li>\(Q_3\): median of the upper half (not including \(Q_2\)).</li>
+        </ol>
+
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Quartile Examples</h3>
+          <ul>
+            <li>Data #1: 1–6 → \(Q_1=2,\ Q_2=3.5,\ Q_3=5\)</li>
+            <li>Data #2: 1–7 → \(Q_1=2,\ Q_2=4,\ Q_3=6\)</li>
+            <li>Data #3: 1–8 → \(Q_1=2.5,\ Q_2=4.5,\ Q_3=6.5\)</li>
+            <li>Data #4: 1–9 → \(Q_1=2.5,\ Q_2=5,\ Q_3=7.5\)</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- IQR -->
+      <section id="quartiles" class="section">
+        <h2>Five-Number Summary &amp; IQR</h2>
+        <p>Five-number summary: \(\text{Low},\ Q_1,\ Q_2,\ Q_3,\ \text{High}\).</p>
+        <p><strong>Interquartile Range (IQR)</strong>: middle 50% spread, \( \text{IQR} = Q_3 - Q_1 \).</p>
+        <ul>
+          <li>IQR isn’t affected by extremes (unlike the range).</li>
+          <li>Still, \(s\) is usually preferred for most analyses.</li>
+        </ul>
+
+        <div class="row">
+          <div class="card soft" style="flex:1;">
+            <h3 style="margin:.2rem 0 .4rem;">Students — “Money in pocket” (stem-and-leaf)</h3>
+            <pre style="white-space:pre; margin: .4rem 0 0; padding:.6rem; background:#fff; border:1px solid var(--rule); border-radius:8px; color:#111;">
+0 0 0 1 3 5 5 5 6 7 8
+1
+2
+3
+4
+5
+6
+7
+            </pre>
+            <p><strong>Low</strong>=0, \(Q_1=1\), \(Q_2=5\), \(Q_3=7\), <strong>High</strong>=10 → IQR = 6.</p>
+          </div>
+          <div class="card soft" style="flex:1;">
+            <h3 style="margin:.2rem 0 .4rem;">Faculty — “Money in pocket” (stem-and-leaf)</h3>
+            <pre style="white-space:pre; margin: .4rem 0 0; padding:.6rem; background:#fff; border:1px solid var(--rule); border-radius:8px; color:#111;">
+0
+1 0 1
+2 0 4 5 8 8
+3 1
+4 3
+5
+6
+7 3
+            </pre>
+            <p><strong>Low</strong>=10, \(Q_1=15\), \(Q_2=25\), \(Q_3=31\), <strong>High</strong>=73 (extreme) → IQR = 16.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Box & whisker -->
+      <section id="boxplot" class="section">
+        <h2>Box &amp; Whisker Plots (Boxplots)</h2>
+        <p>Based on the five-number summary; great for comparing a quantitative variable across groups.</p>
+        <h3>How a boxplot is constructed</h3>
+        <ul>
+          <li>Scale on the axis from Low to High.</li>
+          <li>Draw a box from \(Q_1\) to \(Q_3\); a line inside at \(Q_2\) (median).</li>
+          <li>Whiskers extend to the smallest/largest non-extreme values.</li>
+          <li>Extreme values shown as points or asterisks.</li>
+        </ul>
+        <p>From the “money” example: faculty have higher typical values (box and median higher) and more variability (larger box/whiskers). The 73 is flagged as an extreme.</p>
+        <p>What to read from a boxplot: (i) typical value (median/box position), (ii) variability (box size/whiskers), (iii) shape (via median position and whisker lengths).</p>
+      </section>
+
+      <!-- Shapes from boxplots -->
+      <section id="shapes" class="section">
+        <h2>Identifying Shape from Boxplots</h2>
+        <ul>
+          <li><strong>Symmetric:</strong> median in the center of the box; whiskers similar length (e.g., bell-shaped, uniform).</li>
+          <li><strong>Left-skewed:</strong> median right of center; longer left whisker.</li>
+          <li><strong>Right-skewed:</strong> median left of center; longer right whisker.</li>
+        </ul>
+        <p>Tip: mentally rotate boxplots 90° clockwise so the scale increases left→right (like a histogram) to judge skew consistently.</p>
+      </section>
+
+      <!-- Tread example -->
+      <section id="tread" class="section">
+        <h2>Example — Tread Design vs Stopping Distance</h2>
+        <ul>
+          <li><strong>Best (shortest stopping)</strong>: Design B → its box/median sit lower on the axis.</li>
+          <li><strong>Most consistent</strong>: Design C → smallest box/whiskers (though consistently worse here).</li>
+          <li><strong>Shape</strong>: All are right-skewed (median left of center; longer right whisker).</li>
+        </ul>
+      </section>
+
       <footer>
         Last updated: <span id="lastUpdated"></span>
       </footer>
     </main>
   </div>
+
   <script>
     document.getElementById('yr').textContent = new Date().getFullYear();
-    document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
   </script>
 </body>
 </html>

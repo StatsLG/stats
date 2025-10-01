@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Section 4 | Probability</title>
+  <meta name="description" content="Section 4: Probability — STA220 notes on StatsLG." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- MathJax (LaTeX) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM YOUR TEMPLATE ===== -->
+    <aside class="sidebar" aria-label="Site navigation">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-title">BCTC Statistics Hub</div>
+      </div>
+
+      <div class="nav-section">
+        <h3>Graphing</h3>
+        <nav class="nav">
+          <a href="/graphing/barchart.html">Bar Chart</a>
+          <a href="/graphing/piechart.html">Pie / Donut</a>
+          <a href="/graphing/histogram.html">Histogram</a>
+          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+          <a href="/graphing/barchart2way.html">Grouped Bar</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Analysis</h3>
+        <nav class="nav">
+          <a href="/descriptive/summary.html">Descriptive Summary</a>
+          <a href="/inference/onemean.html">One-Sample Mean Test</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Notes & Extras</h3>
+        <nav class="nav">
+          <a href="/STA210U/">STA 210U</a>
+          <a href="/STA220/">STA 220</a>
+          <a href="/STA296U/">STA 296U</a>
+          <a href="/game/pathyfinder.html">Pathy Finder</a>
+        </nav>
+      </div>
+
+      <div class="footer-note">
+        © <span id="yr"></span> StatsLG - Luke Garnett
+      </div>
+    </aside>
+
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
+    <main>
+      <header>
+        <h1>Section 4 — Probability</h1>
+        <p>We introduce basic probability: counting rules, factorials, permutations and combinations, sample spaces and events, and rules for combining and conditioning events.</p>
+      </header>
+
+      <!-- On this page -->
+      <section class="section">
+        <h2>On this page</h2>
+        <div class="grid">
+          <article class="card"><a href="#counting">Counting Rules</a></article>
+          <article class="card"><a href="#factorial">Factorials</a></article>
+          <article class="card"><a href="#perm">Permutations</a></article>
+          <article class="card"><a href="#comb">Combinations</a></article>
+          <article class="card"><a href="#spaces">Sample Spaces &amp; Events</a></article>
+          <article class="card"><a href="#tree">Tree Diagram: Three Coins</a></article>
+          <article class="card"><a href="#props">Probability Properties</a></article>
+          <article class="card"><a href="#types">Types of Probability</a></article>
+          <article class="card"><a href="#addcomp">Addition &amp; Complement Rules</a></article>
+          <article class="card"><a href="#cond">Conditional Probability</a></article>
+          <article class="card"><a href="#dice">Example: Two Dice (Green, Red)</a></article>
+          <article class="card"><a href="#freq">Example: Drivers by Gender &amp; Tickets</a></article>
+          <article class="card"><a href="#indep">Independence &amp; Dependence</a></article>
+          <article class="card"><a href="#mult">Multiplication Rule</a></article>
+          <article class="card"><a href="#cards">Example: Two Aces (with/without replacement)</a></article>
+          <article class="card"><a href="#city">Example: City vs Combine Government</a></article>
+        </div>
+      </section>
+
+      <!-- Counting -->
+      <section id="counting" class="section">
+        <h2>Counting Rules</h2>
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Examples</h3>
+          <ul>
+            <li><strong>Arrange SUNDAY</strong> (6 distinct letters): \(6\cdot5\cdot4\cdot3\cdot2\cdot1 = 720\).</li>
+            <li><strong>3-digit lock code</strong> (digits 0–9, repetition allowed): \(10\cdot10\cdot10 = 10^3 = 1000\).</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Factorials -->
+      <section id="factorial" class="section">
+        <h2>Factorials</h2>
+        <p>\(n!\) is the product of integers from \(n\) down to 1. By convention, \(0!=1\).</p>
+        <div class="grid">
+          <article class="card"><p>\(1!=1\)</p></article>
+          <article class="card"><p>\(2!=2\cdot1=2\)</p></article>
+          <article class="card"><p>\(3!=3\cdot2\cdot1=6\)</p></article>
+          <article class="card"><p>\(4!=24\)</p></article>
+        </div>
+
+        <div class="card soft" style="margin-top:12px;">
+          <h3 style="margin:.2rem 0 .4rem;">Simplifying with cancellations</h3>
+          <ul>
+            <li>\(\displaystyle \frac{5!}{2!}=\frac{5\cdot4\cdot3\cdot\cancel{2!}}{\cancel{2!}}=60\)</li>
+            <li>\(\displaystyle \frac{9!}{8!}=\frac{9\cdot\cancel{8!}}{\cancel{8!}}=9\)</li>
+            <li>\(\displaystyle \frac{8!}{2!\,6!}=\frac{8\cdot7\cdot\cancel{6!}}{2\cdot1\cdot\cancel{6!}}=\frac{56}{2}=28\)</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Permutations -->
+      <section id="perm" class="section">
+        <h2>Permutations (order matters)</h2>
+        <p>Number of ordered arrangements of \(r\) objects from \(n\): \(\displaystyle \,^{n}P_r=\frac{n!}{(n-r)!}\).</p>
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Example</h3>
+          <p>Select a president, vice president, treasurer, and secretary from 10 people (order matters): \(\;^{10}P_4 = 10\cdot9\cdot8\cdot7 = 5040\).</p>
+        </div>
+      </section>
+
+      <!-- Combinations -->
+      <section id="comb" class="section">
+        <h2>Combinations (order does not matter)</h2>
+        <p>Number of unordered selections of \(r\) from \(n\): \(\displaystyle \,^{n}C_r=\frac{n!}{r!(n-r)!}\).</p>
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Example</h3>
+          <p>Committee of 5 senators from 8: \(\;^{8}C_5=\frac{8!}{5!\,3!}=56\).</p>
+        </div>
+      </section>
+
+      <!-- Sample spaces & events -->
+      <section id="spaces" class="section">
+        <h2>Sample Spaces &amp; Events</h2>
+        <ul>
+          <li>Coin flip: \(S=\{H,T\}\) (qualitative outcome).</li>
+          <li>Roll a die: \(S=\{1,2,3,4,5,6\}\) (discrete quantitative).</li>
+          <li>Measure heights: \(S=[\text{shortest},\text{tallest}]\) (continuous; uncountably many outcomes).</li>
+        </ul>
+        <p><strong>Event</strong> = subset of the sample space (e.g., even on a die: \(\{2,4,6\}\)).</p>
+        <p><strong>Probability</strong> of event \(A\): long-run proportion \(P(A)=\dfrac{\#\text{ outcomes in }A}{\#\text{ outcomes in }S}\) (for equally likely outcomes).</p>
+      </section>
+
+      <!-- Tree diagram -->
+      <section id="tree" class="section">
+        <h2>Tree Diagram: Penny, Nickel, Dime</h2>
+        <p>Each coin has two outcomes ⇒ \(2\cdot2\cdot2=8\) outcomes total.</p>
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Sample Space</h3>
+          <p>\(\{HHH,\ HHT,\ HTH,\ HTT,\ THH,\ THT,\ TTH,\ TTT\}\)</p>
+          <ul>
+            <li>\(A=\{\text{all tails}\}=\{TTT\}\Rightarrow P(A)=1/8\)</li>
+            <li>\(B=\{\text{exactly two tails}\}=\{HTT,THT,TTH\}\Rightarrow P(B)=3/8\)</li>
+            <li>\(C=\{\text{exactly one tail}\}=\{HHT,HTH,THH\}\Rightarrow P(C)=3/8\)</li>
+            <li>\(D=\{\text{no tails}\}=\{HHH\}\Rightarrow P(D)=1/8\)</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Probability properties -->
+      <section id="props" class="section">
+        <h2>Probability Properties</h2>
+        <ul>
+          <li>\(0\le P(A)\le1\)</li>
+          <li>\(P(S)=1\)</li>
+          <li>Higher probability ⇒ more likely</li>
+        </ul>
+      </section>
+
+      <!-- Types, addition, complement -->
+      <section id="types" class="section">
+        <h2>Types of Probability</h2>
+        <ul>
+          <li><strong>Simple:</strong> one event.</li>
+          <li><strong>Joint:</strong> uses intersection \(A\cap B\) or union \(A\cup B\).</li>
+          <li><strong>Mutually exclusive (disjoint):</strong> \(P(A\cap B)=0\).</li>
+        </ul>
+      </section>
+
+      <section id="addcomp" class="section">
+        <h2>Addition &amp; Complement Rules</h2>
+        <ul>
+          <li>Addition: \(P(A\cup B)=P(A)+P(B)-P(A\cap B)\).</li>
+          <li>Complement: \(P(A^c)=1-P(A)\).</li>
+        </ul>
+      </section>
+
+      <!-- Conditional -->
+      <section id="cond" class="section">
+        <h2>Conditional Probability</h2>
+        <p>\(P(A\mid B)=\dfrac{P(A\cap B)}{P(B)}\). The condition changes the denominator to the size/probability of \(B\).</p>
+      </section>
+
+      <!-- Dice example -->
+      <section id="dice" class="section">
+        <h2>Example — Two Dice (Green, Red)</h2>
+        <p>Define events: \(A=\{\text{sum is 7}\}\), \(B=\{\text{both numbers }\le4\}\), \(C=\{\text{green die is 1}\}\).</p>
+
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .6rem;">Sample Space (ordered pairs \((\text{Green},\text{Red})\))</h3>
+          <div class="preview">
+            <table class="table">
+              <thead>
+                <tr><th>Green \ Red</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+              </thead>
+              <tbody>
+                <tr><th>1</th><td>(1,1)</td><td>(1,2)</td><td>(1,3)</td><td>(1,4)</td><td>(1,5)</td><td>(1,6)</td></tr>
+                <tr><th>2</th><td>(2,1)</td><td>(2,2)</td><td>(2,3)</td><td>(2,4)</td><td>(2,5)</td><td>(2,6)</td></tr>
+                <tr><th>3</th><td>(3,1)</td><td>(3,2)</td><td>(3,3)</td><td>(3,4)</td><td>(3,5)</td><td>(3,6)</td></tr>
+                <tr><th>4</th><td>(4,1)</td><td>(4,2)</td><td>(4,3)</td><td>(4,4)</td><td>(4,5)</td><td>(4,6)</td></tr>
+                <tr><th>5</th><td>(5,1)</td><td>(5,2)</td><td>(5,3)</td><td>(5,4)</td><td>(5,5)</td><td>(5,6)</td></tr>
+                <tr><th>6</th><td>(6,1)</td><td>(6,2)</td><td>(6,3)</td><td>(6,4)</td><td>(6,5)</td><td>(6,6)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid" style="margin-top:12px;">
+          <article class="card">
+            <h3>Simple probabilities</h3>
+            <p>\(P(A)=6/36=0.167\)</p>
+            <p>\(P(B)=16/36=0.444\)</p>
+            <p>\(P(C)=6/36=0.167\)</p>
+          </article>
+          <article class="card">
+            <h3>Intersections</h3>
+            <p>\(P(A\cap B)=2/36=0.056\) (pairs (3,4),(4,3))</p>
+            <p>\(P(A\cap C)=1/36=0.028\)</p>
+            <p>\(P(B\cap C)=4/36=0.111\)</p>
+          </article>
+          <article class="card">
+            <h3>Unions</h3>
+            <p>\(P(A\cup B)=6/36+16/36-2/36=20/36=0.556\)</p>
+            <p>\(P(A\cup C)=6/36+6/36-1/36=11/36=0.306\)</p>
+            <p>\(P(B\cup C)=16/36+6/36-4/36=18/36=0.5\)</p>
+          </article>
+          <article class="card">
+            <h3>Complements</h3>
+            <p>\(P(A^c)=1-6/36=30/36=0.833\)</p>
+            <p>\(P(B^c)=1-16/36=20/36=0.556\)</p>
+            <p>\(P(C^c)=1-6/36=30/36=0.833\)</p>
+          </article>
+          <article class="card">
+            <h3>Conditionals (order matters)</h3>
+            <p>\(P(A\mid B)=\dfrac{2/36}{16/36}=2/16=0.125\)</p>
+            <p>\(P(B\mid A)=\dfrac{2/36}{6/36}=2/6=0.333\)</p>
+            <p>\(P(A\mid C)=\dfrac{1/36}{6/36}=1/6=0.167\)</p>
+            <p>\(P(C\mid A)=\dfrac{1/36}{6/36}=1/6=0.167\)</p>
+            <p>\(P(B\mid C)=\dfrac{4/36}{6/36}=4/6=0.667\)</p>
+            <p>\(P(C\mid B)=\dfrac{4/36}{16/36}=4/16=0.25\)</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Frequencies table example -->
+      <section id="freq" class="section">
+        <h2>Example — Drivers by Gender &amp; Tickets</h2>
+        <div class="card soft">
+          <div class="preview" role="region" aria-label="Drivers by gender and number of tickets">
+            <table class="table">
+              <thead>
+                <tr><th></th><th>0 tickets</th><th>1 ticket</th><th>2 tickets</th><th>3+ tickets</th><th>Total</th></tr>
+              </thead>
+              <tbody>
+                <tr><th>Female</th><td>1192</td><td>321</td><td>72</td><td>15</td><td>1600</td></tr>
+                <tr><th>Male</th><td>695</td><td>487</td><td>141</td><td>77</td><td>1400</td></tr>
+                <tr><th>Total</th><td>1887</td><td>808</td><td>213</td><td>92</td><td>3000</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <div class="card" style="flex:1;">
+              <h3>Define events</h3>
+              <p>\(A=\{\text{driver is female}\}\)</p>
+              <p>\(B=\{\text{driver has at least 2 tickets}\}\)</p>
+            </div>
+            <div class="card" style="flex:2;">
+              <h3>Probabilities</h3>
+              <ul>
+                <li>\(P(A)=1600/3000=0.53333\)</li>
+                <li>\(P(B)=(213+92)/3000=305/3000=0.10167\)</li>
+                <li>\(P(A\cap B)=(72+15)/3000=87/3000=0.029\)</li>
+                <li>\(P(A\cup B)=0.53333+0.10167-0.029=0.606\)</li>
+                <li>\(P(A^c)=1-0.53333=0.46667\)</li>
+                <li>\(P(A\mid B)=0.029/0.10167\approx0.28524\)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Independence -->
+      <section id="indep" class="section">
+        <h2>Independence vs Dependence</h2>
+        <p>Events \(A,B\) are <strong>independent</strong> if \(P(A\mid B)=P(A)\); otherwise <strong>dependent</strong>.</p>
+      </section>
+
+      <!-- Multiplication rule -->
+      <section id="mult" class="section">
+        <h2>Multiplication Rule</h2>
+        <p>\(P(A\cap B)=P(A)\,P(B\mid A)\). Derived by rearranging the conditional definition.</p>
+      </section>
+
+      <!-- Cards example -->
+      <section id="cards" class="section">
+        <h2>Example — Two Aces from a 52-card Deck</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Without replacement</h3>
+            <p>Dependent: if first is an ace, second’s probability changes to \(3/51\).</p>
+            <p>\(P(\text{both aces})=(4/52)\cdot(3/51)\approx0.004525\).</p>
+          </article>
+          <article class="card">
+            <h3>With replacement</h3>
+            <p>Independent: shuffling restores \(P(\text{ace})=4/52\) on the second draw.</p>
+            <p>\(P(\text{both aces})=(4/52)\cdot(4/52)\approx0.00591\).</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- City/county example -->
+      <section id="city" class="section">
+        <h2>Example — City vs Combining City &amp; County Government</h2>
+        <div class="card soft">
+          <div class="preview" role="region" aria-label="City vs combine government table">
+            <table class="table">
+              <thead>
+                <tr><th></th><th>Favor (F)</th><th>Oppose</th><th>Total</th></tr>
+              </thead>
+              <tbody>
+                <tr><th>City (C)</th><td>80</td><td>40</td><td>120</td></tr>
+                <tr><th>Outside</th><td>20</td><td>10</td><td>30</td></tr>
+                <tr><th>Total</th><td>100</td><td>50</td><td>150</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="grid" style="margin-top:10px;">
+            <article class="card">
+              <h3>Basics</h3>
+              <p>\(P(F)=100/150=0.667\)</p>
+              <p>\(P(C)=120/150=0.8\)</p>
+              <p>\(P(F\cap C)=80/150=0.533\)</p>
+              <p>\(P(F\cup C)=0.933\)</p>
+              <p>\(P(F^c)=0.333,\;P(C^c)=0.2\)</p>
+            </article>
+            <article class="card">
+              <h3>Conditional &amp; Independence</h3>
+              <p>\(P(F\mid C)=\dfrac{80}{120}=0.667 = P(F)\Rightarrow\) \(F\) and \(C\) are independent <em>for this table</em>.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>
