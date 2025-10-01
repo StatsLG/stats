@@ -36,8 +36,10 @@
     .swatch { width:14px; height:14px; border-radius:3px; border:1px solid rgba(0,0,0,.1) }
     .muter { color: var(--muted); font-size:12px }
     .grid2 { display:grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:12px }
-    .scroll { max-height: 260px; overflow:auto; background:#fff; border:1px solid var(--rule); border-radius:8px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .mini { font-size: 12px; color: var(--muted); }
+    .scroll-mini { max-height: 220px; overflow:auto; background:#fff; border:1px solid var(--rule); border-radius:8px; }
+    .tight-table th, .tight-table td { font-size:12px; padding:4px 6px; }
   </style>
 </head>
 <body>
@@ -144,20 +146,20 @@
 
           <div class="checkline" style="margin-top:10px;">
             <input type="checkbox" id="showGrid" checked>
-            <label for="showGrid" style="margin:0;">Show cluster grid overlay (black)</label>
+            <label for="showGrid" style="margin:0;">Show overlays (match current design)</label>
           </div>
 
           <div class="card soft" style="margin-top:10px;">
             <h3 style="margin:.2rem 0 .4rem;">Estimator notes</h3>
             <ul class="muter">
-              <li><strong>SRS:</strong> sample mean \( \bar y = \frac{1}{n}\sum_{i=1}^{n} y_i \).</li>
-              <li><strong>Stratified:</strong> weighted mean \( \displaystyle \bar y_{\text{str}}=\sum_{h=1}^{S} \frac{N_h}{N}\,\bar y_h \).</li>
-              <li><strong>Cluster (one-stage):</strong> mean of <em>all units sampled</em> across chosen clusters.</li>
+              <li><strong>SRS:</strong> \( \bar y = \frac{1}{n}\sum_{i=1}^{n} y_i \)</li>
+              <li><strong>Stratified:</strong> \( \displaystyle \bar y_{\text{str}}=\sum_{h=1}^{S} \frac{N_h}{N}\,\bar y_h \)</li>
+              <li><strong>Cluster (one-stage):</strong> mean of all units sampled across chosen clusters</li>
             </ul>
           </div>
         </div>
 
-        <!-- ===== RIGHT: Viz & Stats ===== -->
+        <!-- ===== RIGHT: Viz & Numbers ===== -->
         <div class="panel pad">
           <div class="grid2">
             <div class="card">
@@ -166,6 +168,7 @@
               <div class="legend" id="legend" style="margin:8px 0;"></div>
               <svg id="viz" class="viz" viewBox="0 0 760 560" aria-label="Population grid visualization"></svg>
             </div>
+
             <div class="card">
               <h3 style="margin-top:0;">Numbers</h3>
               <div class="grid2">
@@ -179,23 +182,23 @@
                   <p>Error \( \bar y - \mu \): <strong><span id="err"></span></strong></p>
                 </div>
               </div>
-            </div>
-            <div class="card">
-              <h3 style="margin-top:0;">Sample composition by group</h3>
-              <p class="muter" id="groupHint">Group = strata (SRS/Stratified) or clusters (Cluster)</p>
-              <div class="scroll">
-                <table class="table" id="groupTable" aria-label="Sample counts by group">
-                  <thead>
-                    <tr>
-                      <th>Group</th>
-                      <th>Population \(N_g\)</th>
-                      <th>Selected</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
+
+              <div style="margin-top:10px;">
+                <h4 style="margin:0 0 6px;">Sample composition by group <span class="mini">(matches current design)</span></h4>
+                <div class="scroll-mini">
+                  <table class="table tight-table" id="groupTable" aria-label="Sample counts by group">
+                    <thead>
+                      <tr>
+                        <th>Group</th>
+                        <th>Population \(N_g\)</th>
+                        <th>Selected</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+                <p class="mini" id="groupTotals" style="margin-top:6px;"></p>
               </div>
-              <p class="muter" id="groupTotals" style="margin-top:8px;"></p>
             </div>
           </div>
         </div>
@@ -247,11 +250,12 @@
 
     function buildPopulation(){
       units = [];
-      // stratum boundaries (horizontal)
-      const bandHeight = Math.floor(R / S);
+
+      // stratum boundaries (horizontal) — we’ll ensure equal band sizes (R divisible by S)
+      const bandH = Math.floor(R / S);
       const boundaries = Array.from({length:S}, (_,s) => {
-        const r0 = s*bandHeight;
-        const r1 = (s===S-1) ? R-1 : (s+1)*bandHeight - 1;
+        const r0 = s*bandH;
+        const r1 = (s===S-1) ? R-1 : (s+1)*bandH - 1;
         return {s, r0, r1};
       });
 
@@ -259,16 +263,22 @@
       const effects = Array.from({length:S}, (_,i)=> (i - (S-1)/2) * 8); // e.g., [-12,-4,4,12] for S=4
       const base = 50, noiseSD = 6;
 
+      // cluster block sizes — use exact integer sizes; we enforce divisibility
+      const blockH = R / clusterRows;
+      const blockW = C / clusterCols;
+
       for(let r=0;r<R;r++){
-        const sIdx = boundaries.find(b => r>=b.r0 && r<=b.r1)?.s ?? 0;
+        const b = boundaries.find(b => r>=b.r0 && r<=b.r1);
+        const sIdx = b ? b.s : 0;
+
         for(let c=0;c<C;c++){
           const id = r*C + c;
-          // cluster id: block index (ensure R,C divisible by clusterRows/Cols)
-          const blockH = Math.floor(R/clusterRows);
-          const blockW = Math.floor(C/clusterCols);
-          const rc = Math.min(Math.floor(r/blockH), clusterRows-1);
-          const cc = Math.min(Math.floor(c/blockW), clusterCols-1);
+
+          // exact cluster indices (no floor rounding issues now)
+          const rc = Math.min(Math.floor(r / blockH), clusterRows-1);
+          const cc = Math.min(Math.floor(c / blockW), clusterCols-1);
           const clusterId = rc*clusterCols + cc;
+
           const y = base + effects[sIdx] + randn(0, noiseSD);
           units.push({id, r, c, y, stratum: sIdx, clusterId});
         }
@@ -322,17 +332,13 @@
       return out;
     }
 
-    // ====== Group counts (table) ======
+    // ====== Group counts into Numbers card ======
     function updateGroupTable(){
       const design = document.getElementById('designSel').value;
-      const groupTableBody = document.querySelector('#groupTable tbody');
-      const hint = document.getElementById('groupHint');
+      const tbody = document.querySelector('#groupTable tbody');
       const totalsEl = document.getElementById('groupTotals');
 
       const isCluster = (design === 'cluster');
-      hint.textContent = isCluster
-        ? 'Group = clusters (cluster sample)'
-        : 'Group = strata (SRS or stratified)';
 
       // Build population & selected counts per group
       const popCount = new Map();
@@ -346,11 +352,9 @@
         }
       }
 
-      // Sort groups numerically
       const keys = Array.from(popCount.keys()).sort((a,b)=>a-b);
 
-      // Render rows (show all groups; zeros included)
-      groupTableBody.innerHTML = keys.map(k => `
+      tbody.innerHTML = keys.map(k => `
         <tr>
           <td>${isCluster ? ('Cluster ' + (k+1)) : ('Stratum ' + (k+1))}</td>
           <td>${popCount.get(k)}</td>
@@ -358,10 +362,8 @@
         </tr>
       `).join('');
 
-      // Totals line
       const totalSelected = Array.from(selCount.values()).reduce((s,v)=>s+v,0);
-      const totalPop = units.length;
-      totalsEl.textContent = `Selected total: ${totalSelected} of ${totalPop} units`;
+      totalsEl.textContent = `Selected total: ${totalSelected} of ${units.length} units`;
     }
 
     // ====== Drawing ======
@@ -405,7 +407,7 @@
         }
       }
 
-      // cells
+      // cells (selected squares now BLACK outline)
       for(const u of units){
         const fill = (design==='cluster')
           ? palette[u.clusterId % palette.length]
@@ -421,8 +423,8 @@
         rect.setAttribute('width', Math.max(1, cellW - 1));
         rect.setAttribute('height', Math.max(1, cellH - 1));
         rect.setAttribute('fill', fill);
-        rect.setAttribute('stroke', selected ? '#e7a614' : 'rgba(0,0,0,0.06)');
-        rect.setAttribute('stroke-width', selected ? 2.5 : 1);
+        rect.setAttribute('stroke', selected ? '#000' : 'rgba(0,0,0,0.08)');
+        rect.setAttribute('stroke-width', selected ? 2.2 : 1);
         rect.setAttribute('opacity', selected ? 1 : 0.9);
         rect.setAttribute('rx', 2);
         rect.setAttribute('ry', 2);
@@ -431,33 +433,51 @@
         viz.appendChild(rect);
       }
 
-      // cluster grid overlay — now BLACK and thicker for visibility
+      // overlays that MATCH the current design (and in BLACK)
       if(showGrid){
-        const blockH = Math.floor(R/clusterRows);
-        const blockW = Math.floor(C/clusterCols);
-        for(let rc=1; rc<clusterRows; rc++){
-          const y = pad + rc*blockH*cellH;
-          const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-          line.setAttribute('x1', pad);
-          line.setAttribute('x2', W-pad);
-          line.setAttribute('y1', y);
-          line.setAttribute('y2', y);
-          line.setAttribute('stroke', '#000');
-          line.setAttribute('stroke-width', '1.5');
-          line.setAttribute('stroke-dasharray', '6 6');
-          viz.appendChild(line);
-        }
-        for(let cc=1; cc<clusterCols; cc++){
-          const x = pad + cc*blockW*cellW;
-          const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-          line.setAttribute('y1', pad);
-          line.setAttribute('y2', H-pad);
-          line.setAttribute('x1', x);
-          line.setAttribute('x2', x);
-          line.setAttribute('stroke', '#000');
-          line.setAttribute('stroke-width', '1.5');
-          line.setAttribute('stroke-dasharray', '6 6');
-          viz.appendChild(line);
+        if(design === 'cluster'){
+          // cluster grid
+          const blockH = R / clusterRows;
+          const blockW = C / clusterCols;
+          for(let rc=1; rc<clusterRows; rc++){
+            const y = pad + rc*blockH*cellH;
+            const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+            line.setAttribute('x1', pad);
+            line.setAttribute('x2', W-pad);
+            line.setAttribute('y1', y);
+            line.setAttribute('y2', y);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '1.5');
+            line.setAttribute('stroke-dasharray', '6 6');
+            viz.appendChild(line);
+          }
+          for(let cc=1; cc<clusterCols; cc++){
+            const x = pad + cc*blockW*cellW;
+            const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+            line.setAttribute('y1', pad);
+            line.setAttribute('y2', H-pad);
+            line.setAttribute('x1', x);
+            line.setAttribute('x2', x);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '1.5');
+            line.setAttribute('stroke-dasharray', '6 6');
+            viz.appendChild(line);
+          }
+        } else {
+          // stratified: horizontal band boundaries
+          const bandH = Math.floor(R / S);
+          for(let s=1; s<S; s++){
+            const y = pad + s*bandH*cellH;
+            const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+            line.setAttribute('x1', pad);
+            line.setAttribute('x2', W-pad);
+            line.setAttribute('y1', y);
+            line.setAttribute('y2', y);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '1.5');
+            line.setAttribute('stroke-dasharray', '6 6');
+            viz.appendChild(line);
+          }
         }
       }
     }
@@ -497,29 +517,32 @@
       document.getElementById('nInput').parentElement.style.display = (design!=='cluster') ? 'block' : 'none';
     }
 
-    function clampClusterLayout(){
-      // Ensure clusters tile the grid
+    function nearestDivisor(total, want){
+      let best=2, bestDiff=1e9;
+      for(let k=2;k<=10;k++){
+        if(total % k === 0){
+          const diff=Math.abs(k-want);
+          if(diff<bestDiff){ best=k; bestDiff=diff; }
+        }
+      }
+      return best;
+    }
+
+    function clampLayouts(){
+      // ensure strata roughly equal-height; clusters tile exactly
+      S = Math.max(2, Math.min(10, +document.getElementById('SInput').value||4));
       clusterRows = Math.max(2, Math.min(10, +document.getElementById('cRows').value||5));
       clusterCols = Math.max(2, Math.min(10, +document.getElementById('cCols').value||5));
-      function nearestDivisor(total, want){
-        let best=2, bestDiff=1e9;
-        for(let k=2;k<=10;k++){
-          if(total % k === 0){
-            const diff=Math.abs(k-want);
-            if(diff<bestDiff){ best=k; bestDiff=diff; }
-          }
-        }
-        return best;
-      }
+
       if(R % clusterRows !== 0) clusterRows = nearestDivisor(R, clusterRows);
       if(C % clusterCols !== 0) clusterCols = nearestDivisor(C, clusterCols);
+
       document.getElementById('cRows').value = clusterRows;
       document.getElementById('cCols').value = clusterCols;
     }
 
     function rebuildPopulationAndResample(){
-      S = Math.max(2, Math.min(10, +document.getElementById('SInput').value||4));
-      clampClusterLayout();
+      clampLayouts();
       buildPopulation();
       resample();
     }
