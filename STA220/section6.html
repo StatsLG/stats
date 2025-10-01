@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Section 6 | Introduction to Continuous Probability Distributions</title>
+  <meta name="description" content="Section 6: Introduction to Continuous Probability Distributions — STA220 notes on StatsLG." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- MathJax (LaTeX) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM YOUR TEMPLATE ===== -->
+    <aside class="sidebar" aria-label="Site navigation">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-title">BCTC Statistics Hub</div>
+      </div>
+
+      <div class="nav-section">
+        <h3>Graphing</h3>
+        <nav class="nav">
+          <a href="/graphing/barchart.html">Bar Chart</a>
+          <a href="/graphing/piechart.html">Pie / Donut</a>
+          <a href="/graphing/histogram.html">Histogram</a>
+          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+          <a href="/graphing/barchart2way.html">Grouped Bar</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Analysis</h3>
+        <nav class="nav">
+          <a href="/descriptive/summary.html">Descriptive Summary</a>
+          <a href="/inference/onemean.html">One-Sample Mean Test</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Notes & Extras</h3>
+        <nav class="nav">
+          <a href="/STA210U/">STA 210U</a>
+          <a href="/STA220/">STA 220</a>
+          <a href="/STA296U/">STA 296U</a>
+          <a href="/game/pathyfinder.html">Pathy Finder</a>
+        </nav>
+      </div>
+
+      <div class="footer-note">
+        © <span id="yr"></span> StatsLG - Luke Garnett
+      </div>
+    </aside>
+
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
+    <main>
+      <header>
+        <h1>Section 6 — Introduction to Continuous Probability Distributions</h1>
+        <p>We move from discrete models to <strong>continuous</strong> random variables. Probability is represented as <em>area under a density curve</em> \(f(x)\), and we’ll focus on the uniform distribution as a first concrete model.</p>
+      </header>
+
+      <!-- On this page -->
+      <section class="section">
+        <h2>On this page</h2>
+        <div class="grid">
+          <article class="card"><a href="#density">Continuous RVs &amp; Density Functions</a></article>
+          <article class="card"><a href="#properties">Properties of a Density Function</a></article>
+          <article class="card"><a href="#intervals">Interval Probability vs. Points</a></article>
+          <article class="card"><a href="#f2x">Example: \(f(x)=2x\) on \(0\le x\le1\)</a></article>
+          <article class="card"><a href="#meansd">Mean/SD for Continuous RVs (note)</a></article>
+          <article class="card"><a href="#uniform">Uniform Distribution</a></article>
+          <article class="card"><a href="#uniform24">Example: Uniform with \(a=2,\ b=4\)</a></article>
+          <article class="card"><a href="#shortcuts">Uniform Shortcuts: \(P\), \(\mu\), \(\sigma^2\)</a></article>
+          <article class="card"><a href="#travel">Example: Travel Time \(200\)–\(240\) min</a></article>
+        </div>
+      </section>
+
+      <!-- Density basics -->
+      <section id="density" class="section">
+        <h2>Continuous RVs &amp; Density Functions</h2>
+        <p>A continuous random variable takes values on an interval. We model its distribution with a smooth curve \(f(x)\) called a <strong>density function</strong>. The probability of falling in an interval is the <strong>area under</strong> \(f(x)\) over that interval.</p>
+      </section>
+
+      <!-- Properties -->
+      <section id="properties" class="section">
+        <h2>Properties of a Density Function</h2>
+        <ul>
+          <li>\(f(x)\) is a function (passes the vertical line test).</li>
+          <li>\(f(x)\ge 0\) for all \(x\) (probabilities are never negative).</li>
+          <li>Total area under \(f(x)\) is \(1\) (probability over the whole sample space is 1).</li>
+        </ul>
+      </section>
+
+      <!-- Intervals vs points -->
+      <section id="intervals" class="section">
+        <h2>Interval Probability vs. Points</h2>
+        <p>For continuous variables we assign probability to <em>intervals</em>, not points:</p>
+        <p>\(P(a\le x\le b)\) is the area under \(f(x)\) from \(a\) to \(b\).</p>
+        <p>At a single point, \(P(x=a)=0\). A “point” has zero width, so its area is zero. Also, with infinitely many possible outcomes, any specific point has probability \(0\).</p>
+        <p>Therefore, \(P(a\le x\le b)=P(a&lt;x&lt;b)\); inclusion of endpoints doesn’t change the value.</p>
+      </section>
+
+      <!-- Example f(x)=2x -->
+      <section id="f2x" class="section">
+        <h2>Example — \(f(x)=2x\) on \(0\le x\le 1\)</h2>
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Draw &amp; reason</h3>
+          <p>The graph is a straight line from \((0,0)\) to \((1,2)\), forming a right triangle with the \(x\)-axis.</p>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <h3>(a) Total area</h3>
+            <p>\(\displaystyle \text{Area}=\tfrac12\cdot \text{base}\cdot \text{height}=\tfrac12\cdot1\cdot2=1\).</p>
+          </article>
+          <article class="card">
+            <h3>(b) \(P(0\le x\le 0.5)\)</h3>
+            <p>\(\displaystyle \tfrac12\cdot 0.5\cdot 1 = 0.25\).</p>
+          </article>
+          <article class="card">
+            <h3>(c) \(P(0.5\le x\le 1)\)</h3>
+            <p>Total area \(1\) minus area from \(0\) to \(0.5\): \(1-0.25=0.75\).</p>
+          </article>
+          <article class="card">
+            <h3>(d) \(P(0.25\le x\le 0.75)\)</h3>
+            <p>Area \([0,0.75]\): \(\tfrac12\cdot0.75\cdot1.5=0.5625\); area \([0,0.25]\): \(\tfrac12\cdot0.25\cdot0.5=0.0625\); difference \(=0.50\).</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Mean/SD note -->
+      <section id="meansd" class="section">
+        <h2>Mean &amp; Standard Deviation for Continuous RVs (note)</h2>
+        <p>The definitions mirror the discrete case but use calculus (integrals). In this course we’ll focus on specific continuous families (like the uniform) where results are known.</p>
+      </section>
+
+      <!-- Uniform -->
+      <section id="uniform" class="section">
+        <h2>The Uniform Distribution</h2>
+        <p>Flat (constant) density on an interval \([a,b]\):</p>
+        <p>\[
+          f(x) = \frac{1}{\,b-a\,}, \qquad a\le x \le b
+        \]</p>
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Important</h3>
+          <ul>
+            <li>Always restrict the domain to \([a,b]\); outside that interval the density is \(0\).</li>
+            <li>Total area \(=\) height \(\times\) width \(= \tfrac{1}{b-a}\cdot (b-a)=1\).</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Uniform a=2 b=4 -->
+      <section id="uniform24" class="section">
+        <h2>Example — Uniform with \(a=2,\ b=4\)</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Density</h3>
+            <p>\(f(x)=\tfrac{1}{4-2}=\tfrac12\) for \(2\le x\le4\).</p>
+          </article>
+          <article class="card">
+            <h3>Total area</h3>
+            <p>Rectangle area \(=\ell\cdot w=(2)\cdot(\tfrac12)=1\).</p>
+          </article>
+          <article class="card">
+            <h3>\(P(2\le x\le 3)\)</h3>
+            <p>Width \(1\) \(\times\) height \(\tfrac12 = 0.5\).</p>
+          </article>
+          <article class="card">
+            <h3>Mean</h3>
+            <p>Symmetric about \(x=3\Rightarrow \mu=3\).</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Shortcuts -->
+      <section id="shortcuts" class="section">
+        <h2>Uniform Shortcuts</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Interval probability</h3>
+            <p>\(\displaystyle P(c\le x\le d)=\frac{d-c}{\,b-a\,}\quad (a\le c\le d\le b)\)</p>
+          </article>
+          <article class="card">
+            <h3>Mean</h3>
+            <p>\(\displaystyle \mu=\frac{a+b}{2}\)</p>
+          </article>
+          <article class="card">
+            <h3>Variance / SD</h3>
+            <p>\(\displaystyle \sigma^2=\frac{(b-a)^2}{12},\quad \sigma=\sqrt{\sigma^2}\)</p>
+          </article>
+          <article class="card">
+            <h3>Median / Mode / Range</h3>
+            <p>Median \(=\mu\) (symmetry), Mode = D.N.E. (flat), Range \(=b-a\).</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Travel example -->
+      <section id="travel" class="section">
+        <h2>Example — Travel Time \(200\)–\(240\) minutes (Uniform)</h2>
+        <div class="card soft">
+          <h3 style="margin:.2rem 0 .4rem;">Setup</h3>
+          <p>\(a=200,\ b=240\Rightarrow f(x)=\tfrac{1}{40}\) for \(200\le x\le240\).</p>
+          <div class="grid" style="margin-top:10px;">
+            <article class="card">
+              <h3>\(P(200\le x&lt;225)\)</h3>
+              <p>\(\displaystyle \frac{225-200}{240-200}=\frac{25}{40}=\frac58=0.625\).</p>
+            </article>
+            <article class="card">
+              <h3>Mean &amp; Median</h3>
+              <p>\(\mu=\frac{200+240}{2}=220\); median \(=220\).</p>
+            </article>
+            <article class="card">
+              <h3>Mode &amp; Range</h3>
+              <p>Mode = D.N.E.; Range \(=240-200=40\).</p>
+            </article>
+            <article class="card">
+              <h3>Variance &amp; SD</h3>
+              <p>\(\sigma^2=\frac{40^2}{12}=133.333\);\; \(\sigma\approx 11.547\).</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>

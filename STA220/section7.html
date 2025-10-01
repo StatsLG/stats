@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Section 7 | The Normal Distribution & Sampling Distributions</title>
+  <meta name="description" content="Section 7: The Normal Distribution and Sampling Distributions — STA220 notes on StatsLG." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- MathJax (LaTeX) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM YOUR TEMPLATE ===== -->
+    <aside class="sidebar" aria-label="Site navigation">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-title">BCTC Statistics Hub</div>
+      </div>
+
+      <div class="nav-section">
+        <h3>Graphing</h3>
+        <nav class="nav">
+          <a href="/graphing/barchart.html">Bar Chart</a>
+          <a href="/graphing/piechart.html">Pie / Donut</a>
+          <a href="/graphing/histogram.html">Histogram</a>
+          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+          <a href="/graphing/barchart2way.html">Grouped Bar</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Analysis</h3>
+        <nav class="nav">
+          <a href="/descriptive/summary.html">Descriptive Summary</a>
+          <a href="/inference/onemean.html">One-Sample Mean Test</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Notes & Extras</h3>
+        <nav class="nav">
+          <a href="/STA210U/">STA 210U</a>
+          <a href="/STA220/">STA 220</a>
+          <a href="/STA296U/">STA 296U</a>
+          <a href="/game/pathyfinder.html">Pathy Finder</a>
+        </nav>
+      </div>
+
+      <div class="footer-note">
+        © <span id="yr"></span> StatsLG - Luke Garnett
+      </div>
+    </aside>
+
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
+    <main>
+      <header>
+        <h1>Section 7 — The Normal Distribution & Sampling Distributions</h1>
+        <p>Learn how to compute probabilities with the <strong>standard normal</strong>, transform any normal to \(z\), and build intuition for <strong>sampling distributions</strong> (\(\bar x\) and \(\hat p\)), including the <strong>Central Limit Theorem</strong>.</p>
+      </header>
+
+      <!-- On this page -->
+      <section class="section">
+        <h2>On this page</h2>
+        <div class="grid">
+          <article class="card"><a href="#normal">The Normal Distribution</a></article>
+          <article class="card"><a href="#standard">The Standard Normal (z) &amp; Table</a></article>
+          <article class="card"><a href="#std-ex">Standard Normal — Worked Examples</a></article>
+          <article class="card"><a href="#anynormal">From Any Normal to Standard Normal</a></article>
+          <article class="card"><a href="#iqpepsi">Examples: IQ &amp; Pepsi Can</a></article>
+          <article class="card"><a href="#sampling-intro">Sampling Distributions — Concepts</a></article>
+          <article class="card"><a href="#xbar-facts">\(\bar x\): Mean/Variance/SE &amp; Illustration</a></article>
+          <article class="card"><a href="#clt">Central Limit Theorem (CLT)</a></article>
+          <article class="card"><a href="#examples-clt">Examples with \(\bar x\)</a></article>
+          <article class="card"><a href="#phat">\(\hat p\): Sampling Distribution</a></article>
+        </div>
+      </section>
+
+      <!-- Normal distribution -->
+      <section id="normal" class="section">
+        <h2>The Normal Distribution</h2>
+        <ul>
+          <li>Bell-shaped, <strong>symmetric</strong> about the mean \(\mu\); spread controlled by \(\sigma\).</li>
+          <li>For a normal, <strong>mean = median = mode</strong>.</li>
+        </ul>
+        <p>Density:
+          \[
+            f(x)=\frac{1}{\sqrt{2\pi\sigma^2}}\,
+            e^{-\frac{(x-\mu)^2}{2\sigma^2}}
+          \]
+          Parameters \(\mu\) and \(\sigma\) determine which normal curve we have.
+        </p>
+      </section>
+
+      <!-- Standard normal and the table -->
+      <section id="standard" class="section">
+        <h2>The Standard Normal (z) &amp; Table</h2>
+        <p>Set \(\mu=0,\ \sigma=1\). The variable is \(Z\). The standard normal table we use gives
+          \( P(0\le Z \le z) \).
+        </p>
+        <div class="grid">
+          <article class="card">
+            <h3>Example A</h3>
+            <p>\(P(0\le Z\le 1.55)=0.4394\)</p>
+            <p>Look up 1.5 (row) and 0.05 (column).</p>
+          </article>
+          <article class="card">
+            <h3>Example B</h3>
+            <p>\(P(0\le Z\le 1.96)=0.4750\)</p>
+            <p>Look up 1.9 (row) and 0.06 (column).</p>
+          </article>
+        </div>
+        <h3>Facts</h3>
+        <ul>
+          <li>Total area \(=1\).</li>
+          <li>Symmetric about 0 → \(P(Z<0)=P(Z>0)=0.5\).</li>
+        </ul>
+      </section>
+
+      <!-- Standard normal worked examples -->
+      <section id="std-ex" class="section">
+        <h2>Standard Normal — Worked Examples</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>a</h3>
+            <p>\(P(Z\le1.64)=0.5+0.4495=0.9495\)</p>
+          </article>
+          <article class="card">
+            <h3>b</h3>
+            <p>\(P(Z\ge1.64)=0.5-0.4495=0.0505\)</p>
+          </article>
+          <article class="card">
+            <h3>c</h3>
+            <p>\(P(Z\le -1.64)=0.0505\) (by symmetry)</p>
+          </article>
+          <article class="card">
+            <h3>d</h3>
+            <p>\(P(-2.32\le Z\le 0)=0.4898\)</p>
+          </article>
+          <article class="card">
+            <h3>e</h3>
+            <p>\(P(-2\le Z\le 2)=2(0.4772)=0.9544\) (Empirical Rule check)</p>
+          </article>
+          <article class="card">
+            <h3>f</h3>
+            <p>\(P(1.41\le Z\le 2.18)=0.4854-0.4207=0.0647\)</p>
+          </article>
+          <article class="card">
+            <h3>g</h3>
+            <p>\(P(Z\ge12.31)=0\) (effectively off the chart)</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Any normal to standard normal -->
+      <section id="anynormal" class="section">
+        <h2>From Any Normal to Standard Normal</h2>
+        <p>If \(X\sim N(\mu,\sigma)\), then
+          \[
+            Z=\frac{X-\mu}{\sigma}
+          \]
+          is standard normal. This <em>rescales</em> the horizontal axis; areas are preserved.
+        </p>
+        <p><strong>Picture idea:</strong> mark \(\mu\), then \(\mu\pm\sigma\), \(\mu\pm2\sigma\), \(\mu\pm3\sigma\). The same bell, with a \(z\)-axis relabeled in SD units (0, ±1, ±2, ±3).</p>
+      </section>
+
+      <!-- IQ and Pepsi examples -->
+      <section id="iqpepsi" class="section">
+        <h2>Examples: IQ &amp; Pepsi Can</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>IQ scores</h3>
+            <p>\(\mu=100,\ \sigma=10\).</p>
+            <p>a) \(P(100\le X\le120)=P(0\le Z\le2)=0.4772\)</p>
+            <p>b) \(P(X\ge130)=P(Z\ge3)=0.5-0.4987=0.0013\)</p>
+          </article>
+          <article class="card">
+            <h3>“12 oz” Pepsi</h3>
+            <p>\(\mu=12,\ \sigma=0.1\).</p>
+            <p>\(P(X\le11.83)=P(Z\le -1.7)=0.5-0.4554=0.0446\)</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Sampling distributions concepts -->
+      <section id="sampling-intro" class="section">
+        <h2>Sampling Distributions — Concepts</h2>
+        <ul>
+          <li><strong>Population</strong>: all measurements (group of interest)</li>
+          <li><strong>Sample</strong>: subset used for analysis</li>
+          <li><strong>Parameter</strong>: numerical characteristic of a population (\(\mu,p,\sigma,\dots\))</li>
+          <li><strong>Statistic</strong>: numerical characteristic of a sample (\(\bar x,\ \hat p,\ s,\dots\))</li>
+        </ul>
+        <p>Because different random samples give different \(\bar x\), <strong>\(\bar x\) is a random variable</strong>. Its probability model over all possible samples is the <strong>sampling distribution</strong>.</p>
+        <p><strong>Good estimators</strong> have: (a) center at the parameter (unbiased), (b) small variability (minimum variance among unbiased options).</p>
+      </section>
+
+      <!-- xbar facts + illustration -->
+      <section id="xbar-facts" class="section">
+        <h2>\(\bar x\): Mean, Variance, SE &amp; Illustration</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Facts for \(\bar x\)</h3>
+            <ul>
+              <li>\(\mu_{\bar x}=\mu\)</li>
+              <li>\(\sigma^2_{\bar x}=\dfrac{\sigma^2}{n}\)</li>
+              <li>\(\sigma_{\bar x}=\dfrac{\sigma}{\sqrt n}\) (the <em>standard error</em>)</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Finite Population Correction (FPC)</h3>
+            <p>Sampling <em>without replacement</em> from population \(N\):</p>
+            <p>\(\displaystyle \sigma^2_{\bar x}=\frac{\sigma^2}{n}\left(\frac{N-n}{N-1}\right)\)</p>
+            <p>(For large \(N\), FPC \(\approx1\).)</p>
+          </article>
+        </div>
+
+        <div class="card soft" style="margin-top:10px;">
+          <h3 style="margin:.2rem 0 .4rem;">Illustration — Tiny population \(\{1,2,3,4\}\), \(n=2\)</h3>
+          <div class="preview">
+            <table class="table">
+              <thead>
+                <tr><th>Population \(x\)</th><th>\(x^2\)</th><th>\(P(x)\)</th><th>\(x^2P(x)\)</th><th>\(\bar x\)</th><th>\(\bar x^2\)</th><th>\(P(\bar x)\)</th><th>\(\bar x^2P(\bar x)\)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>1</td><td>1/4</td><td>1/4</td><td>1.5</td><td>2.25</td><td>1/6</td><td>2.25/6</td></tr>
+                <tr><td>2</td><td>4</td><td>1/4</td><td>4/4</td><td>2</td><td>4</td><td>1/6</td><td>4/6</td></tr>
+                <tr><td>3</td><td>9</td><td>1/4</td><td>9/4</td><td>2.5</td><td>6.25</td><td>1/6</td><td>6.25/6</td></tr>
+                <tr><td>4</td><td>16</td><td>1/4</td><td>16/4</td><td>2.5</td><td>6.25</td><td>1/6</td><td>6.25/6</td></tr>
+                <tr><td colspan="8">… remaining sample means: 3 (\(1/6\)), 3.5 (\(1/6\))</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <ul>
+            <li>\(\mu=10/4=2.5\), \(\mu_{\bar x}=15/6=2.5\) → unbiased.</li>
+            <li>\(\sigma^2=1.25\); with FPC: \(\displaystyle \sigma^2_{\bar x}=\frac{1.25}{2}\cdot\frac{4-2}{4-1}=\frac{5}{12}=0.417\), hence \(\sigma_{\bar x}\approx 0.645\).</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- CLT -->
+      <section id="clt" class="section">
+        <h2>Central Limit Theorem (CLT)</h2>
+        <p>If the <strong>population is normal</strong>, then for any \(n\):
+          \[
+            Z=\frac{\bar x-\mu}{\sigma/\sqrt n}\ \text{is standard normal.}
+          \]
+        </p>
+        <p>If the population is <strong>not known to be normal</strong>, the CLT says the distribution of \(\bar x\) is approximately normal for <strong>large \(n\)</strong> (use \(n\ge 30\) in this class).</p>
+      </section>
+
+      <!-- Examples with xbar -->
+      <section id="examples-clt" class="section">
+        <h2>Examples with \(\bar x\)</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>“12 oz” Pepsi (normal population)</h3>
+            <p>\(\mu=12,\ \sigma=0.2\)</p>
+            <p>a) Single can: \(P(11.9<X<12.1)=P(-0.5<Z<0.5)=2(0.1915)=0.3830\)</p>
+            <p>b) Sample of \(n=16\): \(P(11.9<\bar x<12.1)=P(-2<Z<2)=2(0.4772)=0.9544\)</p>
+          </article>
+          <article class="card">
+            <h3>Tree heights</h3>
+            <p>\(\mu=110,\ \sigma=20,\ n=100\)</p>
+            <p>\(\mu_{\bar x}=110\), \(\sigma_{\bar x}=20/\sqrt{100}=2\)</p>
+            <p>\(P(\bar x>108)=P(Z>-1)=0.5+0.3413=0.8413\)</p>
+            <p>\(P(X>108)\): <em>cannot compute</em> without knowing the distribution of \(X\).</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- p-hat -->
+      <section id="phat" class="section">
+        <h2>Sampling Distribution of \(\hat p\)</h2>
+        <p>Population proportion \(p=\dfrac{\#\text{ in population with characteristic}}{\#\text{ in population}}\).
+           Sample proportion \(\hat p=\dfrac{\#\text{ in sample with characteristic}}{\#\text{ in sample}}\).
+        </p>
+        <ul>
+          <li>\(\mu_{\hat p}=p\) (unbiased)</li>
+          <li>\(\sigma^2_{\hat p}=\dfrac{pq}{n}\), with \(q=1-p\)</li>
+          <li>\(\sigma_{\hat p}=\sqrt{\dfrac{pq}{n}}\) (standard error)</li>
+          <li>For large \(n\), \(\displaystyle Z=\frac{\hat p-p}{\sqrt{pq/n}}\) is approximately standard normal.</li>
+        </ul>
+      </section>
+
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>
