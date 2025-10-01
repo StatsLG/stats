@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Sampling Designs: SRS vs Stratified vs Cluster</title>
+  <meta name="description" content="Interactive applet demonstrating SRS, stratified sampling, and cluster sampling." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <style>
+    /* Small helpers for the visualization */
+    .viz {
+      width: 100%;
+      height: 560px;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      background: #fff;
+      display: block;
+    }
+    .legend { display:flex; flex-wrap:wrap; gap:8px; align-items:center }
+    .chip { display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border:1px solid var(--rule); border-radius:999px; background:#fff; font-size:12px }
+    .swatch { width:14px; height:14px; border-radius:3px; border:1px solid rgba(0,0,0,.1) }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .muter { color: var(--muted); font-size:12px }
+    .grid2 { display:grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:12px }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) ===== -->
+    <aside class="sidebar" aria-label="Site navigation">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-title">BCTC Statistics Hub</div>
+      </div>
+
+      <div class="nav-section">
+        <h3>Graphing</h3>
+        <nav class="nav">
+          <a href="/graphing/barchart.html">Bar Chart</a>
+          <a href="/graphing/piechart.html">Pie / Donut</a>
+          <a href="/graphing/histogram.html">Histogram</a>
+          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+          <a href="/graphing/barchart2way.html">Grouped Bar</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Analysis</h3>
+        <nav class="nav">
+          <a href="/descriptive/summary.html">Descriptive Summary</a>
+          <a href="/inference/onemean.html">One-Sample Mean Test</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Notes & Extras</h3>
+        <nav class="nav">
+          <a href="/STA210U/">STA 210U</a>
+          <a href="/STA220/">STA 220</a>
+          <a href="/STA296U/">STA 296U</a>
+          <a href="/game/pathyfinder.html">Pathy Finder</a>
+        </nav>
+      </div>
+
+      <div class="footer-note">
+        © <span id="yr"></span> StatsLG - Luke Garnett
+      </div>
+    </aside>
+
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
+    <main>
+      <header>
+        <h1>Sampling Designs: SRS vs Stratified vs Cluster</h1>
+        <p>Population is a <strong>20×20 grid (N=400)</strong> with a numeric outcome \(Y\). Choose a design and compare the <strong>population mean</strong> to the <strong>sample mean</strong>. Stratified uses horizontal bands; Cluster uses equal-sized blocks. Re-sample to see variability.</p>
+      </header>
+
+      <section class="section wrap" style="grid-template-columns: 360px 1fr;">
+        <!-- ===== LEFT: Controls ===== -->
+        <div class="panel pad left">
+          <div class="grid2">
+            <div>
+              <label for="designSel">Sampling design</label>
+              <select id="designSel">
+                <option value="srs">Simple Random Sample (SRS)</option>
+                <option value="strat">Stratified Random Sample</option>
+                <option value="cluster">Cluster Sample (one-stage)</option>
+              </select>
+            </div>
+            <div>
+              <label for="nInput">Sample size n <span class="muter">(SRS/Stratified)</span></label>
+              <input id="nInput" type="number" min="5" max="200" value="40" />
+            </div>
+            <div id="strataBox">
+              <label># of strata (horizontal bands)</label>
+              <input id="SInput" type="number" min="2" max="10" value="4" />
+              <div class="checkline" style="margin-top:6px;">
+                <input type="radio" id="allocProp" name="alloc" value="prop" checked>
+                <label for="allocProp" style="margin:0;">Proportional allocation</label>
+              </div>
+              <div class="checkline">
+                <input type="radio" id="allocEqual" name="alloc" value="equal">
+                <label for="allocEqual" style="margin:0;">Equal \(n_h\)</label>
+              </div>
+            </div>
+            <div id="clusterBox">
+              <label>Cluster layout (rows × cols)</label>
+              <div class="row">
+                <input id="cRows" type="number" min="2" max="10" value="5" />
+                <input id="cCols" type="number" min="2" max="10" value="5" />
+              </div>
+              <label style="margin-top:6px;"># clusters to sample (K)</label>
+              <input id="KInput" type="number" min="1" max="25" value="4" />
+              <p class="muter">Cluster sample size = K × (cluster size).</p>
+            </div>
+          </div>
+
+          <hr class="rule" style="margin:12px 0">
+          <div class="row">
+            <button class="btn" id="btnResample">Re-sample</button>
+            <button class="btn outline" id="btnShuffle">Shuffle population</button>
+            <button class="btn ghost" id="btnDefaults">Reset defaults</button>
+          </div>
+
+          <div class="checkline" style="margin-top:10px;">
+            <input type="checkbox" id="showGrid" checked>
+            <label for="showGrid" style="margin:0;">Show cluster grid overlay</label>
+          </div>
+
+          <div class="card soft" style="margin-top:10px;">
+            <h3 style="margin:.2rem 0 .4rem;">What you’ll notice</h3>
+            <ul class="muter">
+              <li><strong>SRS:</strong> unbiased, but variance can be higher if strata differ.</li>
+              <li><strong>Stratified:</strong> when strata means differ, proportional/ equal allocation often <em>reduces variance</em>.</li>
+              <li><strong>Cluster:</strong> sampling whole clusters is cheap logistically, but often <em>higher variance</em> if units inside clusters are similar.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- ===== RIGHT: Viz & Stats ===== -->
+        <div class="panel pad">
+          <div class="grid2">
+            <div class="card">
+              <h3 style="margin-top:0;">Population</h3>
+              <div class="muter">N=<span id="NLabel">400</span>; 20×20 grid. Colors show <span id="legendLabel">strata</span>.</div>
+              <div class="legend" id="legend" style="margin:8px 0;"></div>
+              <svg id="viz" class="viz" viewBox="0 0 760 560" aria-label="Population grid visualization"></svg>
+            </div>
+            <div class="card">
+              <h3 style="margin-top:0;">Numbers</h3>
+              <div class="grid2">
+                <div>
+                  <p>Population mean \( \mu \): <strong><span id="popMean"></span></strong></p>
+                  <p>Population SD \( \sigma \): <span id="popSD"></span></p>
+                </div>
+                <div>
+                  <p>Sample size \( n \): <strong><span id="sampleN"></span></strong></p>
+                  <p>Sample mean \( \bar y \): <strong><span id="sampMean"></span></strong></p>
+                  <p>Error \( \bar y - \mu \): <strong><span id="err"></span></strong></p>
+                </div>
+              </div>
+              <p class="muter" style="margin-top:8px;">Hover a square to see its \(Y\). Selected sample squares are outlined in <span class="mono">gold</span>.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Footer info
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
+
+    // ====== Parameters & helpers ======
+    const R = 20, C = 20;                 // grid size => N = 400
+    const N = R*C;
+    const viz = document.getElementById('viz');
+    const fmt = (x,d=3)=> Number.isFinite(x) ? x.toFixed(d) : '—';
+    const sum = a => a.reduce((s,v)=>s+v,0);
+    const mean = a => sum(a)/a.length;
+    const popVar = a => { const m=mean(a); return sum(a.map(v => (v-m)*(v-m)))/a.length; };
+    const sd = a => Math.sqrt(popVar(a));
+    const randn = (mu=0, sigma=1) => { // Box-Muller
+      let u=0,v=0; while(u===0) u=Math.random(); while(v===0) v=Math.random();
+      return mu + sigma * Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+    };
+    const choiceK = (arr,k) => {
+      // sample k unique from arr (Fisher-Yates partial)
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+      }
+      return a.slice(0,k);
+    };
+
+    const palette = [
+      '#e7a614', '#3b82f6', '#ef4444', '#10b981', '#a855f7',
+      '#fb923c', '#22c55e', '#06b6d4', '#f43f5e', '#8b5cf6'
+    ];
+
+    // ====== Build population ======
+    let S = 4;                 // strata bands
+    let clusterRows = 5, clusterCols = 5;
+    let units = [];            // [{id,r,c,y,stratum,clusterId}]
+    let sampleSet = new Set(); // selected ids
+
+    function buildPopulation(){
+      units = [];
+      // stratum boundaries (horizontal)
+      const bandHeight = Math.floor(R / S);
+      const boundaries = Array.from({length:S}, (_,s) => {
+        const r0 = s*bandHeight;
+        const r1 = (s===S-1) ? R-1 : (s+1)*bandHeight - 1;
+        return {s, r0, r1};
+      });
+
+      // stratum effects for Y (to make stratified helpful)
+      const effects = Array.from({length:S}, (_,i)=> (i - (S-1)/2) * 8); // e.g., [-12,-4,4,12] for S=4
+      // base mean + noise sd
+      const base = 50, noiseSD = 6;
+
+      for(let r=0;r<R;r++){
+        // which stratum?
+        let sIdx = boundaries.find(b => r>=b.r0 && r<=b.r1)?.s ?? 0;
+        for(let c=0;c<C;c++){
+          const id = r*C + c;
+          // cluster id: block index (assume equal; require R % clusterRows == 0, C % clusterCols == 0)
+          const blockH = Math.floor(R/clusterRows);
+          const blockW = Math.floor(C/clusterCols);
+          const rc = Math.min(Math.floor(r/blockH), clusterRows-1);
+          const cc = Math.min(Math.floor(c/blockW), clusterCols-1);
+          const clusterId = rc*clusterCols + cc;
+          const y = base + effects[sIdx] + randn(0, noiseSD);
+          units.push({id, r, c, y, stratum: sIdx, clusterId});
+        }
+      }
+    }
+
+    // ====== Sampling designs ======
+    function sampleSRS(n){
+      const ids = choiceK(units.map(u=>u.id), Math.min(n,N));
+      return new Set(ids);
+    }
+
+    function stratAllocations(n, sizes, mode='prop'){
+      // sizes: array of N_h per stratum
+      // return integer n_h summing to n; proportional or equal
+      const S = sizes.length;
+      if(mode==='equal'){
+        const base = Math.floor(n / S);
+        let rem = n - base*S;
+        const nh = Array(S).fill(base);
+        let i=0; while(rem>0){ nh[i%S]++; i++; rem--; }
+        return nh;
+      } else {
+        // proportional with largest remainders
+        const raw = sizes.map(Nh => n * Nh / sum(sizes));
+        const flo = raw.map(x => Math.floor(x));
+        let rem = n - sum(flo);
+        const fracIdx = raw.map((x,i)=>({i, f: x - flo[i]})).sort((a,b)=> b.f - a.f);
+        for(let k=0;k<rem;k++) flo[fracIdx[k].i]++;
+        return flo;
+      }
+    }
+
+    function sampleStratified(n, mode='prop'){
+      const groups = new Map(); // s -> array of ids
+      units.forEach(u => {
+        if(!groups.has(u.stratum)) groups.set(u.stratum, []);
+        groups.get(u.stratum).push(u.id);
+      });
+      const sizes = Array.from(groups.values()).map(g=>g.length);
+      const nh = stratAllocations(n, sizes, mode);
+      const out = new Set();
+      Array.from(groups.entries()).forEach(([s, arr], idx) => {
+        const k = Math.min(nh[idx], arr.length);
+        choiceK(arr, k).forEach(id => out.add(id));
+      });
+      return out;
+    }
+
+    function sampleCluster(K){
+      // choose K clusters, sample ALL units within each chosen cluster
+      const allClusters = Array.from(new Set(units.map(u => u.clusterId)));
+      const chosen = choiceK(allClusters, Math.min(K, allClusters.length));
+      const out = new Set(units.filter(u => chosen.includes(u.clusterId)).map(u => u.id));
+      return out;
+    }
+
+    // ====== Drawing ======
+    function draw(){
+      const showGrid = document.getElementById('showGrid').checked;
+      const design = document.getElementById('designSel').value;
+      const legendEl = document.getElementById('legend');
+      const legendLabel = document.getElementById('legendLabel');
+
+      viz.innerHTML = '';
+      const W=760, H=560, pad=10;
+      const cellW = (W - 2*pad) / C;
+      const cellH = (H - 2*pad) / R;
+
+      // legend
+      legendEl.innerHTML = '';
+      if(design === 'cluster'){
+        legendLabel.textContent = 'clusters';
+        // show a few cluster swatches
+        const clusters = Array.from(new Set(units.map(u=>u.clusterId))).slice(0,5);
+        clusters.forEach((cid,i)=>{
+          const div = document.createElement('div');
+          div.className = 'chip';
+          const sw = document.createElement('span');
+          sw.className = 'swatch';
+          sw.style.background = palette[i % palette.length];
+          div.appendChild(sw);
+          div.appendChild(document.createTextNode('Cluster ' + (cid+1)));
+          legendEl.appendChild(div);
+        });
+      } else {
+        legendLabel.textContent = 'strata';
+        for(let s=0;s<S;s++){
+          const div = document.createElement('div');
+          div.className = 'chip';
+          const sw = document.createElement('span');
+          sw.className = 'swatch';
+          sw.style.background = palette[s % palette.length];
+          div.appendChild(sw);
+          div.appendChild(document.createTextNode('Stratum ' + (s+1)));
+          legendEl.appendChild(div);
+        }
+      }
+
+      // cells
+      for(const u of units){
+        let fill;
+        if(design==='cluster'){
+          fill = palette[u.clusterId % palette.length];
+        } else {
+          fill = palette[u.stratum % palette.length];
+        }
+        const x = pad + u.c * cellW;
+        const y = pad + u.r * cellH;
+        const selected = sampleSet.has(u.id);
+        const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        rect.setAttribute('x', x);
+        rect.setAttribute('y', y);
+        rect.setAttribute('width', Math.max(1, cellW - 1));
+        rect.setAttribute('height', Math.max(1, cellH - 1));
+        rect.setAttribute('fill', fill);
+        rect.setAttribute('stroke', selected ? '#e7a614' : 'rgba(0,0,0,0.06)');
+        rect.setAttribute('stroke-width', selected ? 2.5 : 1);
+        rect.setAttribute('opacity', selected ? 1 : 0.9);
+        rect.setAttribute('rx', 2);
+        rect.setAttribute('ry', 2);
+        rect.setAttribute('aria-label', `r${u.r+1} c${u.c+1} Y=${u.y.toFixed(2)}`);
+        rect.setAttribute('title', `Y = ${u.y.toFixed(2)} (r${u.r+1}, c${u.c+1})`);
+        viz.appendChild(rect);
+      }
+
+      // cluster grid overlay
+      if(showGrid){
+        // vertical lines at cluster boundaries
+        const blockH = Math.floor(R/clusterRows);
+        const blockW = Math.floor(C/clusterCols);
+        for(let rc=1; rc<clusterRows; rc++){
+          const y = pad + rc*blockH*cellH;
+          const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+          line.setAttribute('x1', pad);
+          line.setAttribute('x2', W-pad);
+          line.setAttribute('y1', y);
+          line.setAttribute('y2', y);
+          line.setAttribute('stroke', 'rgba(0,0,0,0.35)');
+          line.setAttribute('stroke-dasharray', '6 6');
+          viz.appendChild(line);
+        }
+        for(let cc=1; cc<clusterCols; cc++){
+          const x = pad + cc*blockW*cellW;
+          const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+          line.setAttribute('y1', pad);
+          line.setAttribute('y2', H-pad);
+          line.setAttribute('x1', x);
+          line.setAttribute('x2', x);
+          line.setAttribute('stroke', 'rgba(0,0,0,0.35)');
+          line.setAttribute('stroke-dasharray', '6 6');
+          viz.appendChild(line);
+        }
+      }
+    }
+
+    // ====== Orchestration ======
+    function resample(){
+      const design = document.getElementById('designSel').value;
+      const n = +document.getElementById('nInput').value;
+      const mode = document.getElementById('allocEqual').checked ? 'equal' : 'prop';
+      const K = +document.getElementById('KInput').value;
+
+      if(design==='srs'){
+        sampleSet = sampleSRS(n);
+      }else if(design==='strat'){
+        sampleSet = sampleStratified(n, mode);
+      }else{ // cluster
+        sampleSet = sampleCluster(K);
+      }
+
+      // stats update
+      const yPop = units.map(u=>u.y);
+      const ySamp = units.filter(u=>sampleSet.has(u.id)).map(u=>u.y);
+      document.getElementById('popMean').textContent = fmt(mean(yPop), 3);
+      document.getElementById('popSD').textContent = fmt(sd(yPop), 3);
+      document.getElementById('sampleN').textContent = String(ySamp.length);
+      document.getElementById('sampMean').textContent = fmt(mean(ySamp), 3);
+      document.getElementById('err').textContent = fmt(mean(ySamp) - mean(yPop), 3);
+
+      draw();
+    }
+
+    function syncVisibility(){
+      const design = document.getElementById('designSel').value;
+      document.getElementById('strataBox').style.display = design==='strat' ? 'block' : 'none';
+      document.getElementById('clusterBox').style.display = design==='cluster' ? 'block' : 'none';
+      document.getElementById('nInput').parentElement.style.display = (design!=='cluster') ? 'block' : 'none';
+    }
+
+    function clampClusterLayout(){
+      // Ensure clusters tile the grid
+      clusterRows = Math.max(2, Math.min(10, +document.getElementById('cRows').value||5));
+      clusterCols = Math.max(2, Math.min(10, +document.getElementById('cCols').value||5));
+      // Force divisibility by adjusting to nearest factor of R/C
+      function nearestDivisor(total, want){
+        // find nearest 2..10 that divides total
+        let best=2, bestDiff=1e9;
+        for(let k=2;k<=10;k++){
+          if(total % k === 0){
+            const diff=Math.abs(k-want);
+            if(diff<bestDiff){ best=k; bestDiff=diff; }
+          }
+        }
+        return best;
+      }
+      if(R % clusterRows !== 0) clusterRows = nearestDivisor(R, clusterRows);
+      if(C % clusterCols !== 0) clusterCols = nearestDivisor(C, clusterCols);
+      document.getElementById('cRows').value = clusterRows;
+      document.getElementById('cCols').value = clusterCols;
+    }
+
+    function rebuildPopulationAndResample(){
+      S = Math.max(2, Math.min(10, +document.getElementById('SInput').value||4));
+      clampClusterLayout();
+      buildPopulation();
+      resample();
+    }
+
+    // ====== Events ======
+    document.getElementById('designSel').addEventListener('change', ()=>{ syncVisibility(); resample(); });
+    document.getElementById('nInput').addEventListener('input', resample);
+    document.getElementById('SInput').addEventListener('input', rebuildPopulationAndResample);
+    document.getElementById('allocProp').addEventListener('change', resample);
+    document.getElementById('allocEqual').addEventListener('change', resample);
+    document.getElementById('cRows').addEventListener('input', rebuildPopulationAndResample);
+    document.getElementById('cCols').addEventListener('input', rebuildPopulationAndResample);
+    document.getElementById('KInput').addEventListener('input', resample);
+    document.getElementById('showGrid').addEventListener('change', draw);
+
+    document.getElementById('btnResample').addEventListener('click', resample);
+    document.getElementById('btnShuffle').addEventListener('click', ()=>{ buildPopulation(); resample(); });
+    document.getElementById('btnDefaults').addEventListener('click', ()=>{
+      document.getElementById('designSel').value = 'srs';
+      document.getElementById('nInput').value = 40;
+      document.getElementById('SInput').value = 4;
+      document.getElementById('allocProp').checked = true;
+      document.getElementById('cRows').value = 5;
+      document.getElementById('cCols').value = 5;
+      document.getElementById('KInput').value = 4;
+      document.getElementById('showGrid').checked = true;
+      syncVisibility();
+      rebuildPopulationAndResample();
+    });
+
+    // ====== Init ======
+    syncVisibility();
+    buildPopulation();
+    resample();
+  </script>
+</body>
+</html>
