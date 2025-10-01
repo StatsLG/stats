@@ -8,8 +8,21 @@
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css">
 
+  <!-- MathJax for equations -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
   <style>
-    /* Small helpers for the visualization */
     .viz {
       width: 100%;
       height: 560px;
@@ -21,9 +34,10 @@
     .legend { display:flex; flex-wrap:wrap; gap:8px; align-items:center }
     .chip { display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border:1px solid var(--rule); border-radius:999px; background:#fff; font-size:12px }
     .swatch { width:14px; height:14px; border-radius:3px; border:1px solid rgba(0,0,0,.1) }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     .muter { color: var(--muted); font-size:12px }
     .grid2 { display:grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:12px }
+    .scroll { max-height: 260px; overflow:auto; background:#fff; border:1px solid var(--rule); border-radius:8px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
   </style>
 </head>
 <body>
@@ -78,7 +92,7 @@
     <main>
       <header>
         <h1>Sampling Designs: SRS vs Stratified vs Cluster</h1>
-        <p>Population is a <strong>20×20 grid (N=400)</strong> with a numeric outcome \(Y\). Choose a design and compare the <strong>population mean</strong> to the <strong>sample mean</strong>. Stratified uses horizontal bands; Cluster uses equal-sized blocks. Re-sample to see variability.</p>
+        <p>Population is a <strong>20×20 grid (N=400)</strong> with numeric outcome \(Y\). Choose a design and compare the <strong>population mean</strong> to the <strong>sample mean</strong>. Stratified uses horizontal bands; Cluster uses equal-sized blocks. Re-sample to see variability.</p>
       </header>
 
       <section class="section wrap" style="grid-template-columns: 360px 1fr;">
@@ -130,15 +144,15 @@
 
           <div class="checkline" style="margin-top:10px;">
             <input type="checkbox" id="showGrid" checked>
-            <label for="showGrid" style="margin:0;">Show cluster grid overlay</label>
+            <label for="showGrid" style="margin:0;">Show cluster grid overlay (black)</label>
           </div>
 
           <div class="card soft" style="margin-top:10px;">
-            <h3 style="margin:.2rem 0 .4rem;">What you’ll notice</h3>
+            <h3 style="margin:.2rem 0 .4rem;">Estimator notes</h3>
             <ul class="muter">
-              <li><strong>SRS:</strong> unbiased, but variance can be higher if strata differ.</li>
-              <li><strong>Stratified:</strong> when strata means differ, proportional/ equal allocation often <em>reduces variance</em>.</li>
-              <li><strong>Cluster:</strong> sampling whole clusters is cheap logistically, but often <em>higher variance</em> if units inside clusters are similar.</li>
+              <li><strong>SRS:</strong> sample mean \( \bar y = \frac{1}{n}\sum_{i=1}^{n} y_i \).</li>
+              <li><strong>Stratified:</strong> weighted mean \( \displaystyle \bar y_{\text{str}}=\sum_{h=1}^{S} \frac{N_h}{N}\,\bar y_h \).</li>
+              <li><strong>Cluster (one-stage):</strong> mean of <em>all units sampled</em> across chosen clusters.</li>
             </ul>
           </div>
         </div>
@@ -165,7 +179,23 @@
                   <p>Error \( \bar y - \mu \): <strong><span id="err"></span></strong></p>
                 </div>
               </div>
-              <p class="muter" style="margin-top:8px;">Hover a square to see its \(Y\). Selected sample squares are outlined in <span class="mono">gold</span>.</p>
+            </div>
+            <div class="card">
+              <h3 style="margin-top:0;">Sample composition by group</h3>
+              <p class="muter" id="groupHint">Group = strata (SRS/Stratified) or clusters (Cluster)</p>
+              <div class="scroll">
+                <table class="table" id="groupTable" aria-label="Sample counts by group">
+                  <thead>
+                    <tr>
+                      <th>Group</th>
+                      <th>Population \(N_g\)</th>
+                      <th>Selected</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <p class="muter" id="groupTotals" style="margin-top:8px;"></p>
             </div>
           </div>
         </div>
@@ -196,7 +226,6 @@
       return mu + sigma * Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
     };
     const choiceK = (arr,k) => {
-      // sample k unique from arr (Fisher-Yates partial)
       const a = arr.slice();
       for(let i=a.length-1;i>0;i--){
         const j = Math.floor(Math.random()*(i+1));
@@ -228,15 +257,13 @@
 
       // stratum effects for Y (to make stratified helpful)
       const effects = Array.from({length:S}, (_,i)=> (i - (S-1)/2) * 8); // e.g., [-12,-4,4,12] for S=4
-      // base mean + noise sd
       const base = 50, noiseSD = 6;
 
       for(let r=0;r<R;r++){
-        // which stratum?
-        let sIdx = boundaries.find(b => r>=b.r0 && r<=b.r1)?.s ?? 0;
+        const sIdx = boundaries.find(b => r>=b.r0 && r<=b.r1)?.s ?? 0;
         for(let c=0;c<C;c++){
           const id = r*C + c;
-          // cluster id: block index (assume equal; require R % clusterRows == 0, C % clusterCols == 0)
+          // cluster id: block index (ensure R,C divisible by clusterRows/Cols)
           const blockH = Math.floor(R/clusterRows);
           const blockW = Math.floor(C/clusterCols);
           const rc = Math.min(Math.floor(r/blockH), clusterRows-1);
@@ -255,8 +282,6 @@
     }
 
     function stratAllocations(n, sizes, mode='prop'){
-      // sizes: array of N_h per stratum
-      // return integer n_h summing to n; proportional or equal
       const S = sizes.length;
       if(mode==='equal'){
         const base = Math.floor(n / S);
@@ -265,7 +290,6 @@
         let i=0; while(rem>0){ nh[i%S]++; i++; rem--; }
         return nh;
       } else {
-        // proportional with largest remainders
         const raw = sizes.map(Nh => n * Nh / sum(sizes));
         const flo = raw.map(x => Math.floor(x));
         let rem = n - sum(flo);
@@ -292,11 +316,52 @@
     }
 
     function sampleCluster(K){
-      // choose K clusters, sample ALL units within each chosen cluster
       const allClusters = Array.from(new Set(units.map(u => u.clusterId)));
       const chosen = choiceK(allClusters, Math.min(K, allClusters.length));
       const out = new Set(units.filter(u => chosen.includes(u.clusterId)).map(u => u.id));
       return out;
+    }
+
+    // ====== Group counts (table) ======
+    function updateGroupTable(){
+      const design = document.getElementById('designSel').value;
+      const groupTableBody = document.querySelector('#groupTable tbody');
+      const hint = document.getElementById('groupHint');
+      const totalsEl = document.getElementById('groupTotals');
+
+      const isCluster = (design === 'cluster');
+      hint.textContent = isCluster
+        ? 'Group = clusters (cluster sample)'
+        : 'Group = strata (SRS or stratified)';
+
+      // Build population & selected counts per group
+      const popCount = new Map();
+      const selCount = new Map();
+
+      for(const u of units){
+        const key = isCluster ? u.clusterId : u.stratum;
+        popCount.set(key, (popCount.get(key)||0) + 1);
+        if(sampleSet.has(u.id)){
+          selCount.set(key, (selCount.get(key)||0) + 1);
+        }
+      }
+
+      // Sort groups numerically
+      const keys = Array.from(popCount.keys()).sort((a,b)=>a-b);
+
+      // Render rows (show all groups; zeros included)
+      groupTableBody.innerHTML = keys.map(k => `
+        <tr>
+          <td>${isCluster ? ('Cluster ' + (k+1)) : ('Stratum ' + (k+1))}</td>
+          <td>${popCount.get(k)}</td>
+          <td>${selCount.get(k) || 0}</td>
+        </tr>
+      `).join('');
+
+      // Totals line
+      const totalSelected = Array.from(selCount.values()).reduce((s,v)=>s+v,0);
+      const totalPop = units.length;
+      totalsEl.textContent = `Selected total: ${totalSelected} of ${totalPop} units`;
     }
 
     // ====== Drawing ======
@@ -315,7 +380,6 @@
       legendEl.innerHTML = '';
       if(design === 'cluster'){
         legendLabel.textContent = 'clusters';
-        // show a few cluster swatches
         const clusters = Array.from(new Set(units.map(u=>u.clusterId))).slice(0,5);
         clusters.forEach((cid,i)=>{
           const div = document.createElement('div');
@@ -343,15 +407,14 @@
 
       // cells
       for(const u of units){
-        let fill;
-        if(design==='cluster'){
-          fill = palette[u.clusterId % palette.length];
-        } else {
-          fill = palette[u.stratum % palette.length];
-        }
+        const fill = (design==='cluster')
+          ? palette[u.clusterId % palette.length]
+          : palette[u.stratum % palette.length];
+
         const x = pad + u.c * cellW;
         const y = pad + u.r * cellH;
         const selected = sampleSet.has(u.id);
+
         const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
         rect.setAttribute('x', x);
         rect.setAttribute('y', y);
@@ -368,9 +431,8 @@
         viz.appendChild(rect);
       }
 
-      // cluster grid overlay
+      // cluster grid overlay — now BLACK and thicker for visibility
       if(showGrid){
-        // vertical lines at cluster boundaries
         const blockH = Math.floor(R/clusterRows);
         const blockW = Math.floor(C/clusterCols);
         for(let rc=1; rc<clusterRows; rc++){
@@ -380,7 +442,8 @@
           line.setAttribute('x2', W-pad);
           line.setAttribute('y1', y);
           line.setAttribute('y2', y);
-          line.setAttribute('stroke', 'rgba(0,0,0,0.35)');
+          line.setAttribute('stroke', '#000');
+          line.setAttribute('stroke-width', '1.5');
           line.setAttribute('stroke-dasharray', '6 6');
           viz.appendChild(line);
         }
@@ -391,7 +454,8 @@
           line.setAttribute('y2', H-pad);
           line.setAttribute('x1', x);
           line.setAttribute('x2', x);
-          line.setAttribute('stroke', 'rgba(0,0,0,0.35)');
+          line.setAttribute('stroke', '#000');
+          line.setAttribute('stroke-width', '1.5');
           line.setAttribute('stroke-dasharray', '6 6');
           viz.appendChild(line);
         }
@@ -423,6 +487,7 @@
       document.getElementById('err').textContent = fmt(mean(ySamp) - mean(yPop), 3);
 
       draw();
+      updateGroupTable();
     }
 
     function syncVisibility(){
@@ -436,9 +501,7 @@
       // Ensure clusters tile the grid
       clusterRows = Math.max(2, Math.min(10, +document.getElementById('cRows').value||5));
       clusterCols = Math.max(2, Math.min(10, +document.getElementById('cCols').value||5));
-      // Force divisibility by adjusting to nearest factor of R/C
       function nearestDivisor(total, want){
-        // find nearest 2..10 that divides total
         let best=2, bestDiff=1e9;
         for(let k=2;k<=10;k++){
           if(total % k === 0){
