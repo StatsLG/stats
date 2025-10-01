@@ -33,18 +33,13 @@
       background: #fff;
       display: block;
     }
-    .mini {
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .scroll {
-      max-height: 220px; overflow: auto; background: #fff;
-      border: 1px solid var(--rule); border-radius: 8px; padding: 8px;
-    }
-    .nums { display:grid; grid-template-columns: repeat(5, 1fr); gap:8px }
-    .nums input { width:100%; text-align: center }
+    .mini { font-size: 12px; color: var(--muted); }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     .statgrid { display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:12px }
+    .nums { display:grid; grid-template-columns: repeat(5, 1fr); gap:8px }
+    .nums input { width:100%; text-align:center }
+    .scroll { max-height: 320px; overflow: auto; background:#fff; border:1px solid var(--rule); border-radius:8px; }
+    .nowrap { white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -127,13 +122,6 @@
               <input type="number" id="binWidth" value="0.5" step="0.1" />
             </div>
           </div>
-
-          <div class="checkline" style="margin-top:8px;">
-            <input type="checkbox" id="showSamples">
-            <label for="showSamples" style="margin:0;">Show all samples & means (scroll)</label>
-          </div>
-
-          <div id="samplesBox" class="scroll mono" style="display:none; margin-top:8px;"></div>
         </div>
 
         <!-- ===== RIGHT: Charts & Stats ===== -->
@@ -164,15 +152,41 @@
               <svg id="meanChart" class="chart" viewBox="0 0 640 340" aria-label="Sampling distribution chart"></svg>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div class="card soft" style="margin-top:12px;">
-            <h3 style="margin:.2rem 0 .4rem;">Notes</h3>
-            <ul class="mini">
-              <li>We enumerate all unique <em>combinations</em> of size \(n\) (order doesn’t matter, no replacement).</li>
-              <li>For finite populations, the theoretical SE includes the finite population correction (FPC): \( \sqrt{(N-n)/(N-1)} \).</li>
-              <li>With enough symmetry or repetition in the population, the sampling distribution can be surprisingly tight around \( \mu \).</li>
-            </ul>
+      <!-- ===== ALL SAMPLES TABLE ===== -->
+      <section class="section">
+        <h2>All samples (combinations) and their means</h2>
+        <div class="row">
+          <div>
+            <label for="sortSelect">Sort</label>
+            <select id="sortSelect">
+              <option value="index">Index (1…k)</option>
+              <option value="meanAsc">Mean ↑</option>
+              <option value="meanDesc">Mean ↓</option>
+            </select>
           </div>
+          <div>
+            <label for="findInput">Quick filter</label>
+            <input id="findInput" type="text" placeholder="e.g., 26.1 or 4,6,7" />
+          </div>
+        </div>
+        <div class="panel pad" style="margin-top:8px;">
+          <div class="scroll">
+            <table class="table" id="samplesTable" aria-label="All samples table">
+              <thead>
+                <tr>
+                  <th class="nowrap">#</th>
+                  <th>Indices</th>
+                  <th>Sample values</th>
+                  <th class="nowrap">x̄ (mean)</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="mini" id="tableNote" style="margin-top:8px;"></p>
         </div>
       </section>
 
@@ -183,13 +197,12 @@
   </div>
 
   <script>
-    // Footer year + last updated
+    // Footer bits
     document.getElementById('yr').textContent = new Date().getFullYear();
     document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
 
     // ===== Utilities =====
     const fmt = (x, d=3) => Number.isFinite(x) ? x.toFixed(d) : '—';
-    const clone = a => JSON.parse(JSON.stringify(a));
     const sum = a => a.reduce((s,v)=>s+v,0);
     const mean = a => sum(a)/a.length;
     const variance = a => {
@@ -199,28 +212,28 @@
     const sd = a => Math.sqrt(variance(a));
     const uniqueSort = a => Array.from(new Set(a)).sort((x,y)=>x-y);
 
-    // All k-combinations of array (without replacement)
+    // All k-combinations of array (without replacement) — returns index combos
     function combinations(arr, k){
       const res = [];
       const n = arr.length;
+      if(k===0) return [[]];
+      if(k>n) return [];
       const idx = Array.from({length:k}, (_,i)=>i);
-      function pushCombo() { res.push(idx.map(i => arr[i])); }
-      if(k===0){ return [[]]; }
-      if(k>n){ return []; }
-      pushCombo();
+      const push = ()=> res.push(idx.map(i => arr[i]));
+      push();
       while(true){
         let i = k-1;
         while(i>=0 && idx[i] === n-k+i) i--;
         if(i<0) break;
         idx[i]++;
-        for(let j=i+1; j<k; j++) idx[j] = idx[j-1]+1;
-        pushCombo();
+        for(let j=i+1;j<k;j++) idx[j] = idx[j-1]+1;
+        push();
       }
       return res;
     }
 
-    // Discrete bar chart (exact categories)
-    function drawDiscreteBar(svgId, values, options={}){
+    // Discrete bar chart
+    function drawDiscreteBar(svgId, values){
       const svg = document.getElementById(svgId);
       const W=640, H=340, pad={l:50,r:10,t:18,b:40};
       svg.innerHTML = '';
@@ -229,36 +242,33 @@
       const counts = cats.map(c => values.filter(v=>v===c).length);
       const maxCount = Math.max(...counts);
 
-      // Scales
       const innerW = W - pad.l - pad.r;
       const innerH = H - pad.t - pad.b;
       const barW = innerW / cats.length;
-      const y = c => pad.t + innerH * (1 - c/maxCount);
 
-      // Axes (simple)
-      // y-axis ticks at integers up to maxCount
+      // y grid/ticks
       for(let t=0;t<=maxCount;t++){
         const yTick = pad.t + innerH * (1 - t/maxCount);
-        const line = `<line x1="${pad.l-4}" y1="${yTick}" x2="${W-pad.r}" y2="${yTick}" stroke="#e5e7eb" />`;
-        const text = `<text x="${pad.l-8}" y="${yTick+4}" font-size="11" text-anchor="end" fill="#6b7280">${t}</text>`;
-        svg.insertAdjacentHTML('beforeend', line+text);
+        svg.insertAdjacentHTML('beforeend',
+          `<line x1="${pad.l-4}" y1="${yTick}" x2="${W-pad.r}" y2="${yTick}" stroke="#e5e7eb" />`+
+          `<text x="${pad.l-8}" y="${yTick+4}" font-size="11" text-anchor="end" fill="#6b7280">${t}</text>`
+        );
       }
 
-      // Bars
-      cats.forEach((c, i)=>{
-        const x = pad.l + i*barW + 4;
+      // bars + x labels
+      cats.forEach((c,i)=>{
         const h = innerH * (counts[i]/maxCount);
         const yTop = pad.t + innerH - h;
+        const x = pad.l + i*barW + 4;
         svg.insertAdjacentHTML('beforeend',
           `<rect x="${x}" y="${yTop}" width="${Math.max(2,barW-8)}" height="${h}"
                  fill="var(--kctcs-blue)"></rect>`);
-        // x labels
         svg.insertAdjacentHTML('beforeend',
           `<text x="${pad.l + i*barW + barW/2}" y="${H-12}" font-size="11" text-anchor="middle" fill="#374151">${String(c)}</text>`);
       });
     }
 
-    // Histogram (bin width w)
+    // Histogram
     function drawHistogram(svgId, values, w){
       const svg = document.getElementById(svgId);
       const W=640, H=340, pad={l:50,r:10,t:18,b:40};
@@ -267,15 +277,15 @@
 
       const minV = Math.min(...values), maxV = Math.max(...values);
       const start = Math.floor(minV/w)*w;
-      const end = Math.ceil(maxV/w)*w;
+      const end = Math.ceil(maxV/w)*w + 1e-9;
       const bins = [];
-      for(let edge=start; edge<end + 1e-9; edge+=w){
+      for(let edge=start; edge<end; edge+=w){
         bins.push({x0: edge, x1: edge+w, c:0});
       }
       values.forEach(v=>{
         let b = Math.floor((v - start)/w);
         if(b<0) b=0;
-        if(b>=bins.length) b=bins.length-1; // edge case
+        if(b>=bins.length) b=bins.length-1;
         bins[b].c++;
       });
       const maxC = Math.max(...bins.map(b=>b.c));
@@ -284,15 +294,14 @@
       const innerH = H - pad.t - pad.b;
       const barW = innerW / bins.length;
 
-      // y ticks
       for(let t=0;t<=maxC;t++){
         const yTick = pad.t + innerH * (1 - t/maxC);
-        const line = `<line x1="${pad.l-4}" y1="${yTick}" x2="${W-pad.r}" y2="${yTick}" stroke="#e5e7eb" />`;
-        const text = `<text x="${pad.l-8}" y="${yTick+4}" font-size="11" text-anchor="end" fill="#6b7280">${t}</text>`;
-        svg.insertAdjacentHTML('beforeend', line+text);
+        svg.insertAdjacentHTML('beforeend',
+          `<line x1="${pad.l-4}" y1="${yTick}" x2="${W-pad.r}" y2="${yTick}" stroke="#e5e7eb" />`+
+          `<text x="${pad.l-8}" y="${yTick+4}" font-size="11" text-anchor="end" fill="#6b7280">${t}</text>`
+        );
       }
 
-      // bars + x labels
       bins.forEach((b,i)=>{
         const h = innerH * (b.c/maxC);
         const yTop = pad.t + innerH - h;
@@ -311,8 +320,9 @@
     const defaultPop = [4,6,7,7,8,9,10,10,12,13];
     let pop = defaultPop.slice();
     let n = 3;
+    let rowsCache = []; // all rows for table (unfiltered)
 
-    // Build inputs
+    // Build 10 inputs
     const inputsDiv = document.getElementById('inputs');
     for(let i=0;i<N;i++){
       const el = document.createElement('input');
@@ -324,7 +334,7 @@
       inputsDiv.appendChild(el);
     }
 
-    // UI elements
+    // UI refs
     const NEl = document.getElementById('N');
     const muEl = document.getElementById('mu');
     const sigmaEl = document.getElementById('sigma');
@@ -334,12 +344,15 @@
     const sdXbarEl = document.getElementById('sdXbar');
     const seTheoryEl = document.getElementById('seTheory');
     const popValsEl = document.getElementById('popVals');
-    const samplesBox = document.getElementById('samplesBox');
+    const sortSelect = document.getElementById('sortSelect');
+    const findInput = document.getElementById('findInput');
+    const tableBody = document.querySelector('#samplesTable tbody');
+    const tableNote = document.getElementById('tableNote');
 
     function refresh(){
-      // sanitize & read inputs
-      pop = Array.from(inputsDiv.querySelectorAll('input')).map(i=>parseFloat(i.value)).filter(v=>Number.isFinite(v));
-      if(pop.length!==N){ return; }
+      // read inputs
+      pop = Array.from(inputsDiv.querySelectorAll('input')).map(i=>parseFloat(i.value)).filter(Number.isFinite);
+      if(pop.length!==N) return;
 
       const mu = mean(pop);
       const sig = sd(pop);
@@ -347,9 +360,9 @@
       n = Math.max(2, Math.min(N-1, parseInt(document.getElementById('nInput').value)||3));
       nLabel.textContent = n;
 
-      // All combinations of indices
+      // combinations and samples
       const idx = Array.from({length:N}, (_,i)=>i);
-      const combosIdx = combinations(idx, n);
+      const combosIdx = combinations(idx, n); // array of index arrays
       const samples = combosIdx.map(c => c.map(i => pop[i]));
       const xbars = samples.map(s => mean(s));
 
@@ -358,7 +371,7 @@
       const sdbar = sd(xbars);
       const seTheory = sig/Math.sqrt(n) * Math.sqrt((N-n)/(N-1));
 
-      // UI write
+      // Write stats
       NEl.textContent = N;
       muEl.textContent = fmt(mu, 4);
       sigmaEl.textContent = fmt(sig, 4);
@@ -372,25 +385,59 @@
       drawDiscreteBar('popChart', pop);
       drawHistogram('meanChart', xbars, binW);
 
-      // Optional list
-      const show = document.getElementById('showSamples').checked;
-      samplesBox.style.display = show ? 'block' : 'none';
-      if(show){
-        const items = samples.map((s,i)=> `${String(i+1).padStart(3,' ')}. [${s.join(', ')}]  →  x̄=${fmt(xbars[i],4)}`);
-        samplesBox.textContent = items.join('\n');
-      }
+      // Build table rows cache
+      rowsCache = combosIdx.map((c, i) => ({
+        index: i+1,
+        indices: '[' + c.join(', ') + ']',
+        sample: '[' + c.map(j => fmt(pop[j], 3)).join(', ') + ']',
+        mean: mean(samples[i])
+      }));
+
+      renderTable();
     }
 
-    // Buttons
+    function renderTable(){
+      // filter
+      const q = findInput.value.trim().toLowerCase();
+      let rows = rowsCache.slice();
+      if(q){
+        rows = rows.filter(r =>
+          r.indices.toLowerCase().includes(q) ||
+          r.sample.toLowerCase().includes(q) ||
+          fmt(r.mean, 6).includes(q)
+        );
+      }
+      // sort
+      const how = sortSelect.value;
+      if(how === 'meanAsc') rows.sort((a,b)=> a.mean - b.mean || a.index - b.index);
+      else if(how === 'meanDesc') rows.sort((a,b)=> b.mean - a.mean || a.index - b.index);
+      else rows.sort((a,b)=> a.index - b.index);
+
+      // render
+      tableBody.innerHTML = rows.map(r => `
+        <tr>
+          <td class="nowrap">${r.index}</td>
+          <td class="mono">${r.indices}</td>
+          <td class="mono">${r.sample}</td>
+          <td class="nowrap">${fmt(r.mean, 4)}</td>
+        </tr>
+      `).join('');
+
+      const total = rowsCache.length;
+      const shown = rows.length;
+      tableNote.textContent = shown===total
+        ? `Showing all ${total.toLocaleString()} samples.`
+        : `Showing ${shown.toLocaleString()} of ${total.toLocaleString()} samples (filtered).`;
+    }
+
+    // Controls
     document.getElementById('btnUpdate').addEventListener('click', refresh);
     document.getElementById('btnRandom').addEventListener('click', ()=>{
-      // random integers 1..20, sorted-ish
       const r = Array.from({length:N}, ()=> Math.round(1 + Math.random()*19)).sort((a,b)=>a-b);
       inputsDiv.querySelectorAll('input').forEach((el,i)=>{ el.value = r[i]; });
       refresh();
     });
     document.getElementById('btnEven').addEventListener('click', ()=>{
-      // evenly spaced between 5 and 25
       const a=5, b=25, step=(b-a)/(N-1);
       const r = Array.from({length:N}, (_,i)=> +(a + i*step).toFixed(2));
       inputsDiv.querySelectorAll('input').forEach((el,i)=>{ el.value = r[i]; });
@@ -400,10 +447,11 @@
       inputsDiv.querySelectorAll('input').forEach((el,i)=>{ el.value = defaultPop[i]; });
       document.getElementById('nInput').value = 3;
       document.getElementById('binWidth').value = 0.5;
-      document.getElementById('showSamples').checked = false;
       refresh();
     });
-    document.getElementById('showSamples').addEventListener('change', refresh);
+
+    sortSelect.addEventListener('change', renderTable);
+    findInput.addEventListener('input', renderTable);
     document.getElementById('nInput').addEventListener('input', refresh);
     document.getElementById('binWidth').addEventListener('input', refresh);
 
@@ -412,3 +460,4 @@
   </script>
 </body>
 </html>
+
