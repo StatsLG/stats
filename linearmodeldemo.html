@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Least Squares Regression (Animated)</title>
+  <meta name="description" content="Interactive and animated demonstration of least-squares linear regression." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- MathJax for formulas -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    .viz {
+      width: 100%;
+      height: 520px;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      background: #fff;
+      display: block;
+    }
+    .grid2 { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px }
+    .muter { color: var(--muted); font-size:12px }
+    .mini { color: var(--muted); font-size:12px }
+    .tight p { margin:4px 0 }
+    .statgrid { display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:8px }
+    .rowish { display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .sliderline { display:grid; grid-template-columns: 1fr auto; gap:6px; align-items:center }
+    .legend { display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+    .chip { display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border:1px solid var(--rule); border-radius:999px; background:#fff; font-size:12px }
+    .sw { width:12px; height:12px; border:1px solid rgba(0,0,0,.1); border-radius:3px }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) ===== -->
+    <aside class="sidebar" aria-label="Site navigation">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-title">BCTC Statistics Hub</div>
+      </div>
+
+      <div class="nav-section">
+        <h3>Graphing</h3>
+        <nav class="nav">
+          <a href="/graphing/barchart.html">Bar Chart</a>
+          <a href="/graphing/piechart.html">Pie / Donut</a>
+          <a href="/graphing/histogram.html">Histogram</a>
+          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
+          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
+          <a href="/graphing/barchart2way.html">Grouped Bar</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Analysis</h3>
+        <nav class="nav">
+          <a href="/descriptive/summary.html">Descriptive Summary</a>
+          <a href="/inference/onemean.html">One-Sample Mean Test</a>
+        </nav>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <div class="nav-section">
+        <h3>Notes & Extras</h3>
+        <nav class="nav">
+          <a href="/STA210U/">STA 210U</a>
+          <a href="/STA220/">STA 220</a>
+          <a href="/STA296U/">STA 296U</a>
+          <a href="/game/pathyfinder.html">Pathy Finder</a>
+        </nav>
+      </div>
+
+      <div class="footer-note">
+        © <span id="yr"></span> StatsLG - Luke Garnett
+      </div>
+    </aside>
+
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
+    <main>
+      <header>
+        <h1>Least Squares Regression — Animated</h1>
+        <p>Use the sliders or the animation controls to see how the line changes. Residuals are drawn as vertical segments; shaded squares show each residual squared. The least-squares (OLS) solution is computed by
+          \( \displaystyle \hat\beta_1=\frac{\sum (x_i-\bar x)(y_i-\bar y)}{\sum (x_i-\bar x)^2},\quad \hat\beta_0=\bar y-\hat\beta_1\bar x \).
+        </p>
+      </header>
+
+      <section class="section wrap" style="grid-template-columns: 360px 1fr;">
+        <!-- ===== LEFT: Controls ===== -->
+        <div class="panel pad left">
+          <h2 style="margin-top:0;">Controls</h2>
+
+          <div class="rowish">
+            <div>
+              <label for="nPts"># points</label>
+              <input id="nPts" type="number" min="8" max="200" value="30" />
+            </div>
+            <div>
+              <label for="noise">Noise SD</label>
+              <input id="noise" type="number" step="0.1" min="0" max="10" value="2.0" />
+            </div>
+          </div>
+
+          <div class="rowish" style="margin-top:6px;">
+            <button class="btn" id="btnNew">New data</button>
+            <button class="btn ghost" id="btnJitter">Jitter noise</button>
+            <button class="btn outline" id="btnResetLine">Reset line</button>
+          </div>
+
+          <hr class="rule" style="margin:12px 0">
+
+          <div class="sliderline">
+            <div>
+              <label for="b0">Intercept \( \beta_0 \) </label>
+              <input id="b0" type="range" min="-10" max="10" step="0.1" />
+            </div>
+            <div class="mono" id="b0Val">0.0</div>
+          </div>
+
+          <div class="sliderline">
+            <div>
+              <label for="b1">Slope \( \beta_1 \) </label>
+              <input id="b1" type="range" min="-5" max="5" step="0.05" />
+            </div>
+            <div class="mono" id="b1Val">0.0</div>
+          </div>
+
+          <div class="rowish" style="margin-top:8px;">
+            <div>
+              <label for="lr">Learning rate (GD)</label>
+              <input id="lr" type="range" min="0.001" max="1.0" step="0.001" value="0.05" />
+            </div>
+            <div class="mono" id="lrVal">0.05</div>
+          </div>
+
+          <div class="rowish" style="margin-top:6px;">
+            <button class="btn" id="btnPlay">Play GD</button>
+            <button class="btn ghost" id="btnStep">Step</button>
+            <button class="btn outline" id="btnSnapOLS">Animate to OLS</button>
+          </div>
+
+          <hr class="rule" style="margin:12px 0">
+
+          <div class="checkline"><input id="showOLS" type="checkbox" checked>
+            <label for="showOLS" style="margin:0;">Show OLS line</label></div>
+          <div class="checkline"><input id="forceMean" type="checkbox">
+            <label for="forceMean" style="margin:0;">Force current line through \((\bar x,\bar y)\)</label></div>
+          <div class="checkline"><input id="showResiduals" type="checkbox" checked>
+            <label for="showResiduals" style="margin:0;">Show residuals</label></div>
+          <div class="checkline"><input id="showSquares" type="checkbox" checked>
+            <label for="showSquares" style="margin:0;">Show squared residuals</label></div>
+          <div class="checkline"><input id="showMeanPt" type="checkbox" checked>
+            <label for="showMeanPt" style="margin:0;">Show mean point \((\bar x,\bar y)\)</label></div>
+
+          <div class="card soft tight" style="margin-top:10px;">
+            <p class="mini">Tip: “Animate to OLS” eases the line to the exact least-squares solution. “Play GD” performs gradient descent on \(SSE=\sum (y_i-\hat y_i)^2\).</p>
+          </div>
+        </div>
+
+        <!-- ===== RIGHT: Viz & Stats ===== -->
+        <div class="panel pad">
+          <div class="grid2">
+            <div class="card">
+              <h3 style="margin-top:0;">Scatter & Lines</h3>
+              <div class="legend" style="margin-bottom:6px;">
+                <span class="chip"><span class="sw" style="background:#000"></span> Current line</span>
+                <span class="chip"><span class="sw" style="background:var(--kctcs-blue)"></span> OLS line</span>
+                <span class="chip"><span class="sw" style="background:var(--kctcs-gold)"></span> Residuals / Squares</span>
+              </div>
+              <svg id="svg" class="viz" viewBox="0 0 760 520" aria-label="Least-squares visualization"></svg>
+            </div>
+
+            <div class="card">
+              <h3 style="margin-top:0;">Numbers</h3>
+              <div class="statgrid">
+                <div>
+                  <p>n: <strong id="nOut">—</strong></p>
+                  <p>\(\bar x\): <strong id="xbar">—</strong></p>
+                  <p>\(\bar y\): <strong id="ybar">—</strong></p>
+                </div>
+                <div>
+                  <p>Current \( \beta_0 \): <strong id="b0Out">—</strong></p>
+                  <p>Current \( \beta_1 \): <strong id="b1Out">—</strong></p>
+                  <p>SSE (current): <strong id="sseOut">—</strong></p>
+                </div>
+                <div>
+                  <p>OLS \( \hat\beta_0 \): <strong id="b0OLS">—</strong></p>
+                  <p>OLS \( \hat\beta_1 \): <strong id="b1OLS">—</strong></p>
+                  <p>R² (OLS): <strong id="r2">—</strong></p>
+                </div>
+              </div>
+              <p class="mini" style="margin-top:8px;">OLS line always passes through \((\bar x,\bar y)\).</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Footer
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
+
+    // ===== Helpers =====
+    const svg = document.getElementById('svg');
+    const W=760, H=520, pad={l:60,r:20,t:20,b:50};
+    const rnd = (a,b)=> a + Math.random()*(b-a);
+    const sum = a => a.reduce((s,v)=>s+v,0);
+    const mean = a => sum(a)/a.length;
+    const variance = a => { const m=mean(a); return sum(a.map(v=>(v-m)*(v-m))) / a.length; };
+    const sd = a => Math.sqrt(variance(a));
+    const clamp = (x,a,b)=> Math.min(b, Math.max(a,x));
+    const fmt = (x,d=3)=> Number.isFinite(x)? x.toFixed(d) : '—';
+    function randn(mu=0, sigma=1){
+      let u=0,v=0; while(!u) u=Math.random(); while(!v) v=Math.random();
+      return mu + sigma*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+    }
+
+    // ===== Data & Model State =====
+    let pts = [];        // [{x,y}]
+    let b0 = 0, b1 = 1;  // current line
+    let b0Hat = 0, b1Hat = 1; // OLS
+    let xMin=0, xMax=10, yMin=0, yMax=10;
+    let playing = false, rafId = null;
+    let easeId = null;
+
+    // UI refs
+    const els = {
+      nPts: document.getElementById('nPts'),
+      noise: document.getElementById('noise'),
+      btnNew: document.getElementById('btnNew'),
+      btnJitter: document.getElementById('btnJitter'),
+      btnResetLine: document.getElementById('btnResetLine'),
+      b0: document.getElementById('b0'),
+      b1: document.getElementById('b1'),
+      b0Val: document.getElementById('b0Val'),
+      b1Val: document.getElementById('b1Val'),
+      lr: document.getElementById('lr'),
+      lrVal: document.getElementById('lrVal'),
+      btnPlay: document.getElementById('btnPlay'),
+      btnStep: document.getElementById('btnStep'),
+      btnSnapOLS: document.getElementById('btnSnapOLS'),
+      showOLS: document.getElementById('showOLS'),
+      forceMean: document.getElementById('forceMean'),
+      showResiduals: document.getElementById('showResiduals'),
+      showSquares: document.getElementById('showSquares'),
+      showMeanPt: document.getElementById('showMeanPt'),
+      nOut: document.getElementById('nOut'),
+      xbar: document.getElementById('xbar'),
+      ybar: document.getElementById('ybar'),
+      b0Out: document.getElementById('b0Out'),
+      b1Out: document.getElementById('b1Out'),
+      sseOut: document.getElementById('sseOut'),
+      b0OLS: document.getElementById('b0OLS'),
+      b1OLS: document.getElementById('b1OLS'),
+      r2: document.getElementById('r2'),
+    };
+
+    // ===== Scales =====
+    function xPix(x){ return pad.l + (x - xMin) * (W - pad.l - pad.r) / (xMax - xMin); }
+    function yPix(y){ return pad.t + (yMax - y) * (H - pad.t - pad.b) / (yMax - yMin); }
+    function xData(px){ return xMin + (px - pad.l) * (xMax - xMin) / (W - pad.l - pad.r); }
+    function yData(py){ return yMax - (py - pad.t) * (yMax - yMin) / (H - pad.t - pad.b); }
+
+    // ===== Regression =====
+    function olsLine(data){
+      const xs = data.map(p=>p.x), ys = data.map(p=>p.y);
+      const xbar = mean(xs), ybar = mean(ys);
+      const sxx = sum(xs.map(x => (x-xbar)*(x-xbar)));
+      const sxy = sum(xs.map((x,i)=> (x-xbar)*(ys[i]-ybar)));
+      const b1 = sxy / (sxx || 1);
+      const b0 = ybar - b1 * xbar;
+      const sse = sum(ys.map((y,i)=> {
+        const yhat = b0 + b1 * xs[i];
+        const r = y - yhat;
+        return r*r;
+      }));
+      const sst = sum(ys.map(y => (y - ybar)*(y - ybar)));
+      const r2 = 1 - (sse/(sst||1));
+      return {b0,b1,xbar,ybar,sse,r2};
+    }
+    function sseFor(a,b, data=pts){
+      return sum(data.map(p => {
+        const r = p.y - (a + b*p.x); return r*r;
+      }));
+    }
+    function gradSSE(a,b){ // gradients of mean SSE to stabilize
+      const n = pts.length;
+      const xs = pts.map(p=>p.x), ys = pts.map(p=>p.y);
+      const r = ys.map((y,i)=> y - (a + b*xs[i]));
+      const g0 = (-2/n) * sum(r);
+      const g1 = (-2/n) * sum(r.map((ri,i)=> ri*xs[i]));
+      return {g0, g1};
+    }
+
+    // ===== Drawing =====
+    function drawAxes(){
+      // simple axes & ticks
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      g.setAttribute('stroke', '#6b7280'); // gray-500
+      g.setAttribute('stroke-width','1');
+      // axes
+      const x0 = yPix(0), y0 = xPix(0);
+      // frame
+      const frame = [
+        ['line', {x1:pad.l, y1:H-pad.b, x2:W-pad.r, y2:H-pad.b}],
+        ['line', {x1:pad.l, y1:pad.t, x2:pad.l, y2:H-pad.b}]
+      ];
+      for(const [tag, attrs] of frame){
+        const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+        Object.entries(attrs).forEach(([k,v])=> el.setAttribute(k,v));
+        g.appendChild(el);
+      }
+      // ticks (5 each)
+      const xt = 5, yt = 5;
+      for(let i=0;i<=xt;i++){
+        const x = xMin + i*(xMax-xMin)/xt;
+        const px = xPix(x);
+        const t = document.createElementNS('http://www.w3.org/2000/svg','line');
+        t.setAttribute('x1', px); t.setAttribute('x2', px);
+        t.setAttribute('y1', H-pad.b); t.setAttribute('y2', H-pad.b+6);
+        g.appendChild(t);
+        const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
+        lab.setAttribute('x', px); lab.setAttribute('y', H-pad.b+20);
+        lab.setAttribute('font-size','11'); lab.setAttribute('text-anchor','middle');
+        lab.setAttribute('fill','#374151');
+        lab.textContent = (Math.round(x*100)/100).toString();
+        g.appendChild(lab);
+      }
+      for(let i=0;i<=yt;i++){
+        const y = yMin + i*(yMax-yMin)/yt;
+        const py = yPix(y);
+        const t = document.createElementNS('http://www.w3.org/2000/svg','line');
+        t.setAttribute('x1', pad.l-6); t.setAttribute('x2', pad.l);
+        t.setAttribute('y1', py); t.setAttribute('y2', py);
+        g.appendChild(t);
+        const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
+        lab.setAttribute('x', pad.l-10); lab.setAttribute('y', py+4);
+        lab.setAttribute('font-size','11'); lab.setAttribute('text-anchor','end');
+        lab.setAttribute('fill','#374151');
+        lab.textContent = (Math.round(y*100)/100).toString();
+        g.appendChild(lab);
+      }
+      // labels
+      const xlbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+      xlbl.setAttribute('x', (pad.l + W - pad.r)/2);
+      xlbl.setAttribute('y', H-10); xlbl.setAttribute('font-size','12');
+      xlbl.setAttribute('fill','#111827'); xlbl.textContent = "x";
+      g.appendChild(xlbl);
+      const ylbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+      ylbl.setAttribute('x', 16); ylbl.setAttribute('y', (pad.t + H - pad.b)/2);
+      ylbl.setAttribute('font-size','12'); ylbl.setAttribute('fill','#111827');
+      ylbl.setAttribute('transform', `rotate(-90, 16, ${(pad.t + H - pad.b)/2})`);
+      ylbl.textContent = "y";
+      g.appendChild(ylbl);
+
+      svg.appendChild(g);
+    }
+
+    function drawPoints(){
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      for(const p of pts){
+        const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        c.setAttribute('cx', xPix(p.x));
+        c.setAttribute('cy', yPix(p.y));
+        c.setAttribute('r', 3.5);
+        c.setAttribute('fill', '#111827'); // near-black
+        c.setAttribute('opacity','0.9');
+        g.appendChild(c);
+      }
+      svg.appendChild(g);
+    }
+
+    function drawMeanPoint(xbar, ybar){
+      const cx = xPix(xbar), cy = yPix(ybar);
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      const cross1 = document.createElementNS('http://www.w3.org/2000/svg','line');
+      cross1.setAttribute('x1', cx-6); cross1.setAttribute('x2', cx+6);
+      cross1.setAttribute('y1', cy); cross1.setAttribute('y2', cy);
+      cross1.setAttribute('stroke', '#000'); cross1.setAttribute('stroke-width','2');
+      const cross2 = document.createElementNS('http://www.w3.org/2000/svg','line');
+      cross2.setAttribute('x1', cx); cross2.setAttribute('x2', cx);
+      cross2.setAttribute('y1', cy-6); cross2.setAttribute('y2', cy+6);
+      cross2.setAttribute('stroke', '#000'); cross2.setAttribute('stroke-width','2');
+      g.appendChild(cross1); g.appendChild(cross2);
+      svg.appendChild(g);
+    }
+
+    function drawLine(a,b, color, width=3, dash=''){
+      const x1 = xMin, x2 = xMax;
+      const y1 = a + b*x1, y2 = a + b*x2;
+      const l = document.createElementNS('http://www.w3.org/2000/svg','line');
+      l.setAttribute('x1', xPix(x1)); l.setAttribute('x2', xPix(x2));
+      l.setAttribute('y1', yPix(y1)); l.setAttribute('y2', yPix(y2));
+      l.setAttribute('stroke', color); l.setAttribute('stroke-width', width);
+      if(dash) l.setAttribute('stroke-dasharray', dash);
+      l.setAttribute('opacity','0.95');
+      svg.appendChild(l);
+    }
+
+    function drawResidualsAndSquares(a,b){
+      const showRes = els.showResiduals.checked;
+      const showSq = els.showSquares.checked;
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      for(const p of pts){
+        const yhat = a + b*p.x;
+        const r = p.y - yhat;
+        const x = xPix(p.x), yp = yPix(p.y), yh = yPix(yhat);
+        if(showRes){
+          const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+          line.setAttribute('x1', x); line.setAttribute('x2', x);
+          line.setAttribute('y1', yp); line.setAttribute('y2', yh);
+          line.setAttribute('stroke', 'var(--kctcs-gold)');
+          line.setAttribute('stroke-width', '2');
+          line.setAttribute('opacity','0.9');
+          g.appendChild(line);
+        }
+        if(showSq){
+          const sidePx = Math.abs(yp - yh);
+          const top = Math.min(yp, yh);
+          const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+          rect.setAttribute('x', x + 4); // draw to the right a bit
+          rect.setAttribute('y', top - sidePx); // upward if point above
+          rect.setAttribute('width', sidePx);
+          rect.setAttribute('height', sidePx);
+          rect.setAttribute('fill', 'var(--kctcs-gold)');
+          rect.setAttribute('opacity', '0.18');
+          rect.setAttribute('stroke', 'rgba(0,0,0,0.08)');
+          g.appendChild(rect);
+        }
+      }
+      svg.appendChild(g);
+    }
+
+    function render(){
+      svg.innerHTML = '';
+      drawAxes();
+      drawPoints();
+
+      // stats
+      const xs = pts.map(p=>p.x), ys = pts.map(p=>p.y);
+      const xbar = mean(xs), ybar = mean(ys);
+      if(els.showMeanPt.checked) drawMeanPoint(xbar, ybar);
+
+      // if "force mean", adjust intercept to pass (xbar,ybar)
+      if(els.forceMean.checked){
+        b0 = ybar - b1*xbar;
+        els.b0.value = b0; els.b0Val.textContent = fmt(b0,3);
+      }
+
+      // residuals on current line
+      drawResidualsAndSquares(b0, b1);
+
+      // lines
+      drawLine(b0, b1, '#000', 3); // current line
+      if(els.showOLS.checked){
+        drawLine(b0Hat, b1Hat, 'var(--kctcs-blue)', 3, '');
+      }
+
+      // numerics
+      els.nOut.textContent = pts.length;
+      els.xbar.textContent = fmt(xbar,3);
+      els.ybar.textContent = fmt(ybar,3);
+      els.b0Out.textContent = fmt(b0,3);
+      els.b1Out.textContent = fmt(b1,3);
+      els.sseOut.textContent = fmt(sseFor(b0, b1), 3);
+      els.b0OLS.textContent = fmt(b0Hat,3);
+      els.b1OLS.textContent = fmt(b1Hat,3);
+      const {r2} = olsLine(pts);
+      els.r2.textContent = fmt(r2,4);
+    }
+
+    // ===== Data generation =====
+    function makeData(){
+      const n = parseInt(els.nPts.value)||30;
+      const noise = parseFloat(els.noise.value)||2.0;
+      // generate x on [0, 20], true line: y = a* + b* x, with noise
+      const aStar = rnd(0, 8);
+      const bStar = rnd(0.2, 1.2) * (Math.random() < 0.5 ? -1 : 1);
+      const xs = Array.from({length:n}, (_,i)=> rnd(0, 20));
+      const ys = xs.map(x => aStar + bStar*x + randn(0, noise));
+      pts = xs.map((x,i)=> ({x, y:ys[i]}));
+
+      // pad scales
+      xMin = Math.min(...xs); xMax = Math.max(...xs);
+      yMin = Math.min(...ys); yMax = Math.max(...ys);
+      const xPad = (xMax-xMin)*0.08 || 1;
+      const yPad = (yMax-yMin)*0.12 || 1;
+      xMin -= xPad; xMax += xPad;
+      yMin -= yPad; yMax += yPad;
+
+      // OLS
+      const ols = olsLine(pts);
+      b0Hat = ols.b0; b1Hat = ols.b1;
+
+      // initialize current line near data
+      b0 = ols.ybar - 0.5*ols.b1*ols.xbar;
+      b1 = 0.5*ols.b1;
+
+      // set slider ranges based on data range
+      const aRange = (yMax - yMin);
+      const bRange = (yMax - yMin)/(xMax - xMin);
+      els.b0.min = (yMin - 0.5*aRange).toFixed(2);
+      els.b0.max = (yMax + 0.5*aRange).toFixed(2);
+      els.b1.min = (-3*bRange).toFixed(3);
+      els.b1.max = (3*bRange).toFixed(3);
+
+      els.b0.value = b0; els.b1.value = b1;
+      els.b0Val.textContent = fmt(b0,3);
+      els.b1Val.textContent = fmt(b1,3);
+      render();
+    }
+
+    // ===== Animations =====
+    function stepGD(){
+      // Scale learning rates to the data to keep stable
+      const lr = parseFloat(els.lr.value) || 0.05;
+      const xs = pts.map(p=>p.x);
+      const sx = sd(xs) || 1;
+      const {g0, g1} = gradSSE(b0, b1);
+      const lr0 = lr;         // intercept step
+      const lr1 = lr / (sx*sx); // slope step scaled by x spread
+      b0 -= lr0 * g0;
+      b1 -= lr1 * g1;
+
+      // if force mean point, project to pass through (xbar,ybar)
+      if(els.forceMean.checked){
+        const xbar = mean(xs), ybar = mean(pts.map(p=>p.y));
+        b0 = ybar - b1*xbar;
+      }
+
+      els.b0.value = b0; els.b1.value = b1;
+      els.b0Val.textContent = fmt(b0,3);
+      els.b1Val.textContent = fmt(b1,3);
+      render();
+    }
+    function playLoop(){
+      stepGD();
+      if(playing) rafId = requestAnimationFrame(playLoop);
+    }
+    function togglePlay(){
+      playing = !playing;
+      els.btnPlay.textContent = playing ? 'Pause GD' : 'Play GD';
+      if(playing){ playLoop(); } else { cancelAnimationFrame(rafId); }
+    }
+
+    function animateToOLS(){
+      // smooth ease from (b0,b1) to (b0Hat,b1Hat)
+      cancelAnimationFrame(easeId);
+      const startA = b0, startB = b1;
+      const dA = b0Hat - startA, dB = b1Hat - startB;
+      const dur = 900; // ms
+      const t0 = performance.now();
+      function ease(t){ // ease in-out quad
+        return t<0.5 ? 2*t*t : -1 + (4 - 2*t)*t;
+      }
+      function tick(now){
+        const u = clamp((now - t0)/dur, 0, 1);
+        const e = ease(u);
+        b0 = startA + dA*e;
+        b1 = startB + dB*e;
+        els.b0.value = b0; els.b1.value = b1;
+        els.b0Val.textContent = fmt(b0,3);
+        els.b1Val.textContent = fmt(b1,3);
+        render();
+        if(u<1) easeId = requestAnimationFrame(tick);
+      }
+      easeId = requestAnimationFrame(tick);
+    }
+
+    // ===== Events =====
+    els.btnNew.addEventListener('click', ()=>{ makeData(); });
+    els.btnJitter.addEventListener('click', ()=>{
+      const noise = parseFloat(els.noise.value)||2.0;
+      pts = pts.map(p => ({x:p.x, y: p.y + randn(0, noise)}));
+      // recompute OLS
+      const ols = olsLine(pts);
+      b0Hat = ols.b0; b1Hat = ols.b1;
+      render();
+    });
+    els.btnResetLine.addEventListener('click', ()=>{
+      const ols = olsLine(pts);
+      const xbar = ols.xbar, ybar = ols.ybar;
+      b1 = 0; b0 = ybar; // horizontal through mean
+      els.b0.value = b0; els.b1.value = b1;
+      els.b0Val.textContent = fmt(b0,3); els.b1Val.textContent = fmt(b1,3);
+      render();
+    });
+
+    els.b0.addEventListener('input', e=>{ b0 = parseFloat(e.target.value); els.b0Val.textContent = fmt(b0,3); render(); });
+    els.b1.addEventListener('input', e=>{ b1 = parseFloat(e.target.value); els.b1Val.textContent = fmt(b1,3); render(); });
+    els.lr.addEventListener('input', e=>{ els.lrVal.textContent = (+e.target.value).toFixed(3); });
+
+    els.btnPlay.addEventListener('click', togglePlay);
+    els.btnStep.addEventListener('click', ()=>{ if(playing) togglePlay(); stepGD(); });
+    els.btnSnapOLS.addEventListener('click', ()=>{ if(playing) togglePlay(); animateToOLS(); });
+
+    ['showOLS','forceMean','showResiduals','showSquares','showMeanPt'].forEach(id=>{
+      document.getElementById(id).addEventListener('change', render);
+    });
+    ['nPts','noise'].forEach(id=>{
+      document.getElementById(id).addEventListener('input', ()=>{ makeData(); });
+    });
+
+    // ===== Init =====
+    makeData();
+  </script>
+</body>
+</html>
