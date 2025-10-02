@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Confidence Intervals & Hypothesis Tests — StatsLG</title>
+  <meta name="description" content="Interactive visualization for confidence intervals and hypothesis tests (mean/proportion) with common StatsLG sidebar and CSS." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- Optional: MathJax for formulas in labels -->
+  <script>
+    window.MathJax = { tex:{inlineMath:[['\\(','\\)'],['$','$']]} };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    /* small helpers for the applet visuals (keeps with your brand CSS) */
+    .viz-card{ padding:14px; }
+    .viz-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px }
+    .viz-wrap{ display:grid; grid-template-columns: 1fr; gap:12px }
+    .viz-svg{ width:100%; height:320px; background:#fff; border:1px solid var(--rule); border-radius:12px }
+    .viz-ci{ width:100%; height:120px; background:#fff; border:1px solid var(--rule); border-radius:12px }
+    .controls{ display:grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap:12px; }
+    .muted-small{ color:var(--muted); font-size:12px }
+    .kpi{ display:grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap:10px; }
+    .kpi .card{ padding:10px }
+    .badge{ display:inline-block; padding:2px 8px; border-radius:999px; font-weight:800; font-size:12px }
+    .badge.ok{ background:#10b981; color:#fff }
+    .badge.no{ background:#ef4444; color:#fff }
+    .switch-row{ display:flex; gap:10px; flex-wrap:wrap; align-items:end }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (shared sidebar include) ===== -->
+    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main>
+      <header>
+        <h1>Confidence Intervals & Hypothesis Tests</h1>
+        <p class="subtitle">Visualize the normal model, critical regions, observed z, and whether the confidence interval includes the null value.</p>
+      </header>
+
+      <section class="section">
+        <div class="card viz-card">
+          <div class="viz-head">
+            <div>
+              <strong>Setup</strong>
+              <div class="muted-small">Choose mean or proportion, set \(n\), statistic, null value, confidence, and test.</div>
+            </div>
+            <div class="switch-row">
+              <label>
+                <span class="muted-small">Quantity</span>
+                <select id="mode">
+                  <option value="mean">Mean (σ known or large n)</option>
+                  <option value="prop">Proportion</option>
+                </select>
+              </label>
+              <label>
+                <span class="muted-small">Test tails</span>
+                <select id="tails">
+                  <option value="two">Two-sided</option>
+                  <option value="left">Left-tailed</option>
+                  <option value="right">Right-tailed</option>
+                </select>
+              </label>
+              <label>
+                <span class="muted-small">Confidence %</span>
+                <input id="conf" type="number" min="50" max="99.9" step="0.1" value="95">
+              </label>
+              <label>
+                <span class="muted-small">α (significance)</span>
+                <input id="alpha" type="number" min="0.0001" max="0.5" step="0.0001" value="0.05">
+              </label>
+            </div>
+          </div>
+
+          <div class="controls">
+            <div class="card soft">
+              <label>Sample size \(n\)</label>
+              <input id="n" type="number" min="2" step="1" value="40">
+              <div id="mean-only" style="margin-top:8px;">
+                <label>σ (known or s if \(n\) large)</label>
+                <input id="sigma" type="number" min="0.000001" step="0.000001" value="10">
+              </div>
+              <div id="prop-only" style="display:none; margin-top:8px;">
+                <div class="row" style="gap:8px;">
+                  <div>
+                    <label>Successes \(x\)</label>
+                    <input id="xsucc" type="number" min="0" step="1" value="22">
+                  </div>
+                  <div>
+                    <label>Sample proportion \(\hat p\)</label>
+                    <input id="phat" type="number" min="0" max="1" step="0.0001" value="0.55">
+                  </div>
+                </div>
+                <p class="muted-small" style="margin:6px 0 0;">Either enter \(x\) or \(\hat p\); both will stay synced with \(n\).</p>
+              </div>
+            </div>
+
+            <div class="card soft">
+              <div id="mean-fields">
+                <label>Sample mean \(\bar x\)</label>
+                <input id="xbar" type="number" step="0.0001" value="102.5">
+                <label style="margin-top:8px;">Null mean \(\mu_0\)</label>
+                <input id="mu0" type="number" step="0.0001" value="100">
+              </div>
+              <div id="prop-fields" style="display:none;">
+                <label>Null proportion \(p_0\)</label>
+                <input id="p0" type="number" min="0" max="1" step="0.0001" value="0.5">
+              </div>
+            </div>
+
+            <div class="card soft">
+              <label>Auto-link α to confidence (two-sided: \(\alpha = 1-\)conf)</label>
+              <div class="checkline">
+                <input id="linkAlpha" type="checkbox" checked>
+                <span class="muted-small">Uncheck to set α independently.</span>
+              </div>
+              <div style="margin-top:8px;">
+                <button class="btn" id="update">Update</button>
+                <button class="btn ghost" id="copy">Copy results</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="viz-wrap" style="margin-top:12px;">
+            <svg id="normalPlot" class="viz-svg" role="img" aria-label="Standard normal curve with critical region shading and observed z"></svg>
+            <svg id="ciPlot" class="viz-ci" role="img" aria-label="Confidence interval display"></svg>
+          </div>
+
+          <div class="kpi" style="margin-top:12px;">
+            <div class="card">
+              <div class="muted-small">Standard error (SE)</div>
+              <div id="kSE" class="brand-blue" style="font-weight:800; font-size:18px;">—</div>
+            </div>
+            <div class="card">
+              <div class="muted-small">z* (confidence)</div>
+              <div id="kZstar" style="font-weight:800; font-size:18px;">—</div>
+            </div>
+            <div class="card">
+              <div class="muted-small">CI</div>
+              <div id="kCI" style="font-weight:800; font-size:18px; line-height:1.2;">—</div>
+            </div>
+            <div class="card">
+              <div class="muted-small">z (test)</div>
+              <div id="kZ" style="font-weight:800; font-size:18px;">—</div>
+            </div>
+            <div class="card">
+              <div class="muted-small">p-value</div>
+              <div id="kP" style="font-weight:800; font-size:18px;">—</div>
+            </div>
+            <div class="card">
+              <div class="muted-small">Decision at α</div>
+              <div id="kDecision" style="font-weight:800; font-size:18px;">—</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="muted" style="margin-top:8px;">
+          Notes: Mean mode uses normal z procedures (σ known or \(n\) large). Proportion mode uses normal approximation; ensure \(n\hat p \ge 10\) and \(n(1-\hat p)\ge 10\).
+        </p>
+      </section>
+
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // ----- Sidebar include -----
+    const BASE = ''; // set to '/REPO_NAME' for GitHub project sites
+    (async function injectSidebar(){
+      const el = document.querySelector('[data-include]');
+      if(!el) return;
+      let url = el.getAttribute('data-include') || '/partials/sidebar.html';
+      if (BASE && url.startsWith('/')) url = BASE + url;
+      try{
+        const resp = await fetch(url, {cache:'no-cache'});
+        el.innerHTML = await resp.text();
+        const yr = el.querySelector('#yr'); if (yr) yr.textContent = new Date().getFullYear();
+      }catch(e){
+        el.innerHTML = '<div class="muted">Sidebar failed to load.</div>';
+      }
+    })();
+
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
+
+    // ====== Math helpers (normal PDF/CDF and inverse CDF) ======
+    const SQRT2PI = Math.sqrt(2*Math.PI);
+    function pdf(z){ return Math.exp(-0.5*z*z)/SQRT2PI; }
+    // Abramowitz-Stegun erf approximation for CDF
+    function cdf(z){
+      const sign = z<0 ? -1 : 1;
+      z = Math.abs(z)/Math.SQRT2;
+      const t = 1/(1+0.3275911*z);
+      const a1=0.254829592, a2=-0.284496736, a3=1.421413741, a4=-1.453152027, a5=1.061405429;
+      const erf = 1 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*Math.exp(-z*z);
+      return 0.5*(1 + sign*erf);
+    }
+    // Peter John Acklam's inverse normal approximation
+    function invnorm(p){
+      if(p<=0||p>=1) return NaN;
+      const a=[-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+      const b=[-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+      const c=[-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+      const d=[7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+      const plow=0.02425, phigh=1-plow;
+      let q, r;
+      if (p < plow){
+        q = Math.sqrt(-2*Math.log(p));
+        return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) /
+               ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+      }
+      if (p > phigh){
+        q = Math.sqrt(-2*Math.log(1-p));
+        return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) /
+                 ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+      }
+      q = p-0.5; r = q*q;
+      return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q /
+             (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+    }
+
+    // ====== Elements ======
+    const modeEl   = document.getElementById('mode');
+    const tailsEl  = document.getElementById('tails');
+    const confEl   = document.getElementById('conf');
+    const alphaEl  = document.getElementById('alpha');
+    const linkAlphaEl = document.getElementById('linkAlpha');
+
+    const nEl    = document.getElementById('n');
+    const sigmaEl= document.getElementById('sigma');
+    const xbarEl = document.getElementById('xbar');
+    const mu0El  = document.getElementById('mu0');
+
+    const xsuccEl= document.getElementById('xsucc');
+    const phatEl = document.getElementById('phat');
+    const p0El   = document.getElementById('p0');
+
+    const meanOnly   = document.getElementById('mean-only');
+    const propOnly   = document.getElementById('prop-only');
+    const meanFields = document.getElementById('mean-fields');
+    const propFields = document.getElementById('prop-fields');
+
+    const kSE = document.getElementById('kSE');
+    const kZstar = document.getElementById('kZstar');
+    const kCI = document.getElementById('kCI');
+    const kZ = document.getElementById('kZ');
+    const kP = document.getElementById('kP');
+    const kDecision = document.getElementById('kDecision');
+
+    const normalSVG = document.getElementById('normalPlot');
+    const ciSVG     = document.getElementById('ciPlot');
+
+    // ====== Syncing helpers (proportion x <-> phat) ======
+    function clamp(v, lo, hi){ return Math.min(hi, Math.max(lo, v)); }
+    function syncProp(){
+      const n = +nEl.value || 1;
+      if (document.activeElement === xsuccEl){
+        const x = clamp(Math.round(+xsuccEl.value||0), 0, Math.max(0,n));
+        xsuccEl.value = x;
+        phatEl.value = (x/n).toFixed(4);
+      } else if (document.activeElement === phatEl){
+        let p = clamp(+phatEl.value||0, 0, 1);
+        phatEl.value = p.toFixed(4);
+        xsuccEl.value = Math.round(p*n);
+      } else {
+        // On n change
+        const x = clamp(Math.round(+xsuccEl.value||0), 0, Math.max(0,n));
+        xsuccEl.value = x;
+        phatEl.value = (x/n).toFixed(4);
+      }
+    }
+
+    // ====== Compute core numbers ======
+    function computeState(){
+      const mode = modeEl.value; // 'mean' or 'prop'
+      const n = Math.max(2, +nEl.value||2);
+      const tails = tailsEl.value; // 'two' | 'left' | 'right'
+      const conf = clamp(+confEl.value||95, 50, 99.9);
+      confEl.value = conf;
+
+      if (linkAlphaEl.checked && tails==='two'){
+        alphaEl.value = Math.max(1e-6, (1 - conf/100).toFixed(6));
+      }
+      const alpha = clamp(+alphaEl.value||0.05, 1e-6, 0.5);
+      alphaEl.value = alpha;
+
+      let stat, nullVal, SE, zstar, zObs, pval, CIlo, CIhi, labelUnits;
+
+      if (mode==='mean'){
+        const sigma = Math.max(1e-9, +sigmaEl.value||1);
+        const xbar  = +xbarEl.value||0;
+        const mu0   = +mu0El.value||0;
+        SE = sigma/Math.sqrt(n);
+        zstar = invnorm(0.5 + (conf/100)/2);
+        CIlo = xbar - zstar*SE;
+        CIhi = xbar + zstar*SE;
+        zObs = (xbar - mu0)/SE;
+        labelUnits = 'μ';
+        stat = xbar; nullVal = mu0;
+      } else {
+        const p0 = clamp(+p0El.value||0.5, 0, 1);
+        const phat = clamp(+phatEl.value||0.5, 0, 1);
+        // SE for CI uses phat; for test uses p0 (we'll display the CI with phat SE)
+        SE = Math.sqrt(phat*(1-phat)/n);
+        zstar = invnorm(0.5 + (conf/100)/2);
+        CIlo = phat - zstar*SE;
+        CIhi = phat + zstar*SE;
+        const SE0 = Math.sqrt(p0*(1-p0)/n);
+        zObs = (phat - p0)/SE0;
+        labelUnits = 'p';
+        stat = phat; nullVal = p0;
+      }
+
+      // p-value based on tails
+      let p;
+      if (tails==='two'){
+        p = 2*(1 - cdf(Math.abs(zObs)));
+      } else if (tails==='left'){
+        p = cdf(zObs);
+      } else {
+        p = 1 - cdf(zObs);
+      }
+      pval = clamp(p, 0, 1);
+
+      // Decision
+      const reject = pval <= alpha;
+
+      return { mode, n, tails, conf, alpha, SE, zstar, CIlo, CIhi, zObs, pval, reject, stat, nullVal, labelUnits };
+    }
+
+    // ====== UI writeout ======
+    function fmt(x, d=4){
+      if (!isFinite(x)) return '—';
+      const ax = Math.abs(x);
+      if (ax>0 && (ax<1e-3 || ax>=1e6)) return x.toExponential(2);
+      return x.toFixed(d);
+    }
+
+    function writeKPIs(s){
+      kSE.textContent    = fmt(s.SE, 6);
+      kZstar.textContent = fmt(s.zstar, 4);
+      if (s.mode==='prop'){
+        kCI.innerHTML = `(${fmt(Math.max(0,s.CIlo),4)}, ${fmt(Math.min(1,s.CIhi),4)})`;
+      } else {
+        kCI.textContent = `(${fmt(s.CIlo,4)}, ${fmt(s.CIhi,4)})`;
+      }
+      kZ.textContent = fmt(s.zObs, 4);
+      kP.textContent = fmt(s.pval, 6);
+      kDecision.innerHTML = s.reject
+        ? `<span class="badge no">Reject H₀</span>`
+        : `<span class="badge ok">Fail to reject H₀</span>`;
+    }
+
+    // ====== Drawing ======
+    function clearSVG(svg){ while(svg.firstChild) svg.removeChild(svg.firstChild); }
+    function drawNormalPlot(svg, s){
+      clearSVG(svg);
+      const W = svg.clientWidth || 800, H = svg.clientHeight || 320;
+      const m = {t:16, r:16, b:28, l:40};
+      const w = W - m.l - m.r, h = H - m.t - m.b;
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+      // scales: x in z from -4 to 4
+      const zx = (z)=> m.l + ( (z+4)/8 )*w;
+      const zy = (y)=> m.t + (1 - y)*h; // y in [0,1] of max density
+      const yMax = pdf(0); // peak
+
+      // grid
+      const grid = document.createElementNS('http://www.w3.org/2000/svg','g');
+      for (let z=-4; z<=4; z+=1){
+        const x = zx(z);
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1', x); line.setAttribute('x2', x);
+        line.setAttribute('y1', m.t); line.setAttribute('y2', m.t+h);
+        line.setAttribute('stroke', '#e5e7eb'); grid.appendChild(line);
+        const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
+        lab.setAttribute('x', x); lab.setAttribute('y', m.t+h+18);
+        lab.setAttribute('text-anchor','middle'); lab.setAttribute('font-size','11'); lab.setAttribute('fill','#4b5563');
+        lab.textContent = z.toString();
+        grid.appendChild(lab);
+      }
+      svg.appendChild(grid);
+
+      // curve
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      let d = '';
+      for (let i=0;i<=600;i++){
+        const z = -4 + 8*(i/600);
+        const y = pdf(z)/yMax; // normalize to [0,1]
+        const X = zx(z), Y = zy(y);
+        d += (i===0? 'M':'L') + X + ' ' + Y;
+      }
+      path.setAttribute('d', d);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', '#00467f');
+      path.setAttribute('stroke-width', '2');
+      svg.appendChild(path);
+
+      // critical regions
+      let zcL=null, zcR=null;
+      if (s.tails==='two'){
+        const zc = s.zstar; zcL = -zc; zcR = zc;
+      } else if (s.tails==='left'){
+        zcL = invnorm(s.alpha); // left tail critical value
+      } else {
+        zcR = invnorm(1 - s.alpha); // right tail critical value
+      }
+
+      function shadeTail(zFrom, zTo, color='rgba(231,166,20,0.3)'){
+        const N=300;
+        let pathD = `M ${zx(zFrom)} ${zy(0)}`;
+        for(let i=0;i<=N;i++){
+          const z = zFrom + (zTo - zFrom)*(i/N);
+          const y = pdf(z)/yMax;
+          pathD += ` L ${zx(z)} ${zy(y)}`;
+        }
+        pathD += ` L ${zx(zTo)} ${zy(0)} Z`;
+        const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+        p.setAttribute('d', pathD);
+        p.setAttribute('fill', color);
+        p.setAttribute('stroke', 'none');
+        svg.appendChild(p);
+      }
+
+      // alpha shading
+      if (s.tails==='two'){
+        shadeTail(-4, zcL);
+        shadeTail(zcR, 4);
+        // labels
+        for (const zc of [zcL, zcR]){
+          const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
+          lab.setAttribute('x', zx(zc)); lab.setAttribute('y', m.t+12);
+          lab.setAttribute('text-anchor','middle'); lab.setAttribute('font-size','11'); lab.setAttribute('fill','#111');
+          lab.textContent = (zc>0?'+':'') + fmt(zc,2);
+          svg.appendChild(lab);
+        }
+      } else if (s.tails==='left'){
+        shadeTail(-4, zcL);
+        const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
+        lab.setAttribute('x', zx(zcL)); lab.setAttribute('y', m.t+12);
+        lab.setAttribute('text-anchor','middle'); lab.setAttribute('font-size','11'); lab.setAttribute('fill','#111');
+        lab.textContent = fmt(zcL,2);
+        svg.appendChild(lab);
+      } else {
+        shadeTail(zcR, 4);
+        const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
+        lab.setAttribute('x', zx(zcR)); lab.setAttribute('y', m.t+12);
+        lab.setAttribute('text-anchor','middle'); lab.setAttribute('font-size','11'); lab.setAttribute('fill','#111');
+        lab.textContent = fmt(zcR,2);
+        svg.appendChild(lab);
+      }
+
+      // observed z line + p-value shading
+      const z = s.zObs;
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1', zx(z)); line.setAttribute('x2', zx(z));
+      line.setAttribute('y1', m.t); line.setAttribute('y2', m.t+h);
+      line.setAttribute('stroke', '#111827'); line.setAttribute('stroke-width', '2');
+      svg.appendChild(line);
+
+      // p-value shading (darker)
+      if (s.tails==='two'){
+        const zabs = Math.abs(z);
+        shadeTail(-4, -zabs, 'rgba(0,70,127,0.25)');
+        shadeTail(zabs, 4, 'rgba(0,70,127,0.25)');
+      } else if (s.tails==='left'){
+        shadeTail(-4, z, 'rgba(0,70,127,0.25)');
+      } else {
+        shadeTail(z, 4, 'rgba(0,70,127,0.25)');
+      }
+
+      // legend
+      const legend = document.createElementNS('http://www.w3.org/2000/svg','text');
+      legend.setAttribute('x', m.l); legend.setAttribute('y', m.t-4);
+      legend.setAttribute('font-size','12'); legend.setAttribute('fill','#4b5563');
+      legend.textContent = `Normal(0,1) • critical region(s) in gold, p-value region in blue • z = ${fmt(z,3)}`;
+      svg.appendChild(legend);
+    }
+
+    function drawCI(svg, s){
+      clearSVG(svg);
+      const W = svg.clientWidth || 800, H = svg.clientHeight || 120;
+      const m = {t:16, r:18, b:26, l:46};
+      const w = W - m.l - m.r, h = H - m.t - m.b;
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+      // Axis range centered to show CI & null clearly
+      let lo = s.CIlo, hi = s.CIhi;
+      // pad by ~1 SE on each side
+      const pad = 1.2*s.SE;
+      lo = Math.min(lo, s.nullVal) - pad;
+      hi = Math.max(hi, s.nullVal) + pad;
+
+      // clamp for proportion in [0,1]
+      if (s.mode==='prop'){ lo = Math.max(0, lo); hi = Math.min(1, hi); }
+
+      const x = (v)=> m.l + ( (v - lo)/(hi - lo) )*w;
+      const yMid = m.t + h/2;
+
+      // axis
+      const axis = document.createElementNS('http://www.w3.org/2000/svg','line');
+      axis.setAttribute('x1', m.l); axis.setAttribute('x2', m.l+w);
+      axis.setAttribute('y1', yMid); axis.setAttribute('y2', yMid);
+      axis.setAttribute('stroke', '#111827'); svg.appendChild(axis);
+
+      // ticks (lo, null, hi)
+      function tick(v, label){
+        const tx = x(v);
+        const t = document.createElementNS('http://www.w3.org/2000/svg','line');
+        t.setAttribute('x1', tx); t.setAttribute('x2', tx);
+        t.setAttribute('y1', yMid-6); t.setAttribute('y2', yMid+6);
+        t.setAttribute('stroke', '#111827'); svg.appendChild(t);
+        const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
+        lab.setAttribute('x', tx); lab.setAttribute('y', yMid+18);
+        lab.setAttribute('text-anchor','middle'); lab.setAttribute('font-size','11'); lab.setAttribute('fill','#4b5563');
+        lab.textContent = label;
+        svg.appendChild(lab);
+      }
+
+      tick(lo, fmt(lo, s.mode==='prop'?4:3));
+      tick(hi, fmt(hi, s.mode==='prop'?4:3));
+      tick(s.nullVal, (s.labelUnits==='p'?'p₀=':'μ₀=') + fmt(s.nullVal, s.mode==='prop'?4:3));
+
+      // CI line
+      const inside = (s.nullVal >= s.CIlo && s.nullVal <= s.CIhi);
+      const color = inside ? '#10b981' : '#ef4444';
+      const ciLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+      ciLine.setAttribute('x1', x(s.CIlo)); ciLine.setAttribute('x2', x(s.CIhi));
+      ciLine.setAttribute('y1', yMid); ciLine.setAttribute('y2', yMid);
+      ciLine.setAttribute('stroke', color); ciLine.setAttribute('stroke-width', '6');
+      svg.appendChild(ciLine);
+
+      // center marker at statistic
+      const stat = s.stat;
+      const marker = document.createElementNS('http://www.w3.org/2000/svg','line');
+      marker.setAttribute('x1', x(stat)); marker.setAttribute('x2', x(stat));
+      marker.setAttribute('y1', yMid-10); marker.setAttribute('y2', yMid+10);
+      marker.setAttribute('stroke', '#00467f'); marker.setAttribute('stroke-width', '3');
+      svg.appendChild(marker);
+
+      // label
+      const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+      txt.setAttribute('x', m.l); txt.setAttribute('y', m.t-4);
+      txt.setAttribute('font-size','12'); txt.setAttribute('fill','#4b5563');
+      txt.textContent = `CI for ${s.labelUnits} at ${fmt(+confEl.value,1)}% • center = ${fmt(stat, s.mode==='prop'?4:3)} • includes null? ${inside ? 'Yes' : 'No'}`;
+      svg.appendChild(txt);
+    }
+
+    // ====== Update flow ======
+    function updateAll(){
+      if (modeEl.value==='prop') syncProp();
+      const s = computeState();
+      writeKPIs(s);
+      drawNormalPlot(normalSVG, s);
+      drawCI(ciSVG, s);
+    }
+
+    // ====== Wiring ======
+    modeEl.addEventListener('change', ()=>{
+      const isMean = modeEl.value==='mean';
+      meanOnly.style.display = isMean ? '' : 'none';
+      meanFields.style.display = isMean ? '' : 'none';
+      propOnly.style.display  = !isMean ? '' : 'none';
+      propFields.style.display= !isMean ? '' : 'none';
+      updateAll();
+    });
+
+    [tailsEl, confEl, alphaEl, linkAlphaEl, nEl, sigmaEl, xbarEl, mu0El, p0El].forEach(el=>{
+      el.addEventListener('input', updateAll);
+      el.addEventListener('change', updateAll);
+    });
+    [xsuccEl, phatEl].forEach(el=>{
+      el.addEventListener('input', ()=>{ syncProp(); updateAll(); });
+      el.addEventListener('change', ()=>{ syncProp(); updateAll(); });
+    });
+
+    document.getElementById('update').addEventListener('click', updateAll);
+
+    document.getElementById('copy').addEventListener('click', ()=>{
+      const s = computeState();
+      const txt =
+`Mode: ${s.mode==='mean'?'Mean (σ known / large n)':'Proportion'}
+n = ${s.n}
+Statistic = ${fmt(s.stat, s.mode==='prop'?4:3)}   Null = ${fmt(s.nullVal, s.mode==='prop'?4:3)}
+SE = ${fmt(s.SE,6)}
+Confidence = ${s.conf.toFixed(1)}%  →  z* = ${fmt(s.zstar,4)}
+CI = (${fmt(s.CIlo, s.mode==='prop'?4:3)}, ${fmt(s.CIhi, s.mode==='prop'?4:3)})
+Test: ${s.tails}-tailed at α = ${s.alpha}
+z = ${fmt(s.zObs,4)}   p-value = ${fmt(s.pval,6)}
+Decision: ${s.reject?'Reject H0':'Fail to reject H0'}`;
+      navigator.clipboard.writeText(txt).catch(()=>{});
+    });
+
+    // initial draw
+    updateAll();
+  </script>
+</body>
+</html>
