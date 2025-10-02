@@ -11,52 +11,10 @@
 <body>
   <div class="wrap">
     <!-- ===== LEFT PANEL (BRAND SIDEBAR) ===== -->
-    <aside class="sidebar" aria-label="Site navigation">
-      <div class="brand">
-        <div class="brand-logo" aria-hidden="true"></div>
-        <div class="brand-title">BCTC Statistics Hub</div>
-      </div>
+    <!-- One-line placeholder. The HTML from /partials/sidebar.html will be injected here. -->
+    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
 
-      <div class="nav-section">
-        <h3>Graphing</h3>
-        <nav class="nav">
-          <a href="/graphing/barchart.html">Bar Chart</a>
-          <a href="/graphing/piechart.html">Pie Chart</a>
-          <a href="/graphing/histogram.html">Histogram</a>
-          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
-          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
-          <a href="/graphing/barchart2way.html">Grouped Bar</a>
-        </nav>
-      </div>
-
-      <div class="divider" role="separator"></div>
-
-      <div class="nav-section">
-        <h3>Analysis</h3>
-        <nav class="nav">
-          <a href="/descriptive/summary.html">Descriptive Summary</a>
-          <a href="/inference/onemean.html">One-Sample Mean Test</a>
-        </nav>
-      </div>
-
-      <div class="divider" role="separator"></div>
-
-      <div class="nav-section">
-        <h3>Notes & Extras</h3>
-        <nav class="nav">
-          <a href="/STA210U/">STA 210U</a>
-          <a href="/STA220/">STA 220</a>
-          <a href="/STA296U/">STA 296U</a>
-          <a href="/game/pathyfinder.html">Pathy Finder</a>
-        </nav>
-      </div>
-
-      <div class="footer-note">
-        © <span id="yr"></span> StatsLG - Luke Garnett
-      </div>
-    </aside>
-
-    <!-- ===== MAIN CONTENT (CLEAN & SIMPLE) ===== -->
+    <!-- ===== MAIN CONTENT ===== -->
     <main>
       <header>
         <h1>Welcome to StatsLG</h1>
@@ -123,8 +81,45 @@
 
   <script>
     // Footer year + last updated
-    document.getElementById('yr').textContent = new Date().getFullYear();
-    document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
+    // (Also handled in the sidebar include for the sidebar year)
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
+  </script>
+
+  <!-- Load the include helper (injects /partials/sidebar.html into the <aside>) -->
+  <script>
+  (function () {
+    async function injectIncludes() {
+      const nodes = document.querySelectorAll('[data-include]');
+      await Promise.all(Array.from(nodes).map(async (el) => {
+        let url = el.getAttribute('data-include');
+
+        // If your site is a GitHub *project* site (username.github.io/REPO),
+        // change "/partials/..." to "/REPO/partials/..." or handle base here:
+        // const base = location.pathname.split('/').filter(Boolean)[0] ? '/' + location.pathname.split('/')[1] : '';
+        // if (url.startsWith('/')) url = base + url;
+
+        const resp = await fetch(url, { cache: 'no-cache' });
+        el.innerHTML = await resp.text();
+
+        // Sidebar: set year & mark active link
+        const yr = el.querySelector('#yr'); if (yr) yr.textContent = new Date().getFullYear();
+        const here = location.pathname.replace(/\/index\.html$/, '/');
+        el.querySelectorAll('a[href]').forEach(a => {
+          const target = new URL(a.getAttribute('href'), location.origin).pathname
+            .replace(/\/index\.html$/, '/');
+          if (here === target || (here.startsWith(target) && target !== '/')) {
+            a.classList.add('active');
+          }
+        });
+      }));
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', injectIncludes);
+    } else {
+      injectIncludes();
+    }
+  })();
   </script>
 </body>
 </html>

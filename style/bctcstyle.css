@@ -324,3 +324,10 @@ body .card input[type="color"]{
   border: 2px solid var(--field-border) !important;
   background: transparent !important;
 }
+
+/* Active nav link highlight */
+.nav a.active{
+  background: rgba(231,166,20,.12);
+  outline: 2px solid var(--kctcs-gold);
+  outline-offset: 0;
+}
