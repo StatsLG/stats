@@ -158,45 +158,51 @@
     </main>
   </div>
 
-  <script>
-    // Footer year + last updated (kept from your template)
-    document.getElementById('yr').textContent = new Date().getFullYear();
-    document.getElementById('lastUpdated').textContent =
-      new Date(document.lastModified).toLocaleString();
+<script>
+  // Page footer "last updated"
+  document.getElementById('lastUpdated').textContent =
+    new Date(document.lastModified).toLocaleString();
 
-          // ---- Shared sidebar include loader
-    // Set BASE = '/REPO_NAME' for GitHub *project* sites; leave '' for user/org sites.
-    const BASE = ''; // e.g., '/statslg' if your site is username.github.io/statslg
+  // Shared sidebar include loader
+  const BASE = ''; // set to '/REPO_NAME' for project sites
 
-    (async function injectSidebar(){
-      const el = document.querySelector('[data-include]');
-      if(!el) return;
-      let url = el.getAttribute('data-include') || '/partials/sidebar.html';
-      if (BASE && url.startsWith('/')) url = BASE + url;
+  (async function injectSidebar(){
+    const el = document.querySelector('[data-include]');
+    if(!el) return;
+    let url = el.getAttribute('data-include') || '/partials/sidebar.html';
+    if (BASE && url.startsWith('/')) url = BASE + url;
 
-      try{
-        const resp = await fetch(url, {cache:'no-cache'});
-        if(!resp.ok) throw new Error(resp.statusText);
-        el.innerHTML = await resp.text();
+    try{
+      const resp = await fetch(url, {cache:'no-cache'});
+      if(!resp.ok) throw new Error(resp.statusText);
+      el.innerHTML = await resp.text();
 
-        // Set year inside the injected sidebar
-        const yr = el.querySelector('#yr');
-        if (yr) yr.textContent = new Date().getFullYear();
-
-        // Mark active nav link (only nav links, not the brand)
-        const here = location.pathname.replace(/\/index\.html$/, '/');
-        el.querySelectorAll('.nav a[href]').forEach(a=>{
-          const target = new URL(a.getAttribute('href'), location.origin).pathname
-            .replace(/\/index\.html$/, '/');
-          if (here === target || (here.startsWith(target) && target !== '/')) {
-            a.classList.add('active');
-          }
+      // (Project sites) prefix absolute links inside the injected sidebar
+      if (BASE) {
+        el.querySelectorAll('a[href^="/"]').forEach(a => {
+          a.setAttribute('href', BASE + a.getAttribute('href'));
         });
-      }catch(err){
-        console.error('Sidebar include failed:', err);
-        el.innerHTML = '<div class="muted">Sidebar failed to load.</div>';
       }
-    })();
-  </script>
+
+      // Set year inside the injected sidebar
+      const yr = el.querySelector('#yr');
+      if (yr) yr.textContent = new Date().getFullYear();
+
+      // Mark active nav link (only nav links, not the brand)
+      const here = location.pathname.replace(/\/index\.html$/, '/');
+      el.querySelectorAll('.nav a[href]').forEach(a=>{
+        const target = new URL(a.getAttribute('href'), location.origin).pathname
+          .replace(/\/index\.html$/, '/');
+        if (here === target || (here.startsWith(target) && target !== '/')) {
+          a.classList.add('active');
+        }
+      });
+    }catch(err){
+      console.error('Sidebar include failed:', err);
+      el.innerHTML = '<div class="muted">Sidebar failed to load.</div>';
+    }
+  })();
+</script>
+
 </body>
 </html>
