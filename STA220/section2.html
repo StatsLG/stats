@@ -177,13 +177,22 @@ Stem | Leaves
         <p>Compare with the stem-and-leaf: they tell a similar story about extremes and shape (rotating the stem-and-leaf can resemble a histogram).</p>
       </section>
 
+      <!-- Example: histogram of the male weights (moved here, right after Histograms) -->
+      <section id="hist-weights" class="section">
+        <h2>Example: Histogram of Male Weights</h2>
+        <figure class="card soft">
+          <figcaption class="muted">Classes: 130–140, 140–150, …, 200–210 (midpoints labeled). Extreme value at 201.</figcaption>
+          <svg id="hist-weight" role="img" aria-label="Histogram of male weight data"></svg>
+        </figure>
+      </section>
+
       <!-- Shapes + Figures -->
       <section id="shapes" class="section">
         <h2>Shapes of Distributions (with figures)</h2>
         <ul>
-          <li><strong>Symmetrical:</strong> mirror halves about the center.</li>
-          <li><strong>Uniform:</strong> each class has equal frequency.</li>
-          <li><strong>Skewed:</strong> one tail extends further; the skew’s <em>direction</em> is the side of the longer tail.</li>
+          <li><strong>Symmetric:</strong> mirror halves about the center.</li>
+          <li><strong>Left-skewed:</strong> long tail to the left (more large values).</li>
+          <li><strong>Right-skewed:</strong> long tail to the right (more small values).</li>
           <li><strong>Bimodal:</strong> two distinct peaks.</li>
         </ul>
 
@@ -197,9 +206,12 @@ Stem | Leaves
             <svg id="hist-left" role="img" aria-label="Example left-skewed histogram"></svg>
           </figure>
           <figure class="card soft">
-            <figcaption><strong>Male Weights (n=14)</strong></figcaption>
-            <svg id="hist-weight" role="img" aria-label="Histogram of male weight data"></svg>
-            <p class="muted" style="margin:.4rem 0 0;">Classes: 130–140, 140–150, …, 200–210 (midpoints labeled). Extreme value at 201.</p>
+            <figcaption><strong>Right-Skewed</strong></figcaption>
+            <svg id="hist-right" role="img" aria-label="Example right-skewed histogram"></svg>
+          </figure>
+          <figure class="card soft">
+            <figcaption><strong>Bimodal</strong></figcaption>
+            <svg id="hist-bimodal" role="img" aria-label="Example bimodal histogram"></svg>
           </figure>
         </div>
       </section>
@@ -339,7 +351,7 @@ Stem | Leaves
       const maxF = Math.max(1, ...freqs);
       const m = {top: 16, right: 12, bottom: 28, left: 28};
       const barW = opts.barWidth || 28;
-      const gap = opts.gap || 8;
+      const gap = (opts.gap != null ? opts.gap : 0); // <-- bars touch by default
       const n = freqs.length;
       const chartW = n * barW + (n-1)*gap;
       const chartH = 140;
@@ -348,11 +360,11 @@ Stem | Leaves
       svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
       svg.innerHTML = '';
 
-      // axes
+      // group container
       const g = document.createElementNS('http://www.w3.org/2000/svg','g');
       svg.appendChild(g);
 
-      // y ticks 0..maxF
+      // horizontal grid + y labels
       for(let t=0; t<=maxF; t++){
         const y = m.top + chartH - (t/maxF)*chartH;
         const line = document.createElementNS('http://www.w3.org/2000/svg','line');
@@ -384,10 +396,10 @@ Stem | Leaves
         rect.setAttribute('y', y);
         rect.setAttribute('width', barW);
         rect.setAttribute('height', h);
-        rect.setAttribute('rx', 4);
+        rect.setAttribute('rx', 0);
         rect.setAttribute('fill', '#00467f');        // brand blue
         rect.setAttribute('stroke', '#e7a614');      // brand gold
-        rect.setAttribute('stroke-width', 1.5);
+        rect.setAttribute('stroke-width', 1.2);
         g.appendChild(rect);
 
         const tx = document.createElementNS('http://www.w3.org/2000/svg','text');
@@ -400,7 +412,7 @@ Stem | Leaves
         g.appendChild(tx);
       });
 
-      // axes lines
+      // axes
       const yAxis = document.createElementNS('http://www.w3.org/2000/svg','line');
       yAxis.setAttribute('x1', m.left);
       yAxis.setAttribute('x2', m.left);
@@ -420,21 +432,16 @@ Stem | Leaves
       g.appendChild(xAxis);
     }
 
-    // Draw the three charts
+    // Draw charts (bars touch because gap defaults to 0)
     document.addEventListener('DOMContentLoaded', () => {
-      // Symmetric (example bins)
-      drawHistogram(
-        'hist-symmetric',
-        ['1','2','3','4','5','6','7'],
-        [1,3,6,8,6,3,1]
-      );
-
-      // Left-skewed (tall bars on the right, tail to the left)
-      drawHistogram(
-        'hist-left',
-        ['1','2','3','4','5','6','7'],
-        [6,5,4,3,2,1,0]
-      );
+      // Shapes
+      drawHistogram('hist-symmetric', ['1','2','3','4','5','6','7'], [1,3,6,8,6,3,1]);
+      // Left-skewed: tail to the LEFT → more mass on the RIGHT
+      drawHistogram('hist-left',      ['1','2','3','4','5','6','7'], [0,1,2,3,4,5,6]);
+      // Right-skewed: tail to the RIGHT → more mass on the LEFT
+      drawHistogram('hist-right',     ['1','2','3','4','5','6','7'], [6,5,4,3,2,1,0]);
+      // Bimodal: two peaks
+      drawHistogram('hist-bimodal',   ['1','2','3','4','5','6','7'], [1,5,2,1,2,5,1]);
 
       // Male weights (class midpoints on x-axis)
       const labels = [135,145,155,165,175,185,195,205];
