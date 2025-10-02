@@ -331,3 +331,9 @@ body .card input[type="color"]{
   outline: 2px solid var(--kctcs-gold);
   outline-offset: 0;
 }
+
+.nav a.active{
+  background: rgba(231,166,20,.12);
+  outline: 2px solid var(--kctcs-gold);
+  outline-offset: 0;
+}

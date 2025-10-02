@@ -10,51 +10,8 @@
 </head>
 <body>
   <div class="wrap">
-    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM YOUR TEMPLATE ===== -->
-    <aside class="sidebar" aria-label="Site navigation">
-      <div class="brand">
-        <div class="brand-logo" aria-hidden="true"></div>
-        <div class="brand-title">BCTC Statistics Hub</div>
-      </div>
-
-      <div class="nav-section">
-        <h3>Graphing</h3>
-        <nav class="nav">
-          <a href="/graphing/barchart.html">Bar Chart</a>
-          <a href="/graphing/piechart.html">Pie Chart</a>
-          <a href="/graphing/histogram.html">Histogram</a>
-          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
-          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
-          <a href="/graphing/barchart2way.html">Grouped Bar</a>
-        </nav>
-      </div>
-
-      <div class="divider" role="separator"></div>
-
-      <div class="nav-section">
-        <h3>Analysis</h3>
-        <nav class="nav">
-          <a href="/descriptive/summary.html">Descriptive Summary</a>
-          <a href="/inference/onemean.html">One-Sample Mean Test</a>
-        </nav>
-      </div>
-
-      <div class="divider" role="separator"></div>
-
-      <div class="nav-section">
-        <h3>Notes & Extras</h3>
-        <nav class="nav">
-          <a href="/STA210U/">STA 210U</a>
-          <a href="/STA220/">STA 220</a>
-          <a href="/STA296U/">STA 296U</a>
-          <a href="/game/pathyfinder.html">Pathy Finder</a>
-        </nav>
-      </div>
-
-      <div class="footer-note">
-        © <span id="yr"></span> StatsLG - Luke Garnett
-      </div>
-    </aside>
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — loaded from one shared file ===== -->
+    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
 
     <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
     <main>
@@ -85,10 +42,43 @@
   </div>
 
   <script>
-    // Sidebar footer year + page last modified (same behavior as your template)
-    document.getElementById('yr').textContent = new Date().getFullYear();
+    // ---- Page footer "last updated"
     document.getElementById('lastUpdated').textContent =
       new Date(document.lastModified).toLocaleString();
+
+    // ---- Shared sidebar include loader
+    // Set BASE = '/REPO_NAME' for GitHub *project* sites; leave '' for user/org sites.
+    const BASE = ''; // e.g., '/statslg' if your site is username.github.io/statslg
+
+    (async function injectSidebar(){
+      const el = document.querySelector('[data-include]');
+      if(!el) return;
+      let url = el.getAttribute('data-include') || '/partials/sidebar.html';
+      if (BASE && url.startsWith('/')) url = BASE + url;
+
+      try{
+        const resp = await fetch(url, {cache:'no-cache'});
+        if(!resp.ok) throw new Error(resp.statusText);
+        el.innerHTML = await resp.text();
+
+        // Set year inside the injected sidebar
+        const yr = el.querySelector('#yr');
+        if (yr) yr.textContent = new Date().getFullYear();
+
+        // Mark active nav link (only nav links, not the brand)
+        const here = location.pathname.replace(/\/index\.html$/, '/');
+        el.querySelectorAll('.nav a[href]').forEach(a=>{
+          const target = new URL(a.getAttribute('href'), location.origin).pathname
+            .replace(/\/index\.html$/, '/');
+          if (here === target || (here.startsWith(target) && target !== '/')) {
+            a.classList.add('active');
+          }
+        });
+      }catch(err){
+        console.error('Sidebar include failed:', err);
+        el.innerHTML = '<div class="muted">Sidebar failed to load.</div>';
+      }
+    })();
 
     // ----- Editable sections list -----
     // Files are relative to STA220/ (this page's folder)
@@ -100,84 +90,20 @@
         file: "section1.html",
         updated: "2025-10-01"
       },
-            {
-        id: "section2",
-        title: "Section 2",
-        desc: "Description",
-        file: "section2.html",
-        updated: "2025-10-01"
-      },
-            {
-        id: "section3",
-        title: "Section 3",
-        desc: "Description",
-        file: "section3.html",
-        updated: "2025-10-01"
-      },
-            {
-        id: "section4",
-        title: "Section 4",
-        desc: "Description",
-        file: "section4.html",
-        updated: "2025-10-01"
-      },
-                  {
-        id: "section5",
-        title: "Section 5",
-        desc: "Description",
-        file: "section5.html",
-        updated: "2025-10-01"
-      },
-                  {
-        id: "section6",
-        title: "Section 6",
-        desc: "Description",
-        file: "section6.html",
-        updated: "2025-10-01"
-      },
-                  {
-        id: "section7",
-        title: "Section 7",
-        desc: "Description",
-        file: "section7.html",
-        updated: "2025-10-01"
-      },
-                  {
-        id: "section8",
-        title: "Section 8",
-        desc: "Description",
-        file: "section8.html",
-        updated: "2025-10-01"
-      },
-                  {
-        id: "section9",
-        title: "Section 9",
-        desc: "Description",
-        file: "section9.html",
-        updated: "2025-10-01"
-      },
-                  {
-        id: "section10",
-        title: "Section 10",
-        desc: "Description",
-        file: "section10.html",
-        updated: "2025-10-01"
-      },
-                  {
-        id: "section11",
-        title: "Section 11",
-        desc: "Description",
-        file: "section4.html",
-        updated: "2025-10-01"
-      },
-      // Add more sections here:
-      // { id: "section2", title: "Section 2 — Graphs & Summaries", desc: "Visual summaries and numeric measures.", file: "section2.html", updated: "2025-10-07" },
-      // { id: "section3", title: "Section 3 — Probability Basics", desc: "Sample spaces, rules, independence.", file: "section3.html", updated: "2025-10-14" },
+      { id: "section2",  title: "Section 2",  desc: "Description", file: "section2.html",  updated: "2025-10-01" },
+      { id: "section3",  title: "Section 3",  desc: "Description", file: "section3.html",  updated: "2025-10-01" },
+      { id: "section4",  title: "Section 4",  desc: "Description", file: "section4.html",  updated: "2025-10-01" },
+      { id: "section5",  title: "Section 5",  desc: "Description", file: "section5.html",  updated: "2025-10-01" },
+      { id: "section6",  title: "Section 6",  desc: "Description", file: "section6.html",  updated: "2025-10-01" },
+      { id: "section7",  title: "Section 7",  desc: "Description", file: "section7.html",  updated: "2025-10-01" },
+      { id: "section8",  title: "Section 8",  desc: "Description", file: "section8.html",  updated: "2025-10-01" },
+      { id: "section9",  title: "Section 9",  desc: "Description", file: "section9.html",  updated: "2025-10-01" },
+      { id: "section10", title: "Section 10", desc: "Description", file: "section10.html", updated: "2025-10-01" },
+      { id: "section11", title: "Section 11", desc: "Description", file: "section11.html", updated: "2025-10-01" } // fixed filename
     ];
 
     // ----- Render cards -----
     const cards = document.getElementById('cards');
-
     function render(list){
       cards.innerHTML = "";
       list.forEach(s => {
