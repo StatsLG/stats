@@ -23,28 +23,47 @@
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <style>
-    /* Make the graph big and responsive */
-    .viz {
-      width: 100%;
-      height: min(72vh, 820px);   /* nice and tall; caps on huge screens */
-      min-height: 520px;          /* stays usable on smaller laptops */
-      border: 1px solid var(--rule);
-      border-radius: var(--radius);
-      background: #fff;
-      display: block;
+    /* Layout for graph + controls in ONE box */
+    .ols-grid{
+      display:grid;
+      grid-template-columns: 1fr 360px;   /* big graph, compact controls */
+      gap:14px;
+      align-items:start;
     }
-    /* Compact helpers */
-    .grid2 { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px }
-    .muter { color: var(--muted); font-size:12px }
-    .mini { color: var(--muted); font-size:12px }
-    .tight p { margin:4px 0 }
-    .statgrid { display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:8px }
+    @media (max-width: 980px){
+      .ols-grid{ grid-template-columns: 1fr; }
+    }
+
+    /* Big responsive graph */
+    .viz{
+      width:100%;
+      height:min(72vh, 820px);
+      min-height:520px;
+      border:1px solid var(--rule);
+      border-radius: var(--radius);
+      background:#fff;
+      display:block;
+    }
+
+    /* Sticky, scrollable right column so controls stay visible */
+    .sidecol{
+      position: sticky;
+      top: 8px;
+      max-height: calc(100vh - 120px);
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .grid2 { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:10px }
     .rowish { display:flex; gap:8px; align-items:center; flex-wrap:wrap }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     .sliderline { display:grid; grid-template-columns: 1fr auto; gap:6px; align-items:center }
     .legend { display:flex; gap:10px; align-items:center; flex-wrap:wrap }
     .chip { display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border:1px solid var(--rule); border-radius:999px; background:#fff; font-size:12px }
     .sw { width:12px; height:12px; border:1px solid rgba(0,0,0,.1); border-radius:3px }
+    .mini { color: var(--muted); font-size:12px }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
   </style>
 </head>
 <body>
@@ -99,123 +118,119 @@
     <main>
       <header>
         <h1>Least Squares Regression — Animated</h1>
-        <p>Move the sliders or use the animation controls. Residuals are vertical segments; shaded squares show each residual squared. OLS solution:
+        <p>Adjust the controls on the right and watch the graph update live. OLS solution:
           \( \displaystyle \hat\beta_1=\frac{\sum (x_i-\bar x)(y_i-\bar y)}{\sum (x_i-\bar x)^2},\quad \hat\beta_0=\bar y-\hat\beta_1\bar x \).
         </p>
       </header>
 
-      <!-- ===== BIG GRAPH (full width) ===== -->
+      <!-- ONE BOX with graph + controls -->
       <section class="section">
         <div class="panel pad">
-          <div class="card">
-            <h3 style="margin-top:0;">Scatter & Lines</h3>
-            <div class="legend" style="margin-bottom:6px;">
-              <span class="chip"><span class="sw" style="background:#000"></span> Current line</span>
-              <span class="chip"><span class="sw" style="background:var(--kctcs-blue)"></span> OLS line</span>
-              <span class="chip"><span class="sw" style="background:var(--kctcs-gold)"></span> Residuals / Squares</span>
-            </div>
-            <!-- Larger internal viewBox for crisper text at scale -->
-            <svg id="svg" class="viz" viewBox="0 0 960 640" aria-label="Least-squares visualization"></svg>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== CONTROLS + NUMBERS (stacked under the graph; side-by-side when wide) ===== -->
-      <section class="section">
-        <div class="panel pad">
-          <div class="grid2">
-            <!-- Controls -->
+          <div class="ols-grid">
+            <!-- LEFT: Big graph -->
             <div class="card">
-              <h3 style="margin-top:0;">Controls</h3>
-
-              <div class="rowish">
-                <div>
-                  <label for="nPts"># points</label>
-                  <input id="nPts" type="number" min="8" max="200" value="30" />
-                </div>
-                <div>
-                  <label for="noise">Noise SD</label>
-                  <input id="noise" type="number" step="0.1" min="0" max="10" value="2.0" />
-                </div>
+              <h3 style="margin-top:0;">Scatter & Lines</h3>
+              <div class="legend" style="margin-bottom:6px;">
+                <span class="chip"><span class="sw" style="background:#000"></span> Current line</span>
+                <span class="chip"><span class="sw" style="background:var(--kctcs-blue)"></span> OLS line</span>
+                <span class="chip"><span class="sw" style="background:var(--kctcs-gold)"></span> Residuals / Squares</span>
               </div>
-
-              <div class="rowish" style="margin-top:6px;">
-                <button class="btn" id="btnNew">New data</button>
-                <button class="btn ghost" id="btnJitter">Jitter noise</button>
-                <button class="btn outline" id="btnResetLine">Reset line</button>
-              </div>
-
-              <hr class="rule" style="margin:12px 0">
-
-              <div class="sliderline">
-                <div>
-                  <label for="b0">Intercept \( \beta_0 \) </label>
-                  <input id="b0" type="range" min="-10" max="10" step="0.1" />
-                </div>
-                <div class="mono" id="b0Val">0.0</div>
-              </div>
-
-              <div class="sliderline">
-                <div>
-                  <label for="b1">Slope \( \beta_1 \) </label>
-                  <input id="b1" type="range" min="-5" max="5" step="0.05" />
-                </div>
-                <div class="mono" id="b1Val">0.0</div>
-              </div>
-
-              <div class="rowish" style="margin-top:8px;">
-                <div>
-                  <label for="lr">Learning rate (GD)</label>
-                  <input id="lr" type="range" min="0.001" max="1.0" step="0.001" value="0.05" />
-                </div>
-                <div class="mono" id="lrVal">0.05</div>
-              </div>
-
-              <div class="rowish" style="margin-top:6px;">
-                <button class="btn" id="btnPlay">Play GD</button>
-                <button class="btn ghost" id="btnStep">Step</button>
-                <button class="btn outline" id="btnSnapOLS">Animate to OLS</button>
-              </div>
-
-              <hr class="rule" style="margin:12px 0">
-
-              <div class="checkline"><input id="showOLS" type="checkbox" checked>
-                <label for="showOLS" style="margin:0;">Show OLS line</label></div>
-              <div class="checkline"><input id="forceMean" type="checkbox">
-                <label for="forceMean" style="margin:0;">Force current line through \((\bar x,\bar y)\)</label></div>
-              <div class="checkline"><input id="showResiduals" type="checkbox" checked>
-                <label for="showResiduals" style="margin:0;">Show residuals</label></div>
-              <div class="checkline"><input id="showSquares" type="checkbox" checked>
-                <label for="showSquares" style="margin:0;">Show squared residuals</label></div>
-              <div class="checkline"><input id="showMeanPt" type="checkbox" checked>
-                <label for="showMeanPt" style="margin:0;">Show mean point \((\bar x,\bar y)\)</label></div>
-
-              <div class="card soft tight" style="margin-top:10px;">
-                <p class="mini">Tip: “Animate to OLS” eases the line to the exact least-squares solution. “Play GD” performs gradient descent on \(SSE=\sum (y_i-\hat y_i)^2\).</p>
-              </div>
+              <svg id="svg" class="viz" viewBox="0 0 960 640" aria-label="Least-squares visualization"></svg>
             </div>
 
-            <!-- Numbers -->
-            <div class="card">
-              <h3 style="margin-top:0;">Numbers</h3>
-              <div class="statgrid">
-                <div>
-                  <p>n: <strong id="nOut">—</strong></p>
-                  <p>\(\bar x\): <strong id="xbar">—</strong></p>
-                  <p>\(\bar y\): <strong id="ybar">—</strong></p>
+            <!-- RIGHT: Sticky controls + numbers -->
+            <div class="sidecol">
+              <div class="card">
+                <h3 style="margin-top:0;">Controls</h3>
+
+                <div class="rowish">
+                  <div>
+                    <label for="nPts"># points</label>
+                    <input id="nPts" type="number" min="8" max="200" value="30" />
+                  </div>
+                  <div>
+                    <label for="noise">Noise SD</label>
+                    <input id="noise" type="number" step="0.1" min="0" max="10" value="2.0" />
+                  </div>
                 </div>
-                <div>
-                  <p>Current \( \beta_0 \): <strong id="b0Out">—</strong></p>
-                  <p>Current \( \beta_1 \): <strong id="b1Out">—</strong></p>
-                  <p>SSE (current): <strong id="sseOut">—</strong></p>
+
+                <div class="rowish" style="margin-top:6px;">
+                  <button class="btn" id="btnNew">New data</button>
+                  <button class="btn ghost" id="btnJitter">Jitter noise</button>
+                  <button class="btn outline" id="btnResetLine">Reset line</button>
                 </div>
-                <div>
-                  <p>OLS \( \hat\beta_0 \): <strong id="b0OLS">—</strong></p>
-                  <p>OLS \( \hat\beta_1 \): <strong id="b1OLS">—</strong></p>
-                  <p>R² (OLS): <strong id="r2">—</strong></p>
+
+                <hr class="rule" style="margin:12px 0">
+
+                <div class="sliderline">
+                  <div>
+                    <label for="b0">Intercept \( \beta_0 \)</label>
+                    <input id="b0" type="range" min="-10" max="10" step="0.1" />
+                  </div>
+                  <div class="mono" id="b0Val">0.0</div>
+                </div>
+
+                <div class="sliderline">
+                  <div>
+                    <label for="b1">Slope \( \beta_1 \)</label>
+                    <input id="b1" type="range" min="-5" max="5" step="0.05" />
+                  </div>
+                  <div class="mono" id="b1Val">0.0</div>
+                </div>
+
+                <div class="rowish" style="margin-top:8px;">
+                  <div>
+                    <label for="lr">Learning rate (GD)</label>
+                    <input id="lr" type="range" min="0.001" max="1.0" step="0.001" value="0.05" />
+                  </div>
+                  <div class="mono" id="lrVal">0.05</div>
+                </div>
+
+                <div class="rowish" style="margin-top:6px;">
+                  <button class="btn" id="btnPlay">Play GD</button>
+                  <button class="btn ghost" id="btnStep">Step</button>
+                  <button class="btn outline" id="btnSnapOLS">Animate to OLS</button>
+                </div>
+
+                <hr class="rule" style="margin:12px 0">
+
+                <div class="checkline"><input id="showOLS" type="checkbox" checked>
+                  <label for="showOLS" style="margin:0;">Show OLS line</label></div>
+                <div class="checkline"><input id="forceMean" type="checkbox">
+                  <label for="forceMean" style="margin:0;">Force current line through \((\bar x,\bar y)\)</label></div>
+                <div class="checkline"><input id="showResiduals" type="checkbox" checked>
+                  <label for="showResiduals" style="margin:0;">Show residuals</label></div>
+                <div class="checkline"><input id="showSquares" type="checkbox" checked>
+                  <label for="showSquares" style="margin:0;">Show squared residuals</label></div>
+                <div class="checkline"><input id="showMeanPt" type="checkbox" checked>
+                  <label for="showMeanPt" style="margin:0;">Show mean point \((\bar x,\bar y)\)</label></div>
+
+                <div class="card soft" style="margin-top:10px;">
+                  <p class="mini">Tip: “Animate to OLS” eases the line to the exact least-squares solution. “Play GD” performs gradient descent on \(SSE=\sum (y_i-\hat y_i)^2\).</p>
                 </div>
               </div>
-              <p class="mini" style="margin-top:8px;">OLS line always passes through \((\bar x,\bar y)\).</p>
+
+              <div class="card">
+                <h3 style="margin-top:0;">Numbers</h3>
+                <div class="grid2">
+                  <div>
+                    <p>n: <strong id="nOut">—</strong></p>
+                    <p>\(\bar x\): <strong id="xbar">—</strong></p>
+                    <p>\(\bar y\): <strong id="ybar">—</strong></p>
+                  </div>
+                  <div>
+                    <p>Current \( \beta_0 \): <strong id="b0Out">—</strong></p>
+                    <p>Current \( \beta_1 \): <strong id="b1Out">—</strong></p>
+                    <p>SSE (current): <strong id="sseOut">—</strong></p>
+                  </div>
+                  <div>
+                    <p>OLS \( \hat\beta_0 \): <strong id="b0OLS">—</strong></p>
+                    <p>OLS \( \hat\beta_1 \): <strong id="b1OLS">—</strong></p>
+                    <p>R² (OLS): <strong id="r2">—</strong></p>
+                  </div>
+                </div>
+                <p class="mini" style="margin-top:8px;">OLS line always passes through \((\bar x,\bar y)\).</p>
+              </div>
             </div>
           </div>
         </div>
@@ -234,7 +249,6 @@
 
     // ===== Helpers =====
     const svg = document.getElementById('svg');
-    // Larger internal canvas than before for crisper scaling
     const W=960, H=640, pad={l:60,r:20,t:20,b:50};
     const rnd = (a,b)=> a + Math.random()*(b-a);
     const sum = a => a.reduce((s,v)=>s+v,0);
@@ -291,8 +305,6 @@
     // ===== Scales =====
     function xPix(x){ return pad.l + (x - xMin) * (W - pad.l - pad.r) / (xMax - xMin); }
     function yPix(y){ return pad.t + (yMax - y) * (H - pad.t - pad.b) / (yMax - yMin); }
-    function xData(px){ return xMin + (px - pad.l) * (xMax - xMin) / (W - pad.l - pad.r); }
-    function yData(py){ return yMax - (py - pad.t) * (yMax - yMin) / (H - pad.t - pad.b); }
 
     // ===== Regression =====
     function olsLine(data){
@@ -328,9 +340,9 @@
     // ===== Drawing =====
     function drawAxes(){
       const g = document.createElementNS('http://www.w3.org/2000/svg','g');
-      g.setAttribute('stroke', '#6b7280');
+      g.setAttribute('stroke', '#6b7280'); // gray-500
       g.setAttribute('stroke-width','1');
-      // axes
+      // axes frame
       const frame = [
         ['line', {x1:pad.l, y1:H-pad.b, x2:W-pad.r, y2:H-pad.b}],
         ['line', {x1:pad.l, y1:pad.t, x2:pad.l, y2:H-pad.b}]
@@ -433,7 +445,7 @@
       const g = document.createElementNS('http://www.w3.org/2000/svg','g');
       for(const p of pts){
         const yhat = a + b*p.x;
-        const r = p.y - yhat;
+        theR = p.y - yhat;
         const x = xPix(p.x), yp = yPix(p.y), yh = yPix(yhat);
         if(showRes){
           const line = document.createElementNS('http://www.w3.org/2000/svg','line');
@@ -541,14 +553,6 @@
     }
 
     // ===== Animations =====
-    function gradSSE(a,b){
-      const n = pts.length;
-      const xs = pts.map(p=>p.x), ys = pts.map(p=>p.y);
-      const r = ys.map((y,i)=> y - (a + b*xs[i]));
-      const g0 = (-2/n) * sum(r);
-      const g1 = (-2/n) * sum(r.map((ri,i)=> ri*xs[i]));
-      return {g0, g1};
-    }
     function stepGD(){
       const lr = parseFloat(els.lr.value) || 0.05;
       const xs = pts.map(p=>p.x);
@@ -631,6 +635,7 @@
     });
     ['nPts','noise'].forEach(id=>{
       document.getElementById(id).addEventListener('input', ()=>{ makeData(); });
+
     });
 
     // ===== Init =====
@@ -638,3 +643,4 @@
   </script>
 </body>
 </html>
+
