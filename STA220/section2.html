@@ -25,51 +25,8 @@
 </head>
 <body>
   <div class="wrap">
-    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — EXACT FROM YOUR TEMPLATE ===== -->
-    <aside class="sidebar" aria-label="Site navigation">
-      <div class="brand">
-        <div class="brand-logo" aria-hidden="true"></div>
-        <div class="brand-title">BCTC Statistics Hub</div>
-      </div>
-
-      <div class="nav-section">
-        <h3>Graphing</h3>
-        <nav class="nav">
-          <a href="/graphing/barchart.html">Bar Chart</a>
-          <a href="/graphing/piechart.html">Pie / Donut</a>
-          <a href="/graphing/histogram.html">Histogram</a>
-          <a href="/graphing/boxplot.html">Box &amp; Whisker</a>
-          <a href="/graphing/scatterplot.html">Scatter + Regression</a>
-          <a href="/graphing/barchart2way.html">Grouped Bar</a>
-        </nav>
-      </div>
-
-      <div class="divider" role="separator"></div>
-
-      <div class="nav-section">
-        <h3>Analysis</h3>
-        <nav class="nav">
-          <a href="/descriptive/summary.html">Descriptive Summary</a>
-          <a href="/inference/onemean.html">One-Sample Mean Test</a>
-        </nav>
-      </div>
-
-      <div class="divider" role="separator"></div>
-
-      <div class="nav-section">
-        <h3>Notes & Extras</h3>
-        <nav class="nav">
-          <a href="/STA210U/">STA 210U</a>
-          <a href="/STA220/">STA 220</a>
-          <a href="/STA296U/">STA 296U</a>
-          <a href="/game/pathyfinder.html">Pathy Finder</a>
-        </nav>
-      </div>
-
-      <div class="footer-note">
-        © <span id="yr"></span> StatsLG - Luke Garnett
-      </div>
-    </aside>
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — shared include ===== -->
+    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
 
     <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
     <main>
@@ -89,7 +46,7 @@
           <article class="card"><a href="#stemplot">Stem-and-Leaf</a></article>
           <article class="card"><a href="#freq">Frequency Distributions</a></article>
           <article class="card"><a href="#hist">Histograms</a></article>
-          <article class="card"><a href="#shapes">Shapes of Distributions</a></article>
+          <article class="card"><a href="#shapes">Shapes of Distributions (with figures)</a></article>
           <article class="card"><a href="#sigma">Summation Notation (Σ)</a></article>
           <article class="card"><a href="#center">Measures of Central Tendency</a></article>
         </div>
@@ -220,20 +177,31 @@ Stem | Leaves
         <p>Compare with the stem-and-leaf: they tell a similar story about extremes and shape (rotating the stem-and-leaf can resemble a histogram).</p>
       </section>
 
-      <!-- Shapes of distributions -->
+      <!-- Shapes + Figures -->
       <section id="shapes" class="section">
-        <h2>Shapes of Distributions</h2>
+        <h2>Shapes of Distributions (with figures)</h2>
         <ul>
           <li><strong>Symmetrical:</strong> mirror halves about the center.</li>
-          <li><strong>Uniform:</strong> every class has equal frequency.</li>
-          <li><strong>Skewed:</strong> one tail extends farther. Direction of skewness is the side of the longer tail.
-            <ul>
-              <li><em>Skewed right:</em> tail stretched to the right.</li>
-              <li><em>Skewed left:</em> tail stretched to the left.</li>
-            </ul>
-          </li>
+          <li><strong>Uniform:</strong> each class has equal frequency.</li>
+          <li><strong>Skewed:</strong> one tail extends further; the skew’s <em>direction</em> is the side of the longer tail.</li>
           <li><strong>Bimodal:</strong> two distinct peaks.</li>
         </ul>
+
+        <div class="grid">
+          <figure class="card soft">
+            <figcaption><strong>Symmetric</strong></figcaption>
+            <svg id="hist-symmetric" role="img" aria-label="Example symmetric histogram"></svg>
+          </figure>
+          <figure class="card soft">
+            <figcaption><strong>Left-Skewed</strong></figcaption>
+            <svg id="hist-left" role="img" aria-label="Example left-skewed histogram"></svg>
+          </figure>
+          <figure class="card soft">
+            <figcaption><strong>Male Weights (n=14)</strong></figcaption>
+            <svg id="hist-weight" role="img" aria-label="Histogram of male weight data"></svg>
+            <p class="muted" style="margin:.4rem 0 0;">Classes: 130–140, 140–150, …, 200–210 (midpoints labeled). Extreme value at 201.</p>
+          </figure>
+        </div>
       </section>
 
       <!-- Summation Notation -->
@@ -253,7 +221,7 @@ Stem | Leaves
         <ul>
           <li>\(\sum (c\,x) = c \sum x\)</li>
           <li>\(\sum c = n\,c\)</li>
-          <li>\(\sum (x + c) = \sum x + \sum c = \sum x + n\,c\)</li>
+          <li>\(\sum (x + c) = \sum x + n\,c\)</li>
         </ul>
 
         <div class="card soft">
@@ -284,7 +252,7 @@ Stem | Leaves
           <h4 style="margin:.2rem 0 .4rem;">Examples</h4>
           <ul>
             <li>Data 2,3,1,3 → \(\bar{x} = 9/4 = 2.25\) (reasonable here; two values below and two above).</li>
-            <li>Add 10 → Data 2,3,1,3,10 → \(\bar{x} = 19/5 = 3.8\). Now the mean is pulled by the extreme 10, so it’s less representative.</li>
+            <li>Add 10 → Data 2,3,1,3,10 → \(\bar{x} = 19/5 = 3.8\) (pulled upward by the extreme 10).</li>
           </ul>
           <p><strong>Mean characteristics:</strong> sensitive to extremes; not necessarily an attainable data value.</p>
         </div>
@@ -320,9 +288,159 @@ Stem | Leaves
   </div>
 
   <script>
-    document.getElementById('yr').textContent = new Date().getFullYear();
+    // Page footer "last updated"
     document.getElementById('lastUpdated').textContent =
       new Date(document.lastModified).toLocaleString();
+
+    // Shared sidebar include loader
+    const BASE = ''; // set to '/REPO_NAME' for GitHub project sites
+
+    (async function injectSidebar(){
+      const el = document.querySelector('[data-include]');
+      if(!el) return;
+      let url = el.getAttribute('data-include') || '/partials/sidebar.html';
+      if (BASE && url.startsWith('/')) url = BASE + url;
+
+      try{
+        const resp = await fetch(url, {cache:'no-cache'});
+        if(!resp.ok) throw new Error(resp.statusText);
+        el.innerHTML = await resp.text();
+
+        // (Project sites) prefix absolute links inside the injected sidebar
+        if (BASE) {
+          el.querySelectorAll('a[href^="/"]').forEach(a => {
+            a.setAttribute('href', BASE + a.getAttribute('href'));
+          });
+        }
+
+        // Set year inside the injected sidebar
+        const yr = el.querySelector('#yr');
+        if (yr) yr.textContent = new Date().getFullYear();
+
+        // Mark active nav link (only nav links, not the brand)
+        const here = location.pathname.replace(/\/index\.html$/, '/');
+        el.querySelectorAll('.nav a[href]').forEach(a=>{
+          const target = new URL(a.getAttribute('href'), location.origin).pathname
+            .replace(/\/index\.html$/, '/');
+          if (here === target || (here.startsWith(target) && target !== '/')) {
+            a.classList.add('active');
+          }
+        });
+      }catch(err){
+        console.error('Sidebar include failed:', err);
+        el.innerHTML = '<div class="muted">Sidebar failed to load.</div>';
+      }
+    })();
+
+    // --- Tiny SVG histogram renderer (no libraries)
+    function drawHistogram(svgId, labels, freqs, opts = {}){
+      const svg = document.getElementById(svgId);
+      if(!svg) return;
+      const maxF = Math.max(1, ...freqs);
+      const m = {top: 16, right: 12, bottom: 28, left: 28};
+      const barW = opts.barWidth || 28;
+      const gap = opts.gap || 8;
+      const n = freqs.length;
+      const chartW = n * barW + (n-1)*gap;
+      const chartH = 140;
+      const W = m.left + chartW + m.right;
+      const H = m.top + chartH + m.bottom;
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      svg.innerHTML = '';
+
+      // axes
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      svg.appendChild(g);
+
+      // y ticks 0..maxF
+      for(let t=0; t<=maxF; t++){
+        const y = m.top + chartH - (t/maxF)*chartH;
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1', m.left);
+        line.setAttribute('x2', m.left + chartW);
+        line.setAttribute('y1', y);
+        line.setAttribute('y2', y);
+        line.setAttribute('stroke', '#e5e7eb');
+        g.appendChild(line);
+
+        const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
+        lab.setAttribute('x', m.left - 6);
+        lab.setAttribute('y', y + 4);
+        lab.setAttribute('text-anchor', 'end');
+        lab.setAttribute('font-size', '11');
+        lab.setAttribute('fill', '#4b5563');
+        lab.textContent = t;
+        g.appendChild(lab);
+      }
+
+      // bars + x labels
+      freqs.forEach((f, i)=>{
+        const x = m.left + i*(barW + gap);
+        const h = (f/maxF) * chartH;
+        const y = m.top + chartH - h;
+
+        const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        rect.setAttribute('x', x);
+        rect.setAttribute('y', y);
+        rect.setAttribute('width', barW);
+        rect.setAttribute('height', h);
+        rect.setAttribute('rx', 4);
+        rect.setAttribute('fill', '#00467f');        // brand blue
+        rect.setAttribute('stroke', '#e7a614');      // brand gold
+        rect.setAttribute('stroke-width', 1.5);
+        g.appendChild(rect);
+
+        const tx = document.createElementNS('http://www.w3.org/2000/svg','text');
+        tx.setAttribute('x', x + barW/2);
+        tx.setAttribute('y', m.top + chartH + 16);
+        tx.setAttribute('text-anchor', 'middle');
+        tx.setAttribute('font-size', '11');
+        tx.setAttribute('fill', '#4b5563');
+        tx.textContent = labels[i];
+        g.appendChild(tx);
+      });
+
+      // axes lines
+      const yAxis = document.createElementNS('http://www.w3.org/2000/svg','line');
+      yAxis.setAttribute('x1', m.left);
+      yAxis.setAttribute('x2', m.left);
+      yAxis.setAttribute('y1', m.top);
+      yAxis.setAttribute('y2', m.top + chartH);
+      yAxis.setAttribute('stroke', '#111827');
+      yAxis.setAttribute('stroke-width', 1);
+      g.appendChild(yAxis);
+
+      const xAxis = document.createElementNS('http://www.w3.org/2000/svg','line');
+      xAxis.setAttribute('x1', m.left);
+      xAxis.setAttribute('x2', m.left + chartW);
+      xAxis.setAttribute('y1', m.top + chartH);
+      xAxis.setAttribute('y2', m.top + chartH);
+      xAxis.setAttribute('stroke', '#111827');
+      xAxis.setAttribute('stroke-width', 1);
+      g.appendChild(xAxis);
+    }
+
+    // Draw the three charts
+    document.addEventListener('DOMContentLoaded', () => {
+      // Symmetric (example bins)
+      drawHistogram(
+        'hist-symmetric',
+        ['1','2','3','4','5','6','7'],
+        [1,3,6,8,6,3,1]
+      );
+
+      // Left-skewed (tall bars on the right, tail to the left)
+      drawHistogram(
+        'hist-left',
+        ['1','2','3','4','5','6','7'],
+        [6,5,4,3,2,1,0]
+      );
+
+      // Male weights (class midpoints on x-axis)
+      const labels = [135,145,155,165,175,185,195,205];
+      const freqs  = [  1,  1,  4,  4,  3,  0,  0,  1];
+      drawHistogram('hist-weight', labels, freqs);
+    });
   </script>
 </body>
 </html>
