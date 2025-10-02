@@ -1,55 +1,63 @@
 // /js/export-docx.js
 (function () {
-  // Load html-docx-js when needed
-  function ensureHtmlDocx() {
-    return new Promise((resolve, reject) => {
-      if (window.htmlDocx) return resolve();
-      const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/html-docx-js@0.4.1/dist/html-docx.js';
-      s.onload = () => resolve();
-      s.onerror = () => reject(new Error('Failed to load html-docx-js'));
-      document.head.appendChild(s);
-    });
+  // ---- Load html-docx-js from multiple sources and accept different globals
+  async function ensureHtmlDocx() {
+    const urls = [
+      'https://cdn.jsdelivr.net/npm/html-docx-js@0.4.1/dist/html-docx.js',
+      'https://unpkg.com/html-docx-js@0.4.1/dist/html-docx.js'
+    ];
+    function getApi() {
+      return (window.htmlDocx || window.HTMLDocx) && (window.htmlDocx || window.HTMLDocx);
+    }
+    if (getApi()) return getApi();
+
+    for (const url of urls) {
+      try {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = url;
+          s.async = true;
+          s.onload = resolve;
+          s.onerror = () => reject(new Error('Failed to load ' + url));
+          document.head.appendChild(s);
+        });
+        if (getApi()) return getApi();
+      } catch (e) {
+        console.warn(e.message);
+      }
+    }
+    throw new Error('html-docx-js failed to load from all sources');
   }
 
-  // --- Helpers -------------------------------------------------------------
+  // ---- Helpers
+  const b64utf8 = (str) => window.btoa(unescape(encodeURIComponent(str)));
 
-  // Safe base64 for UTF-8 strings
-  function b64utf8(str) {
-    return window.btoa(unescape(encodeURIComponent(str)));
-  }
-
-  // Convert an <svg> node into a PNG data URL (via <canvas>)
   async function svgToPngDataUrl(svg) {
-    // Get dimensions from viewBox or fallback
+    // Use viewBox if present; otherwise guess
     let w = 600, h = 300;
     const vb = (svg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
     if (vb.length === 4 && vb[2] > 0 && vb[3] > 0) { w = vb[2]; h = vb[3]; }
-
+    // Serialize and load into an <img>
     const svgStr = new XMLSerializer().serializeToString(svg);
     const dataUrl = 'data:image/svg+xml;base64,' + b64utf8(svgStr);
-
     const img = new Image();
-    // no crossOrigin needed for data URL
     const loaded = new Promise((res, rej) => {
-      img.onload = () => res();
+      img.onload = res;
       img.onerror = () => rej(new Error('SVG decode failed'));
     });
     img.src = dataUrl;
     await loaded;
-
+    // Draw to canvas → PNG
     const canvas = document.createElement('canvas');
     canvas.width = Math.max(1, Math.round(w));
     canvas.height = Math.max(1, Math.round(h));
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#ffffff'; // white background to avoid transparent artifacts in Word
+    ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
     return canvas.toDataURL('image/png');
   }
 
-  // Replace all <svg> with <img src="data:image/png;base64,...">
   async function replaceSvgsWithPngs(root) {
     const svgs = Array.from(root.querySelectorAll('svg'));
     for (const svg of svgs) {
@@ -57,43 +65,38 @@
         const pngUrl = await svgToPngDataUrl(svg);
         const img = document.createElement('img');
         img.src = pngUrl;
-        // Make it scale well in Word
         img.style.maxWidth = '100%';
         img.style.height = 'auto';
         svg.replaceWith(img);
       } catch (e) {
-        console.warn('Skipping one SVG (failed to convert to PNG):', e);
-        svg.remove(); // avoid crashing export
+        console.warn('Skipping SVG (conversion failed):', e);
+        svg.remove(); // avoid export crash
       }
     }
   }
 
-  // Inline <img> elements as data URLs to avoid CORS fetches during Docx build
   async function inlineImages(root) {
     const imgs = Array.from(root.querySelectorAll('img'));
     for (const img of imgs) {
       const src = (img.getAttribute('src') || '').trim();
       if (!src || src.startsWith('data:')) continue;
-
       try {
-        // Absolute URL relative to document for fetch
-        const url = new URL(src, location.href).href;
-        const res = await fetch(url, { mode: 'cors', cache: 'no-cache' });
+        const abs = new URL(src, location.href).href;
+        const res = await fetch(abs, { mode: 'cors', cache: 'no-cache' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const blob = await res.blob();
         const reader = new FileReader();
-        const done = new Promise((res2) => { reader.onload = () => res2(); });
+        const done = new Promise((ok) => { reader.onload = () => ok(); });
         reader.readAsDataURL(blob);
         await done;
-        img.src = reader.result; // set data URL
+        img.src = reader.result; // data URL
       } catch (e) {
-        console.warn('Could not inline image (will skip to prevent crash):', src, e);
+        console.warn('Could not inline image (removed to prevent crash):', src, e);
         img.remove();
       }
     }
   }
 
-  // Minimal DOCX CSS
   const DOC_CSS = `
     body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;color:#111}
     h1{font-size:22pt;margin:0 0 .2in}
@@ -109,10 +112,25 @@
     .btn,.btns{display:none}
   `;
 
-  // --- Public API ----------------------------------------------------------
+  function saveBlob(blob, filename) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+  }
+
+  // Fallback: produce Word-compatible .doc (HTML) if docx fails
+  function fallbackSaveAsDoc(html, filenameBase) {
+    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+    saveBlob(blob, (filenameBase || 'document') + '.doc');
+  }
+
+  // ---- Public API
   window.downloadAsDocx = async function (filename) {
     try {
-      // Wait for MathJax (if used) to finish typesetting
+      // Wait for MathJax (if used)
       if (window.MathJax && MathJax.typesetPromise) {
         try { await MathJax.typesetPromise(); } catch (e) { console.debug('MathJax typeset skipped:', e); }
       }
@@ -120,41 +138,33 @@
       const main = document.querySelector('main');
       if (!main) throw new Error('No <main> content to export.');
 
-      // Work on a clone to avoid mutating the live page
+      // Clone & sanitize
       const clone = main.cloneNode(true);
       clone.querySelectorAll('script').forEach(s => s.remove());
 
-      // Convert SVG charts → PNG images
+      // Images/SVG handling
       await replaceSvgsWithPngs(clone);
-
-      // Inline <img> resources to data URLs (best effort); skip on failure
       await inlineImages(clone);
 
-      // Build HTML for html-docx-js
+      // Build minimal HTML
       const title = (document.querySelector('h1')?.textContent || document.title || 'statslg').trim();
-      const safeTitle = title.replace(/[^\w\-]+/g, '_');
-      const name = filename || (safeTitle + '.docx');
-
+      const safeBase = title.replace(/[^\w\-]+/g, '_') || 'statslg';
+      const name = filename || (safeBase + '.docx');
       const html =
         '<!DOCTYPE html><html><head><meta charset="utf-8">' +
         '<title>' + title + '</title>' +
         '<style>' + DOC_CSS + '</style>' +
-        '</head><body>' +
-        clone.innerHTML +
-        '</body></html>';
+        '</head><body>' + clone.innerHTML + '</body></html>';
 
-      await ensureHtmlDocx();
-      const blob = window.htmlDocx.asBlob(html);
-
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = name;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => {
-        URL.revokeObjectURL(a.href);
-        a.remove();
-      }, 1000);
+      // Try DOCX first
+      try {
+        const api = await ensureHtmlDocx();
+        const blob = api.asBlob(html);
+        saveBlob(blob, name);
+      } catch (inner) {
+        console.error('DOCX build failed — falling back to .doc:', inner);
+        fallbackSaveAsDoc(html, safeBase);
+      }
     } catch (e) {
       console.error('DOCX export failed:', e);
       alert('Sorry, the DOCX export failed.');
