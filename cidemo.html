@@ -8,28 +8,27 @@
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css">
 
-  <!-- (optional) MathJax for pretty inline math in labels -->
   <script>
+    // Optional MathJax
     window.MathJax = { tex:{ inlineMath:[['\\(','\\)'],['$','$']] } };
   </script>
   <script id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <style>
     .viz-card{ padding:14px; }
     .controls{ display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
     .viz-wrap{ display:grid; grid-template-columns: 1fr; gap:12px; margin-top:12px; }
-    .viz{ width:100%; height:320px; background:#fff; border:1px solid var(--rule); border-radius:12px }
-    .viz-short{ height:360px }
+    .viz{ width:100%; height:320px; min-height:320px; background:#fff; border:1px solid var(--rule); border-radius:12px }
+    .viz-short{ height:360px; min-height:360px }
     .muted-small{ color:var(--muted); font-size:12px }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <!-- ===== Shared sidebar include ===== -->
-    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
+    <!-- Use a RELATIVE include path so it works from project sites, too -->
+    <aside class="sidebar" aria-label="Site navigation" data-include="partials/sidebar.html"></aside>
 
-    <!-- ===== Main ===== -->
     <main>
       <header>
         <h1>Confidence Interval Coverage (Mean, z-interval)</h1>
@@ -88,27 +87,41 @@
   </div>
 
   <script>
-    // -------- shared sidebar include --------
-    const BASE = ''; // set to '/REPO_NAME' for project sites
+    // ---------------- Sidebar include: robust for GitHub Pages ----------------
     (async function injectSidebar(){
       const el = document.querySelector('[data-include]');
       if(!el) return;
-      let url = el.getAttribute('data-include') || '/partials/sidebar.html';
-      if (BASE && url.startsWith('/')) url = BASE + url;
-      try{
-        const resp = await fetch(url, {cache:'no-cache'});
-        el.innerHTML = await resp.text();
-        const yr = el.querySelector('#yr'); if (yr) yr.textContent = new Date().getFullYear();
-      }catch(e){
-        el.innerHTML = '<div class="muted">Sidebar failed to load.</div>';
+
+      // candidate paths: as-given, root, project-base + given, project-base + root
+      const given = el.getAttribute('data-include') || 'partials/sidebar.html'; // relative
+      const firstSeg = location.pathname.split('/').filter(Boolean)[0] || '';
+      const base = firstSeg ? ('/' + firstSeg) : ''; // '/REPO' for project sites, '' for user sites
+
+      const candidates = [
+        given,                                 // 'partials/sidebar.html' (relative to current folder)
+        '/' + given.replace(/^\//,''),
+        base + '/' + given.replace(/^\//,''),
+        base + '/partials/sidebar.html',
+        '/partials/sidebar.html'
+      ].filter((v,i,a)=>a.indexOf(v)===i); // unique
+
+      let html = '';
+      for (const url of candidates){
+        try{
+          const r = await fetch(url, {cache:'no-cache'});
+          if (r.ok) { html = await r.text(); break; }
+        }catch(_){}
       }
+
+      el.innerHTML = html || '<div class="muted">Sidebar failed to load.</div>';
+      const yr = el.querySelector('#yr'); if (yr) yr.textContent = new Date().getFullYear();
     })();
+
     document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
 
-    // -------- Robust normal CDF + inverse (binary search) --------
+    // ---------------- Normal PDF/CDF + robust inverse ----------------
     const SQRT2 = Math.SQRT2, SQRT2PI = Math.sqrt(2*Math.PI);
     function pdf(z){ return Math.exp(-0.5*z*z)/SQRT2PI; }
-    // erf approximation → CDF
     function cdf(z){
       const sign = z < 0 ? -1 : 1;
       z = Math.abs(z)/SQRT2;
@@ -117,26 +130,25 @@
       const erf = 1 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*Math.exp(-z*z);
       return 0.5*(1 + sign*erf);
     }
-    // Always-convergent inverse CDF (no NaNs)
     function invnorm(p){
       if (p<=0) return -10;
       if (p>=1) return 10;
       let lo=-10, hi=10;
       for (let i=0;i<80;i++){
-        const mid=(lo+hi)/2, cmid=cdf(mid);
-        if (cmid < p) lo = mid; else hi = mid;
+        const mid=(lo+hi)/2, cm=cdf(mid);
+        if (cm<p) lo=mid; else hi=mid;
       }
       return (lo+hi)/2;
     }
 
-    // -------- RNG: normal via Box–Muller --------
+    // ---------------- RNG (Box–Muller) ----------------
     function rnorm(mean=0, sd=1){
       let u=0, v=0; while(u===0) u=Math.random(); while(v===0) v=Math.random();
-      const z=Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
+      const z=Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
       return mean + sd*z;
     }
 
-    // -------- State + elements --------
+    // ---------------- Elements/State ----------------
     const muEl = document.getElementById('mu');
     const sigmaEl = document.getElementById('sigma');
     const nEl = document.getElementById('n');
@@ -162,9 +174,9 @@
       const n = Math.max(2, +nEl.value || 2);
       const conf = Math.max(50, Math.min(99.9, +confEl.value || 95));
       const alpha2 = (1 - conf/100)/2;
-      const zstar = invnorm(1 - alpha2);        // robust
+      const zstar = invnorm(1 - alpha2);
       const SE = sigma / Math.sqrt(n);
-      const m = zstar * SE;
+      const m = Math.max(1e-12, zstar*SE); // guard
       return { mu, sigma, n, conf, zstar, SE, m };
     }
 
@@ -194,12 +206,8 @@
     }
 
     function scaleX(core){
-      if (!isFinite(core.m)) { // super-safe guard
-        const span = 4*core.SE || 1;
-        return {lo: core.mu - span, hi: core.mu + span};
-      }
-      if (sampleMeans.length===0){
-        const span = Math.max(4*core.SE, 1.5*core.m);
+      if (!sampleMeans.length){
+        const span = Math.max(4*core.SE, 1.5*core.m, 1);
         return {lo: core.mu - span, hi: core.mu + span};
       }
       let minX = Infinity, maxX = -Infinity;
@@ -207,28 +215,43 @@
         minX = Math.min(minX, x - core.m);
         maxX = Math.max(maxX, x + core.m);
       }
-      const pad = 0.15*(maxX - minX || core.m || 1);
+      if (!isFinite(minX) || !isFinite(maxX) || minX===maxX){
+        const span = Math.max(4*core.SE, 1.5*core.m, 1);
+        return {lo: core.mu - span, hi: core.mu + span};
+      }
+      const pad = 0.15*(maxX - minX || 1);
       return {lo: minX - pad, hi: maxX + pad};
+    }
+
+    function drawNoData(svg, msg){
+      const {W,H} = sizeSVG(svg);
+      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x', W/2); t.setAttribute('y', H/2);
+      t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','14'); t.setAttribute('fill','#4b5563');
+      t.textContent = msg; svg.appendChild(t);
     }
 
     function drawPanelA(core){
       clearSVG(svgA);
       const {W,H} = sizeSVG(svgA, 900, 320);
-      const mrg = {t:16, r:16, b:32, l:48};
-      const w = W - mrg.l - mrg.r, h = H - mrg.t - mrg.b;
+      const m = {t:16, r:16, b:32, l:48};
+      const w = W - m.l - m.r, h = H - m.t - m.b;
 
       cachedScale = scaleX(core);
       const {lo, hi} = cachedScale;
-      const x = v => mrg.l + ( (v - lo)/(hi - lo) ) * w;
-      const y = t => mrg.t + t*h;
+      const x = v => m.l + ( (v - lo)/(hi - lo) ) * w;
+      const y = t => m.t + t*h;
 
-      // axis
+      if (!isFinite(lo) || !isFinite(hi) || hi<=lo){
+        drawNoData(svgA, 'Waiting for samples…'); return;
+      }
+
+      // axis + ticks
       const axis = document.createElementNS('http://www.w3.org/2000/svg','line');
-      axis.setAttribute('x1', mrg.l); axis.setAttribute('x2', mrg.l+w);
+      axis.setAttribute('x1', m.l); axis.setAttribute('x2', m.l+w);
       axis.setAttribute('y1', y(0.75)); axis.setAttribute('y2', y(0.75));
       axis.setAttribute('stroke', '#111827'); svgA.appendChild(axis);
 
-      // ticks
       const ticks = 6;
       for (let i=0;i<=ticks;i++){
         const v = lo + i*(hi-lo)/ticks;
@@ -240,30 +263,30 @@
         const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
         lab.setAttribute('x', tx); lab.setAttribute('y', y(0.76)+16);
         lab.setAttribute('text-anchor','middle'); lab.setAttribute('font-size','11'); lab.setAttribute('fill','#4b5563');
-        lab.textContent = fmt(v,2);
-        svgA.appendChild(lab);
+        lab.textContent = fmt(v,2); svgA.appendChild(lab);
       }
 
-      // true mu
+      // μ line
       const muLine = document.createElementNS('http://www.w3.org/2000/svg','line');
       muLine.setAttribute('x1', x(core.mu)); muLine.setAttribute('x2', x(core.mu));
       muLine.setAttribute('y1', y(0.05)); muLine.setAttribute('y2', y(0.95));
       muLine.setAttribute('stroke', '#111827'); muLine.setAttribute('stroke-width', '2');
       svgA.appendChild(muLine);
+
       const muLab = document.createElementNS('http://www.w3.org/2000/svg','text');
       muLab.setAttribute('x', x(core.mu)); muLab.setAttribute('y', y(0.05)-6);
       muLab.setAttribute('text-anchor', 'middle'); muLab.setAttribute('font-size','12'); muLab.setAttribute('fill', '#111827');
       muLab.textContent = 'μ (true)'; svgA.appendChild(muLab);
 
-      // acceptance band
+      // acceptance band: μ ± m
+      const x1 = x(core.mu - core.m), x2 = x(core.mu + core.m);
       const band = document.createElementNS('http://www.w3.org/2000/svg','rect');
-      band.setAttribute('x', x(core.mu - core.m));
+      band.setAttribute('x', Math.min(x1,x2));
       band.setAttribute('y', y(0.15));
-      band.setAttribute('width', Math.max(1, x(core.mu + core.m) - x(core.mu - core.m)));
+      band.setAttribute('width', Math.max(1, Math.abs(x2 - x1)));
       band.setAttribute('height', Math.max(1, y(0.60)-y(0.15)));
       band.setAttribute('fill', 'rgba(16,185,129,0.20)');
-      band.setAttribute('stroke', '#10b981');
-      band.setAttribute('stroke-width', '1');
+      band.setAttribute('stroke', '#10b981'); band.setAttribute('stroke-width', '1');
       svgA.appendChild(band);
 
       // dots
@@ -281,9 +304,8 @@
         svgA.appendChild(dot);
       }
 
-      // legend
       const legend = document.createElementNS('http://www.w3.org/2000/svg','text');
-      legend.setAttribute('x', mrg.l); legend.setAttribute('y', mrg.t - 2);
+      legend.setAttribute('x', m.l); legend.setAttribute('y', m.t - 2);
       legend.setAttribute('font-size','12'); legend.setAttribute('fill','#4b5563');
       legend.textContent = 'Panel A • Means inside the green band → CI would cover μ';
       svgA.appendChild(legend);
@@ -294,47 +316,49 @@
     function drawPanelB(core){
       clearSVG(svgB);
       const {W,H} = sizeSVG(svgB, 900, 360);
-      const mrg = {t:18, r:16, b:28, l:48};
-      const w = W - mrg.l - mrg.r, h = H - mrg.t - mrg.b;
+      const m = {t:18, r:16, b:28, l:48};
+      const w = W - m.l - m.r, h = H - m.t - m.b;
 
       const {lo, hi} = cachedScale || scaleX(core);
-      const x = v => mrg.l + ( (v - lo)/(hi - lo) ) * w;
+      if (!isFinite(lo) || !isFinite(hi) || hi<=lo){
+        drawNoData(svgB, 'Waiting for samples…'); return;
+      }
+      const x = v => m.l + ( (v - lo)/(hi - lo) ) * w;
 
-      // axis
+      // axis + ticks
       const axis = document.createElementNS('http://www.w3.org/2000/svg','line');
-      axis.setAttribute('x1', mrg.l); axis.setAttribute('x2', mrg.l+w);
-      axis.setAttribute('y1', mrg.t); axis.setAttribute('y2', mrg.t);
+      axis.setAttribute('x1', m.l); axis.setAttribute('x2', m.l+w);
+      axis.setAttribute('y1', m.t); axis.setAttribute('y2', m.t);
       axis.setAttribute('stroke', '#111827'); svgB.appendChild(axis);
 
-      // ticks
       const ticks = 6;
       for (let i=0;i<=ticks;i++){
         const v = lo + i*(hi-lo)/ticks;
         const tx = x(v);
         const line = document.createElementNS('http://www.w3.org/2000/svg','line');
         line.setAttribute('x1', tx); line.setAttribute('x2', tx);
-        line.setAttribute('y1', mrg.t-4); line.setAttribute('y2', mrg.t+4);
+        line.setAttribute('y1', m.t-4); line.setAttribute('y2', m.t+4);
         line.setAttribute('stroke', '#111827'); svgB.appendChild(line);
         const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
-        lab.setAttribute('x', tx); lab.setAttribute('y', mrg.t-8);
+        lab.setAttribute('x', tx); lab.setAttribute('y', m.t-8);
         lab.setAttribute('text-anchor','middle'); lab.setAttribute('font-size','11'); lab.setAttribute('fill','#4b5563');
         lab.textContent = fmt(v,2); svgB.appendChild(lab);
       }
 
-      // mu reference
+      // μ reference
       const muLine = document.createElementNS('http://www.w3.org/2000/svg','line');
       muLine.setAttribute('x1', x(computeCore().mu)); muLine.setAttribute('x2', x(computeCore().mu));
-      muLine.setAttribute('y1', mrg.t); muLine.setAttribute('y2', mrg.t+h);
+      muLine.setAttribute('y1', m.t); muLine.setAttribute('y2', m.t+h);
       muLine.setAttribute('stroke', '#111827'); muLine.setAttribute('stroke-width', '2');
       svgB.appendChild(muLine);
       const muLab = document.createElementNS('http://www.w3.org/2000/svg','text');
-      muLab.setAttribute('x', x(computeCore().mu)+6); muLab.setAttribute('y', mrg.t+14);
+      muLab.setAttribute('x', x(computeCore().mu)+6); muLab.setAttribute('y', m.t+14);
       muLab.setAttribute('font-size','12'); muLab.setAttribute('fill','#111827');
       muLab.textContent = 'μ (true)'; svgB.appendChild(muLab);
 
-      // intervals
+      // intervals (stacked rows)
       const n = sampleMeans.length;
-      if (!n) return;
+      if (!n){ drawNoData(svgB, 'No samples yet'); return; }
       const rowH = 18;
       const maxRows = Math.floor(h/rowH) || 1;
 
@@ -342,13 +366,14 @@
         const xbar = sampleMeans[i];
         const loCI = xbar - core.m, hiCI = xbar + core.m;
         const covers = (loCI <= core.mu && core.mu <= hiCI);
-        const yRow = mrg.t + 20 + (i % maxRows)*rowH;
+        const yRow = m.t + 20 + (i % maxRows)*rowH;
 
         const line = document.createElementNS('http://www.w3.org/2000/svg','line');
         line.setAttribute('x1', x(loCI)); line.setAttribute('x2', x(hiCI));
         line.setAttribute('y1', yRow); line.setAttribute('y2', yRow);
         line.setAttribute('stroke', covers ? '#10b981' : '#ef4444');
-        line.setAttribute('stroke-width', '4'); svgB.appendChild(line);
+        line.setAttribute('stroke-width', '4');
+        svgB.appendChild(line);
 
         const mid = document.createElementNS('http://www.w3.org/2000/svg','line');
         mid.setAttribute('x1', x(xbar)); mid.setAttribute('x2', x(xbar));
@@ -358,12 +383,11 @@
       }
 
       const legend = document.createElementNS('http://www.w3.org/2000/svg','text');
-      legend.setAttribute('x', mrg.l); legend.setAttribute('y', mrg.t - 12);
+      legend.setAttribute('x', m.l); legend.setAttribute('y', m.t - 12);
       legend.setAttribute('font-size','12'); legend.setAttribute('fill','#4b5563');
       legend.textContent = 'Panel B • Intervals — green cover μ, red miss μ';
       svgB.appendChild(legend);
 
-      // recompute count for KPI
       const covered = sampleMeans.reduce((acc,xbar)=>acc + ((Math.abs(xbar - core.mu)<=core.m)?1:0), 0);
       updateKPIs(core, covered);
     }
@@ -378,10 +402,7 @@
       const core = computeCore();
       const R = Math.max(5, Math.min(400, +nsampEl.value || 60));
       const se = core.SE;
-      sampleMeans = [];
-      for (let i=0;i<R;i++){
-        sampleMeans.push(rnorm(core.mu, se));
-      }
+      sampleMeans = Array.from({length:R}, ()=> rnorm(core.mu, se));
       redraw();
     }
     function addOne(){
@@ -398,12 +419,12 @@
     resampleBtn.addEventListener('click', resampleAll);
     stepBtn.addEventListener('click', addOne);
 
-    // Redraw on resize (so width is never 0)
+    // Redraw on resize so width never 0
     const ro = new ResizeObserver(()=>redraw());
     ro.observe(document.body);
 
-    // initial
-    resampleAll();
+    // Kick off after a tick so CSS has applied
+    setTimeout(resampleAll, 0);
   </script>
 </body>
 </html>
