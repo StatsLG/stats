@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CI Coverage Demo — StatsLG</title>
-  <meta name="description" content="Visual demo of confidence-interval coverage with shared StatsLG sidebar and styling." />
+  <title>CI Coverage Demo (Columns) — StatsLG</title>
+  <meta name="description" content="Confidence interval coverage demo with horizontal parameter line and per-sample columns." />
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css">
 
-  <!-- (optional) MathJax for pretty inline math in labels -->
+  <!-- (optional) MathJax for pretty math in labels) -->
   <script>
     window.MathJax = { tex:{ inlineMath:[['\\(','\\)'],['$','$']] } };
   </script>
@@ -19,23 +19,24 @@
     .viz-card{ padding:14px; }
     .controls{ display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
     .viz-wrap{ display:grid; grid-template-columns: 1fr; gap:12px; margin-top:12px; }
-    .viz{ width:100%; height:320px; min-height:320px; background:#fff; border:1px solid var(--rule); border-radius:12px }
-    .viz-short{ height:360px; min-height:360px }
+    .hscroll{ overflow-x:auto; overflow-y:hidden; border:1px solid var(--rule); border-radius:12px; background:#fff; }
+    .viz{ display:block; height:320px; }
+    .viz-short{ height:360px }
     .muted-small{ color:var(--muted); font-size:12px }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <!-- ===== Shared sidebar include (robust paths) ===== -->
+    <!-- ===== Shared sidebar include (robust paths for GitHub Pages) ===== -->
     <aside class="sidebar" aria-label="Site navigation" data-include="partials/sidebar.html"></aside>
 
-    <!-- ===== Main ===== -->
     <main>
       <header>
         <h1>Confidence Interval Coverage (Mean, z-interval)</h1>
         <p class="subtitle">
-          Panel A: sample means stacked in rows vs band \( \mu \pm z^*\sigma/\sqrt{n} \).<br>
-          Panel B: the same samples as intervals \( \bar x \pm z^*\sigma/\sqrt{n} \) with a single short dash marking \( \bar x \) and a reference line at \( \mu \).
+          Now with a <strong>horizontal</strong> parameter line \( \mu \) and <strong>one column per sample</strong>.<br>
+          Panel A: dots are \(\bar x\) vs a horizontal band \( \mu \pm z^*\sigma/\sqrt{n} \).<br>
+          Panel B: vertical CIs \( \bar x \pm z^*\sigma/\sqrt{n} \) with a single short dash at \(\bar x\).
         </p>
       </header>
 
@@ -62,7 +63,7 @@
                 <button class="btn ghost" id="step">Add 1</button>
               </div>
               <p class="muted-small" style="margin:.4rem 0 0;">
-                Samples are generated as \( \bar X \sim \mathcal N(\mu,\; \sigma/\sqrt{n}) \) for speed.
+                Samples generated as \( \bar X \sim \mathcal N(\mu,\; \sigma/\sqrt{n}) \) for speed.
               </p>
             </div>
             <div class="card soft">
@@ -75,8 +76,8 @@
           </div>
 
           <div class="viz-wrap">
-            <svg id="panelA" class="viz" role="img" aria-label="Sample means vs acceptance band"></svg>
-            <svg id="panelB" class="viz viz-short" role="img" aria-label="Confidence intervals by sample"></svg>
+            <div class="hscroll"><svg id="panelA" class="viz" role="img" aria-label="Sample means vs horizontal acceptance band"></svg></div>
+            <div class="hscroll"><svg id="panelB" class="viz viz-short" role="img" aria-label="Per-sample vertical confidence intervals"></svg></div>
           </div>
         </div>
       </section>
@@ -88,39 +89,27 @@
   </div>
 
   <script>
-    // ---------------- Sidebar include (robust for GitHub Pages) ----------------
+    // ---------- Sidebar include (robust for user/project GitHub Pages) ----------
     (async function injectSidebar(){
-      const el = document.querySelector('[data-include]');
-      if(!el) return;
-
+      const el = document.querySelector('[data-include]'); if(!el) return;
       const given = el.getAttribute('data-include') || 'partials/sidebar.html';
       const firstSeg = location.pathname.split('/').filter(Boolean)[0] || '';
       const base = firstSeg ? ('/' + firstSeg) : '';
-
       const candidates = [
-        given,
-        '/' + given.replace(/^\//,''),
-        base + '/' + given.replace(/^\//,''),
-        base + '/partials/sidebar.html',
-        '/partials/sidebar.html'
+        given, '/' + given.replace(/^\//,''), base + '/' + given.replace(/^\//,''),
+        base + '/partials/sidebar.html', '/partials/sidebar.html'
       ].filter((v,i,a)=>a.indexOf(v)===i);
-
       let html = '';
       for (const url of candidates){
-        try{
-          const r = await fetch(url, {cache:'no-cache'});
-          if (r.ok) { html = await r.text(); break; }
-        }catch(_){}
+        try{ const r = await fetch(url, {cache:'no-cache'}); if (r.ok){ html = await r.text(); break; } }catch(_){}
       }
-
       el.innerHTML = html || '<div class="muted">Sidebar failed to load.</div>';
       const yr = el.querySelector('#yr'); if (yr) yr.textContent = new Date().getFullYear();
     })();
-
     document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
 
-    // ---------------- Normal CDF + robust inverse ----------------
-    const SQRT2 = Math.SQRT2, SQRT2PI = Math.sqrt(2*Math.PI);
+    // ---------- Normal CDF + robust inverse ----------
+    const SQRT2 = Math.SQRT2;
     function cdf(z){
       const sign = z < 0 ? -1 : 1;
       z = Math.abs(z)/SQRT2;
@@ -130,24 +119,20 @@
       return 0.5*(1 + sign*erf);
     }
     function invnorm(p){
-      if (p<=0) return -10;
-      if (p>=1) return 10;
+      if (p<=0) return -10; if (p>=1) return 10;
       let lo=-10, hi=10;
-      for (let i=0;i<80;i++){
-        const mid=(lo+hi)/2, cm=cdf(mid);
-        if (cm<p) lo=mid; else hi=mid;
-      }
+      for (let i=0;i<80;i++){ const mid=(lo+hi)/2, cm=cdf(mid); if (cm<p) lo=mid; else hi=mid; }
       return (lo+hi)/2;
     }
 
-    // ---------------- RNG (Box–Muller) ----------------
+    // ---------- RNG ----------
     function rnorm(mean=0, sd=1){
       let u=0, v=0; while(u===0) u=Math.random(); while(v===0) v=Math.random();
       const z=Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
       return mean + sd*z;
     }
 
-    // ---------------- Elements/State ----------------
+    // ---------- Elements & state ----------
     const muEl = document.getElementById('mu');
     const sigmaEl = document.getElementById('sigma');
     const nEl = document.getElementById('n');
@@ -165,7 +150,7 @@
     const svgB = document.getElementById('panelB');
 
     let sampleMeans = [];
-    let cachedScale = null;
+    let yScale = {lo:0, hi:1};  // value scale (shared across panels)
 
     function computeCore(){
       const mu = +muEl.value || 0;
@@ -196,110 +181,122 @@
     }
 
     function clearSVG(svg){ while(svg.firstChild) svg.removeChild(svg.firstChild); }
-    function sizeSVG(svg, fallbackW=900, fallbackH=320){
-      const rect = svg.getBoundingClientRect();
-      const W = Math.round(rect.width || svg.clientWidth || fallbackW);
-      const H = Math.round(rect.height || svg.clientHeight || fallbackH);
+
+    // ---- Layout helpers: make the SVG wide enough for one column per sample
+    function layoutFor(svg, n, baseHeight=320){
+      const m = {t:16, r:16, b:32, l:48};
+      const colW = 22;                  // px per sample column (tweak if you want denser)
+      const W = m.l + m.r + Math.max(1,n)*colW;
+      const H = baseHeight;
+      svg.setAttribute('width', W);
+      svg.setAttribute('height', H);
       svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-      return {W,H};
+      return {m, W, H, colW, plotW: W - m.l - m.r, plotH: H - m.t - m.b};
     }
 
-    function scaleX(core){
+    function computeYScale(core){
       if (!sampleMeans.length){
         const span = Math.max(4*core.SE, 1.5*core.m, 1);
         return {lo: core.mu - span, hi: core.mu + span};
       }
-      let minX = Infinity, maxX = -Infinity;
-      for (const x of sampleMeans){
-        minX = Math.min(minX, x - core.m);
-        maxX = Math.max(maxX, x + core.m);
+      let lo = Infinity, hi = -Infinity;
+      for (const xbar of sampleMeans){
+        lo = Math.min(lo, xbar - core.m);
+        hi = Math.max(hi, xbar + core.m);
       }
-      if (!isFinite(minX) || !isFinite(maxX) || minX===maxX){
+      if (!isFinite(lo) || !isFinite(hi) || lo===hi){
         const span = Math.max(4*core.SE, 1.5*core.m, 1);
         return {lo: core.mu - span, hi: core.mu + span};
       }
-      const pad = 0.15*(maxX - minX || 1);
-      return {lo: minX - pad, hi: maxX + pad};
+      const pad = 0.15*(hi - lo || 1);
+      return {lo: lo - pad, hi: hi + pad};
     }
 
-    // ---------------- Panel A: stacked means (rows) ----------------
+    // map value -> y pixel (higher value -> higher up)
+    function yMap(v, L){ return L.m.t + (L.plotH)*(1 - (v - yScale.lo)/(yScale.hi - yScale.lo)); }
+
+    // ---------- Panel A: dots in columns, horizontal μ & band ----------
     function drawPanelA(core){
       clearSVG(svgA);
-      const {W,H} = sizeSVG(svgA, 900, 320);
-      const m = {t:16, r:16, b:32, l:48};
-      const w = W - m.l - m.r, h = H - m.t - m.b;
+      const n = sampleMeans.length || (+nsampEl.value || 60);
+      const L = layoutFor(svgA, n, 320);
 
-      cachedScale = scaleX(core);
-      const {lo, hi} = cachedScale;
-      if (!isFinite(lo) || !isFinite(hi) || hi<=lo){
-        drawNoData(svgA, 'Waiting for samples…'); return;
-      }
-      const x = v => m.l + ( (v - lo)/(hi - lo) ) * w;
+      yScale = computeYScale(core);
+      const xColCenter = i => L.m.l + (i + 0.5)*L.colW;
 
-      // axis at bottom
-      const axisY = m.t + h - 8;
-      const axis = document.createElementNS('http://www.w3.org/2000/svg','line');
-      axis.setAttribute('x1', m.l); axis.setAttribute('x2', m.l+w);
-      axis.setAttribute('y1', axisY); axis.setAttribute('y2', axisY);
-      axis.setAttribute('stroke', '#111827'); svgA.appendChild(axis);
-
-      // ticks
+      // y-axis ticks
       const ticks = 6;
       for (let i=0;i<=ticks;i++){
-        const v = lo + i*(hi-lo)/ticks;
-        const tx = x(v);
+        const v = yScale.lo + i*(yScale.hi - yScale.lo)/ticks;
+        const y = yMap(v, L);
         const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-        line.setAttribute('x1', tx); line.setAttribute('x2', tx);
-        line.setAttribute('y1', axisY-4); line.setAttribute('y2', axisY+4);
+        line.setAttribute('x1', L.m.l-6); line.setAttribute('x2', L.m.l);
+        line.setAttribute('y1', y); line.setAttribute('y2', y);
         line.setAttribute('stroke', '#111827'); svgA.appendChild(line);
         const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
-        lab.setAttribute('x', tx); lab.setAttribute('y', axisY+16);
-        lab.setAttribute('text-anchor','middle'); lab.setAttribute('font-size','11'); lab.setAttribute('fill','#4b5563');
+        lab.setAttribute('x', L.m.l-8); lab.setAttribute('y', y+4);
+        lab.setAttribute('text-anchor','end'); lab.setAttribute('font-size','11'); lab.setAttribute('fill','#4b5563');
         lab.textContent = fmt(v,2); svgA.appendChild(lab);
       }
 
-      // μ line (full height)
-      const muX = x(core.mu);
+      // μ horizontal line
+      const yMu = yMap(core.mu, L);
       const muLine = document.createElementNS('http://www.w3.org/2000/svg','line');
-      muLine.setAttribute('x1', muX); muLine.setAttribute('x2', muX);
-      muLine.setAttribute('y1', m.t); muLine.setAttribute('y2', m.t+h);
+      muLine.setAttribute('x1', L.m.l); muLine.setAttribute('x2', L.m.l+L.plotW);
+      muLine.setAttribute('y1', yMu); muLine.setAttribute('y2', yMu);
       muLine.setAttribute('stroke', '#111827'); muLine.setAttribute('stroke-width', '2');
       svgA.appendChild(muLine);
 
-      // acceptance band across full height
+      const muLab = document.createElementNS('http://www.w3.org/2000/svg','text');
+      muLab.setAttribute('x', L.m.l+6); muLab.setAttribute('y', yMu-6);
+      muLab.setAttribute('font-size','12'); muLab.setAttribute('fill', '#111827');
+      muLab.textContent = 'μ (true)'; svgA.appendChild(muLab);
+
+      // acceptance band: μ ± m (horizontal band across full width)
+      const y1 = yMap(core.mu + core.m, L), y2 = yMap(core.mu - core.m, L);
       const band = document.createElementNS('http://www.w3.org/2000/svg','rect');
-      const x1 = x(core.mu - core.m), x2 = x(core.mu + core.m);
-      band.setAttribute('x', Math.min(x1,x2));
-      band.setAttribute('y', m.t+4);
-      band.setAttribute('width', Math.max(1, Math.abs(x2 - x1)));
-      band.setAttribute('height', h-8);
+      band.setAttribute('x', L.m.l);
+      band.setAttribute('y', Math.min(y1,y2));
+      band.setAttribute('width', L.plotW);
+      band.setAttribute('height', Math.abs(y2 - y1));
       band.setAttribute('fill', 'rgba(16,185,129,0.18)');
       band.setAttribute('stroke', '#10b981'); band.setAttribute('stroke-width', '1');
-      svgA.appendChild(band);
+      // draw band first → send to back
+      svgA.insertBefore(band, svgA.firstChild);
 
-      // stacked rows for means (align with Panel B)
-      const n = sampleMeans.length;
-      const rowH = 18;
-      const maxRows = Math.floor((h-24)/rowH) || 1;
+      // dots per column
       let coverCount = 0;
-
-      for (let i=0;i<n;i++){
+      for (let i=0;i<sampleMeans.length;i++){
         const xbar = sampleMeans[i];
         const covers = Math.abs(xbar - core.mu) <= core.m;
         if (covers) coverCount++;
-        const yRow = m.t + 16 + (i % maxRows)*rowH;
-
-        // dot for mean
+        const cx = xColCenter(i);
+        const cy = yMap(xbar, L);
         const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
-        dot.setAttribute('cx', x(xbar)); dot.setAttribute('cy', yRow);
+        dot.setAttribute('cx', cx); dot.setAttribute('cy', cy);
         dot.setAttribute('r', 4);
         dot.setAttribute('fill', covers ? '#10b981' : '#ef4444');
         dot.setAttribute('stroke', covers ? '#065f46' : '#7f1d1d');
         svgA.appendChild(dot);
       }
 
+      // x-axis: sample index (sparse labels)
+      const axis = document.createElementNS('http://www.w3.org/2000/svg','line');
+      axis.setAttribute('x1', L.m.l); axis.setAttribute('x2', L.m.l+L.plotW);
+      axis.setAttribute('y1', L.m.t+L.plotH+4); axis.setAttribute('y2', L.m.t+L.plotH+4);
+      axis.setAttribute('stroke','#111827'); svgA.appendChild(axis);
+
+      const step = Math.max(1, Math.round(n/12));
+      for (let i=0;i<n;i+=step){
+        const x = xColCenter(i);
+        const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+        t.setAttribute('x', x); t.setAttribute('y', L.m.t+L.plotH+18);
+        t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','11'); t.setAttribute('fill','#4b5563');
+        t.textContent = i+1; svgA.appendChild(t);
+      }
+
       const legend = document.createElementNS('http://www.w3.org/2000/svg','text');
-      legend.setAttribute('x', m.l); legend.setAttribute('y', m.t - 2);
+      legend.setAttribute('x', L.m.l); legend.setAttribute('y', L.m.t - 2);
       legend.setAttribute('font-size','12'); legend.setAttribute('fill','#4b5563');
       legend.textContent = 'Panel A • Dots = sample means; inside green band → CI would cover μ';
       svgA.appendChild(legend);
@@ -307,96 +304,91 @@
       updateKPIs(core, coverCount);
     }
 
-    function drawNoData(svg, msg){
-      const {W,H} = sizeSVG(svg);
-      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
-      t.setAttribute('x', W/2); t.setAttribute('y', H/2);
-      t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','14'); t.setAttribute('fill','#4b5563');
-      t.textContent = msg; svg.appendChild(t);
-    }
-
-    // ---------------- Panel B: intervals with one short dash at mean ----------------
+    // ---------- Panel B: vertical intervals per column; single short dash at mean ----------
     function drawPanelB(core){
       clearSVG(svgB);
-      const {W,H} = sizeSVG(svgB, 900, 360);
-      const m = {t:18, r:16, b:28, l:48};
-      const w = W - m.l - m.r, h = H - m.t - m.b;
+      const n = sampleMeans.length || (+nsampEl.value || 60);
+      const L = layoutFor(svgB, n, 360);
+      const xColCenter = i => L.m.l + (i + 0.5)*L.colW;
 
-      const {lo, hi} = cachedScale || scaleX(core);
-      if (!isFinite(lo) || !isFinite(hi) || hi<=lo){
-        drawNoData(svgB, 'Waiting for samples…'); return;
-      }
-      const x = v => m.l + ( (v - lo)/(hi - lo) ) * w;
+      // reuse yScale computed in Panel A
 
-      // axis + ticks (top)
-      const axis = document.createElementNS('http://www.w3.org/2000/svg','line');
-      axis.setAttribute('x1', m.l); axis.setAttribute('x2', m.l+w);
-      axis.setAttribute('y1', m.t); axis.setAttribute('y2', m.t);
-      axis.setAttribute('stroke', '#111827'); svgB.appendChild(axis);
-
+      // y-axis ticks
       const ticks = 6;
       for (let i=0;i<=ticks;i++){
-        const v = lo + i*(hi-lo)/ticks;
-        const tx = x(v);
+        const v = yScale.lo + i*(yScale.hi - yScale.lo)/ticks;
+        const y = yMap(v, L);
         const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-        line.setAttribute('x1', tx); line.setAttribute('x2', tx);
-        line.setAttribute('y1', m.t-4); line.setAttribute('y2', m.t+4);
+        line.setAttribute('x1', L.m.l-6); line.setAttribute('x2', L.m.l);
+        line.setAttribute('y1', y); line.setAttribute('y2', y);
         line.setAttribute('stroke', '#111827'); svgB.appendChild(line);
         const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
-        lab.setAttribute('x', tx); lab.setAttribute('y', m.t-8);
-        lab.setAttribute('text-anchor','middle'); lab.setAttribute('font-size','11'); lab.setAttribute('fill','#4b5563');
+        lab.setAttribute('x', L.m.l-8); lab.setAttribute('y', y+4);
+        lab.setAttribute('text-anchor','end'); lab.setAttribute('font-size','11'); lab.setAttribute('fill','#4b5563');
         lab.textContent = fmt(v,2); svgB.appendChild(lab);
       }
 
-      // μ reference line (full height)
-      const muX = x(core.mu);
+      // μ horizontal line
+      const yMu = yMap(core.mu, L);
       const muLine = document.createElementNS('http://www.w3.org/2000/svg','line');
-      muLine.setAttribute('x1', muX); muLine.setAttribute('x2', muX);
-      muLine.setAttribute('y1', m.t); muLine.setAttribute('y2', m.t+h);
+      muLine.setAttribute('x1', L.m.l); muLine.setAttribute('x2', L.m.l+L.plotW);
+      muLine.setAttribute('y1', yMu); muLine.setAttribute('y2', yMu);
       muLine.setAttribute('stroke', '#111827'); muLine.setAttribute('stroke-width', '2');
       svgB.appendChild(muLine);
+
       const muLab = document.createElementNS('http://www.w3.org/2000/svg','text');
-      muLab.setAttribute('x', muX+6); muLab.setAttribute('y', m.t+14);
+      muLab.setAttribute('x', L.m.l+6); muLab.setAttribute('y', yMu-6);
       muLab.setAttribute('font-size','12'); muLab.setAttribute('fill', '#111827');
       muLab.textContent = 'μ (true)'; svgB.appendChild(muLab);
 
-      // intervals stacked in rows (same layout as A)
-      const n = sampleMeans.length;
-      if (!n){ drawNoData(svgB, 'No samples yet'); return; }
-      const rowH = 18;
-      const maxRows = Math.floor((h-24)/rowH) || 1;
-
-      for (let i=0;i<n;i++){
+      // intervals per sample
+      const dashW = 10; // horizontal dash length at the mean
+      for (let i=0;i<sampleMeans.length;i++){
         const xbar = sampleMeans[i];
-        const loCI = xbar - core.m, hiCI = xbar + core.m;
-        const covers = (loCI <= core.mu && core.mu <= hiCI);
-        const yRow = m.t + 20 + (i % maxRows)*rowH;
+        const covers = Math.abs(xbar - core.mu) <= core.m;
+        const cx = xColCenter(i);
+        const yLo = yMap(xbar - core.m, L);
+        const yHi = yMap(xbar + core.m, L);
 
-        // interval line (single solid line)
+        // vertical interval line
         const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-        line.setAttribute('x1', x(loCI)); line.setAttribute('x2', x(hiCI));
-        line.setAttribute('y1', yRow); line.setAttribute('y2', yRow);
+        line.setAttribute('x1', cx); line.setAttribute('x2', cx);
+        line.setAttribute('y1', Math.min(yLo,yHi)); line.setAttribute('y2', Math.max(yLo,yHi));
         line.setAttribute('stroke', covers ? '#10b981' : '#ef4444');
         line.setAttribute('stroke-width', '4');
-        line.setAttribute('stroke-linecap', 'round'); // smoother ends
+        line.setAttribute('stroke-linecap', 'round');
         svgB.appendChild(line);
 
-        // mean marker: SHORT HORIZONTAL DASH centered at xbar
+        // single short horizontal dash at the sample mean
+        const yMean = yMap(xbar, L);
         const dash = document.createElementNS('http://www.w3.org/2000/svg','line');
-        const dashW = 10; // total length of the dash
-        dash.setAttribute('x1', x(xbar) - dashW/2);
-        dash.setAttribute('x2', x(xbar) + dashW/2);
-        dash.setAttribute('y1', yRow); dash.setAttribute('y2', yRow);
+        dash.setAttribute('x1', cx - dashW/2); dash.setAttribute('x2', cx + dashW/2);
+        dash.setAttribute('y1', yMean); dash.setAttribute('y2', yMean);
         dash.setAttribute('stroke', '#00467f');
         dash.setAttribute('stroke-width', '3');
         dash.setAttribute('stroke-linecap', 'round');
         svgB.appendChild(dash);
       }
 
+      // x-axis: sample index (sparse labels)
+      const axis = document.createElementNS('http://www.w3.org/2000/svg','line');
+      axis.setAttribute('x1', L.m.l); axis.setAttribute('x2', L.m.l+L.plotW);
+      axis.setAttribute('y1', L.m.t+L.plotH+4); axis.setAttribute('y2', L.m.t+L.plotH+4);
+      axis.setAttribute('stroke','#111827'); svgB.appendChild(axis);
+
+      const step = Math.max(1, Math.round(sampleMeans.length/12));
+      for (let i=0;i<sampleMeans.length;i+=step){
+        const x = xColCenter(i);
+        const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+        t.setAttribute('x', x); t.setAttribute('y', L.m.t+L.plotH+18);
+        t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','11'); t.setAttribute('fill','#4b5563');
+        t.textContent = i+1; svgB.appendChild(t);
+      }
+
       const legend = document.createElementNS('http://www.w3.org/2000/svg','text');
-      legend.setAttribute('x', m.l); legend.setAttribute('y', m.t - 12);
+      legend.setAttribute('x', L.m.l); legend.setAttribute('y', L.m.t - 2);
       legend.setAttribute('font-size','12'); legend.setAttribute('fill','#4b5563');
-      legend.textContent = 'Panel B • Each bar is CI; short blue dash marks the sample mean';
+      legend.textContent = 'Panel B • One vertical CI per sample; short blue dash marks the mean';
       svgB.appendChild(legend);
 
       const covered = sampleMeans.reduce((acc,xbar)=>acc + ((Math.abs(xbar - core.mu)<=core.m)?1:0), 0);
@@ -422,16 +414,7 @@
       redraw();
     }
 
-    // Redraw helpers
-    function drawNoData(svg, msg){
-      const {W,H} = sizeSVG(svg);
-      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
-      t.setAttribute('x', W/2); t.setAttribute('y', H/2);
-      t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','14'); t.setAttribute('fill','#4b5563');
-      t.textContent = msg; svg.appendChild(t);
-    }
-
-    // Wire inputs
+    // Wiring
     [muEl, sigmaEl, nEl, confEl, nsampEl].forEach(el=>{
       el.addEventListener('change', resampleAll);
       el.addEventListener('input', resampleAll);
@@ -439,7 +422,7 @@
     resampleBtn.addEventListener('click', resampleAll);
     stepBtn.addEventListener('click', addOne);
 
-    // Redraw on resize so width never 0
+    // Redraw on resize so vertical scale never collapses
     const ro = new ResizeObserver(()=>redraw());
     ro.observe(document.body);
 
@@ -448,4 +431,5 @@
   </script>
 </body>
 </html>
+
 
