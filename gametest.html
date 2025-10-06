@@ -32,7 +32,7 @@
     .footer{ margin-top:.75rem; color: var(--muted); font-size:13px; display:flex; justify-content:space-between; gap:.75rem; flex-wrap:wrap }
 
     /* Overworld */
-    .field{ position:relative; height:240px; overflow:hidden; background:var(--panel); border:1px solid var(--rule); display:grid; grid-template-columns:repeat(16, 1fr); grid-template-rows:repeat(10, 1fr) }
+    .field{ position:relative; height:clamp(200px, 35vh, 320px); overflow:hidden; background:var(--panel); border:1px solid var(--rule); display:grid; grid-template-columns:repeat(16, 1fr); grid-template-rows:repeat(10, 1fr) }
     .tile{ border:1px solid rgba(0,0,0,.04); }
     .grass{ background: linear-gradient(135deg, rgba(46,160,67,.18), rgba(46,160,67,.10)); }
     .path{ background: linear-gradient(135deg, rgba(140,95,60,.18), rgba(140,95,60,.10)); }
@@ -166,7 +166,7 @@
     try{
       const res = await fetch('partials/sidebar.html', {cache:'no-store'});
       if(res.ok){ const m=document.getElementById('sidebarMount'); if(m) m.innerHTML = await res.text(); }
-    }catch(_){}}
+    }catch(_){ /* ignore missing sidebar */ }
   )();
 
   // ---- OVERWORLD (cute character + encounters) ----
