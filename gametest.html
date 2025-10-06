@@ -9,8 +9,8 @@
   <style>
     /* Light local styles that piggyback on your bctcstyle.css tokens */
     :root{ --ring: rgba(56,189,248,.35); }
-    body{min-height:100dvh; display:flex;}
-    #sidebar{flex:0 0 auto;}
+    body{min-height:100dvh;}
+    /* sidebar handled by .layout + .sidebarMount */
     main{flex:1 1 auto; padding:clamp(12px,2.5vw,24px); max-width:1000px; margin-inline:auto;}
 
     .toolbar{display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:.75rem}
@@ -59,10 +59,31 @@
     .screen.active{transform:translateX(0); opacity:1}
     .screen.exit{transform:translateX(-105%); opacity:0}
   </style>
+  <style id="brand-bridge">
+    /* Bridge local components to bctcstyle.css */
+    .card{ background: var(--card); color: var(--ink); border: 2px solid var(--kctcs-gold); border-radius: var(--radius); padding:14px; box-shadow: var(--shadow-1); }
+    .muted{ color: var(--muted); }
+    select, input[type="text"], textarea{ width:100%; background:var(--input-bg); color:var(--input-ink); border:1px solid var(--input-border); border-radius:10px; padding:10px 12px; }
+    .pill{ padding:.5rem .75rem; border-radius:999px; border:1px solid var(--rule); cursor:pointer; user-select:none; background:transparent }
+    .pill[aria-pressed="true"]{ outline:2px solid var(--kctcs-blue); }
+    .btn.ghost{ background: transparent; border:1px solid var(--rule); color: var(--ink); }
+    .feedback{ margin-top:.75rem; padding:.9rem; border-radius:10px; border:1px solid var(--rule); background: var(--panel); }
+    .ok{ background: rgba(34,197,94,.10); }
+    .bad{ background: rgba(239,68,68,.10); }
+    .kbd{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background: var(--card); padding:.15rem .4rem; border-radius:6px; border:1px solid var(--rule); }
+    /* Map nodes use brand colors */
+    .node{ border:1px solid var(--rule) !important; background:var(--panel) !important; color:var(--ink) !important; box-shadow:0 4px 18px rgba(0,0,0,.05) !important; }
+    .node span{ background: var(--kctcs-gold) !important; color:#000 !important; }
+    .wire{ stroke: var(--kctcs-blue) !important; opacity:.45; }
+    /* Layout wrapper to match site grid */
+    .layout{ display:grid; grid-template-columns: var(--sidebar-w,280px) 1fr; min-height:100dvh; }
+    @media (max-width:760px){ .layout{ grid-template-columns:1fr } }
+  </style>
 </head>
 <body>
   <!-- Sidebar: pulled in from your site if available -->
-  <div id="sidebar"></div>
+  <div class="layout">
+    <aside id="sidebarMount" class="sidebar"></aside>
 
   <main>
     <!-- Animated choose-a-path map at top -->
@@ -107,8 +128,8 @@
         <div class="question" id="prompt" style="font-size:1.1rem">A wild variable appears…</div>
         <div class="muted" id="flavor">Pick a gate from the map above to classify this variable.</div>
         <div class="actions" style="margin-top:.75rem">
-          <button class="btn secondary" id="newBtn">New Variable (N)</button>
-          <button class="btn primary" id="checkBtn">Check All (Enter)</button>
+          <button class="btn outline" id="newBtn">New Variable (N)</button>
+          <button class="btn" id="checkBtn">Check All (Enter)</button>
           <button class="btn ghost" id="revealBtn">Hint / Reveal (H)</button>
           <label class="btn ghost" style="display:flex; align-items:center; gap:.5rem;">
             <input type="checkbox" id="instructor" /> Instructor Mode
@@ -131,7 +152,7 @@
             </select>
           </label>
         </div>
-        <div class="actions"><button class="btn secondary" data-close>Done</button></div>
+        <div class="actions"><button class="btn outline" data-close>Done</button></div>
       </div>
 
       <!-- LEVEL PANEL -->
@@ -150,7 +171,7 @@
             </select>
           </label>
         </div>
-        <div class="actions"><button class="btn secondary" data-close>Done</button></div>
+        <div class="actions"><button class="btn outline" data-close>Done</button></div>
       </div>
 
       <!-- GRAPH PANEL -->
@@ -158,7 +179,7 @@
         <h3 style="margin:.2rem 0">Gate 3: Graphs</h3>
         <p class="muted">Choose all appropriate graph types.</p>
         <div class="options" id="graphOptions" role="group" aria-label="Graph choices"></div>
-        <div class="actions"><button class="btn secondary" data-close>Done</button></div>
+        <div class="actions"><button class="btn outline" data-close>Done</button></div>
       </div>
 
       <div id="feedback"></div>
@@ -173,6 +194,7 @@
       </div>
     </div>
   </main>
+  </div>
 
   <script>
   // --- Error catcher: surface any JS errors in-page ---------------------------------
@@ -191,7 +213,7 @@
   (async function(){
     try{
       const res = await fetch('partials/sidebar.html', {cache:'no-store'});
-      if (res.ok){ document.getElementById('sidebar').innerHTML = await res.text(); }
+      if (res.ok){ document.getElementById('sidebarMount').innerHTML = await res.text(); }
     }catch(_){ /* no sidebar: ignore */ }
   })();
 
