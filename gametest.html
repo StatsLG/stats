@@ -4,89 +4,79 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Variable Tamer — Stats Game</title>
-  <!-- Optional site stylesheet (will be ignored if not present) -->
+  <!-- Site-wide BCTC styles -->
   <link rel="stylesheet" href="bctcstyle.css" />
   <style>
-    :root{
-      --bg:#0f172a; --panel:#111827; --muted:#94a3b8; --text:#e5e7eb;
-      --accent:#22c55e; --accent-2:#38bdf8; --warn:#f59e0b; --danger:#ef4444;
-      --ring: rgba(56,189,248,.35);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; background:var(--bg); color:var(--text);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial;
-      display:grid; place-items:center; padding:1rem;
-    }
-    .wrap{width:min(100%,980px)}
-    header{display:flex; gap:.75rem; align-items:center; justify-content:space-between; margin-bottom:1rem}
-    header h1{font-size:clamp(1.1rem,3.5vw,1.75rem); margin:0}
-    .stats{display:flex; gap:.5rem; flex-wrap:wrap}
-    .chip{background:#0b1022; padding:.4rem .7rem; border-radius:999px; border:1px solid #1f2937; font-size:.9rem}
-    .chip b{color:var(--accent-2)}
+    /* Light local styles that piggyback on your bctcstyle.css tokens */
+    :root{ --ring: rgba(56,189,248,.35); }
+    body{min-height:100dvh; display:flex;}
+    #sidebar{flex:0 0 auto;}
+    main{flex:1 1 auto; padding:clamp(12px,2.5vw,24px); max-width:1000px; margin-inline:auto;}
 
-    .card{background:var(--panel); border:1px solid #1f2937; border-radius:18px; padding:1rem; box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    .question{font-size:1.1rem; line-height:1.45}
-    .hint{color:var(--muted); font-size:.95rem}
+    .toolbar{display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:.75rem}
+    .chips{display:flex; gap:.5rem; flex-wrap:wrap}
+    .chip{background:var(--surface-2, #0b1022); border:1px solid var(--border, #2a3343); color:var(--text, #e5e7eb);
+          padding:.35rem .7rem; border-radius:999px; font-size:.95rem}
+    .chip b{color:var(--accent-2,#38bdf8)}
 
-    .section{margin-top:1rem; padding-top:.75rem; border-top:1px dashed #2f3645}
-    .row{display:grid; grid-template-columns:1fr; gap:.5rem}
-    @media (min-width:720px){ .row{grid-template-columns:1fr 1fr} }
+    .card{background:var(--surface, #111827); color:var(--text, #e5e7eb); border:1px solid var(--border,#1f2937);
+          border-radius:18px; padding:1rem; box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .muted{color:var(--muted, #94a3b8)}
+    .row{display:grid; grid-template-columns:1fr; gap:.6rem}
+    @media (min-width:760px){ .row{grid-template-columns:1fr 1fr} }
 
-    select, button{width:100%}
-    select, .multiselect, input[type="text"], textarea{
-      background:#0b1022; color:var(--text); border:1px solid #1f2937; border-radius:12px;
-      padding:.7rem .8rem; outline:none; font-size:1rem;
+    select, .pill, button, input[type="checkbox"]{font-size:1rem}
+    select, input[type="text"], textarea{
+      width:100%; background:var(--surface-2,#0b1022); color:var(--text,#e5e7eb);
+      border:1px solid var(--border,#1f2937); border-radius:12px; padding:.65rem .8rem; outline:none
     }
-    select:focus, .multiselect:focus-within{box-shadow:0 0 0 4px var(--ring); border-color:#334155}
+    select:focus{box-shadow:0 0 0 4px var(--ring)}
 
-    .options{display:flex; flex-wrap:wrap; gap:.5rem}
-    .pill{
-      padding:.5rem .75rem; border-radius:999px; border:1px solid #1f2937; cursor:pointer;
-      user-select:none; background:#0b1022; font-size:.95rem;
-    }
+    .options{display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.25rem}
+    .pill{padding:.5rem .75rem; border-radius:999px; border:1px solid var(--border,#1f2937); cursor:pointer; user-select:none; background:var(--surface-2,#0b1022)}
     .pill[aria-pressed="true"]{background:rgba(56,189,248,.08); border-color:#2a4050}
 
-    .actions{display:flex; gap:.6rem; margin-top:1rem; flex-wrap:wrap}
-    .btn{appearance:none; border:none; border-radius:12px; padding:.8rem 1rem; font-weight:600; cursor:pointer}
-    .btn.primary{background:var(--accent-2); color:#00121a}
-    .btn.secondary{background:#0b1022; color:var(--text); border:1px solid #1f2937}
-    .btn.ghost{background:transparent; border:1px dashed #334155; color:var(--muted)}
+    .actions{display:flex; gap:.6rem; margin-top:.75rem; flex-wrap:wrap}
+    .btn{appearance:none; border:none; border-radius:12px; padding:.75rem 1rem; font-weight:600; cursor:pointer}
+    .btn.primary{background:var(--accent-2,#38bdf8); color:#00121a}
+    .btn.secondary{background:var(--surface-2,#0b1022); color:var(--text,#e5e7eb); border:1px solid var(--border,#1f2937)}
+    .btn.ghost{background:transparent; border:1px dashed var(--border,#334155); color:var(--muted,#94a3b8)}
 
-    .feedback{margin-top:.75rem; padding:.9rem; border-radius:12px; border:1px solid #1f2937}
-    .ok{background:rgba(34,197,94,.1); border-color:rgba(34,197,94,.35)}
-    .bad{background:rgba(239,68,68,.1); border-color:rgba(239,68,68,.35)}
+    .feedback{margin-top:.75rem; padding:.9rem; border-radius:12px; border:1px solid var(--border,#1f2937)}
+    .ok{background:rgba(34,197,94,.10); border-color:rgba(34,197,94,.35)}
+    .bad{background:rgba(239,68,68,.10); border-color:rgba(239,68,68,.35)}
+    .warn{background:rgba(245,158,11,.10); border-color:rgba(245,158,11,.35)}
 
     details.explain{margin-top:.5rem}
-    summary{cursor:pointer; color:var(--muted)}
-    .muted{color:var(--muted)}
+    summary{cursor:pointer; color:var(--muted,#94a3b8)}
 
-    .footer{margin-top:.75rem; font-size:.9rem; color:var(--muted); display:flex; justify-content:space-between; gap:.75rem; flex-wrap:wrap}
-    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace; background:#0b1022; padding:.15rem .4rem; border-radius:6px; border:1px solid #1f2937}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; background:var(--surface-2,#0b1022); padding:.15rem .4rem; border-radius:6px; border:1px solid var(--border,#1f2937)}
+    .footer{margin-top:.75rem; font-size:.95rem; color:var(--muted,#94a3b8); display:flex; justify-content:space-between; gap:.75rem; flex-wrap:wrap}
   </style>
 </head>
 <body>
-  <noscript>
-    <div style="background:#fee2e2;color:#991b1b;padding:12px;border-radius:10px;margin:10px 0;border:1px solid #fecaca;">
-      This game needs JavaScript enabled. Please enable JavaScript and reload.
-    </div>
-  </noscript>
-  <div class="wrap">
-    <header>
-      <h1>Variable Tamer <span class="muted">— classify & graph</span></h1>
-      <div class="stats">
+  <!-- Sidebar: pulled in from your site if available -->
+  <div id="sidebar"></div>
+
+  <main>
+    <noscript>
+      <div class="feedback bad">This game needs JavaScript enabled. Enable it and reload.</div>
+    </noscript>
+
+    <div class="toolbar">
+      <h1 style="margin:0">Variable Tamer <span class="muted">— classify & graph</span></h1>
+      <div class="chips">
         <div class="chip" id="scoreChip">Score: <b>0</b></div>
         <div class="chip" id="streakChip">Streak: <b>0</b></div>
         <div class="chip" id="roundChip">Round: <b>1</b></div>
       </div>
-    </header>
+    </div>
 
     <div class="card" id="game">
-      <div class="question" id="prompt">A wild variable appears…</div>
-      <div class="hint" id="flavor">Classify its type, level of measurement, and pick the best graph(s).</div>
+      <div class="question" id="prompt" style="font-size:1.1rem">A wild variable appears…</div>
+      <div class="muted" id="flavor">Classify its type, level of measurement, and pick the best graph(s).</div>
 
-      <div class="section">
+      <div class="section" style="margin-top:.75rem">
         <div class="row">
           <label>
             <div class="muted">Variable Type</div>
@@ -111,7 +101,7 @@
         </div>
       </div>
 
-      <div class="section">
+      <div class="section" style="margin-top:.75rem">
         <div class="muted" style="margin-bottom:.25rem">Choose all appropriate graph types</div>
         <div class="options" id="graphOptions" role="group" aria-label="Graph choices"></div>
       </div>
@@ -137,10 +127,10 @@
         <button class="btn ghost" id="resetBtn">Reset Score</button>
       </div>
     </div>
-  </div>
+  </main>
 
   <script>
-  // Error catcher: surface any JS errors in-page so you don't just see a blank screen.
+  // --- Error catcher: surface any JS errors in-page ---------------------------------
   window.addEventListener('error', (e)=>{
     const msg = (e?.error && e.error.stack) ? e.error.stack : (e?.message || 'Unknown error');
     const box = document.getElementById('feedback');
@@ -149,167 +139,45 @@
       div.className = 'feedback bad';
       div.innerHTML = `<b>Script Error:</b><br><pre style="white-space:pre-wrap">${msg}</pre>`;
       box.innerHTML=''; box.appendChild(div);
-    } else {
-      const warn = document.createElement('pre');
-      warn.textContent = `Script Error: ${msg}`;
-      document.body.prepend(warn);
     }
   });
 
-  // --- Variable bank -------------------------------------------------------
-  // Each item describes a variable and its correct classification.
-  // "graphs" lists all acceptable graph types for that variable.
+  // --- Load sidebar.html if it exists ----------------------------------------------
+  (async function(){
+    try{
+      const res = await fetch('sidebar.html', {cache:'no-store'});
+      if (res.ok){ document.getElementById('sidebar').innerHTML = await res.text(); }
+    }catch(_){ /* no sidebar: ignore */ }
+  })();
+
+  // --- Variable bank ---------------------------------------------------------------
+  // Full bank from earlier draft + a few extras.
   const BANK = [
-    {
-      prompt: "Favorite ice cream flavor",
-      type: "categorical", level: "nominal",
-      graphs: ["bar","pareto","pie"],
-      why: "Categories without order ⇒ nominal. Graph with bar/pareto; pie works if categories form a whole."
-    },
-    {
-      prompt: "Class standing (freshman, sophomore, junior, senior)",
-      type: "categorical", level: "ordinal",
-      graphs: ["bar","pareto"],
-      why: "Ranked categories ⇒ ordinal. Bar/pareto respect ordering (avoid histogram: not numeric bins)."
-    },
-    {
-      prompt: "Number of siblings",
-      type: "quant_discrete", level: "ratio",
-      graphs: ["dot","hist","stem","box"],
-      why: "Counts are discrete ratio (true zero & meaningful ratios). Dot plot/histogram/stem-and-leaf/box plot all work."
-    },
-    {
-      prompt: "Weekly study hours",
-      type: "quant_continuous", level: "ratio",
-      graphs: ["hist","density","box","dot"],
-      why: "Time is continuous ratio. Histogram/density/box; dot plot fine for small n."
-    },
-    {
-      prompt: "Body temperature (°C)",
-      type: "quant_continuous", level: "interval",
-      graphs: ["hist","density","box"],
-      why: "°C has no true zero ⇒ interval. Use histogram/density/box."
-    },
-    {
-      prompt: "Body temperature (K)",
-      type: "quant_continuous", level: "ratio",
-      graphs: ["hist","density","box"],
-      why: "Kelvin has a true zero ⇒ ratio."
-    },
-    {
-      prompt: "Jersey number",
-      type: "categorical", level: "nominal",
-      graphs: ["bar","pareto","pie"],
-      why: "Labels, not quantities (23 ≠ twice 11). Treat as nominal categorical."
-    },
-    {
-      prompt: "Finishing position in a race (1st, 2nd, 3rd, …)",
-      type: "categorical", level: "ordinal",
-      graphs: ["bar","pareto"],
-      why: "Ranks ⇒ ordinal (differences between places not equal)."
-    },
-    {
-      prompt: "Height (cm)",
-      type: "quant_continuous", level: "ratio",
-      graphs: ["hist","density","box","dot","stem"],
-      why: "Continuous ratio variable."
-    },
-    {
-      prompt: "Age (years)",
-      type: "quant_continuous", level: "ratio",
-      graphs: ["hist","density","box","dot"],
-      why: "Age has true zero and meaningful ratios (20 is twice 10)."
-    },
-    {
-      prompt: "Daily step count",
-      type: "quant_discrete", level: "ratio",
-      graphs: ["hist","dot","box","stem"],
-      why: "Counts ⇒ discrete ratio."
-    },
-    {
-      prompt: "Satisfaction (Likert: 1=Strongly disagree … 5=Strongly agree)",
-      type: "categorical", level: "ordinal",
-      graphs: ["bar","pareto"],
-      why: "Likert items are ordinal (ordered categories)."
-    },
-    {
-      prompt: "Exam score (0–100)",
-      type: "quant_continuous", level: "ratio",
-      graphs: ["hist","density","box","dot"],
-      why: "Score with true zero (0) behaves like ratio for most analyses."
-    },
-    {
-      prompt: "Zip code",
-      type: "categorical", level: "nominal",
-      graphs: ["bar","pareto","pie"],
-      why: "Identifiers/labels ⇒ nominal."
-    },
-    {
-      prompt: "Month of birth",
-      type: "categorical", level: "nominal",
-      graphs: ["bar","pie","pareto"],
-      why: "No inherent order (or you can cyclic order)."
-    },
-    {
-      prompt: "Finish time in 5K (minutes)",
-      type: "quant_continuous", level: "ratio",
-      graphs: ["hist","density","box","dot"],
-      why: "Time is continuous ratio."
-    },
-    {
-      prompt: "Temperature change from baseline (Δ°C)",
-      type: "quant_continuous", level: "interval",
-      graphs: ["hist","density","box"],
-      why: "Differences can be negative; no true zero for intervals."
-    },
-    {
-      prompt: "Handedness (left/right)",
-      type: "categorical", level: "nominal",
-      graphs: ["bar","pie","pareto"],
-      why: "Binary categories ⇒ nominal."
-    },
-    {
-      prompt: "Class period (1st, 2nd, …)",
-      type: "categorical", level: "ordinal",
-      graphs: ["bar","pareto"],
-      why: "Ordered categories."
-    },
-    {
-      prompt: "Distance (meters)",
-      type: "quant_continuous", level: "ratio",
-      graphs: ["hist","density","box","dot","stem"],
-      why: "Physical measure with true zero."
-    },
-    {
-      prompt: "Wind speed (mph)",
-      type: "quant_continuous", level: "ratio",
-      graphs: ["hist","density","box"],
-      why: "Continuous ratio."
-    },
-    {
-      prompt: "Score on a 5‑point rubric (0–4)",
-      type: "categorical", level: "ordinal",
-      graphs: ["bar","pareto"],
-      why: "Rubric levels are ordered categories."
-    },
-    {
-      prompt: "Miles per gallon (MPG)",
-      type: "quant_continuous", level: "ratio",
-      graphs: ["hist","density","box","dot"],
-      why: "Ratio scale (0 mpg is meaningful)."
-    },
-    {
-      prompt: "Temperature (°F)",
-      type: "quant_continuous", level: "interval",
-      graphs: ["hist","density","box"],
-      why: "Fahrenheit lacks true zero ⇒ interval."
-    },
-    {
-      prompt: "Shots made out of 10 attempts",
-      type: "quant_discrete", level: "ratio",
-      graphs: ["dot","hist","box","stem"],
-      why: "Counts (binomial outcomes) ⇒ discrete ratio."
-    }
+    {prompt:"Favorite ice cream flavor", type:"categorical", level:"nominal", graphs:["bar","pareto","pie"], why:"Categories without order ⇒ nominal. Graph with bar/pareto; pie works if categories form a whole."},
+    {prompt:"Class standing (freshman, sophomore, junior, senior)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Ranked categories ⇒ ordinal. Bar/pareto respect ordering (avoid histogram: not numeric bins)."},
+    {prompt:"Number of siblings", type:"quant_discrete", level:"ratio", graphs:["dot","hist","stem","box"], why:"Counts are discrete ratio (true zero & meaningful ratios). Dot plot/histogram/stem-and-leaf/box plot all work."},
+    {prompt:"Weekly study hours", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"Time is continuous ratio. Histogram/density/box; dot plot fine for small n."},
+    {prompt:"Body temperature (°C)", type:"quant_continuous", level:"interval", graphs:["hist","density","box"], why:"°C has no true zero ⇒ interval. Use histogram/density/box."},
+    {prompt:"Body temperature (K)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box"], why:"Kelvin has a true zero ⇒ ratio."},
+    {prompt:"Jersey number", type:"categorical", level:"nominal", graphs:["bar","pareto","pie"], why:"Labels, not quantities (23 ≠ twice 11). Treat as nominal categorical."},
+    {prompt:"Finishing position in a race (1st, 2nd, 3rd, …)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Ranks ⇒ ordinal (differences between places not equal)."},
+    {prompt:"Height (cm)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot","stem"], why:"Continuous ratio variable."},
+    {prompt:"Age (years)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"Age has true zero and meaningful ratios (20 is twice 10)."},
+    {prompt:"Daily step count", type:"quant_discrete", level:"ratio", graphs:["hist","dot","box","stem"], why:"Counts ⇒ discrete ratio."},
+    {prompt:"Satisfaction (Likert: 1–5)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Likert items are ordinal (ordered categories)."},
+    {prompt:"Exam score (0–100)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"Score with true zero (0) behaves like ratio for most analyses."},
+    {prompt:"Zip code", type:"categorical", level:"nominal", graphs:["bar","pareto","pie"], why:"Identifiers/labels ⇒ nominal."},
+    {prompt:"Month of birth", type:"categorical", level:"nominal", graphs:["bar","pie","pareto"], why:"No inherent linear order (you may show cyclic order)."},
+    {prompt:"Finish time in 5K (minutes)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"Time is continuous ratio."},
+    {prompt:"Temperature change from baseline (Δ°C)", type:"quant_continuous", level:"interval", graphs:["hist","density","box"], why:"Differences can be negative; no true ratio zero for intervals."},
+    {prompt:"Handedness (left/right)", type:"categorical", level:"nominal", graphs:["bar","pie","pareto"], why:"Binary categories ⇒ nominal."},
+    {prompt:"Class period (1st, 2nd, …)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Ordered categories."},
+    {prompt:"Distance (meters)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot","stem"], why:"Physical measure with true zero."},
+    {prompt:"Wind speed (mph)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box"], why:"Continuous ratio."},
+    {prompt:"Score on a 5‑point rubric (0–4)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Rubric levels are ordered categories."},
+    {prompt:"Miles per gallon (MPG)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"Ratio scale (0 mpg is meaningful)."},
+    {prompt:"Temperature (°F)", type:"quant_continuous", level:"interval", graphs:["hist","density","box"], why:"Fahrenheit lacks true zero ⇒ interval."},
+    {prompt:"Shots made out of 10 attempts", type:"quant_discrete", level:"ratio", graphs:["dot","hist","box","stem"], why:"Counts (binomial outcomes) ⇒ discrete ratio."}
   ];
 
   const GRAPH_CHOICES = [
@@ -323,11 +191,10 @@
     { id:"stem", label:"Stem-and-leaf" },
   ];
 
-  // --- State ---------------------------------------------------------------
-  let score=0, streak=0, roundN=1;
-  let current=null; // current variable item
+  // --- State ----------------------------------------------------------------------
+  let score=0, streak=0, roundN=1; let current=null;
 
-  // --- DOM helpers ---------------------------------------------------------
+  // --- DOM helpers ----------------------------------------------------------------
   const $ = sel => document.querySelector(sel);
   const scoreChip = $('#scoreChip b');
   const streakChip = $('#streakChip b');
@@ -341,21 +208,14 @@
   const explain = $('#explain');
   const explainBox = $('#explainBox');
 
-  function updateChips(){
-    scoreChip.textContent = score;
-    streakChip.textContent = streak;
-    roundChip.textContent = roundN;
-  }
+  function updateChips(){ scoreChip.textContent = score; streakChip.textContent = streak; roundChip.textContent = roundN; }
 
   function renderGraphPills(){
     graphOptions.innerHTML = '';
     GRAPH_CHOICES.forEach((g, idx)=>{
       const btn = document.createElement('button');
-      btn.className='pill';
-      btn.type='button';
-      btn.setAttribute('role','switch');
-      btn.setAttribute('aria-pressed','false');
-      btn.dataset.id = g.id;
+      btn.className='pill'; btn.type='button'; btn.setAttribute('role','switch');
+      btn.setAttribute('aria-pressed','false'); btn.dataset.id = g.id;
       btn.innerText = `${idx+1}. ${g.label}`;
       btn.addEventListener('click', ()=>{
         const on = btn.getAttribute('aria-pressed')==='true';
@@ -369,26 +229,18 @@
     current = BANK[Math.floor(Math.random()*BANK.length)];
     promptEl.textContent = `A wild variable appears: ${current.prompt}`;
     flavorEl.textContent = 'Classify its type, level, and choose all appropriate graphs.';
-    typeSelect.value = '';
-    levelSelect.value = '';
+    typeSelect.value = ''; levelSelect.value = '';
     [...graphOptions.children].forEach(x=>x.setAttribute('aria-pressed','false'));
-    feedback.innerHTML='';
-    explain.textContent='';
-    explainBox.open=false;
+    feedback.innerHTML=''; explain.textContent=''; explainBox.open=false;
   }
 
   function getSelectedGraphs(){
-    return [...graphOptions.children]
-      .filter(x=>x.getAttribute('aria-pressed')==='true')
-      .map(x=>x.dataset.id);
+    return [...graphOptions.children].filter(x=>x.getAttribute('aria-pressed')==='true').map(x=>x.dataset.id);
   }
 
   function setFeedback(ok, html){
-    const div=document.createElement('div');
-    div.className = `feedback ${ok? 'ok':'bad'}`;
-    div.innerHTML = html;
-    feedback.innerHTML='';
-    feedback.appendChild(div);
+    const div=document.createElement('div'); div.className = `feedback ${ok? 'ok':'bad'}`; div.innerHTML = html;
+    feedback.innerHTML=''; feedback.appendChild(div);
   }
 
   function arraysEqualAsSets(a,b){
@@ -398,23 +250,26 @@
     return A.every((v,i)=>v===B[i]);
   }
 
+  function prettyType(t){
+    return t==='categorical' ? 'Categorical (Qualitative)'
+      : t==='quant_discrete' ? 'Quantitative — Discrete'
+      : 'Quantitative — Continuous';
+  }
+  function prettyLevel(l){ return l[0].toUpperCase()+l.slice(1); }
+  function prettyGraph(id){ const f = GRAPH_CHOICES.find(g=>g.id===id); return f? f.label : id; }
+
   function check(){
     if (!current) return;
-    const typeAns = typeSelect.value;
-    const levelAns = levelSelect.value;
-    const chosenGraphs = getSelectedGraphs();
+    const typeAns = typeSelect.value; const levelAns = levelSelect.value; const chosenGraphs = getSelectedGraphs();
 
-    let okType = typeAns === current.type;
-    let okLevel = levelAns === current.level;
+    let okType = typeAns === current.type; let okLevel = levelAns === current.level;
 
-    // Graph logic: allow any subset that equals the acceptable set.
-    // For pedagogy, also accept a strong subset (e.g., choosing just "bar" for nominal) and award partial.
+    // Graph grading: exact = full; subset = partial; otherwise wrong
     const correctGraphs = current.graphs;
     const exactGraphs = arraysEqualAsSets(chosenGraphs, correctGraphs);
     const subsetOK = chosenGraphs.length>0 && chosenGraphs.every(g=>correctGraphs.includes(g));
 
-    let points = 0;
-    let msgs = [];
+    let points = 0; let msgs = [];
     if (okType) { points += 2; } else { msgs.push(`• Variable type should be <b>${prettyType(current.type)}</b>.`); }
     if (okLevel) { points += 2; } else { msgs.push(`• Level of measurement is <b>${prettyLevel(current.level)}</b>.`); }
 
@@ -423,66 +278,40 @@
     else { msgs.push(`• Appropriate graphs: <b>${correctGraphs.map(prettyGraph).join(', ')}</b>.`); }
 
     const allCorrect = (points>=10);
-    if (allCorrect){
-      streak += 1; score += 10;
-      setFeedback(true, `✅ Nice! +10 points.`);
-    } else if (points>=6){
-      streak = 0; score += points;
-      setFeedback(true, `🟢 Partly correct. +${points} points.<br>${msgs.join('<br>')}`);
-    } else {
-      streak = 0; score += points;
-      setFeedback(false, `🔴 Not quite. +${points} points.<br>${msgs.join('<br>')}`);
-    }
+    if (allCorrect){ streak += 1; score += 10; setFeedback(true, `✅ Nice! +10 points.`); }
+    else if (points>=6){ streak = 0; score += points; setFeedback(true, `🟢 Partly correct. +${points} points.<br>${msgs.join('<br>')}`); }
+    else { streak = 0; score += points; setFeedback(false, `🔴 Not quite. +${points} points.<br>${msgs.join('<br>')}`); }
 
     explain.textContent = current.why;
     explainBox.open = $('#instructor').checked; // auto-open if instructor mode
 
-    roundN += 1;
-    updateChips();
-  }
-
-  function prettyType(t){
-    return t==='categorical' ? 'Categorical (Qualitative)'
-      : t==='quant_discrete' ? 'Quantitative — Discrete'
-      : 'Quantitative — Continuous';
-  }
-  function prettyLevel(l){
-    return l[0].toUpperCase()+l.slice(1);
-  }
-  function prettyGraph(id){
-    const f = GRAPH_CHOICES.find(g=>g.id===id); return f? f.label : id;
+    roundN += 1; updateChips();
   }
 
   // --- Wire up -------------------------------------------------------------
-  renderGraphPills();
-  pickNew();
-  updateChips();
-
-  $('#checkBtn').addEventListener('click', check);
-  $('#newBtn').addEventListener('click', ()=>{ pickNew(); updateChips(); });
-  $('#revealBtn').addEventListener('click', ()=>{
+  renderGraphPills(); pickNew(); updateChips();
+  document.getElementById('checkBtn').addEventListener('click', check);
+  document.getElementById('newBtn').addEventListener('click', ()=>{ pickNew(); updateChips(); });
+  document.getElementById('revealBtn').addEventListener('click', ()=>{
     if (!current) return;
     setFeedback(true,
       `Type: <b>${prettyType(current.type)}</b><br>`+
       `Level: <b>${prettyLevel(current.level)}</b><br>`+
       `Graphs: <b>${current.graphs.map(prettyGraph).join(', ')}</b>`);
-    explain.textContent = current.why;
-    explainBox.open = true;
+    explain.textContent = current.why; explainBox.open = true;
   });
-  $('#resetBtn').addEventListener('click', ()=>{ score=0; streak=0; roundN=1; updateChips(); setFeedback(true,'Scores reset.'); });
+  document.getElementById('resetBtn').addEventListener('click', ()=>{ score=0; streak=0; roundN=1; updateChips(); setFeedback(true,'Scores reset.'); });
 
   // Keyboard shortcuts
   window.addEventListener('keydown', (e)=>{
     if (e.key==='Enter'){ e.preventDefault(); check(); }
-    if (e.key.toLowerCase()==='n'){ e.preventDefault(); pickNew(); updateChips(); }
-    if (e.key.toLowerCase()==='h'){ e.preventDefault(); $('#revealBtn').click(); }
-    // number keys toggle graph pills
+    const k = e.key.toLowerCase();
+    if (k==='n'){ e.preventDefault(); pickNew(); updateChips(); }
+    if (k==='h'){ e.preventDefault(); document.getElementById('revealBtn').click(); }
     if (/^[1-9]$/.test(e.key)){
-      const idx = parseInt(e.key,10)-1; const btn = graphOptions.children[idx];
-      if (btn){ btn.click(); }
+      const idx = parseInt(e.key,10)-1; const btn = graphOptions.children[idx]; if (btn){ btn.click(); }
     }
   });
-
   </script>
 </body>
 </html>
