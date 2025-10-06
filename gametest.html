@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Variable Tamer — Sequential Wizard + Encounters</title>
-  <!-- Brand stylesheet (placed in /style/bctcstyle.css) -->
-  <link rel="stylesheet" href="style/bctcstyle.css" />
+  <title>Variable Tamer — x̄ rescues μ</title>
+  <!-- Brand stylesheet (placed in /style/bctcstyle.css). If this page lives in /game/, switch to ../style/bctcstyle.css -->
+  <link id="brandcss" rel="stylesheet" href="style/bctcstyle.css" />
   <style>
     /* Minimal local layout/animation; colors/typography come from bctcstyle.css */
     .layout{ display:grid; grid-template-columns: var(--sidebar-w,280px) 1fr; min-height:100dvh }
@@ -13,7 +13,7 @@
     main{ padding:24px; max-width:1100px }
 
     .stepper{ display:flex; gap:10px; margin:0 0 14px; flex-wrap:wrap }
-    .step{ display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px; border:2px solid var(--rule); background: var(--card); }
+    .step{ display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px; border:2px solid var(--rule); background: var(--card) }
     .step .dot{ width:22px; height:22px; border-radius:999px; display:grid; place-items:center; background: var(--kctcs-gold); color:#000; font-weight:800 }
     .step.active{ border-color: var(--kctcs-blue) }
     .step.done{ outline: 2px solid rgba(34,197,94,.35) }
@@ -33,15 +33,15 @@
 
     /* Overworld */
     .field{ position:relative; height:clamp(200px, 35vh, 320px); overflow:hidden; background:var(--panel); border:1px solid var(--rule); display:grid; grid-template-columns:repeat(16, 1fr); grid-template-rows:repeat(10, 1fr) }
-    .tile{ border:1px solid rgba(0,0,0,.04); }
-    .grass{ background: linear-gradient(135deg, rgba(46,160,67,.18), rgba(46,160,67,.10)); }
-    .path{ background: linear-gradient(135deg, rgba(140,95,60,.18), rgba(140,95,60,.10)); }
+    .tile{ border:1px solid rgba(0,0,0,.04) }
+    .grass{ background: linear-gradient(135deg, rgba(46,160,67,.18), rgba(46,160,67,.10)) }
+    .path{ background: linear-gradient(135deg, rgba(140,95,60,.18), rgba(140,95,60,.10)) }
     .hero{ position:absolute; width:20px; height:20px; display:grid; place-items:center; font-size:16px; line-height:20px; transition: transform .12s ease; will-change: transform }
-    .hero .glyph{ font-weight:900; font-size:18px; }
+    .hero .glyph{ font-weight:900; font-size:18px }
     .toast{ position:absolute; left:50%; top:8px; transform:translateX(-50%); background: var(--card); border:2px solid var(--kctcs-gold); padding:6px 10px; border-radius:10px; box-shadow:var(--shadow-2); font-weight:700 }
 
     /* --- Encounter FX --- */
-    .encounter-overlay{ position:absolute; inset:0; pointer-events:none; display:grid; place-items:center; overflow:hidden; }
+    .encounter-overlay{ position:absolute; inset:0; pointer-events:none; display:grid; place-items:center; overflow:hidden }
     .encounter-flash{ position:absolute; inset:0; background:radial-gradient(circle at center, rgba(231,166,20,.35), rgba(231,166,20,0) 60%); animation: flash 600ms ease-out forwards }
     .encounter-stripes{ position:absolute; inset:-20%; background:repeating-linear-gradient(45deg, rgba(0,70,127,.15) 0 14px, rgba(231,166,20,.18) 14px 28px); filter: blur(2px); animation: spin 900ms linear forwards }
     .shake{ animation: shake 500ms ease-in-out }
@@ -52,21 +52,18 @@
     /* --- Win FX (confetti) --- */
     .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden }
     .confetti i{ position:absolute; width:10px; height:16px; background: var(--kctcs-gold); transform: rotate(15deg); animation: fall 900ms ease-in forwards; opacity:.95 }
-    .confetti i.alt{ background: var(--kctcs-blue); }
+    .confetti i.alt{ background: var(--kctcs-blue) }
     @keyframes fall{ from{ transform: translateY(-20vh) rotate(0deg) } to{ transform: translateY(110vh) rotate(360deg) } }
 
     /* --- μ cage --- */
-    .muCage{ position:absolute; width:24px; height:24px; display:grid; place-items:center; }
-    .muCage .mu{ font-size:18px; font-weight:900; }
-    .muCage .bars{ position:absolute; inset:0; display:grid; grid-template-columns: repeat(3, 1fr); }
+    .muCage{ position:absolute; width:24px; height:24px; display:grid; place-items:center }
+    .muCage .mu{ font-size:18px; font-weight:900 }
+    .muCage .bars{ position:absolute; inset:0; display:grid; grid-template-columns: repeat(3, 1fr) }
     .muCage .bars i{ background: rgba(0,0,0,.28); margin:1px; border-radius:2px }
     .muCage.free .bars{ animation: barsOpen .7s ease forwards }
     .muCage .mu.muFly{ animation: muFly 1.1s ease-out forwards }
     @keyframes barsOpen{ to{ transform: translateY(-120%); opacity:0 } }
     @keyframes muFly{ to{ transform: translateY(-80px) scale(1.1); opacity:0 } }
-    .confetti i{ position:absolute; width:10px; height:16px; background: var(--kctcs-gold); transform: rotate(15deg); animation: fall 900ms ease-in forwards; opacity:.95 }
-    .confetti i.alt{ background: var(--kctcs-blue); }
-    @keyframes fall{ from{ transform: translateY(-20vh) rotate(0deg) } to{ transform: translateY(110vh) rotate(360deg) } }
   </style>
 </head>
 <body>
@@ -75,7 +72,7 @@
     <main>
       <header class="header">
         <h1>Variable Tamer</h1>
-        <p class="text-muted">Walk around to find a random encounter, then complete the wizard: <strong>Type → Level → Graphs</strong>.</p>
+        <p class="text-muted">Walk around as <strong>x̄</strong> to find a random encounter, then complete the wizard: <strong>Type → Level → Graphs</strong>. Rescue <strong>μ</strong> by winning 3 encounters.</p>
       </header>
 
       <!-- Playfield / Overworld -->
@@ -84,8 +81,6 @@
           <div class="checkline"><input id="encOn" type="checkbox" checked><label for="encOn"> Random encounters</label></div>
           <div class="text-muted">Use arrow keys / WASD to move. Step in tall grass for encounters.</div>
           <div id="muCounter" class="brand-blue" style="margin-left:auto"><strong>Rescue μ:</strong> <span id="muCount">0</span>/3</div>
-        </div>
-          <div class="text-muted">Use arrow keys / WASD to move. Step in tall grass for encounters.</div>
         </div>
         <div id="field" class="field round shadow-1" tabindex="0" role="application" aria-label="Overworld field"></div>
       </section>
@@ -161,20 +156,26 @@
   </div>
 
   <script>
-  // Load sidebar
+  // --- Sidebar + brand CSS path resilience ---
   (async function(){
     try{
       const res = await fetch('partials/sidebar.html', {cache:'no-store'});
       if(res.ok){ const m=document.getElementById('sidebarMount'); if(m) m.innerHTML = await res.text(); }
     }catch(_){ /* ignore missing sidebar */ }
-  )();
+    // If CSS variables not found, try ../style path (for /game/ deployments)
+    const rootStyle = getComputedStyle(document.documentElement);
+    if(!rootStyle.getPropertyValue('--kctcs-blue').trim()){
+      const link = document.getElementById('brandcss'); if(link) link.href = '../style/bctcstyle.css';
+    }
+  })();
 
-  // ---- OVERWORLD (cute character + encounters) ----
+  // ---- OVERWORLD (x̄ avatar + μ cage + encounters) ----
   const field = document.getElementById('field');
   const encOn = document.getElementById('encOn');
   const COLS=16, ROWS=10;
   let grid=[]; let hero={x:8,y:5,el:null};
   let mu={x:12,y:3,el:null,caged:true,progress:0};
+
   function buildField(){
     if(!field) return;
     field.innerHTML=''; grid=[];
@@ -187,25 +188,21 @@
         grid.push(isGrass? 'G':'P');
       }
     }
-    const h=document.createElement('div'); h.className='hero'; h.innerHTML='<span class="glyph">x̄<\/span>'; field.appendChild(h); hero.el=h; placeHero();
-    // place μ cage if still trapped
+    const h=document.createElement('div'); h.className='hero'; h.innerHTML='<span class="glyph">x̄</span>'; field.appendChild(h); hero.el=h; placeHero();
     if(mu.caged){
-      const m=document.createElement('div'); m.className='muCage'; m.innerHTML='<span class="mu">μ<\/span><div class="bars"><i><\/i><i><\/i><i><\/i><\/div>';
+      const m=document.createElement('div'); m.className='muCage'; m.innerHTML='<span class="mu">μ</span><div class="bars"><i></i><i></i><i></i></div>';
       field.appendChild(m); mu.el=m; placeMu();
     }
   }
   function cellSize(){ return { cw: field.clientWidth/COLS, ch: field.clientHeight/ROWS }; }
-  function placeMu(){ if(!mu.el) return; const {cw,ch}=cellSize(); mu.el.style.transform=`translate(${mu.x*cw}px, ${mu.y*ch}px)`; }; }
   function placeHero(){ if(!hero.el) return; const {cw,ch}=cellSize(); hero.el.style.transform=`translate(${hero.x*cw}px, ${hero.y*ch}px)`; }
+  function placeMu(){ if(!mu.el) return; const {cw,ch}=cellSize(); mu.el.style.transform=`translate(${mu.x*cw}px, ${mu.y*ch}px)`; }
   function tileAt(x,y){ if(x<0||y<0||x>=COLS||y>=ROWS) return 'W'; return grid[y*COLS+x]; }
   function tryMove(dx,dy){ const nx=hero.x+dx, ny=hero.y+dy; if(tileAt(nx,ny)==='W') return; hero.x=nx; hero.y=ny; placeHero(); placeMu(); maybeEncounter(); }
   function maybeEncounter(){
     if(!encOn || !encOn.checked) return;
     if(tileAt(hero.x,hero.y)!=='G') return; // only grass
-    if(Math.random()<0.20){
-      showToast('A wild variable appears!');
-      startEncounter();
-    }
+    if(Math.random()<0.20){ showToast('A wild variable appears!'); startEncounter(); }
   }
   function showToast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; field.appendChild(t); setTimeout(()=>t.remove(),1200); }
   function updateMuCounter(){ const c=document.getElementById('muCount'); if(c) c.textContent = String(mu.progress); }
@@ -255,6 +252,7 @@
     if(['arrowleft','a'].includes(k)) { e.preventDefault(); tryMove(-1,0); }
     if(['arrowright','d'].includes(k)) { e.preventDefault(); tryMove(1,0); }
   });
+  window.addEventListener('resize', ()=>{ placeHero(); placeMu(); });
 
   // ---- BANK ----
   const BANK = [
@@ -388,8 +386,7 @@
   function prettyGraph(id){ const f = GRAPH_CHOICES.find(g=>g.id===id); return f? f.label : id; }
 
   // Wire up
-  renderGraphPills(); buildField(); // Encounter triggers pickNew()
-  // pickNew() will be called from startEncounter();
+  renderGraphPills(); buildField(); updateMuCounter();
   document.getElementById('submitType').addEventListener('click', submitType);
   document.getElementById('submitLevel').addEventListener('click', submitLevel);
   document.getElementById('submitGraphs').addEventListener('click', submitGraphs);
