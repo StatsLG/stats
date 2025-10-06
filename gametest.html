@@ -30,6 +30,12 @@
     .bad{ background: rgba(239,68,68,.10) }
 
     .footer{ margin-top:.75rem; color: var(--muted); font-size:13px; display:flex; justify-content:space-between; gap:.75rem; flex-wrap:wrap }
+      .field{ position:relative; height:240px; overflow:hidden; background:var(--panel); border:1px solid var(--rule); display:grid; grid-template-columns:repeat(16, 1fr); grid-template-rows:repeat(10, 1fr) }
+    .tile{ border:1px solid rgba(0,0,0,.04); }
+    .grass{ background: linear-gradient(135deg, rgba(46,160,67,.18), rgba(46,160,67,.10)); }
+    .path{ background: linear-gradient(135deg, rgba(140,95,60,.18), rgba(140,95,60,.10)); }
+    .hero{ position:absolute; width:20px; height:20px; display:grid; place-items:center; font-size:16px; line-height:20px; transition: transform .12s ease; will-change: transform }
+    .toast{ position:absolute; left:50%; top:8px; transform:translateX(-50%); background: var(--card); border:2px solid var(--kctcs-gold); padding:6px 10px; border-radius:10px; box-shadow:var(--shadow-2); font-weight:700 }
   </style>
 </head>
 <body>
@@ -38,8 +44,17 @@
     <main>
       <header class="header">
         <h1>Variable Tamer</h1>
-        <p class="text-muted">A three-step wizard: <strong>Type → Level → Graphs</strong>. You advance only when correct.</p>
+        <p class="text-muted">Walk around to find a random encounter, then complete the wizard: <strong>Type → Level → Graphs</strong>.</p>
       </header>
+
+      <!-- Playfield / Overworld -->
+      <section class="panel pad" id="overworld" aria-label="Overworld">
+        <div class="row" style="align-items:center; margin-bottom:8px">
+          <div class="checkline"><input id="encOn" type="checkbox" checked><label for="encOn"> Random encounters</label></div>
+          <div class="text-muted">Use arrow keys / WASD to move. Step in tall grass for encounters.</div>
+        </div>
+        <div id="field" class="field round shadow-1" tabindex="0" role="application" aria-label="Overworld field"></div>
+      </section>
 
       <div class="stepper">
         <div class="step active" id="s1"><div class="dot">1</div> Type</div>
@@ -119,6 +134,48 @@
       if(res.ok){ const m=document.getElementById('sidebarMount'); if(m) m.innerHTML = await res.text(); }
     }catch(_){}
   })();
+
+  // ---- OVERWORLD (cute character + encounters) ----
+  const field = document.getElementById('field');
+  const encOn = document.getElementById('encOn');
+  const COLS=16, ROWS=10;
+  let grid=[]; let hero={x:8,y:5,el:null};
+  function buildField(){
+    if(!field) return;
+    field.innerHTML=''; grid=[];
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        const d=document.createElement('div'); d.className='tile';
+        const isGrass = (r>1 && r<ROWS-1 && c>1 && c<COLS-1 && Math.random()<0.6);
+        d.classList.add(isGrass? 'grass':'path');
+        field.appendChild(d);
+        grid.push(isGrass? 'G':'P');
+      }
+    }
+    const h=document.createElement('div'); h.className='hero'; h.textContent='🧑‍🏫'; field.appendChild(h); hero.el=h; placeHero();
+  }
+  function cellSize(){ return { cw: field.clientWidth/COLS, ch: field.clientHeight/ROWS }; }
+  function placeHero(){ if(!hero.el) return; const {cw,ch}=cellSize(); hero.el.style.transform=`translate(${hero.x*cw}px, ${hero.y*ch}px)`; }
+  function tileAt(x,y){ if(x<0||y<0||x>=COLS||y>=ROWS) return 'W'; return grid[y*COLS+x]; }
+  function tryMove(dx,dy){ const nx=hero.x+dx, ny=hero.y+dy; if(tileAt(nx,ny)==='W') return; hero.x=nx; hero.y=ny; placeHero(); maybeEncounter(); }
+  function maybeEncounter(){
+    if(!encOn || !encOn.checked) return;
+    if(tileAt(hero.x,hero.y)!=='G') return; // only grass
+    if(Math.random()<0.20){
+      showToast('A wild variable appears!');
+      startEncounter();
+    }
+  }
+  function showToast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; field.appendChild(t); setTimeout(()=>t.remove(),1200); }
+  function startEncounter(){ pickNew(); document.getElementById('game').scrollIntoView({behavior:'smooth'}); setScreen(1); }
+
+  window.addEventListener('keydown',(e)=>{
+    const k=e.key.toLowerCase();
+    if(['arrowup','w'].includes(k)) { e.preventDefault(); tryMove(0,-1); }
+    if(['arrowdown','s'].includes(k)) { e.preventDefault(); tryMove(0,1); }
+    if(['arrowleft','a'].includes(k)) { e.preventDefault(); tryMove(-1,0); }
+    if(['arrowright','d'].includes(k)) { e.preventDefault(); tryMove(1,0); }
+  });
 
   // ---- BANK ----
   const BANK = [
@@ -251,7 +308,8 @@
   function prettyGraph(id){ const f = GRAPH_CHOICES.find(g=>g.id===id); return f? f.label : id; }
 
   // Wire up
-  renderGraphPills(); pickNew();
+  renderGraphPills(); buildField(); // Encounter triggers pickNew()
+  // pickNew() will be called from startEncounter();
   document.getElementById('submitType').addEventListener('click', submitType);
   document.getElementById('submitLevel').addEventListener('click', submitLevel);
   document.getElementById('submitGraphs').addEventListener('click', submitGraphs);
