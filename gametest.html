@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Variable Tamer — Stats Game</title>
   <!-- Site-wide BCTC styles -->
-  <link rel="stylesheet" href="bctcstyle.css" />
+  <link rel="stylesheet" href="style/bctcstyle.css" />
   <style>
     /* Light local styles that piggyback on your bctcstyle.css tokens */
     :root{ --ring: rgba(56,189,248,.35); }
@@ -79,6 +79,19 @@
     .layout{ display:grid; grid-template-columns: var(--sidebar-w,280px) 1fr; min-height:100dvh; }
     @media (max-width:760px){ .layout{ grid-template-columns:1fr } }
   </style>
+  <script>
+    // Warn if the brand CSS didn't load from style/bctcstyle.css
+    window.addEventListener('load', ()=>{
+      const rootStyle = getComputedStyle(document.documentElement);
+      const brandBlue = rootStyle.getPropertyValue('--kctcs-blue').trim();
+      if (!brandBlue){
+        const warn = document.createElement('div');
+        warn.style.cssText = 'background:#fee2e2;color:#7f1d1d;padding:10px;border:1px solid #fecaca;border-radius:8px;margin:10px';
+        warn.textContent = 'Heads up: style/bctcstyle.css did not load. Check the path and file name.';
+        document.body.prepend(warn);
+      }
+    });
+  </script>
 </head>
 <body>
   <!-- Sidebar: pulled in from your site if available -->
