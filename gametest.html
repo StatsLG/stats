@@ -53,12 +53,42 @@
     .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; background:var(--surface-2,#0b1022); padding:.15rem .4rem; border-radius:6px; border:1px solid var(--border,#1f2937)}
     .footer{margin-top:.75rem; font-size:.95rem; color:var(--muted,#94a3b8); display:flex; justify-content:space-between; gap:.75rem; flex-wrap:wrap}
   </style>
+  <style>
+    /* Screen slider animations */
+    .screen{position:relative; transform:translateX(105%); opacity:0; transition:transform .28s ease, opacity .28s ease; padding:.25rem 0}
+    .screen.active{transform:translateX(0); opacity:1}
+    .screen.exit{transform:translateX(-105%); opacity:0}
+  </style>
 </head>
 <body>
   <!-- Sidebar: pulled in from your site if available -->
   <div id="sidebar"></div>
 
   <main>
+    <!-- Animated choose-a-path map at top -->
+    <section id="map" class="card" style="margin-bottom:12px; overflow:hidden; position:relative">
+      <div class="muted" style="margin-bottom:.35rem">Choose a path: complete all three gates in any order</div>
+      <div class="map-grid">
+        <button class="node" data-panel="typePanel"><span>1</span> Variable Type</button>
+        <button class="node" data-panel="levelPanel"><span>2</span> Level</button>
+        <button class="node" data-panel="graphPanel"><span>3</span> Graphs</button>
+        <svg class="wires" viewBox="0 0 600 160" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M60 60 C 150 20, 250 20, 340 60" class="wire" />
+          <path d="M60 60 C 150 100, 250 100, 340 60" class="wire" />
+          <path d="M340 60 C 430 20, 520 20, 560 60" class="wire" />
+        </svg>
+      </div>
+      <style>
+        .map-grid{position:relative; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; align-items:center}
+        .node{position:relative; padding:12px 14px; border-radius:14px; border:1px solid var(--border,#1f2937); background:var(--surface-2,#0b1022); color:var(--text,#e5e7eb); cursor:pointer; text-align:left; box-shadow:0 4px 18px rgba(0,0,0,.15); transition:transform .18s ease, box-shadow .18s ease}
+        .node span{display:inline-grid; place-items:center; width:26px; height:26px; border-radius:999px; background:var(--accent-2,#38bdf8); color:#00121a; font-weight:700; margin-right:.5rem}
+        .node:active{transform:translateY(1px)}
+        .node.done{border-color:rgba(34,197,94,.55); box-shadow:0 0 0 3px rgba(34,197,94,.25) inset}
+        svg.wires{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
+        .wire{fill:none; stroke:rgba(56,189,248,.45); stroke-width:3; stroke-dasharray:6 10; animation:dash 6s linear infinite}
+        @keyframes dash{to{stroke-dashoffset: -300}}
+      </style>
+    </section>
     <noscript>
       <div class="feedback bad">This game needs JavaScript enabled. Enable it and reload.</div>
     </noscript>
@@ -72,11 +102,24 @@
       </div>
     </div>
 
-    <div class="card" id="game">
-      <div class="question" id="prompt" style="font-size:1.1rem">A wild variable appears…</div>
-      <div class="muted" id="flavor">Classify its type, level of measurement, and pick the best graph(s).</div>
+    <div class="card" id="game" style="overflow:hidden">
+      <div class="screen active" id="introScreen">
+        <div class="question" id="prompt" style="font-size:1.1rem">A wild variable appears…</div>
+        <div class="muted" id="flavor">Pick a gate from the map above to classify this variable.</div>
+        <div class="actions" style="margin-top:.75rem">
+          <button class="btn secondary" id="newBtn">New Variable (N)</button>
+          <button class="btn primary" id="checkBtn">Check All (Enter)</button>
+          <button class="btn ghost" id="revealBtn">Hint / Reveal (H)</button>
+          <label class="btn ghost" style="display:flex; align-items:center; gap:.5rem;">
+            <input type="checkbox" id="instructor" /> Instructor Mode
+          </label>
+        </div>
+      </div>
 
-      <div class="section" style="margin-top:.75rem">
+      <!-- TYPE PANEL -->
+      <div class="screen" id="typePanel" role="region" aria-label="Variable Type">
+        <h3 style="margin:.2rem 0">Gate 1: Variable Type</h3>
+        <p class="muted">Categorical vs quantitative (discrete / continuous).</p>
         <div class="row">
           <label>
             <div class="muted">Variable Type</div>
@@ -87,7 +130,15 @@
               <option value="quant_continuous">Quantitative — Continuous</option>
             </select>
           </label>
+        </div>
+        <div class="actions"><button class="btn secondary" data-close>Done</button></div>
+      </div>
 
+      <!-- LEVEL PANEL -->
+      <div class="screen" id="levelPanel" role="region" aria-label="Level of Measurement">
+        <h3 style="margin:.2rem 0">Gate 2: Level</h3>
+        <p class="muted">Nominal / Ordinal / Interval / Ratio.</p>
+        <div class="row">
           <label>
             <div class="muted">Level of Measurement</div>
             <select id="levelSelect" aria-label="Level of measurement">
@@ -99,24 +150,18 @@
             </select>
           </label>
         </div>
+        <div class="actions"><button class="btn secondary" data-close>Done</button></div>
       </div>
 
-      <div class="section" style="margin-top:.75rem">
-        <div class="muted" style="margin-bottom:.25rem">Choose all appropriate graph types</div>
+      <!-- GRAPH PANEL -->
+      <div class="screen" id="graphPanel" role="region" aria-label="Graph Choices">
+        <h3 style="margin:.2rem 0">Gate 3: Graphs</h3>
+        <p class="muted">Choose all appropriate graph types.</p>
         <div class="options" id="graphOptions" role="group" aria-label="Graph choices"></div>
-      </div>
-
-      <div class="actions">
-        <button class="btn primary" id="checkBtn">Check Answer (Enter)</button>
-        <button class="btn secondary" id="newBtn">New Variable (N)</button>
-        <button class="btn ghost" id="revealBtn">Hint / Reveal (H)</button>
-        <label class="btn ghost" style="display:flex; align-items:center; gap:.5rem;">
-          <input type="checkbox" id="instructor" /> Instructor Mode
-        </label>
+        <div class="actions"><button class="btn secondary" data-close>Done</button></div>
       </div>
 
       <div id="feedback"></div>
-
       <details class="explain" id="explainBox">
         <summary>Explanation</summary>
         <div id="explain"></div>
@@ -145,7 +190,7 @@
   // --- Load sidebar.html if it exists ----------------------------------------------
   (async function(){
     try{
-      const res = await fetch('sidebar.html', {cache:'no-store'});
+      const res = await fetch('partials/sidebar.html', {cache:'no-store'});
       if (res.ok){ document.getElementById('sidebar').innerHTML = await res.text(); }
     }catch(_){ /* no sidebar: ignore */ }
   })();
@@ -290,8 +335,24 @@
 
   // --- Wire up -------------------------------------------------------------
   renderGraphPills(); pickNew(); updateChips();
+
+  // Map: open panels with slide-in animation
+  document.querySelectorAll('.node').forEach(node=>{
+    node.addEventListener('click', ()=>{
+      const id = node.dataset.panel; openPanel(id); node.classList.add('pulse'); setTimeout(()=>node.classList.remove('pulse'),400);
+    });
+  });
+
+  function openPanel(id){
+    document.querySelectorAll('#game .screen').forEach(s=>{ if(s.id!==id && s.classList.contains('active')) s.classList.remove('active'); });
+    const panel = document.getElementById(id); panel.classList.add('active');
+  }
+  document.querySelectorAll('[data-close]').forEach(btn=>btn.addEventListener('click', ()=>{
+    const panel = btn.closest('.screen'); panel.classList.remove('active');
+  }));
+
   document.getElementById('checkBtn').addEventListener('click', check);
-  document.getElementById('newBtn').addEventListener('click', ()=>{ pickNew(); updateChips(); });
+  document.getElementById('newBtn').addEventListener('click', ()=>{ pickNew(); updateChips(); document.querySelectorAll('.node').forEach(n=>n.classList.remove('done')); });
   document.getElementById('revealBtn').addEventListener('click', ()=>{
     if (!current) return;
     setFeedback(true,
@@ -300,13 +361,23 @@
       `Graphs: <b>${current.graphs.map(prettyGraph).join(', ')}</b>`);
     explain.textContent = current.why; explainBox.open = true;
   });
-  document.getElementById('resetBtn').addEventListener('click', ()=>{ score=0; streak=0; roundN=1; updateChips(); setFeedback(true,'Scores reset.'); });
+  document.getElementById('resetBtn').addEventListener('click', ()=>{ score=0; streak=0; roundN=1; updateChips(); setFeedback(true,'Scores reset.'); document.querySelectorAll('.node').forEach(n=>n.classList.remove('done')); });
+
+  // When selections change, mark node as done
+  typeSelect.addEventListener('change', ()=> document.querySelector('[data-panel="typePanel"]').classList.toggle('done', !!typeSelect.value));
+  levelSelect.addEventListener('change', ()=> document.querySelector('[data-panel="levelPanel"]').classList.toggle('done', !!levelSelect.value));
+  // Graphs: mark done if any chosen
+  const observer = new MutationObserver(()=>{
+    const chosen = [...graphOptions.children].some(x=>x.getAttribute('aria-pressed')==='true');
+    document.querySelector('[data-panel="graphPanel"]').classList.toggle('done', chosen);
+  });
+  observer.observe(graphOptions, {attributes:true, subtree:true, attributeFilter:['aria-pressed']});
 
   // Keyboard shortcuts
   window.addEventListener('keydown', (e)=>{
     if (e.key==='Enter'){ e.preventDefault(); check(); }
     const k = e.key.toLowerCase();
-    if (k==='n'){ e.preventDefault(); pickNew(); updateChips(); }
+    if (k==='n'){ e.preventDefault(); pickNew(); updateChips(); document.querySelectorAll('.node').forEach(n=>n.classList.remove('done')); }
     if (k==='h'){ e.preventDefault(); document.getElementById('revealBtn').click(); }
     if (/^[1-9]$/.test(e.key)){
       const idx = parseInt(e.key,10)-1; const btn = graphOptions.children[idx]; if (btn){ btn.click(); }
