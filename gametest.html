@@ -37,6 +37,7 @@
     .grass{ background: linear-gradient(135deg, rgba(46,160,67,.18), rgba(46,160,67,.10)); }
     .path{ background: linear-gradient(135deg, rgba(140,95,60,.18), rgba(140,95,60,.10)); }
     .hero{ position:absolute; width:20px; height:20px; display:grid; place-items:center; font-size:16px; line-height:20px; transition: transform .12s ease; will-change: transform }
+    .hero .glyph{ font-weight:900; font-size:18px; }
     .toast{ position:absolute; left:50%; top:8px; transform:translateX(-50%); background: var(--card); border:2px solid var(--kctcs-gold); padding:6px 10px; border-radius:10px; box-shadow:var(--shadow-2); font-weight:700 }
 
     /* --- Encounter FX --- */
@@ -50,6 +51,19 @@
 
     /* --- Win FX (confetti) --- */
     .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden }
+    .confetti i{ position:absolute; width:10px; height:16px; background: var(--kctcs-gold); transform: rotate(15deg); animation: fall 900ms ease-in forwards; opacity:.95 }
+    .confetti i.alt{ background: var(--kctcs-blue); }
+    @keyframes fall{ from{ transform: translateY(-20vh) rotate(0deg) } to{ transform: translateY(110vh) rotate(360deg) } }
+
+    /* --- μ cage --- */
+    .muCage{ position:absolute; width:24px; height:24px; display:grid; place-items:center; }
+    .muCage .mu{ font-size:18px; font-weight:900; }
+    .muCage .bars{ position:absolute; inset:0; display:grid; grid-template-columns: repeat(3, 1fr); }
+    .muCage .bars i{ background: rgba(0,0,0,.28); margin:1px; border-radius:2px }
+    .muCage.free .bars{ animation: barsOpen .7s ease forwards }
+    .muCage .mu.muFly{ animation: muFly 1.1s ease-out forwards }
+    @keyframes barsOpen{ to{ transform: translateY(-120%); opacity:0 } }
+    @keyframes muFly{ to{ transform: translateY(-80px) scale(1.1); opacity:0 } }
     .confetti i{ position:absolute; width:10px; height:16px; background: var(--kctcs-gold); transform: rotate(15deg); animation: fall 900ms ease-in forwards; opacity:.95 }
     .confetti i.alt{ background: var(--kctcs-blue); }
     @keyframes fall{ from{ transform: translateY(-20vh) rotate(0deg) } to{ transform: translateY(110vh) rotate(360deg) } }
@@ -68,6 +82,9 @@
       <section class="panel pad" id="overworld" aria-label="Overworld">
         <div class="row" style="align-items:center; margin-bottom:8px">
           <div class="checkline"><input id="encOn" type="checkbox" checked><label for="encOn"> Random encounters</label></div>
+          <div class="text-muted">Use arrow keys / WASD to move. Step in tall grass for encounters.</div>
+          <div id="muCounter" class="brand-blue" style="margin-left:auto"><strong>Rescue μ:</strong> <span id="muCount">0</span>/3</div>
+        </div>
           <div class="text-muted">Use arrow keys / WASD to move. Step in tall grass for encounters.</div>
         </div>
         <div id="field" class="field round shadow-1" tabindex="0" role="application" aria-label="Overworld field"></div>
@@ -157,6 +174,7 @@
   const encOn = document.getElementById('encOn');
   const COLS=16, ROWS=10;
   let grid=[]; let hero={x:8,y:5,el:null};
+  let mu={x:12,y:3,el:null,caged:true,progress:0};
   function buildField(){
     if(!field) return;
     field.innerHTML=''; grid=[];
@@ -169,12 +187,18 @@
         grid.push(isGrass? 'G':'P');
       }
     }
-    const h=document.createElement('div'); h.className='hero'; h.textContent='🧑‍🏫'; field.appendChild(h); hero.el=h; placeHero();
+    const h=document.createElement('div'); h.className='hero'; h.innerHTML='<span class="glyph">x̄<\/span>'; field.appendChild(h); hero.el=h; placeHero();
+    // place μ cage if still trapped
+    if(mu.caged){
+      const m=document.createElement('div'); m.className='muCage'; m.innerHTML='<span class="mu">μ<\/span><div class="bars"><i><\/i><i><\/i><i><\/i><\/div>';
+      field.appendChild(m); mu.el=m; placeMu();
+    }
   }
   function cellSize(){ return { cw: field.clientWidth/COLS, ch: field.clientHeight/ROWS }; }
+  function placeMu(){ if(!mu.el) return; const {cw,ch}=cellSize(); mu.el.style.transform=`translate(${mu.x*cw}px, ${mu.y*ch}px)`; }; }
   function placeHero(){ if(!hero.el) return; const {cw,ch}=cellSize(); hero.el.style.transform=`translate(${hero.x*cw}px, ${hero.y*ch}px)`; }
   function tileAt(x,y){ if(x<0||y<0||x>=COLS||y>=ROWS) return 'W'; return grid[y*COLS+x]; }
-  function tryMove(dx,dy){ const nx=hero.x+dx, ny=hero.y+dy; if(tileAt(nx,ny)==='W') return; hero.x=nx; hero.y=ny; placeHero(); maybeEncounter(); }
+  function tryMove(dx,dy){ const nx=hero.x+dx, ny=hero.y+dy; if(tileAt(nx,ny)==='W') return; hero.x=nx; hero.y=ny; placeHero(); placeMu(); maybeEncounter(); }
   function maybeEncounter(){
     if(!encOn || !encOn.checked) return;
     if(tileAt(hero.x,hero.y)!=='G') return; // only grass
@@ -184,6 +208,9 @@
     }
   }
   function showToast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; field.appendChild(t); setTimeout(()=>t.remove(),1200); }
+  function updateMuCounter(){ const c=document.getElementById('muCount'); if(c) c.textContent = String(mu.progress); }
+  function progressMu(){ if(!mu.caged) return; mu.progress++; updateMuCounter(); if(mu.progress>=3) freeMu(); }
+  function freeMu(){ if(!mu.el) return; mu.el.classList.add('free'); const span = mu.el.querySelector('.mu'); if(span) span.classList.add('muFly'); setTimeout(()=>{ mu.el.remove(); mu.caged=false; showToast('μ is free!'); }, 1100); }
 
   // --- Encounter/Win FX helpers ---
   function playEncounterFX(){
@@ -346,7 +373,7 @@
       setFeedback(fbGraphs, true, 'Perfect! You tamed the variable.');
       s3.classList.add('done');
       explain.textContent = current.why; explainBox.open = true;
-      playWinFX();
+      playWinFX(); progressMu(); updateMuCounter();
     } else {
       setFeedback(fbGraphs, false, `Close. Correct set: <b>${correct.map(prettyGraph).join(', ')}</b>.`);
     }
