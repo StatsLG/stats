@@ -3,261 +3,147 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Variable Tamer — Stats Game</title>
-  <!-- Site-wide BCTC styles -->
+  <title>Variable Tamer — Sequential Wizard</title>
+  <!-- Brand stylesheet (placed in /style/bctcstyle.css) -->
   <link rel="stylesheet" href="style/bctcstyle.css" />
   <style>
-    /* Light local styles that piggyback on your bctcstyle.css tokens */
-    :root{ --ring: rgba(56,189,248,.35); }
-    body{min-height:100dvh;}
-    /* sidebar handled by .layout + .sidebarMount */
-    main{flex:1 1 auto; padding:clamp(12px,2.5vw,24px); max-width:1000px; margin-inline:auto;}
-
-    .toolbar{display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:.75rem}
-    .chips{display:flex; gap:.5rem; flex-wrap:wrap}
-    .chip{background:var(--surface-2, #0b1022); border:1px solid var(--border, #2a3343); color:var(--text, #e5e7eb);
-          padding:.35rem .7rem; border-radius:999px; font-size:.95rem}
-    .chip b{color:var(--accent-2,#38bdf8)}
-
-    .card{background:var(--surface, #111827); color:var(--text, #e5e7eb); border:1px solid var(--border,#1f2937);
-          border-radius:18px; padding:1rem; box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    .muted{color:var(--muted, #94a3b8)}
-    .row{display:grid; grid-template-columns:1fr; gap:.6rem}
-    @media (min-width:760px){ .row{grid-template-columns:1fr 1fr} }
-
-    select, .pill, button, input[type="checkbox"]{font-size:1rem}
-    select, input[type="text"], textarea{
-      width:100%; background:var(--surface-2,#0b1022); color:var(--text,#e5e7eb);
-      border:1px solid var(--border,#1f2937); border-radius:12px; padding:.65rem .8rem; outline:none
-    }
-    select:focus{box-shadow:0 0 0 4px var(--ring)}
-
-    .options{display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.25rem}
-    .pill{padding:.5rem .75rem; border-radius:999px; border:1px solid var(--border,#1f2937); cursor:pointer; user-select:none; background:var(--surface-2,#0b1022)}
-    .pill[aria-pressed="true"]{background:rgba(56,189,248,.08); border-color:#2a4050}
-
-    .actions{display:flex; gap:.6rem; margin-top:.75rem; flex-wrap:wrap}
-    .btn{appearance:none; border:none; border-radius:12px; padding:.75rem 1rem; font-weight:600; cursor:pointer}
-    .btn.primary{background:var(--accent-2,#38bdf8); color:#00121a}
-    .btn.secondary{background:var(--surface-2,#0b1022); color:var(--text,#e5e7eb); border:1px solid var(--border,#1f2937)}
-    .btn.ghost{background:transparent; border:1px dashed var(--border,#334155); color:var(--muted,#94a3b8)}
-
-    .feedback{margin-top:.75rem; padding:.9rem; border-radius:12px; border:1px solid var(--border,#1f2937)}
-    .ok{background:rgba(34,197,94,.10); border-color:rgba(34,197,94,.35)}
-    .bad{background:rgba(239,68,68,.10); border-color:rgba(239,68,68,.35)}
-    .warn{background:rgba(245,158,11,.10); border-color:rgba(245,158,11,.35)}
-
-    details.explain{margin-top:.5rem}
-    summary{cursor:pointer; color:var(--muted,#94a3b8)}
-
-    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; background:var(--surface-2,#0b1022); padding:.15rem .4rem; border-radius:6px; border:1px solid var(--border,#1f2937)}
-    .footer{margin-top:.75rem; font-size:.95rem; color:var(--muted,#94a3b8); display:flex; justify-content:space-between; gap:.75rem; flex-wrap:wrap}
-  </style>
-  <style>
-    /* Screen slider animations */
-    .screen{position:relative; transform:translateX(105%); opacity:0; transition:transform .28s ease, opacity .28s ease; padding:.25rem 0}
-    .screen.active{transform:translateX(0); opacity:1}
-    .screen.exit{transform:translateX(-105%); opacity:0}
-  </style>
-  <style id="brand-bridge">
-    /* Bridge local components to bctcstyle.css */
-    .card{ background: var(--card); color: var(--ink); border: 2px solid var(--kctcs-gold); border-radius: var(--radius); padding:14px; box-shadow: var(--shadow-1); }
-    .muted{ color: var(--muted); }
-    select, input[type="text"], textarea{ width:100%; background:var(--input-bg); color:var(--input-ink); border:1px solid var(--input-border); border-radius:10px; padding:10px 12px; }
-    .pill{ padding:.5rem .75rem; border-radius:999px; border:1px solid var(--rule); cursor:pointer; user-select:none; background:transparent }
-    .pill[aria-pressed="true"]{ outline:2px solid var(--kctcs-blue); }
-    .btn.ghost{ background: transparent; border:1px solid var(--rule); color: var(--ink); }
-    .feedback{ margin-top:.75rem; padding:.9rem; border-radius:10px; border:1px solid var(--rule); background: var(--panel); }
-    .ok{ background: rgba(34,197,94,.10); }
-    .bad{ background: rgba(239,68,68,.10); }
-    .kbd{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background: var(--card); padding:.15rem .4rem; border-radius:6px; border:1px solid var(--rule); }
-    /* Map nodes use brand colors */
-    .node{ border:1px solid var(--rule) !important; background:var(--panel) !important; color:var(--ink) !important; box-shadow:0 4px 18px rgba(0,0,0,.05) !important; }
-    .node span{ background: var(--kctcs-gold) !important; color:#000 !important; }
-    .wire{ stroke: var(--kctcs-blue) !important; opacity:.45; }
-    /* Layout wrapper to match site grid */
-    .layout{ display:grid; grid-template-columns: var(--sidebar-w,280px) 1fr; min-height:100dvh; }
+    /* Minimal local layout/animation; colors/typography come from bctcstyle.css */
+    .layout{ display:grid; grid-template-columns: var(--sidebar-w,280px) 1fr; min-height:100dvh }
     @media (max-width:760px){ .layout{ grid-template-columns:1fr } }
+    main{ padding:24px; max-width:1100px }
+
+    .stepper{ display:flex; gap:10px; margin:0 0 14px; flex-wrap:wrap }
+    .step{ display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px; border:2px solid var(--rule); background: var(--card); }
+    .step .dot{ width:22px; height:22px; border-radius:999px; display:grid; place-items:center; background: var(--kctcs-gold); color:#000; font-weight:800 }
+    .step.active{ border-color: var(--kctcs-blue) }
+    .step.done{ outline: 2px solid rgba(34,197,94,.35) }
+
+    .screen{ position:relative; transform: translateY(8px); opacity:0; pointer-events:none; transition: opacity .22s ease, transform .22s ease }
+    .screen.active{ transform: translateY(0); opacity:1; pointer-events:auto }
+
+    .options{ display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.25rem }
+    .pill{ padding:.5rem .75rem; border-radius:999px; border:1px solid var(--rule); cursor:pointer; user-select:none; background:transparent }
+    .pill[aria-pressed="true"]{ outline:2px solid var(--kctcs-blue) }
+
+    .feedback{ margin-top:.75rem; padding:.9rem; border-radius:10px; border:1px solid var(--rule); background: var(--panel) }
+    .ok{ background: rgba(34,197,94,.10) }
+    .bad{ background: rgba(239,68,68,.10) }
+
+    .footer{ margin-top:.75rem; color: var(--muted); font-size:13px; display:flex; justify-content:space-between; gap:.75rem; flex-wrap:wrap }
   </style>
-  <script>
-    // Warn if the brand CSS didn't load from style/bctcstyle.css
-    window.addEventListener('load', ()=>{
-      const rootStyle = getComputedStyle(document.documentElement);
-      const brandBlue = rootStyle.getPropertyValue('--kctcs-blue').trim();
-      if (!brandBlue){
-        const warn = document.createElement('div');
-        warn.style.cssText = 'background:#fee2e2;color:#7f1d1d;padding:10px;border:1px solid #fecaca;border-radius:8px;margin:10px';
-        warn.textContent = 'Heads up: style/bctcstyle.css did not load. Check the path and file name.';
-        document.body.prepend(warn);
-      }
-    });
-  </script>
 </head>
 <body>
-  <!-- Sidebar: pulled in from your site if available -->
   <div class="layout">
     <aside id="sidebarMount" class="sidebar"></aside>
+    <main>
+      <header class="header">
+        <h1>Variable Tamer</h1>
+        <p class="text-muted">A three-step wizard: <strong>Type → Level → Graphs</strong>. You advance only when correct.</p>
+      </header>
 
-  <main>
-    <!-- Animated choose-a-path map at top -->
-    <section id="map" class="card" style="margin-bottom:12px; overflow:hidden; position:relative">
-      <div class="muted" style="margin-bottom:.35rem">Choose a path: complete all three gates in any order</div>
-      <div class="map-grid">
-        <button class="node" data-panel="typePanel"><span>1</span> Variable Type</button>
-        <button class="node" data-panel="levelPanel"><span>2</span> Level</button>
-        <button class="node" data-panel="graphPanel"><span>3</span> Graphs</button>
-        <svg class="wires" viewBox="0 0 600 160" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M60 60 C 150 20, 250 20, 340 60" class="wire" />
-          <path d="M60 60 C 150 100, 250 100, 340 60" class="wire" />
-          <path d="M340 60 C 430 20, 520 20, 560 60" class="wire" />
-        </svg>
+      <div class="stepper">
+        <div class="step active" id="s1"><div class="dot">1</div> Type</div>
+        <div class="step" id="s2"><div class="dot">2</div> Level</div>
+        <div class="step" id="s3"><div class="dot">3</div> Graphs</div>
       </div>
-      <style>
-        .map-grid{position:relative; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; align-items:center}
-        .node{position:relative; padding:12px 14px; border-radius:14px; border:1px solid var(--border,#1f2937); background:var(--surface-2,#0b1022); color:var(--text,#e5e7eb); cursor:pointer; text-align:left; box-shadow:0 4px 18px rgba(0,0,0,.15); transition:transform .18s ease, box-shadow .18s ease}
-        .node span{display:inline-grid; place-items:center; width:26px; height:26px; border-radius:999px; background:var(--accent-2,#38bdf8); color:#00121a; font-weight:700; margin-right:.5rem}
-        .node:active{transform:translateY(1px)}
-        .node.done{border-color:rgba(34,197,94,.55); box-shadow:0 0 0 3px rgba(34,197,94,.25) inset}
-        svg.wires{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
-        .wire{fill:none; stroke:rgba(56,189,248,.45); stroke-width:3; stroke-dasharray:6 10; animation:dash 6s linear infinite}
-        @keyframes dash{to{stroke-dashoffset: -300}}
-      </style>
-    </section>
-    <noscript>
-      <div class="feedback bad">This game needs JavaScript enabled. Enable it and reload.</div>
-    </noscript>
 
-    <div class="toolbar">
-      <h1 style="margin:0">Variable Tamer <span class="muted">— classify & graph</span></h1>
-      <div class="chips">
-        <div class="chip" id="scoreChip">Score: <b>0</b></div>
-        <div class="chip" id="streakChip">Streak: <b>0</b></div>
-        <div class="chip" id="roundChip">Round: <b>1</b></div>
-      </div>
-    </div>
+      <section class="card" id="game">
+        <p id="prompt"><strong>A wild variable appears…</strong></p>
 
-    <div class="card" id="game" style="overflow:hidden">
-      <div class="screen active" id="introScreen">
-        <div class="question" id="prompt" style="font-size:1.1rem">A wild variable appears…</div>
-        <div class="muted" id="flavor">Pick a gate from the map above to classify this variable.</div>
-        <div class="actions" style="margin-top:.75rem">
-          <button class="btn outline" id="newBtn">New Variable (N)</button>
-          <button class="btn" id="checkBtn">Check All (Enter)</button>
-          <button class="btn ghost" id="revealBtn">Hint / Reveal (H)</button>
-          <label class="btn ghost" style="display:flex; align-items:center; gap:.5rem;">
-            <input type="checkbox" id="instructor" /> Instructor Mode
-          </label>
+        <!-- STEP 1: TYPE -->
+        <div class="screen active" id="stepType">
+          <label>Variable Type</label>
+          <select id="typeSelect">
+            <option value="">— choose —</option>
+            <option value="categorical">Categorical (Qualitative)</option>
+            <option value="quant_discrete">Quantitative — Discrete</option>
+            <option value="quant_continuous">Quantitative — Continuous</option>
+          </select>
+          <div class="row" style="margin-top:.6rem">
+            <button class="btn" id="submitType">Submit Type (Enter)</button>
+            <button class="btn ghost" id="revealType">Hint</button>
+          </div>
+          <div id="fbType"></div>
         </div>
-      </div>
 
-      <!-- TYPE PANEL -->
-      <div class="screen" id="typePanel" role="region" aria-label="Variable Type">
-        <h3 style="margin:.2rem 0">Gate 1: Variable Type</h3>
-        <p class="muted">Categorical vs quantitative (discrete / continuous).</p>
-        <div class="row">
-          <label>
-            <div class="muted">Variable Type</div>
-            <select id="typeSelect" aria-label="Variable type">
-              <option value="">— choose —</option>
-              <option value="categorical">Categorical (Qualitative)</option>
-              <option value="quant_discrete">Quantitative — Discrete</option>
-              <option value="quant_continuous">Quantitative — Continuous</option>
-            </select>
-          </label>
+        <!-- STEP 2: LEVEL -->
+        <div class="screen" id="stepLevel">
+          <label>Level of Measurement</label>
+          <select id="levelSelect">
+            <option value="">— choose —</option>
+            <option value="nominal">Nominal</option>
+            <option value="ordinal">Ordinal</option>
+            <option value="interval">Interval</option>
+            <option value="ratio">Ratio</option>
+          </select>
+          <div class="row" style="margin-top:.6rem">
+            <button class="btn" id="submitLevel">Submit Level (Enter)</button>
+            <button class="btn ghost" id="revealLevel">Hint</button>
+          </div>
+          <div id="fbLevel"></div>
         </div>
-        <div class="actions"><button class="btn outline" data-close>Done</button></div>
-      </div>
 
-      <!-- LEVEL PANEL -->
-      <div class="screen" id="levelPanel" role="region" aria-label="Level of Measurement">
-        <h3 style="margin:.2rem 0">Gate 2: Level</h3>
-        <p class="muted">Nominal / Ordinal / Interval / Ratio.</p>
-        <div class="row">
-          <label>
-            <div class="muted">Level of Measurement</div>
-            <select id="levelSelect" aria-label="Level of measurement">
-              <option value="">— choose —</option>
-              <option value="nominal">Nominal</option>
-              <option value="ordinal">Ordinal</option>
-              <option value="interval">Interval</option>
-              <option value="ratio">Ratio</option>
-            </select>
-          </label>
+        <!-- STEP 3: GRAPHS -->
+        <div class="screen" id="stepGraphs">
+          <label>Choose all appropriate graph types</label>
+          <div class="options" id="graphOptions" role="group" aria-label="Graph choices"></div>
+          <div class="row" style="margin-top:.6rem">
+            <button class="btn" id="submitGraphs">Submit Graphs (Enter)</button>
+            <button class="btn ghost" id="revealGraphs">Hint</button>
+          </div>
+          <div id="fbGraphs"></div>
         </div>
-        <div class="actions"><button class="btn outline" data-close>Done</button></div>
-      </div>
 
-      <!-- GRAPH PANEL -->
-      <div class="screen" id="graphPanel" role="region" aria-label="Graph Choices">
-        <h3 style="margin:.2rem 0">Gate 3: Graphs</h3>
-        <p class="muted">Choose all appropriate graph types.</p>
-        <div class="options" id="graphOptions" role="group" aria-label="Graph choices"></div>
-        <div class="actions"><button class="btn outline" data-close>Done</button></div>
-      </div>
+        <!-- DONE / NEXT -->
+        <div class="row" style="margin-top:1rem">
+          <button class="btn outline" id="newVar">New Variable (N)</button>
+          <button class="btn ghost" id="showExplain">Show Explanation</button>
+        </div>
+        <details class="panel pad" id="explainBox" style="margin-top:.6rem">
+          <summary>Explanation</summary>
+          <div id="explain"></div>
+        </details>
 
-      <div id="feedback"></div>
-      <details class="explain" id="explainBox">
-        <summary>Explanation</summary>
-        <div id="explain"></div>
-      </details>
-
-      <div class="footer">
-        <div>Keyboard: <span class="kbd">Enter</span> check • <span class="kbd">N</span> new • <span class="kbd">H</span> hint • <span class="kbd">1..9</span> toggle graphs</div>
-        <button class="btn ghost" id="resetBtn">Reset Score</button>
-      </div>
-    </div>
-  </main>
+        <div class="footer">
+          <div>Keyboard: Enter = submit current step • N = new variable • 1–9 toggle graph choices</div>
+        </div>
+      </section>
+    </main>
   </div>
 
   <script>
-  // --- Error catcher: surface any JS errors in-page ---------------------------------
-  window.addEventListener('error', (e)=>{
-    const msg = (e?.error && e.error.stack) ? e.error.stack : (e?.message || 'Unknown error');
-    const box = document.getElementById('feedback');
-    if (box){
-      const div = document.createElement('div');
-      div.className = 'feedback bad';
-      div.innerHTML = `<b>Script Error:</b><br><pre style="white-space:pre-wrap">${msg}</pre>`;
-      box.innerHTML=''; box.appendChild(div);
-    }
-  });
-
-  // --- Load sidebar.html if it exists ----------------------------------------------
+  // Load sidebar
   (async function(){
     try{
       const res = await fetch('partials/sidebar.html', {cache:'no-store'});
-      if (res.ok){ document.getElementById('sidebarMount').innerHTML = await res.text(); }
-    }catch(_){ /* no sidebar: ignore */ }
+      if(res.ok){ const m=document.getElementById('sidebarMount'); if(m) m.innerHTML = await res.text(); }
+    }catch(_){}
   })();
 
-  // --- Variable bank ---------------------------------------------------------------
-  // Full bank from earlier draft + a few extras.
+  // ---- BANK ----
   const BANK = [
     {prompt:"Favorite ice cream flavor", type:"categorical", level:"nominal", graphs:["bar","pareto","pie"], why:"Categories without order ⇒ nominal. Graph with bar/pareto; pie works if categories form a whole."},
     {prompt:"Class standing (freshman, sophomore, junior, senior)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Ranked categories ⇒ ordinal. Bar/pareto respect ordering (avoid histogram: not numeric bins)."},
     {prompt:"Number of siblings", type:"quant_discrete", level:"ratio", graphs:["dot","hist","stem","box"], why:"Counts are discrete ratio (true zero & meaningful ratios). Dot plot/histogram/stem-and-leaf/box plot all work."},
     {prompt:"Weekly study hours", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"Time is continuous ratio. Histogram/density/box; dot plot fine for small n."},
-    {prompt:"Body temperature (°C)", type:"quant_continuous", level:"interval", graphs:["hist","density","box"], why:"°C has no true zero ⇒ interval. Use histogram/density/box."},
+    {prompt:"Body temperature (°C)", type:"quant_continuous", level:"interval", graphs:["hist","density","box"], why:"°C has no true zero ⇒ interval."},
     {prompt:"Body temperature (K)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box"], why:"Kelvin has a true zero ⇒ ratio."},
-    {prompt:"Jersey number", type:"categorical", level:"nominal", graphs:["bar","pareto","pie"], why:"Labels, not quantities (23 ≠ twice 11). Treat as nominal categorical."},
-    {prompt:"Finishing position in a race (1st, 2nd, 3rd, …)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Ranks ⇒ ordinal (differences between places not equal)."},
+    {prompt:"Jersey number", type:"categorical", level:"nominal", graphs:["bar","pareto","pie"], why:"Labels, not quantities. Treat as nominal categorical."},
+    {prompt:"Finishing position in a race (1st, 2nd, 3rd, …)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Ranks ⇒ ordinal."},
     {prompt:"Height (cm)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot","stem"], why:"Continuous ratio variable."},
-    {prompt:"Age (years)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"Age has true zero and meaningful ratios (20 is twice 10)."},
+    {prompt:"Age (years)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"True zero and meaningful ratios."},
     {prompt:"Daily step count", type:"quant_discrete", level:"ratio", graphs:["hist","dot","box","stem"], why:"Counts ⇒ discrete ratio."},
-    {prompt:"Satisfaction (Likert: 1–5)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Likert items are ordinal (ordered categories)."},
-    {prompt:"Exam score (0–100)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"Score with true zero (0) behaves like ratio for most analyses."},
+    {prompt:"Satisfaction (Likert: 1–5)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Likert items are ordinal."},
+    {prompt:"Exam score (0–100)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"Score behaves like ratio for most analyses."},
     {prompt:"Zip code", type:"categorical", level:"nominal", graphs:["bar","pareto","pie"], why:"Identifiers/labels ⇒ nominal."},
-    {prompt:"Month of birth", type:"categorical", level:"nominal", graphs:["bar","pie","pareto"], why:"No inherent linear order (you may show cyclic order)."},
+    {prompt:"Month of birth", type:"categorical", level:"nominal", graphs:["bar","pie","pareto"], why:"No inherent linear order."},
     {prompt:"Finish time in 5K (minutes)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"Time is continuous ratio."},
-    {prompt:"Temperature change from baseline (Δ°C)", type:"quant_continuous", level:"interval", graphs:["hist","density","box"], why:"Differences can be negative; no true ratio zero for intervals."},
+    {prompt:"Temperature change from baseline (Δ°C)", type:"quant_continuous", level:"interval", graphs:["hist","density","box"], why:"Differences can be negative; interval scale."},
     {prompt:"Handedness (left/right)", type:"categorical", level:"nominal", graphs:["bar","pie","pareto"], why:"Binary categories ⇒ nominal."},
     {prompt:"Class period (1st, 2nd, …)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Ordered categories."},
     {prompt:"Distance (meters)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot","stem"], why:"Physical measure with true zero."},
-    {prompt:"Wind speed (mph)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box"], why:"Continuous ratio."},
-    {prompt:"Score on a 5‑point rubric (0–4)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Rubric levels are ordered categories."},
-    {prompt:"Miles per gallon (MPG)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"Ratio scale (0 mpg is meaningful)."},
     {prompt:"Temperature (°F)", type:"quant_continuous", level:"interval", graphs:["hist","density","box"], why:"Fahrenheit lacks true zero ⇒ interval."},
-    {prompt:"Shots made out of 10 attempts", type:"quant_discrete", level:"ratio", graphs:["dot","hist","box","stem"], why:"Counts (binomial outcomes) ⇒ discrete ratio."}
+    {prompt:"Shots made out of 10 attempts", type:"quant_discrete", level:"ratio", graphs:["dot","hist","box","stem"], why:"Counts (binomial)."}
   ];
 
   const GRAPH_CHOICES = [
@@ -271,32 +157,42 @@
     { id:"stem", label:"Stem-and-leaf" },
   ];
 
-  // --- State ----------------------------------------------------------------------
-  let score=0, streak=0, roundN=1; let current=null;
-
-  // --- DOM helpers ----------------------------------------------------------------
-  const $ = sel => document.querySelector(sel);
-  const scoreChip = $('#scoreChip b');
-  const streakChip = $('#streakChip b');
-  const roundChip = $('#roundChip b');
+  // --- State & DOM ---
+  let current=null; let step=1;
+  const $ = s=>document.querySelector(s);
   const promptEl = $('#prompt');
-  const flavorEl = $('#flavor');
-  const typeSelect = $('#typeSelect');
-  const levelSelect = $('#levelSelect');
-  const graphOptions = $('#graphOptions');
-  const feedback = $('#feedback');
-  const explain = $('#explain');
-  const explainBox = $('#explainBox');
+  const s1 = $('#s1'), s2 = $('#s2'), s3 = $('#s3');
+  const stepType = $('#stepType'), stepLevel = $('#stepLevel'), stepGraphs = $('#stepGraphs');
+  const fbType = $('#fbType'), fbLevel = $('#fbLevel'), fbGraphs = $('#fbGraphs');
+  const typeSelect = $('#typeSelect'); const levelSelect = $('#levelSelect');
+  const graphOptions = $('#graphOptions'); const explain = $('#explain'); const explainBox = $('#explainBox');
 
-  function updateChips(){ scoreChip.textContent = score; streakChip.textContent = streak; roundChip.textContent = roundN; }
+  function setScreen(n){
+    step=n;
+    stepType.classList.toggle('active', n===1);
+    stepLevel.classList.toggle('active', n===2);
+    stepGraphs.classList.toggle('active', n===3);
+    s1.classList.toggle('active', n===1); s2.classList.toggle('active', n===2); s3.classList.toggle('active', n===3);
+  }
+
+  function pickNew(){
+    current = BANK[Math.floor(Math.random()*BANK.length)];
+    promptEl.innerHTML = `<strong>A wild variable appears:</strong> ${current.prompt}`;
+    typeSelect.value=''; levelSelect.value='';
+    fbType.innerHTML=''; fbLevel.innerHTML=''; fbGraphs.innerHTML='';
+    explain.textContent=''; explainBox.open=false;
+    [...graphOptions.children].forEach(x=>x.setAttribute('aria-pressed','false'));
+    s1.classList.remove('done'); s2.classList.remove('done'); s3.classList.remove('done');
+    setScreen(1);
+  }
 
   function renderGraphPills(){
-    graphOptions.innerHTML = '';
+    graphOptions.innerHTML='';
     GRAPH_CHOICES.forEach((g, idx)=>{
       const btn = document.createElement('button');
-      btn.className='pill'; btn.type='button'; btn.setAttribute('role','switch');
-      btn.setAttribute('aria-pressed','false'); btn.dataset.id = g.id;
-      btn.innerText = `${idx+1}. ${g.label}`;
+      btn.className='pill'; btn.type='button';
+      btn.setAttribute('role','switch'); btn.setAttribute('aria-pressed','false');
+      btn.dataset.id = g.id; btn.textContent = `${idx+1}. ${g.label}`;
       btn.addEventListener('click', ()=>{
         const on = btn.getAttribute('aria-pressed')==='true';
         btn.setAttribute('aria-pressed', String(!on));
@@ -305,29 +201,45 @@
     });
   }
 
-  function pickNew(){
-    current = BANK[Math.floor(Math.random()*BANK.length)];
-    promptEl.textContent = `A wild variable appears: ${current.prompt}`;
-    flavorEl.textContent = 'Classify its type, level, and choose all appropriate graphs.';
-    typeSelect.value = ''; levelSelect.value = '';
-    [...graphOptions.children].forEach(x=>x.setAttribute('aria-pressed','false'));
-    feedback.innerHTML=''; explain.textContent=''; explainBox.open=false;
+  function setFeedback(el, ok, html){
+    const div=document.createElement('div'); div.className = `feedback ${ok? 'ok':'bad'}`; div.innerHTML = html; el.innerHTML=''; el.appendChild(div);
+  }
+
+  function arraysEqualAsSets(a,b){
+    if (a.length!==b.length) return false; const A=[...a].sort(); const B=[...b].sort();
+    return A.every((v,i)=>v===B[i]);
   }
 
   function getSelectedGraphs(){
     return [...graphOptions.children].filter(x=>x.getAttribute('aria-pressed')==='true').map(x=>x.dataset.id);
   }
 
-  function setFeedback(ok, html){
-    const div=document.createElement('div'); div.className = `feedback ${ok? 'ok':'bad'}`; div.innerHTML = html;
-    feedback.innerHTML=''; feedback.appendChild(div);
+  // --- Step handlers ---
+  function submitType(){
+    const ans = typeSelect.value;
+    if(!ans) { setFeedback(fbType, false, 'Pick a type.'); return; }
+    if(ans === current.type){ setFeedback(fbType, true, 'Correct!'); s1.classList.add('done'); setScreen(2); }
+    else { setFeedback(fbType, false, `Not quite. This variable is <b>${prettyType(current.type)}</b>.`); }
   }
 
-  function arraysEqualAsSets(a,b){
-    if (!Array.isArray(a) || !Array.isArray(b)) return false;
-    if (a.length!==b.length) return false;
-    const A=[...a].sort(); const B=[...b].sort();
-    return A.every((v,i)=>v===B[i]);
+  function submitLevel(){
+    const ans = levelSelect.value;
+    if(!ans) { setFeedback(fbLevel, false, 'Pick a level.'); return; }
+    if(ans === current.level){ setFeedback(fbLevel, true, 'Correct!'); s2.classList.add('done'); setScreen(3); }
+    else { setFeedback(fbLevel, false, `Not quite. The level is <b>${prettyLevel(current.level)}</b>.`); }
+  }
+
+  function submitGraphs(){
+    const chosen = getSelectedGraphs();
+    if(chosen.length===0){ setFeedback(fbGraphs, false, 'Choose at least one graph type.'); return; }
+    const correct = current.graphs;
+    if(arraysEqualAsSets(chosen, correct)){
+      setFeedback(fbGraphs, true, 'Perfect! You tamed the variable.');
+      s3.classList.add('done');
+      explain.textContent = current.why; explainBox.open = true;
+    } else {
+      setFeedback(fbGraphs, false, `Close. Correct set: <b>${correct.map(prettyGraph).join(', ')}</b>.`);
+    }
   }
 
   function prettyType(t){
@@ -338,84 +250,26 @@
   function prettyLevel(l){ return l[0].toUpperCase()+l.slice(1); }
   function prettyGraph(id){ const f = GRAPH_CHOICES.find(g=>g.id===id); return f? f.label : id; }
 
-  function check(){
-    if (!current) return;
-    const typeAns = typeSelect.value; const levelAns = levelSelect.value; const chosenGraphs = getSelectedGraphs();
+  // Wire up
+  renderGraphPills(); pickNew();
+  document.getElementById('submitType').addEventListener('click', submitType);
+  document.getElementById('submitLevel').addEventListener('click', submitLevel);
+  document.getElementById('submitGraphs').addEventListener('click', submitGraphs);
+  document.getElementById('revealType').addEventListener('click', ()=> setFeedback(fbType, true, `Hint: ${current.why.split('.')[0]}.`));
+  document.getElementById('revealLevel').addEventListener('click', ()=> setFeedback(fbLevel, true, `Hint: ${current.why.split('.')[0]}.`));
+  document.getElementById('revealGraphs').addEventListener('click', ()=> setFeedback(fbGraphs, true, `Appropriate: ${current.graphs.map(prettyGraph).join(', ')}`));
+  document.getElementById('newVar').addEventListener('click', pickNew);
+  document.getElementById('showExplain').addEventListener('click', ()=>{ explain.textContent=current.why; explainBox.open=true; });
 
-    let okType = typeAns === current.type; let okLevel = levelAns === current.level;
-
-    // Graph grading: exact = full; subset = partial; otherwise wrong
-    const correctGraphs = current.graphs;
-    const exactGraphs = arraysEqualAsSets(chosenGraphs, correctGraphs);
-    const subsetOK = chosenGraphs.length>0 && chosenGraphs.every(g=>correctGraphs.includes(g));
-
-    let points = 0; let msgs = [];
-    if (okType) { points += 2; } else { msgs.push(`• Variable type should be <b>${prettyType(current.type)}</b>.`); }
-    if (okLevel) { points += 2; } else { msgs.push(`• Level of measurement is <b>${prettyLevel(current.level)}</b>.`); }
-
-    if (exactGraphs){ points += 6; }
-    else if (subsetOK){ points += 4; msgs.push(`• Good start on graphs. Full-credit set: <b>${correctGraphs.map(prettyGraph).join(', ')}</b>.`); }
-    else { msgs.push(`• Appropriate graphs: <b>${correctGraphs.map(prettyGraph).join(', ')}</b>.`); }
-
-    const allCorrect = (points>=10);
-    if (allCorrect){ streak += 1; score += 10; setFeedback(true, `✅ Nice! +10 points.`); }
-    else if (points>=6){ streak = 0; score += points; setFeedback(true, `🟢 Partly correct. +${points} points.<br>${msgs.join('<br>')}`); }
-    else { streak = 0; score += points; setFeedback(false, `🔴 Not quite. +${points} points.<br>${msgs.join('<br>')}`); }
-
-    explain.textContent = current.why;
-    explainBox.open = $('#instructor').checked; // auto-open if instructor mode
-
-    roundN += 1; updateChips();
-  }
-
-  // --- Wire up -------------------------------------------------------------
-  renderGraphPills(); pickNew(); updateChips();
-
-  // Map: open panels with slide-in animation
-  document.querySelectorAll('.node').forEach(node=>{
-    node.addEventListener('click', ()=>{
-      const id = node.dataset.panel; openPanel(id); node.classList.add('pulse'); setTimeout(()=>node.classList.remove('pulse'),400);
-    });
-  });
-
-  function openPanel(id){
-    document.querySelectorAll('#game .screen').forEach(s=>{ if(s.id!==id && s.classList.contains('active')) s.classList.remove('active'); });
-    const panel = document.getElementById(id); panel.classList.add('active');
-  }
-  document.querySelectorAll('[data-close]').forEach(btn=>btn.addEventListener('click', ()=>{
-    const panel = btn.closest('.screen'); panel.classList.remove('active');
-  }));
-
-  document.getElementById('checkBtn').addEventListener('click', check);
-  document.getElementById('newBtn').addEventListener('click', ()=>{ pickNew(); updateChips(); document.querySelectorAll('.node').forEach(n=>n.classList.remove('done')); });
-  document.getElementById('revealBtn').addEventListener('click', ()=>{
-    if (!current) return;
-    setFeedback(true,
-      `Type: <b>${prettyType(current.type)}</b><br>`+
-      `Level: <b>${prettyLevel(current.level)}</b><br>`+
-      `Graphs: <b>${current.graphs.map(prettyGraph).join(', ')}</b>`);
-    explain.textContent = current.why; explainBox.open = true;
-  });
-  document.getElementById('resetBtn').addEventListener('click', ()=>{ score=0; streak=0; roundN=1; updateChips(); setFeedback(true,'Scores reset.'); document.querySelectorAll('.node').forEach(n=>n.classList.remove('done')); });
-
-  // When selections change, mark node as done
-  typeSelect.addEventListener('change', ()=> document.querySelector('[data-panel="typePanel"]').classList.toggle('done', !!typeSelect.value));
-  levelSelect.addEventListener('change', ()=> document.querySelector('[data-panel="levelPanel"]').classList.toggle('done', !!levelSelect.value));
-  // Graphs: mark done if any chosen
-  const observer = new MutationObserver(()=>{
-    const chosen = [...graphOptions.children].some(x=>x.getAttribute('aria-pressed')==='true');
-    document.querySelector('[data-panel="graphPanel"]').classList.toggle('done', chosen);
-  });
-  observer.observe(graphOptions, {attributes:true, subtree:true, attributeFilter:['aria-pressed']});
-
-  // Keyboard shortcuts
+  // Keyboard: Enter submits current step; N = new; numbers toggle pills
   window.addEventListener('keydown', (e)=>{
-    if (e.key==='Enter'){ e.preventDefault(); check(); }
+    if(e.key==='Enter'){
+      if(step===1) submitType(); else if(step===2) submitLevel(); else submitGraphs();
+    }
     const k = e.key.toLowerCase();
-    if (k==='n'){ e.preventDefault(); pickNew(); updateChips(); document.querySelectorAll('.node').forEach(n=>n.classList.remove('done')); }
-    if (k==='h'){ e.preventDefault(); document.getElementById('revealBtn').click(); }
-    if (/^[1-9]$/.test(e.key)){
-      const idx = parseInt(e.key,10)-1; const btn = graphOptions.children[idx]; if (btn){ btn.click(); }
+    if(k==='n'){ pickNew(); }
+    if(/^[1-9]$/.test(e.key)){
+      if(step===3){ const idx = parseInt(e.key,10)-1; const btn = graphOptions.children[idx]; if(btn){ btn.click(); } }
     }
   });
   </script>
