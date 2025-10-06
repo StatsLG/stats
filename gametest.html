@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Variable Tamer — Sequential Wizard</title>
+  <title>Variable Tamer — Sequential Wizard + Encounters</title>
   <!-- Brand stylesheet (placed in /style/bctcstyle.css) -->
   <link rel="stylesheet" href="style/bctcstyle.css" />
   <style>
@@ -30,12 +30,29 @@
     .bad{ background: rgba(239,68,68,.10) }
 
     .footer{ margin-top:.75rem; color: var(--muted); font-size:13px; display:flex; justify-content:space-between; gap:.75rem; flex-wrap:wrap }
-      .field{ position:relative; height:240px; overflow:hidden; background:var(--panel); border:1px solid var(--rule); display:grid; grid-template-columns:repeat(16, 1fr); grid-template-rows:repeat(10, 1fr) }
+
+    /* Overworld */
+    .field{ position:relative; height:240px; overflow:hidden; background:var(--panel); border:1px solid var(--rule); display:grid; grid-template-columns:repeat(16, 1fr); grid-template-rows:repeat(10, 1fr) }
     .tile{ border:1px solid rgba(0,0,0,.04); }
     .grass{ background: linear-gradient(135deg, rgba(46,160,67,.18), rgba(46,160,67,.10)); }
     .path{ background: linear-gradient(135deg, rgba(140,95,60,.18), rgba(140,95,60,.10)); }
     .hero{ position:absolute; width:20px; height:20px; display:grid; place-items:center; font-size:16px; line-height:20px; transition: transform .12s ease; will-change: transform }
     .toast{ position:absolute; left:50%; top:8px; transform:translateX(-50%); background: var(--card); border:2px solid var(--kctcs-gold); padding:6px 10px; border-radius:10px; box-shadow:var(--shadow-2); font-weight:700 }
+
+    /* --- Encounter FX --- */
+    .encounter-overlay{ position:absolute; inset:0; pointer-events:none; display:grid; place-items:center; overflow:hidden; }
+    .encounter-flash{ position:absolute; inset:0; background:radial-gradient(circle at center, rgba(231,166,20,.35), rgba(231,166,20,0) 60%); animation: flash 600ms ease-out forwards }
+    .encounter-stripes{ position:absolute; inset:-20%; background:repeating-linear-gradient(45deg, rgba(0,70,127,.15) 0 14px, rgba(231,166,20,.18) 14px 28px); filter: blur(2px); animation: spin 900ms linear forwards }
+    .shake{ animation: shake 500ms ease-in-out }
+    @keyframes flash{ from{opacity:0} 30%{opacity:1} to{opacity:0} }
+    @keyframes spin{ from{ transform: rotate(0deg) scale(1.1) } to{ transform: rotate(8deg) scale(1.05) } }
+    @keyframes shake{ 0%,100%{ transform: translate(0,0) } 20%{ transform: translate(-3px, 1px) } 40%{ transform: translate(3px, -1px) } 60%{ transform: translate(-2px, 2px) } 80%{ transform: translate(2px, -2px) } }
+
+    /* --- Win FX (confetti) --- */
+    .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden }
+    .confetti i{ position:absolute; width:10px; height:16px; background: var(--kctcs-gold); transform: rotate(15deg); animation: fall 900ms ease-in forwards; opacity:.95 }
+    .confetti i.alt{ background: var(--kctcs-blue); }
+    @keyframes fall{ from{ transform: translateY(-20vh) rotate(0deg) } to{ transform: translateY(110vh) rotate(360deg) } }
   </style>
 </head>
 <body>
@@ -132,8 +149,8 @@
     try{
       const res = await fetch('partials/sidebar.html', {cache:'no-store'});
       if(res.ok){ const m=document.getElementById('sidebarMount'); if(m) m.innerHTML = await res.text(); }
-    }catch(_){}
-  })();
+    }catch(_){}}
+  )();
 
   // ---- OVERWORLD (cute character + encounters) ----
   const field = document.getElementById('field');
@@ -167,7 +184,42 @@
     }
   }
   function showToast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; field.appendChild(t); setTimeout(()=>t.remove(),1200); }
-  function startEncounter(){ pickNew(); document.getElementById('game').scrollIntoView({behavior:'smooth'}); setScreen(1); }
+
+  // --- Encounter/Win FX helpers ---
+  function playEncounterFX(){
+    if(!field) return;
+    const ov = document.createElement('div'); ov.className='encounter-overlay';
+    const stripes = document.createElement('div'); stripes.className='encounter-stripes';
+    const flash = document.createElement('div'); flash.className='encounter-flash';
+    ov.appendChild(stripes); ov.appendChild(flash); field.appendChild(ov);
+    field.classList.add('shake');
+    setTimeout(()=>{ field.classList.remove('shake'); ov.remove(); }, 700);
+  }
+  function playWinFX(){
+    const layer = document.createElement('div'); layer.className='confetti';
+    const n = 50; const w = window.innerWidth; const h = window.innerHeight;
+    for(let i=0;i<n;i++){
+      const p = document.createElement('i');
+      p.style.left = (Math.random()*w) + 'px';
+      p.style.top = (-Math.random()*h*0.3) + 'px';
+      p.style.opacity = 0.8 + Math.random()*0.2;
+      p.style.transform = `rotate(${Math.random()*180}deg)`;
+      if(i%3===0) p.classList.add('alt');
+      p.style.animationDelay = (Math.random()*0.2)+'s';
+      layer.appendChild(p);
+    }
+    document.body.appendChild(layer);
+    setTimeout(()=> layer.remove(), 1200);
+  }
+
+  function startEncounter(){
+    playEncounterFX();
+    setTimeout(()=>{
+      pickNew();
+      document.getElementById('game').scrollIntoView({behavior:'smooth'});
+      setScreen(1);
+    }, 650);
+  }
 
   window.addEventListener('keydown',(e)=>{
     const k=e.key.toLowerCase();
@@ -294,6 +346,7 @@
       setFeedback(fbGraphs, true, 'Perfect! You tamed the variable.');
       s3.classList.add('done');
       explain.textContent = current.why; explainBox.open = true;
+      playWinFX();
     } else {
       setFeedback(fbGraphs, false, `Close. Correct set: <b>${correct.map(prettyGraph).join(', ')}</b>.`);
     }
