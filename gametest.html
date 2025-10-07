@@ -40,18 +40,18 @@
     .hero .glyph{ font-weight:900; font-size:18px }
     .toast{ position:absolute; left:50%; top:8px; transform:translateX(-50%); background: var(--card); border:2px solid var(--kctcs-gold); padding:6px 10px; border-radius:10px; box-shadow:var(--shadow-2); font-weight:700 }
 
-    /* --- Encounter FX --- */
+    /* --- Encounter FX (now ~2s) --- */
     .encounter-overlay{ position:absolute; inset:0; pointer-events:none; display:grid; place-items:center; overflow:hidden }
-    .encounter-flash{ position:absolute; inset:0; background:radial-gradient(circle at center, rgba(231,166,20,.35), rgba(231,166,20,0) 60%); animation: flash 600ms ease-out forwards }
-    .encounter-stripes{ position:absolute; inset:-20%; background:repeating-linear-gradient(45deg, rgba(0,70,127,.15) 0 14px, rgba(231,166,20,.18) 14px 28px); filter: blur(2px); animation: spin 900ms linear forwards }
-    .shake{ animation: shake 500ms ease-in-out }
+    .encounter-flash{ position:absolute; inset:0; background:radial-gradient(circle at center, rgba(231,166,20,.35), rgba(231,166,20,0) 60%); animation: flash 2000ms ease-out forwards }
+    .encounter-stripes{ position:absolute; inset:-20%; background:repeating-linear-gradient(45deg, rgba(0,70,127,.15) 0 14px, rgba(231,166,20,.18) 14px 28px); filter: blur(2px); animation: spin 2000ms linear forwards }
+    .shake{ animation: shake 2000ms ease-in-out }
     @keyframes flash{ from{opacity:0} 30%{opacity:1} to{opacity:0} }
     @keyframes spin{ from{ transform: rotate(0deg) scale(1.1) } to{ transform: rotate(8deg) scale(1.05) } }
     @keyframes shake{ 0%,100%{ transform: translate(0,0) } 20%{ transform: translate(-3px, 1px) } 40%{ transform: translate(3px, -1px) } 60%{ transform: translate(-2px, 2px) } 80%{ transform: translate(2px, -2px) } }
 
-    /* --- Win FX (confetti) --- */
+    /* --- Win FX (confetti ~2s) --- */
     .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden }
-    .confetti i{ position:absolute; width:10px; height:16px; background: var(--kctcs-gold); transform: rotate(15deg); animation: fall 900ms ease-in forwards; opacity:.95 }
+    .confetti i{ position:absolute; width:10px; height:16px; background: var(--kctcs-gold); transform: rotate(15deg); animation: fall 2000ms ease-in forwards; opacity:.95 }
     .confetti i.alt{ background: var(--kctcs-blue) }
     @keyframes fall{ from{ transform: translateY(-20vh) rotate(0deg) } to{ transform: translateY(110vh) rotate(360deg) } }
 
@@ -195,6 +195,7 @@
     }
   }
   function cellSize(){ return { cw: field.clientWidth/COLS, ch: field.clientHeight/ROWS }; }
+  function resizeField(){ if(!field) return; const cell = field.clientWidth / COLS; field.style.height = (cell * ROWS) + 'px'; placeHero(); placeMu(); }
   function placeHero(){ if(!hero.el) return; const {cw,ch}=cellSize(); hero.el.style.transform=`translate(${hero.x*cw}px, ${hero.y*ch}px)`; }
   function placeMu(){ if(!mu.el) return; const {cw,ch}=cellSize(); mu.el.style.transform=`translate(${mu.x*cw}px, ${mu.y*ch}px)`; }
   function tileAt(x,y){ if(x<0||y<0||x>=COLS||y>=ROWS) return 'W'; return grid[y*COLS+x]; }
@@ -217,7 +218,7 @@
     const flash = document.createElement('div'); flash.className='encounter-flash';
     ov.appendChild(stripes); ov.appendChild(flash); field.appendChild(ov);
     field.classList.add('shake');
-    setTimeout(()=>{ field.classList.remove('shake'); ov.remove(); }, 700);
+    setTimeout(()=>{ field.classList.remove('shake'); ov.remove(); }, 2100);
   }
   function playWinFX(){
     const layer = document.createElement('div'); layer.className='confetti';
@@ -233,7 +234,7 @@
       layer.appendChild(p);
     }
     document.body.appendChild(layer);
-    setTimeout(()=> layer.remove(), 1200);
+    setTimeout(()=> layer.remove(), 2100);
   }
 
   function startEncounter(){
@@ -242,7 +243,7 @@
       pickNew();
       document.getElementById('game').scrollIntoView({behavior:'smooth'});
       setScreen(1);
-    }, 650);
+    }, 2000);
   }
 
   window.addEventListener('keydown',(e)=>{
@@ -252,7 +253,7 @@
     if(['arrowleft','a'].includes(k)) { e.preventDefault(); tryMove(-1,0); }
     if(['arrowright','d'].includes(k)) { e.preventDefault(); tryMove(1,0); }
   });
-  window.addEventListener('resize', ()=>{ placeHero(); placeMu(); });
+  window.addEventListener('resize', ()=>{ window.requestAnimationFrame(resizeField); });
 
   // ---- BANK ----
   const BANK = [
@@ -386,7 +387,7 @@
   function prettyGraph(id){ const f = GRAPH_CHOICES.find(g=>g.id===id); return f? f.label : id; }
 
   // Wire up
-  renderGraphPills(); buildField(); updateMuCounter();
+  renderGraphPills(); buildField(); resizeField(); updateMuCounter();
   document.getElementById('submitType').addEventListener('click', submitType);
   document.getElementById('submitLevel').addEventListener('click', submitLevel);
   document.getElementById('submitGraphs').addEventListener('click', submitGraphs);
