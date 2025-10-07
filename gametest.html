@@ -376,17 +376,15 @@
     }
   };
 
+  /* Only 4 graph choices now */
   const GRAPH_CHOICES = [
-    { id:"bar", label:"Bar chart (counts/percents)" },
-    { id:"pareto", label:"Pareto (sorted bar)" },
-    { id:"pie", label:"Pie chart" },
+    { id:"bar",  label:"Bar chart" },
+    { id:"pie",  label:"Pie chart" },
     { id:"hist", label:"Histogram" },
-    { id:"density", label:"Density/curve" },
-    { id:"dot", label:"Dot plot" },
-    { id:"box", label:"Box plot" },
-    { id:"stem", label:"Stem-and-leaf" },
+    { id:"box",  label:"Box plot" },
   ];
 
+  /* Damage numbers */
   const DAMAGE_ENEMY = 34;   // ~3 hits
   const DAMAGE_ME = 15;
   let hpMe = 100, hpEnemy = 100;
@@ -436,7 +434,6 @@
     f.className = `floater ${who}`;
     f.textContent = text;
     targetEl.appendChild(f);
-    // place around the center with a tiny horizontal jitter
     const jitter = (Math.random()*24 - 12);
     f.style.left = `calc(50% + ${jitter}px)`;
     setTimeout(()=>{ f.remove(); }, 950);
@@ -469,30 +466,39 @@
     setTimeout(()=>{ closeBattle(); }, 1200);
   }
 
-  // BANK (variables)
+  // BANK (variables) — graph answers restricted to {bar, pie, hist, box}
   const BANK = [
-    {prompt:"Favorite ice cream flavor", type:"categorical", level:"nominal", graphs:["bar","pareto","pie"], why:"Categories without order ⇒ nominal. Graph with bar/pareto; pie works if categories form a whole."},
-    {prompt:"Class standing (freshman, sophomore, junior, senior)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Ranked categories ⇒ ordinal. Bar/pareto respect ordering (avoid histogram: not numeric bins)."},
-    {prompt:"Number of siblings", type:"quant_discrete", level:"ratio", graphs:["dot","hist","stem","box"], why:"Counts are discrete ratio (true zero & meaningful ratios). Dot plot/histogram/stem-and-leaf/box plot all work."},
-    {prompt:"Weekly study hours", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"Time is continuous ratio. Histogram/density/box; dot plot fine for small n."},
-    {prompt:"Body temperature (°C)", type:"quant_continuous", level:"interval", graphs:["hist","density","box"], why:"°C has no true zero ⇒ interval."},
-    {prompt:"Body temperature (K)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box"], why:"Kelvin has a true zero ⇒ ratio."},
-    {prompt:"Jersey number", type:"categorical", level:"nominal", graphs:["bar","pareto","pie"], why:"Labels, not quantities. Treat as nominal categorical."},
-    {prompt:"Finishing position in a race (1st, 2nd, 3rd, …)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Ranks ⇒ ordinal."},
-    {prompt:"Height (cm)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot","stem"], why:"Continuous ratio variable."},
-    {prompt:"Age (years)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"True zero and meaningful ratios."},
-    {prompt:"Daily step count", type:"quant_discrete", level:"ratio", graphs:["hist","dot","box","stem"], why:"Counts ⇒ discrete ratio."},
-    {prompt:"Satisfaction (Likert: 1–5)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Likert items are ordinal."},
-    {prompt:"Exam score (0–100)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"Score behaves like ratio for most analyses."},
-    {prompt:"Zip code", type:"categorical", level:"nominal", graphs:["bar","pareto","pie"], why:"Identifiers/labels ⇒ nominal."},
-    {prompt:"Month of birth", type:"categorical", level:"nominal", graphs:["bar","pie","pareto"], why:"No inherent linear order."},
-    {prompt:"Finish time in 5K (minutes)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot"], why:"Time is continuous ratio."},
-    {prompt:"Temperature change from baseline (Δ°C)", type:"quant_continuous", level:"interval", graphs:["hist","density","box"], why:"Differences can be negative; interval scale."},
-    {prompt:"Handedness (left/right)", type:"categorical", level:"nominal", graphs:["bar","pie","pareto"], why:"Binary categories ⇒ nominal."},
-    {prompt:"Class period (1st, 2nd, …)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Ordered categories."},
-    {prompt:"Distance (meters)", type:"quant_continuous", level:"ratio", graphs:["hist","density","box","dot","stem"], why:"Physical measure with true zero."},
-    {prompt:"Temperature (°F)", type:"quant_continuous", level:"interval", graphs:["hist","density","box"], why:"Fahrenheit lacks true zero ⇒ interval."},
-    {prompt:"Shots made out of 10 attempts", type:"quant_discrete", level:"ratio", graphs:["dot","hist","box","stem"], why:"Counts (binomial)."}
+    // Categorical — nominal: Bar, Pie
+    {prompt:"Favorite ice cream flavor", type:"categorical", level:"nominal", graphs:["bar","pie"], why:"Categories without order ⇒ nominal. Bar or pie both OK."},
+    {prompt:"Jersey number", type:"categorical", level:"nominal", graphs:["bar","pie"], why:"Identifiers/labels ⇒ nominal."},
+    {prompt:"Month of birth", type:"categorical", level:"nominal", graphs:["bar","pie"], why:"No inherent linear order."},
+    {prompt:"Handedness (left/right)", type:"categorical", level:"nominal", graphs:["bar","pie"], why:"Binary categories ⇒ nominal."},
+
+    // Categorical — ordinal: Bar (we avoid pie to reinforce ordering)
+    {prompt:"Class standing (freshman, sophomore, junior, senior)", type:"categorical", level:"ordinal", graphs:["bar"], why:"Ordered categories ⇒ bar chart (sorted order)."},
+    {prompt:"Finishing position in a race (1st, 2nd, 3rd, …)", type:"categorical", level:"ordinal", graphs:["bar"], why:"Ranks ⇒ ordinal; bar chart communicates order."},
+    {prompt:"Satisfaction (Likert: 1–5)", type:"categorical", level:"ordinal", graphs:["bar"], why:"Likert items are ordinal; use bar to show order."},
+    {prompt:"Class period (1st, 2nd, …)", type:"categorical", level:"ordinal", graphs:["bar"], why:"Ordered labels ⇒ bar chart works best."},
+
+    // Quantitative — use Histogram and/or Box plot
+    {prompt:"Number of siblings", type:"quant_discrete", level:"ratio", graphs:["hist","box"], why:"Counts (discrete ratio). Histogram or box plot."},
+    {prompt:"Daily step count", type:"quant_discrete", level:"ratio", graphs:["hist","box"], why:"Counts ⇒ discrete; histogram/box are appropriate."},
+    {prompt:"Shots made out of 10 attempts", type:"quant_discrete", level:"ratio", graphs:["hist","box"], why:"Counts ⇒ discrete. Histogram/box."},
+
+    {prompt:"Weekly study hours", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"Time is continuous ratio. Histogram/box plot."},
+    {prompt:"Height (cm)", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"Continuous ratio variable. Histogram/box."},
+    {prompt:"Age (years)", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"True zero; histogram/box fit."},
+    {prompt:"Exam score (0–100)", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"Treated like ratio; histogram/box."},
+    {prompt:"Distance (meters)", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"Physical measure (true zero)."},
+    {prompt:"Finish time in 5K (minutes)", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"Time (ratio). Histogram/box."},
+
+    // Interval scale (still quantitative): Histogram/Box
+    {prompt:"Body temperature (°C)", type:"quant_continuous", level:"interval", graphs:["hist","box"], why:"Interval scale ⇒ histogram or box."},
+    {prompt:"Temperature (°F)", type:"quant_continuous", level:"interval", graphs:["hist","box"], why:"Interval scale ⇒ histogram/box."},
+    {prompt:"Temperature change from baseline (Δ°C)", type:"quant_continuous", level:"interval", graphs:["hist","box"], why:"Differences can be negative; histogram/box."},
+
+    // Kelvin: ratio
+    {prompt:"Body temperature (K)", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"Kelvin has a true zero ⇒ ratio. Histogram/box."},
   ];
 
   function pickNew(){
@@ -501,7 +507,7 @@
     renderGraphPills();
   }
 
-  // Graph pills in popup
+  // Graph pills in popup (only 4)
   function renderGraphPills(){
     bGraphOptions.innerHTML='';
     GRAPH_CHOICES.forEach((g, idx)=>{
@@ -525,7 +531,10 @@
       : 'Quantitative — Continuous';
   }
   function prettyLevel(l){ return l[0].toUpperCase()+l.slice(1); }
-  function prettyGraph(id){ const ALL=[...GRAPH_CHOICES]; const f = ALL.find(g=>g.id===id); return f? f.label : id; }
+  function prettyGraph(id){
+    const f = GRAPH_CHOICES.find(g=>g.id===id);
+    return f? f.label : id;
+  }
   function arraysEqualAsSets(a,b){ if (a.length!==b.length) return false; const A=[...a].sort(), B=[...b].sort(); return A.every((v,i)=>v===B[i]); }
 
   // Submit handlers (popup)
@@ -566,7 +575,7 @@
     }
   });
 
-  // Hints
+  // Hints (trimmed to avoid removed chart types)
   document.getElementById('bHintType').addEventListener('click', ()=> setFeedback(bFbType,true,`Hint: ${current.why.split('.')[0]}.`));
   document.getElementById('bHintLevel').addEventListener('click', ()=> setFeedback(bFbLevel,true,`Hint: ${current.why.split('.')[0]}.`));
   document.getElementById('bHintGraphs').addEventListener('click', ()=> setFeedback(bFbGraphs,true,`Appropriate: ${current.graphs.map(prettyGraph).join(', ')}`));
@@ -589,7 +598,7 @@
       else if(step===2){ document.getElementById('bSubmitLevel').click(); }
       else { document.getElementById('bSubmitGraphs').click(); }
     }
-    if(/^[1-9]$/.test(e.key) && step===3){
+    if(/^[1-4]$/.test(e.key) && step===3){
       const idx = parseInt(e.key,10)-1; const btn = bGraphOptions.children[idx]; if(btn){ btn.click(); }
     }
   });
