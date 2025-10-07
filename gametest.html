@@ -7,7 +7,7 @@
   <!-- Brand stylesheet (placed in /style/bctcstyle.css). If this page lives in /game/, switch to ../style/bctcstyle.css -->
   <link id="brandcss" rel="stylesheet" href="style/bctcstyle.css" />
   <style>
-    /* Minimal local layout/animation; colors/typography come from bctcstyle.css */
+    /* Layout (brand colors/typography from bctcstyle.css) */
     .layout{ display:grid; grid-template-columns: var(--sidebar-w,280px) 1fr; min-height:100dvh }
     @media (max-width:760px){ .layout{ grid-template-columns:1fr } }
     main{ padding:24px; max-width:1100px }
@@ -32,15 +32,21 @@
     .footer{ margin-top:.75rem; color: var(--muted); font-size:13px; display:flex; justify-content:space-between; gap:.75rem; flex-wrap:wrap }
 
     /* Overworld */
-    .field{ position:relative; height:clamp(200px, 35vh, 320px); overflow:hidden; background:var(--panel); border:1px solid var(--rule); display:grid; grid-template-columns:repeat(16, 1fr); grid-template-rows:repeat(10, 1fr) }
+    .field{
+      position:relative; height:clamp(200px, 35vh, 320px);
+      overflow:hidden; background:var(--panel); border:1px solid var(--rule);
+      display:grid; grid-template-columns:repeat(16, 1fr); grid-template-rows:repeat(10, 1fr)
+    }
     .tile{ border:1px solid rgba(0,0,0,.04) }
     .grass{ background: linear-gradient(135deg, rgba(46,160,67,.18), rgba(46,160,67,.10)) }
     .path{ background: linear-gradient(135deg, rgba(140,95,60,.18), rgba(140,95,60,.10)) }
-    .hero{ position:absolute; width:20px; height:20px; display:grid; place-items:center; font-size:16px; line-height:20px; transition: transform .12s ease; will-change: transform }
-    .hero .glyph{ font-weight:900; font-size:18px }
+
+    .hero{ position:absolute; display:grid; place-items:center; transition: transform .12s ease; will-change: transform }
+    .hero .glyph{ font-weight:900; font-size:18px; line-height:1 }
+
     .toast{ position:absolute; left:50%; top:8px; transform:translateX(-50%); background: var(--card); border:2px solid var(--kctcs-gold); padding:6px 10px; border-radius:10px; box-shadow:var(--shadow-2); font-weight:700 }
 
-    /* --- Encounter FX (now ~2s) --- */
+    /* Encounter FX (~2s) */
     .encounter-overlay{ position:absolute; inset:0; pointer-events:none; display:grid; place-items:center; overflow:hidden }
     .encounter-flash{ position:absolute; inset:0; background:radial-gradient(circle at center, rgba(231,166,20,.35), rgba(231,166,20,0) 60%); animation: flash 2000ms ease-out forwards }
     .encounter-stripes{ position:absolute; inset:-20%; background:repeating-linear-gradient(45deg, rgba(0,70,127,.15) 0 14px, rgba(231,166,20,.18) 14px 28px); filter: blur(2px); animation: spin 2000ms linear forwards }
@@ -49,13 +55,13 @@
     @keyframes spin{ from{ transform: rotate(0deg) scale(1.1) } to{ transform: rotate(8deg) scale(1.05) } }
     @keyframes shake{ 0%,100%{ transform: translate(0,0) } 20%{ transform: translate(-3px, 1px) } 40%{ transform: translate(3px, -1px) } 60%{ transform: translate(-2px, 2px) } 80%{ transform: translate(2px, -2px) } }
 
-    /* --- Win FX (confetti ~2s) --- */
+    /* Win FX (confetti ~2s) */
     .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden }
     .confetti i{ position:absolute; width:10px; height:16px; background: var(--kctcs-gold); transform: rotate(15deg); animation: fall 2000ms ease-in forwards; opacity:.95 }
     .confetti i.alt{ background: var(--kctcs-blue) }
     @keyframes fall{ from{ transform: translateY(-20vh) rotate(0deg) } to{ transform: translateY(110vh) rotate(360deg) } }
 
-    /* --- μ cage --- */
+    /* μ cage */
     .muCage{ position:absolute; width:24px; height:24px; display:grid; place-items:center }
     .muCage .mu{ font-size:18px; font-weight:900 }
     .muCage .bars{ position:absolute; inset:0; display:grid; grid-template-columns: repeat(3, 1fr) }
@@ -64,6 +70,43 @@
     .muCage .mu.muFly{ animation: muFly 1.1s ease-out forwards }
     @keyframes barsOpen{ to{ transform: translateY(-120%); opacity:0 } }
     @keyframes muFly{ to{ transform: translateY(-80px) scale(1.1); opacity:0 } }
+
+    /* BATTLE OVERLAY (slides up) */
+    .battle{ position:fixed; inset:0; display:grid; place-items:end center; pointer-events:none; }
+    .battle .panel{
+      width: min(980px, 100%);
+      background: var(--card);
+      border-top: 4px solid var(--kctcs-gold);
+      box-shadow: 0 -10px 30px rgba(0,0,0,.18);
+      transform: translateY(100%);
+      transition: transform .45s cubic-bezier(.2,.9,.2,1);
+      pointer-events:auto;
+      border-radius: 16px 16px 0 0;
+      padding: 14px;
+    }
+    .battle.open .panel{ transform: translateY(0) }
+    .battle-hud{ display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:center; margin-bottom:10px }
+    .hpbar{ height:12px; background:#eee; border-radius:999px; overflow:hidden; border:1px solid var(--rule) }
+    .hpfill{ height:100%; width:100%; background:linear-gradient(90deg,#22c55e,#16a34a); transition: width .25s ease }
+    .hpfill.enemy{ background:linear-gradient(90deg,#ef4444,#b91c1c) }
+    .hud-row{ display:flex; gap:10px; align-items:center; justify-content:space-between; font-weight:700 }
+    .sprite-stage{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; align-items:center; margin-bottom:10px }
+    .sprite{ height:120px; border:1px solid var(--rule); border-radius:12px; display:grid; place-items:center; background:var(--panel) }
+    .sprite .me{ font-weight:900; font-size:28px }
+    .sprite .enemyTag{ font-weight:800; font-size:14px; color:var(--muted); position:absolute; top:6px; right:10px }
+
+    /* Creature styles */
+    .creature{ width:84px; height:84px; position:relative }
+    .labelon{ border-radius:26px; background:conic-gradient(from 0deg, #e7a614, #00467f, #8b5cf6, #e7a614); filter:saturate(1.2); animation: morph 2.8s ease-in-out infinite alternate }
+    @keyframes morph{ to{ border-radius:14px; transform: rotate(6deg) scale(1.06) } }
+    .countaur{ display:grid; grid-template-rows:repeat(3,1fr); gap:4px }
+    .countaur i{ background:#0ea5e9; border-radius:6px; width:100%; height:100% }
+    .flowdon{ background: radial-gradient(120% 80% at 50% 0%, rgba(0,70,127,.25), transparent), linear-gradient(135deg,#60a5fa,#34d399); border-radius:18px; filter: saturate(1.1); animation: wave 3s ease-in-out infinite }
+    @keyframes wave{ 50%{ transform: translateY(-4px) scale(1.02) } }
+
+    /* Battle footer text */
+    .battle-msg{ font-size:14px; color:var(--muted); margin:.25rem 0 .5rem }
+
   </style>
 </head>
 <body>
@@ -155,25 +198,56 @@
     </main>
   </div>
 
+  <!-- Battle Overlay -->
+  <div id="battle" class="battle" aria-hidden="true">
+    <div class="panel">
+      <div class="battle-hud">
+        <div class="hud-row">
+          <span>🧑‍🏫 x̄</span>
+          <div class="hpbar" aria-label="Player HP"><div id="hpMe" class="hpfill" style="width:100%"></div></div>
+        </div>
+        <div class="hud-row">
+          <span id="enemyName">Enemy</span>
+          <div class="hpbar" aria-label="Enemy HP"><div id="hpEnemy" class="hpfill enemy" style="width:100%"></div></div>
+        </div>
+      </div>
+
+      <div class="sprite-stage">
+        <div class="sprite"><div class="me">x̄</div></div>
+        <div class="sprite" style="position:relative">
+          <div id="enemyTag" class="enemyTag"></div>
+          <div id="enemySprite" class="creature"></div>
+        </div>
+      </div>
+
+      <div class="battle-msg" id="battleMsg">A wild variable challenges you!</div>
+
+      <!-- The existing wizard UI lives in #game; we mirror prompts here by scrolling into view on open -->
+      <div class="panel pad" style="margin-top:6px">
+        <strong>Battle Steps:</strong> Answer the three questions below the fold to attack (Type → Level → Graphs).
+        <div class="text-muted" style="margin-top:4px">Correct answer = damage to enemy • Wrong answer = you take damage</div>
+      </div>
+    </div>
+  </div>
+
   <script>
-  // --- Sidebar + brand CSS path resilience ---
+  // Sidebar + CSS fallback
   (async function(){
     try{
       const res = await fetch('partials/sidebar.html', {cache:'no-store'});
       if(res.ok){ const m=document.getElementById('sidebarMount'); if(m) m.innerHTML = await res.text(); }
-    }catch(_){ /* ignore missing sidebar */ }
-    // If CSS variables not found, try ../style path (for /game/ deployments)
+    }catch(_){ /* ignore */ }
     const rootStyle = getComputedStyle(document.documentElement);
     if(!rootStyle.getPropertyValue('--kctcs-blue').trim()){
       const link = document.getElementById('brandcss'); if(link) link.href = '../style/bctcstyle.css';
     }
   })();
 
-  // ---- OVERWORLD (x̄ avatar + μ cage + encounters) ----
+  // OVERWORLD (x̄ + μ cage + encounters)
   const field = document.getElementById('field');
   const encOn = document.getElementById('encOn');
   const COLS=16, ROWS=10;
-  let grid=[]; let hero={x:8,y:5,el:null};
+  let grid=[]; let hero={x:8,y:5,el:null,w:0,h:0};
   let mu={x:12,y:3,el:null,caged:true,progress:0};
 
   function buildField(){
@@ -188,21 +262,33 @@
         grid.push(isGrass? 'G':'P');
       }
     }
-    const h=document.createElement('div'); h.className='hero'; h.innerHTML='<span class="glyph">x̄</span>'; field.appendChild(h); hero.el=h; placeHero();
+    const h=document.createElement('div');
+    h.className='hero'; h.innerHTML='<span class="glyph">x̄</span>';
+    field.appendChild(h); hero.el=h; placeHero(true);
     if(mu.caged){
       const m=document.createElement('div'); m.className='muCage'; m.innerHTML='<span class="mu">μ</span><div class="bars"><i></i><i></i><i></i></div>';
       field.appendChild(m); mu.el=m; placeMu();
     }
   }
   function cellSize(){ return { cw: field.clientWidth/COLS, ch: field.clientHeight/ROWS }; }
-  function resizeField(){ if(!field) return; const cell = field.clientWidth / COLS; field.style.height = (cell * ROWS) + 'px'; placeHero(); placeMu(); }
-  function placeHero(){ if(!hero.el) return; const {cw,ch}=cellSize(); hero.el.style.transform=`translate(${hero.x*cw}px, ${hero.y*ch}px)`; }
+  function resizeField(){
+    if(!field) return;
+    const cell = field.clientWidth / COLS;
+    field.style.height = (cell * ROWS) + 'px';
+    placeHero(true);
+    placeMu();
+  }
+  function placeHero(resize=false){
+    if(!hero.el) return; const {cw,ch}=cellSize();
+    if(resize){ hero.el.style.width = `${cw}px`; hero.el.style.height = `${ch}px`; }
+    hero.el.style.transform=`translate(${hero.x*cw}px, ${hero.y*ch}px)`;
+  }
   function placeMu(){ if(!mu.el) return; const {cw,ch}=cellSize(); mu.el.style.transform=`translate(${mu.x*cw}px, ${mu.y*ch}px)`; }
   function tileAt(x,y){ if(x<0||y<0||x>=COLS||y>=ROWS) return 'W'; return grid[y*COLS+x]; }
   function tryMove(dx,dy){ const nx=hero.x+dx, ny=hero.y+dy; if(tileAt(nx,ny)==='W') return; hero.x=nx; hero.y=ny; placeHero(); placeMu(); maybeEncounter(); }
   function maybeEncounter(){
     if(!encOn || !encOn.checked) return;
-    if(tileAt(hero.x,hero.y)!=='G') return; // only grass
+    if(tileAt(hero.x,hero.y)!=='G') return;
     if(Math.random()<0.20){ showToast('A wild variable appears!'); startEncounter(); }
   }
   function showToast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; field.appendChild(t); setTimeout(()=>t.remove(),1200); }
@@ -210,7 +296,7 @@
   function progressMu(){ if(!mu.caged) return; mu.progress++; updateMuCounter(); if(mu.progress>=3) freeMu(); }
   function freeMu(){ if(!mu.el) return; mu.el.classList.add('free'); const span = mu.el.querySelector('.mu'); if(span) span.classList.add('muFly'); setTimeout(()=>{ mu.el.remove(); mu.caged=false; showToast('μ is free!'); }, 1100); }
 
-  // --- Encounter/Win FX helpers ---
+  // Encounter/Win FX
   function playEncounterFX(){
     if(!field) return;
     const ov = document.createElement('div'); ov.className='encounter-overlay';
@@ -237,25 +323,89 @@
     setTimeout(()=> layer.remove(), 2100);
   }
 
+  // ======== BATTLE SYSTEM ========
+  const battleEl = document.getElementById('battle');
+  const hpMeEl = document.getElementById('hpMe');
+  const hpEnemyEl = document.getElementById('hpEnemy');
+  const enemyNameEl = document.getElementById('enemyName');
+  const enemyTagEl = document.getElementById('enemyTag');
+  const enemySpriteEl = document.getElementById('enemySprite');
+  const battleMsgEl = document.getElementById('battleMsg');
+
+  const CREATURES = {
+    categorical: { name:'Labelon', build: (el)=>{ el.className='creature labelon'; } },
+    quant_discrete: { name:'Countaur', build: (el)=>{ el.className='creature countaur'; el.innerHTML='<i></i><i></i><i></i>'; } },
+    quant_continuous: { name:'Flowdon', build: (el)=>{ el.className='creature flowdon'; } },
+  };
+
+  const DAMAGE_ENEMY = 34;   // ~3 hits to KO
+  const DAMAGE_ME = 15;
+  let hpMe = 100;
+  let hpEnemy = 100;
+  let battling = false;
+
+  function openBattle(type){
+    const creature = CREATURES[type] || CREATURES.categorical;
+    enemyNameEl.textContent = creature.name;
+    enemyTagEl.textContent = type.replace('_',' ');
+    creature.build(enemySpriteEl);
+    hpMe = 100; hpEnemy = 100;
+    hpMeEl.style.width = '100%';
+    hpEnemyEl.style.width = '100%';
+    battleMsgEl.textContent = `A wild ${creature.name} challenges you!`;
+    battleEl.classList.add('open');
+    battleEl.setAttribute('aria-hidden','false');
+    battling = true;
+    // scroll to wizard so answers are visible
+    document.getElementById('game').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  function closeBattle(){
+    battleEl.classList.remove('open');
+    battleEl.setAttribute('aria-hidden','true');
+    battling = false;
+  }
+
+  function damageEnemy(){
+    hpEnemy = Math.max(0, hpEnemy - DAMAGE_ENEMY);
+    hpEnemyEl.style.width = hpEnemy + '%';
+    if(hpEnemy<=0){ onWinBattle(); }
+  }
+  function damageMe(){
+    hpMe = Math.max(0, hpMe - DAMAGE_ME);
+    hpMeEl.style.width = hpMe + '%';
+    if(hpMe<=0){ onLoseBattle(); }
+  }
+  function onWinBattle(){
+    battleMsgEl.textContent = 'Victory! The variable is tamed.';
+    playWinFX(); progressMu(); updateMuCounter();
+    setTimeout(()=> closeBattle(), 1200);
+  }
+  function onLoseBattle(){
+    battleMsgEl.textContent = 'x̄ lost confidence and recalculates…';
+    setTimeout(()=>{ closeBattle(); pickNew(); }, 1200);
+  }
+
   function startEncounter(){
     playEncounterFX();
     setTimeout(()=>{
-      pickNew();
-      document.getElementById('game').scrollIntoView({behavior:'smooth'});
+      pickNew(); // pick variable first so we know the creature type
+      openBattle(current.type);
       setScreen(1);
     }, 2000);
   }
 
+  // Key movement
   window.addEventListener('keydown',(e)=>{
     const k=e.key.toLowerCase();
     if(['arrowup','w'].includes(k)) { e.preventDefault(); tryMove(0,-1); }
     if(['arrowdown','s'].includes(k)) { e.preventDefault(); tryMove(0,1); }
     if(['arrowleft','a'].includes(k)) { e.preventDefault(); tryMove(-1,0); }
     if(['arrowright','d'].includes(k)) { e.preventDefault(); tryMove(1,0); }
+    if(k==='escape' && battleEl.classList.contains('open')){ e.preventDefault(); closeBattle(); } // helper in dev
   });
   window.addEventListener('resize', ()=>{ window.requestAnimationFrame(resizeField); });
 
-  // ---- BANK ----
+  // ---- BANK (variables) ----
   const BANK = [
     {prompt:"Favorite ice cream flavor", type:"categorical", level:"nominal", graphs:["bar","pareto","pie"], why:"Categories without order ⇒ nominal. Graph with bar/pareto; pie works if categories form a whole."},
     {prompt:"Class standing (freshman, sophomore, junior, senior)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Ranked categories ⇒ ordinal. Bar/pareto respect ordering (avoid histogram: not numeric bins)."},
@@ -292,7 +442,7 @@
     { id:"stem", label:"Stem-and-leaf" },
   ];
 
-  // --- State & DOM ---
+  // State & DOM
   let current=null; let step=1;
   const $ = s=>document.querySelector(s);
   const promptEl = $('#prompt');
@@ -349,19 +499,29 @@
     return [...graphOptions.children].filter(x=>x.getAttribute('aria-pressed')==='true').map(x=>x.dataset.id);
   }
 
-  // --- Step handlers ---
+  // Step handlers + damage
   function submitType(){
     const ans = typeSelect.value;
     if(!ans) { setFeedback(fbType, false, 'Pick a type.'); return; }
-    if(ans === current.type){ setFeedback(fbType, true, 'Correct!'); s1.classList.add('done'); setScreen(2); }
-    else { setFeedback(fbType, false, `Not quite. This variable is <b>${prettyType(current.type)}</b>.`); }
+    if(ans === current.type){
+      setFeedback(fbType, true, 'Correct! Attack landed.');
+      damageEnemy(); s1.classList.add('done'); setScreen(2);
+    } else {
+      setFeedback(fbType, false, `Not quite. This variable is <b>${prettyType(current.type)}</b>. You take damage.`);
+      damageMe();
+    }
   }
 
   function submitLevel(){
     const ans = levelSelect.value;
     if(!ans) { setFeedback(fbLevel, false, 'Pick a level.'); return; }
-    if(ans === current.level){ setFeedback(fbLevel, true, 'Correct!'); s2.classList.add('done'); setScreen(3); }
-    else { setFeedback(fbLevel, false, `Not quite. The level is <b>${prettyLevel(current.level)}</b>.`); }
+    if(ans === current.level){
+      setFeedback(fbLevel, true, 'Correct! Attack landed.');
+      damageEnemy(); s2.classList.add('done'); setScreen(3);
+    } else {
+      setFeedback(fbLevel, false, `Not quite. The level is <b>${prettyLevel(current.level)}</b>. You take damage.`);
+      damageMe();
+    }
   }
 
   function submitGraphs(){
@@ -369,12 +529,15 @@
     if(chosen.length===0){ setFeedback(fbGraphs, false, 'Choose at least one graph type.'); return; }
     const correct = current.graphs;
     if(arraysEqualAsSets(chosen, correct)){
-      setFeedback(fbGraphs, true, 'Perfect! You tamed the variable.');
+      setFeedback(fbGraphs, true, 'Perfect! Critical hit — variable tamed.');
       s3.classList.add('done');
       explain.textContent = current.why; explainBox.open = true;
-      playWinFX(); progressMu(); updateMuCounter();
+      damageEnemy(); // final blow
+      // victory handled in damageEnemy() if HP <= 0; if not (edge case), still celebrate
+      if(hpEnemy>0){ playWinFX(); progressMu(); updateMuCounter(); }
     } else {
-      setFeedback(fbGraphs, false, `Close. Correct set: <b>${correct.map(prettyGraph).join(', ')}</b>.`);
+      setFeedback(fbGraphs, false, `Close. Correct set: <b>${correct.map(prettyGraph).join(', ')}</b>. You take damage.`);
+      damageMe();
     }
   }
 
@@ -408,6 +571,9 @@
       if(step===3){ const idx = parseInt(e.key,10)-1; const btn = graphOptions.children[idx]; if(btn){ btn.click(); } }
     }
   });
+
+  // Keep squares perfect on load & resize
+  window.addEventListener('load', resizeField);
   </script>
 </body>
 </html>
