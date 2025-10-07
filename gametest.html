@@ -12,24 +12,12 @@
     @media (max-width:760px){ .layout{ grid-template-columns:1fr } }
     main{ padding:24px; max-width:1100px }
 
-    .stepper{ display:flex; gap:10px; margin:0 0 14px; flex-wrap:wrap }
-    .step{ display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px; border:2px solid var(--rule); background: var(--card) }
-    .step .dot{ width:22px; height:22px; border-radius:999px; display:grid; place-items:center; background: var(--kctcs-gold); color:#000; font-weight:800 }
-    .step.active{ border-color: var(--kctcs-blue) }
-    .step.done{ outline: 2px solid rgba(34,197,94,.35) }
-
-    .screen{ position:relative; transform: translateY(8px); opacity:0; pointer-events:none; transition: opacity .22s ease, transform .22s ease }
-    .screen.active{ transform: translateY(0); opacity:1; pointer-events:auto }
-
-    .options{ display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.25rem }
-    .pill{ padding:.5rem .75rem; border-radius:999px; border:1px solid var(--rule); cursor:pointer; user-select:none; background:transparent }
-    .pill[aria-pressed="true"]{ outline:2px solid var(--kctcs-blue) }
-
     .feedback{ margin-top:.75rem; padding:.9rem; border-radius:10px; border:1px solid var(--rule); background: var(--panel) }
     .ok{ background: rgba(34,197,94,.10) }
     .bad{ background: rgba(239,68,68,.10) }
-
-    .footer{ margin-top:.75rem; color: var(--muted); font-size:13px; display:flex; justify-content:space-between; gap:.75rem; flex-wrap:wrap }
+    .options{ display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.25rem }
+    .pill{ padding:.5rem .75rem; border-radius:999px; border:1px solid var(--rule); cursor:pointer; user-select:none; background:transparent }
+    .pill[aria-pressed="true"]{ outline:2px solid var(--kctcs-blue) }
 
     /* Overworld */
     .field{
@@ -83,6 +71,7 @@
       pointer-events:auto;
       border-radius: 16px 16px 0 0;
       padding: 14px;
+      max-height: 92vh; overflow:auto;
     }
     .battle.open .panel{ transform: translateY(0) }
     .battle-hud{ display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:center; margin-bottom:10px }
@@ -91,7 +80,7 @@
     .hpfill.enemy{ background:linear-gradient(90deg,#ef4444,#b91c1c) }
     .hud-row{ display:flex; gap:10px; align-items:center; justify-content:space-between; font-weight:700 }
     .sprite-stage{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; align-items:center; margin-bottom:10px }
-    .sprite{ height:120px; border:1px solid var(--rule); border-radius:12px; display:grid; place-items:center; background:var(--panel) }
+    .sprite{ height:120px; border:1px solid var(--rule); border-radius:12px; display:grid; place-items:center; background:var(--panel); position:relative }
     .sprite .me{ font-weight:900; font-size:28px }
     .sprite .enemyTag{ font-weight:800; font-size:14px; color:var(--muted); position:absolute; top:6px; right:10px }
 
@@ -104,9 +93,25 @@
     .flowdon{ background: radial-gradient(120% 80% at 50% 0%, rgba(0,70,127,.25), transparent), linear-gradient(135deg,#60a5fa,#34d399); border-radius:18px; filter: saturate(1.1); animation: wave 3s ease-in-out infinite }
     @keyframes wave{ 50%{ transform: translateY(-4px) scale(1.02) } }
 
-    /* Battle footer text */
+    .step-title{ font-weight:800; margin:8px 0 4px; color:var(--kctcs-blue) }
+    .row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap }
     .battle-msg{ font-size:14px; color:var(--muted); margin:.25rem 0 .5rem }
 
+    /* Damage floaters */
+    .floater{
+      position:absolute; left:50%; transform:translate(-50%, 0);
+      font-weight:900; font-size:16px;
+      color:#ef4444; text-shadow:0 1px 0 #fff, 0 0 6px rgba(239,68,68,.35);
+      animation: pop 900ms ease-out forwards;
+      pointer-events:none;
+    }
+    .floater.me{ color:#ef4444 }
+    .floater.enemy{ color:#ef4444 }
+    @keyframes pop{
+      0%{ opacity:0; transform:translate(-50%, 10px) scale(.9) }
+      15%{ opacity:1; transform:translate(-50%, 0) scale(1) }
+      100%{ opacity:0; transform:translate(-50%, -28px) scale(1.06) }
+    }
   </style>
 </head>
 <body>
@@ -115,7 +120,7 @@
     <main>
       <header class="header">
         <h1>Variable Tamer</h1>
-        <p class="text-muted">Walk around as <strong>x̄</strong> to find a random encounter, then complete the wizard: <strong>Type → Level → Graphs</strong>. Rescue <strong>μ</strong> by winning 3 encounters.</p>
+        <p class="text-muted">Walk around as <strong>x̄</strong> to find a random encounter, then battle entirely in the popup: <strong>Type → Level → Graphs</strong>. Rescue <strong>μ</strong> by winning 3 encounters.</p>
       </header>
 
       <!-- Playfield / Overworld -->
@@ -127,78 +132,10 @@
         </div>
         <div id="field" class="field round shadow-1" tabindex="0" role="application" aria-label="Overworld field"></div>
       </section>
-
-      <div class="stepper">
-        <div class="step active" id="s1"><div class="dot">1</div> Type</div>
-        <div class="step" id="s2"><div class="dot">2</div> Level</div>
-        <div class="step" id="s3"><div class="dot">3</div> Graphs</div>
-      </div>
-
-      <section class="card" id="game">
-        <p id="prompt"><strong>A wild variable appears…</strong></p>
-
-        <!-- STEP 1: TYPE -->
-        <div class="screen active" id="stepType">
-          <label>Variable Type</label>
-          <select id="typeSelect">
-            <option value="">— choose —</option>
-            <option value="categorical">Categorical (Qualitative)</option>
-            <option value="quant_discrete">Quantitative — Discrete</option>
-            <option value="quant_continuous">Quantitative — Continuous</option>
-          </select>
-          <div class="row" style="margin-top:.6rem">
-            <button class="btn" id="submitType">Submit Type (Enter)</button>
-            <button class="btn ghost" id="revealType">Hint</button>
-          </div>
-          <div id="fbType"></div>
-        </div>
-
-        <!-- STEP 2: LEVEL -->
-        <div class="screen" id="stepLevel">
-          <label>Level of Measurement</label>
-          <select id="levelSelect">
-            <option value="">— choose —</option>
-            <option value="nominal">Nominal</option>
-            <option value="ordinal">Ordinal</option>
-            <option value="interval">Interval</option>
-            <option value="ratio">Ratio</option>
-          </select>
-          <div class="row" style="margin-top:.6rem">
-            <button class="btn" id="submitLevel">Submit Level (Enter)</button>
-            <button class="btn ghost" id="revealLevel">Hint</button>
-          </div>
-          <div id="fbLevel"></div>
-        </div>
-
-        <!-- STEP 3: GRAPHS -->
-        <div class="screen" id="stepGraphs">
-          <label>Choose all appropriate graph types</label>
-          <div class="options" id="graphOptions" role="group" aria-label="Graph choices"></div>
-          <div class="row" style="margin-top:.6rem">
-            <button class="btn" id="submitGraphs">Submit Graphs (Enter)</button>
-            <button class="btn ghost" id="revealGraphs">Hint</button>
-          </div>
-          <div id="fbGraphs"></div>
-        </div>
-
-        <!-- DONE / NEXT -->
-        <div class="row" style="margin-top:1rem">
-          <button class="btn outline" id="newVar">New Variable (N)</button>
-          <button class="btn ghost" id="showExplain">Show Explanation</button>
-        </div>
-        <details class="panel pad" id="explainBox" style="margin-top:.6rem">
-          <summary>Explanation</summary>
-          <div id="explain"></div>
-        </details>
-
-        <div class="footer">
-          <div>Keyboard: Enter = submit current step • N = new variable • 1–9 toggle graph choices</div>
-        </div>
-      </section>
     </main>
   </div>
 
-  <!-- Battle Overlay -->
+  <!-- Battle Overlay (ALL questions live here) -->
   <div id="battle" class="battle" aria-hidden="true">
     <div class="panel">
       <div class="battle-hud">
@@ -213,8 +150,8 @@
       </div>
 
       <div class="sprite-stage">
-        <div class="sprite"><div class="me">x̄</div></div>
-        <div class="sprite" style="position:relative">
+        <div id="spriteMe" class="sprite"><div class="me">x̄</div></div>
+        <div id="spriteEnemy" class="sprite">
           <div id="enemyTag" class="enemyTag"></div>
           <div id="enemySprite" class="creature"></div>
         </div>
@@ -222,10 +159,57 @@
 
       <div class="battle-msg" id="battleMsg">A wild variable challenges you!</div>
 
-      <!-- The existing wizard UI lives in #game; we mirror prompts here by scrolling into view on open -->
-      <div class="panel pad" style="margin-top:6px">
-        <strong>Battle Steps:</strong> Answer the three questions below the fold to attack (Type → Level → Graphs).
-        <div class="text-muted" style="margin-top:4px">Correct answer = damage to enemy • Wrong answer = you take damage</div>
+      <!-- STEP 1: TYPE -->
+      <div class="card" id="bStepType">
+        <div class="step-title">1) Variable Type</div>
+        <div class="row">
+          <select id="bTypeSelect">
+            <option value="">— choose —</option>
+            <option value="categorical">Categorical (Qualitative)</option>
+            <option value="quant_discrete">Quantitative — Discrete</option>
+            <option value="quant_continuous">Quantitative — Continuous</option>
+          </select>
+          <button class="btn" id="bSubmitType">Submit</button>
+          <button class="btn ghost" id="bHintType">Hint</button>
+        </div>
+        <div id="bFbType"></div>
+      </div>
+
+      <!-- STEP 2: LEVEL -->
+      <div class="card" id="bStepLevel" style="display:none">
+        <div class="step-title">2) Level of Measurement</div>
+        <div class="row">
+          <select id="bLevelSelect">
+            <option value="">— choose —</option>
+            <option value="nominal">Nominal</option>
+            <option value="ordinal">Ordinal</option>
+            <option value="interval">Interval</option>
+            <option value="ratio">Ratio</option>
+          </select>
+          <button class="btn" id="bSubmitLevel">Submit</button>
+          <button class="btn ghost" id="bHintLevel">Hint</button>
+        </div>
+        <div id="bFbLevel"></div>
+      </div>
+
+      <!-- STEP 3: GRAPHS -->
+      <div class="card" id="bStepGraphs" style="display:none">
+        <div class="step-title">3) Choose all appropriate graph types</div>
+        <div class="options" id="bGraphOptions" role="group" aria-label="Graph choices"></div>
+        <div class="row" style="margin-top:.6rem">
+          <button class="btn" id="bSubmitGraphs">Submit</button>
+          <button class="btn ghost" id="bHintGraphs">Hint</button>
+        </div>
+        <div id="bFbGraphs"></div>
+      </div>
+
+      <details class="panel pad" id="bExplainBox" style="margin-top:.6rem; display:none">
+        <summary>Explanation</summary>
+        <div id="bExplain"></div>
+      </details>
+
+      <div class="row" style="margin-top:10px; justify-content:flex-end">
+        <button class="btn outline" id="bClose" title="Close battle (dev helper)">Close</button>
       </div>
     </div>
   </div>
@@ -243,11 +227,11 @@
     }
   })();
 
-  // OVERWORLD (x̄ + μ cage + encounters)
+  // OVERWORLD (x̄ + μ + encounters)
   const field = document.getElementById('field');
   const encOn = document.getElementById('encOn');
   const COLS=16, ROWS=10;
-  let grid=[]; let hero={x:8,y:5,el:null,w:0,h:0};
+  let grid=[]; let hero={x:8,y:5,el:null};
   let mu={x:12,y:3,el:null,caged:true,progress:0};
 
   function buildField(){
@@ -272,15 +256,13 @@
   }
   function cellSize(){ return { cw: field.clientWidth/COLS, ch: field.clientHeight/ROWS }; }
   function resizeField(){
-    if(!field) return;
-    const cell = field.clientWidth / COLS;
+    if(!field) return; const cell = field.clientWidth / COLS;
     field.style.height = (cell * ROWS) + 'px';
-    placeHero(true);
-    placeMu();
+    placeHero(true); placeMu();
   }
   function placeHero(resize=false){
     if(!hero.el) return; const {cw,ch}=cellSize();
-    if(resize){ hero.el.style.width = `${cw}px`; hero.el.style.height = `${ch}px`; }
+    if(resize){ hero.el.style.width=`${cw}px`; hero.el.style.height=`${ch}px`; }
     hero.el.style.transform=`translate(${hero.x*cw}px, ${hero.y*ch}px)`;
   }
   function placeMu(){ if(!mu.el) return; const {cw,ch}=cellSize(); mu.el.style.transform=`translate(${mu.x*cw}px, ${mu.y*ch}px)`; }
@@ -323,7 +305,7 @@
     setTimeout(()=> layer.remove(), 2100);
   }
 
-  // ======== BATTLE SYSTEM ========
+  // ======== BATTLE SYSTEM (popup) ========
   const battleEl = document.getElementById('battle');
   const hpMeEl = document.getElementById('hpMe');
   const hpEnemyEl = document.getElementById('hpEnemy');
@@ -331,50 +313,152 @@
   const enemyTagEl = document.getElementById('enemyTag');
   const enemySpriteEl = document.getElementById('enemySprite');
   const battleMsgEl = document.getElementById('battleMsg');
+  const spriteMe = document.getElementById('spriteMe');
+  const spriteEnemy = document.getElementById('spriteEnemy');
+
+  // Battle step DOM
+  const bStepType = document.getElementById('bStepType');
+  const bStepLevel = document.getElementById('bStepLevel');
+  const bStepGraphs = document.getElementById('bStepGraphs');
+  const bTypeSelect = document.getElementById('bTypeSelect');
+  const bLevelSelect = document.getElementById('bLevelSelect');
+  const bGraphOptions = document.getElementById('bGraphOptions');
+  const bFbType = document.getElementById('bFbType');
+  const bFbLevel = document.getElementById('bFbLevel');
+  const bFbGraphs = document.getElementById('bFbGraphs');
+  const bExplainBox = document.getElementById('bExplainBox');
+  const bExplain = document.getElementById('bExplain');
+  const bClose = document.getElementById('bClose');
 
   const CREATURES = {
-    categorical: { name:'Labelon', build: (el)=>{ el.className='creature labelon'; } },
+    categorical: { name:'Labelon', build: (el)=>{ el.className='creature labelon'; el.innerHTML=''; } },
     quant_discrete: { name:'Countaur', build: (el)=>{ el.className='creature countaur'; el.innerHTML='<i></i><i></i><i></i>'; } },
-    quant_continuous: { name:'Flowdon', build: (el)=>{ el.className='creature flowdon'; } },
+    quant_continuous: { name:'Flowdon', build: (el)=>{ el.className='creature flowdon'; el.innerHTML=''; } },
   };
 
-  const DAMAGE_ENEMY = 34;   // ~3 hits to KO
-  const DAMAGE_ME = 15;
-  let hpMe = 100;
-  let hpEnemy = 100;
-  let battling = false;
+  /* Creature one-liners (correct/wrong pools) */
+  const CREATURE_LINES = {
+    categorical: {
+      correct:[
+        "Labelon: “Names only—no numbers needed!”",
+        "Labelon: “Qualitative and proud!”",
+        "Labelon: “Labels rule, order drools!”"
+      ],
+      wrong:[
+        "Labelon: “Trying to rank me? Hah!”",
+        "Labelon: “Numbers? Not in this house.”",
+        "Labelon: “No inherent order—gotcha!”"
+      ]
+    },
+    quant_discrete: {
+      correct:[
+        "Countaur: “Clop! Integer steps only.”",
+        "Countaur: “Counts click like dice.”",
+        "Countaur: “Discrete wins—no in-betweens.”"
+      ],
+      wrong:[
+        "Countaur: “You can’t split a count!”",
+        "Countaur: “Half a sibling? Neigh!”",
+        "Countaur: “Discrete ≠ continuous, friend.”"
+      ]
+    },
+    quant_continuous: {
+      correct:[
+        "Flowdon: “I flow between any two points.”",
+        "Flowdon: “Infinite granularity… smooth!”",
+        "Flowdon: “Continuum conquered.”"
+      ],
+      wrong:[
+        "Flowdon: “Don’t box me into integers!”",
+        "Flowdon: “I’m smoother than that.”",
+        "Flowdon: “Between any two, there’s more!”"
+      ]
+    }
+  };
 
-  function openBattle(type){
-    const creature = CREATURES[type] || CREATURES.categorical;
-    enemyNameEl.textContent = creature.name;
+  const GRAPH_CHOICES = [
+    { id:"bar", label:"Bar chart (counts/percents)" },
+    { id:"pareto", label:"Pareto (sorted bar)" },
+    { id:"pie", label:"Pie chart" },
+    { id:"hist", label:"Histogram" },
+    { id:"density", label:"Density/curve" },
+    { id:"dot", label:"Dot plot" },
+    { id:"box", label:"Box plot" },
+    { id:"stem", label:"Stem-and-leaf" },
+  ];
+
+  const DAMAGE_ENEMY = 34;   // ~3 hits
+  const DAMAGE_ME = 15;
+  let hpMe = 100, hpEnemy = 100;
+  let current = null;
+  let step = 1; // 1,2,3
+
+  function openBattle(type, prompt){
+    const c = CREATURES[type] || CREATURES.categorical;
+    enemyNameEl.textContent = c.name;
     enemyTagEl.textContent = type.replace('_',' ');
-    creature.build(enemySpriteEl);
+    c.build(enemySpriteEl);
     hpMe = 100; hpEnemy = 100;
-    hpMeEl.style.width = '100%';
-    hpEnemyEl.style.width = '100%';
-    battleMsgEl.textContent = `A wild ${creature.name} challenges you!`;
-    battleEl.classList.add('open');
-    battleEl.setAttribute('aria-hidden','false');
-    battling = true;
-    // scroll to wizard so answers are visible
-    document.getElementById('game').scrollIntoView({behavior:'smooth', block:'start'});
+    hpMeEl.style.width='100%'; hpEnemyEl.style.width='100%';
+    battleMsgEl.innerHTML = `<strong>A wild variable appears:</strong> ${prompt}`;
+    // reset steps
+    step=1;
+    bTypeSelect.value=''; bLevelSelect.value='';
+    bFbType.innerHTML=''; bFbLevel.innerHTML=''; bFbGraphs.innerHTML='';
+    bExplain.textContent=''; bExplainBox.style.display='none';
+    [...bGraphOptions.children].forEach(x=>x.setAttribute('aria-pressed','false'));
+    setBattleScreen(1);
+    battleEl.classList.add('open'); battleEl.setAttribute('aria-hidden','false');
   }
   function closeBattle(){
     battleEl.classList.remove('open');
     battleEl.setAttribute('aria-hidden','true');
-    battling = false;
+  }
+  function setBattleScreen(n){
+    step=n;
+    bStepType.style.display = (n===1?'':'none');
+    bStepLevel.style.display = (n===2?'':'none');
+    bStepGraphs.style.display = (n===3?'':'none');
+  }
+  function setFeedback(el, ok, html){
+    const div=document.createElement('div'); div.className=`feedback ${ok?'ok':'bad'}`; div.innerHTML=html; el.innerHTML=''; el.appendChild(div);
+  }
+
+  /* ---- Damage + Floaters + Lines ---- */
+  function randomLine(type, ok){
+    const t = CREATURE_LINES[type] || CREATURE_LINES.categorical;
+    const pool = ok ? t.correct : t.wrong;
+    return pool[Math.floor(Math.random()*pool.length)];
+  }
+  function floater(targetEl, text, who){
+    if(!targetEl) return;
+    const f = document.createElement('div');
+    f.className = `floater ${who}`;
+    f.textContent = text;
+    targetEl.appendChild(f);
+    // place around the center with a tiny horizontal jitter
+    const jitter = (Math.random()*24 - 12);
+    f.style.left = `calc(50% + ${jitter}px)`;
+    setTimeout(()=>{ f.remove(); }, 950);
   }
 
   function damageEnemy(){
     hpEnemy = Math.max(0, hpEnemy - DAMAGE_ENEMY);
     hpEnemyEl.style.width = hpEnemy + '%';
+    floater(spriteEnemy, `−${DAMAGE_ENEMY}`, 'enemy');
     if(hpEnemy<=0){ onWinBattle(); }
   }
   function damageMe(){
     hpMe = Math.max(0, hpMe - DAMAGE_ME);
     hpMeEl.style.width = hpMe + '%';
+    floater(spriteMe, `−${DAMAGE_ME}`, 'me');
     if(hpMe<=0){ onLoseBattle(); }
   }
+  function sayCreature(ok){
+    const t = current.type;
+    battleMsgEl.textContent = randomLine(t, ok);
+  }
+
   function onWinBattle(){
     battleMsgEl.textContent = 'Victory! The variable is tamed.';
     playWinFX(); progressMu(); updateMuCounter();
@@ -382,30 +466,10 @@
   }
   function onLoseBattle(){
     battleMsgEl.textContent = 'x̄ lost confidence and recalculates…';
-    setTimeout(()=>{ closeBattle(); pickNew(); }, 1200);
+    setTimeout(()=>{ closeBattle(); }, 1200);
   }
 
-  function startEncounter(){
-    playEncounterFX();
-    setTimeout(()=>{
-      pickNew(); // pick variable first so we know the creature type
-      openBattle(current.type);
-      setScreen(1);
-    }, 2000);
-  }
-
-  // Key movement
-  window.addEventListener('keydown',(e)=>{
-    const k=e.key.toLowerCase();
-    if(['arrowup','w'].includes(k)) { e.preventDefault(); tryMove(0,-1); }
-    if(['arrowdown','s'].includes(k)) { e.preventDefault(); tryMove(0,1); }
-    if(['arrowleft','a'].includes(k)) { e.preventDefault(); tryMove(-1,0); }
-    if(['arrowright','d'].includes(k)) { e.preventDefault(); tryMove(1,0); }
-    if(k==='escape' && battleEl.classList.contains('open')){ e.preventDefault(); closeBattle(); } // helper in dev
-  });
-  window.addEventListener('resize', ()=>{ window.requestAnimationFrame(resizeField); });
-
-  // ---- BANK (variables) ----
+  // BANK (variables)
   const BANK = [
     {prompt:"Favorite ice cream flavor", type:"categorical", level:"nominal", graphs:["bar","pareto","pie"], why:"Categories without order ⇒ nominal. Graph with bar/pareto; pie works if categories form a whole."},
     {prompt:"Class standing (freshman, sophomore, junior, senior)", type:"categorical", level:"ordinal", graphs:["bar","pareto"], why:"Ranked categories ⇒ ordinal. Bar/pareto respect ordering (avoid histogram: not numeric bins)."},
@@ -431,48 +495,15 @@
     {prompt:"Shots made out of 10 attempts", type:"quant_discrete", level:"ratio", graphs:["dot","hist","box","stem"], why:"Counts (binomial)."}
   ];
 
-  const GRAPH_CHOICES = [
-    { id:"bar", label:"Bar chart (counts/percents)" },
-    { id:"pareto", label:"Pareto (sorted bar)" },
-    { id:"pie", label:"Pie chart" },
-    { id:"hist", label:"Histogram" },
-    { id:"density", label:"Density/curve" },
-    { id:"dot", label:"Dot plot" },
-    { id:"box", label:"Box plot" },
-    { id:"stem", label:"Stem-and-leaf" },
-  ];
-
-  // State & DOM
-  let current=null; let step=1;
-  const $ = s=>document.querySelector(s);
-  const promptEl = $('#prompt');
-  const s1 = $('#s1'), s2 = $('#s2'), s3 = $('#s3');
-  const stepType = $('#stepType'), stepLevel = $('#stepLevel'), stepGraphs = $('#stepGraphs');
-  const fbType = $('#fbType'), fbLevel = $('#fbLevel'), fbGraphs = $('#fbGraphs');
-  const typeSelect = $('#typeSelect'); const levelSelect = $('#levelSelect');
-  const graphOptions = $('#graphOptions'); const explain = $('#explain'); const explainBox = $('#explainBox');
-
-  function setScreen(n){
-    step=n;
-    stepType.classList.toggle('active', n===1);
-    stepLevel.classList.toggle('active', n===2);
-    stepGraphs.classList.toggle('active', n===3);
-    s1.classList.toggle('active', n===1); s2.classList.toggle('active', n===2); s3.classList.toggle('active', n===3);
-  }
-
   function pickNew(){
     current = BANK[Math.floor(Math.random()*BANK.length)];
-    promptEl.innerHTML = `<strong>A wild variable appears:</strong> ${current.prompt}`;
-    typeSelect.value=''; levelSelect.value='';
-    fbType.innerHTML=''; fbLevel.innerHTML=''; fbGraphs.innerHTML='';
-    explain.textContent=''; explainBox.open=false;
-    [...graphOptions.children].forEach(x=>x.setAttribute('aria-pressed','false'));
-    s1.classList.remove('done'); s2.classList.remove('done'); s3.classList.remove('done');
-    setScreen(1);
+    openBattle(current.type, current.prompt);
+    renderGraphPills();
   }
 
+  // Graph pills in popup
   function renderGraphPills(){
-    graphOptions.innerHTML='';
+    bGraphOptions.innerHTML='';
     GRAPH_CHOICES.forEach((g, idx)=>{
       const btn = document.createElement('button');
       btn.className='pill'; btn.type='button';
@@ -482,97 +513,90 @@
         const on = btn.getAttribute('aria-pressed')==='true';
         btn.setAttribute('aria-pressed', String(!on));
       });
-      graphOptions.appendChild(btn);
+      bGraphOptions.appendChild(btn);
     });
   }
-
-  function setFeedback(el, ok, html){
-    const div=document.createElement('div'); div.className = `feedback ${ok? 'ok':'bad'}`; div.innerHTML = html; el.innerHTML=''; el.appendChild(div);
-  }
-
-  function arraysEqualAsSets(a,b){
-    if (a.length!==b.length) return false; const A=[...a].sort(); const B=[...b].sort();
-    return A.every((v,i)=>v===B[i]);
-  }
-
   function getSelectedGraphs(){
-    return [...graphOptions.children].filter(x=>x.getAttribute('aria-pressed')==='true').map(x=>x.dataset.id);
+    return [...bGraphOptions.children].filter(x=>x.getAttribute('aria-pressed')==='true').map(x=>x.dataset.id);
   }
-
-  // Step handlers + damage
-  function submitType(){
-    const ans = typeSelect.value;
-    if(!ans) { setFeedback(fbType, false, 'Pick a type.'); return; }
-    if(ans === current.type){
-      setFeedback(fbType, true, 'Correct! Attack landed.');
-      damageEnemy(); s1.classList.add('done'); setScreen(2);
-    } else {
-      setFeedback(fbType, false, `Not quite. This variable is <b>${prettyType(current.type)}</b>. You take damage.`);
-      damageMe();
-    }
-  }
-
-  function submitLevel(){
-    const ans = levelSelect.value;
-    if(!ans) { setFeedback(fbLevel, false, 'Pick a level.'); return; }
-    if(ans === current.level){
-      setFeedback(fbLevel, true, 'Correct! Attack landed.');
-      damageEnemy(); s2.classList.add('done'); setScreen(3);
-    } else {
-      setFeedback(fbLevel, false, `Not quite. The level is <b>${prettyLevel(current.level)}</b>. You take damage.`);
-      damageMe();
-    }
-  }
-
-  function submitGraphs(){
-    const chosen = getSelectedGraphs();
-    if(chosen.length===0){ setFeedback(fbGraphs, false, 'Choose at least one graph type.'); return; }
-    const correct = current.graphs;
-    if(arraysEqualAsSets(chosen, correct)){
-      setFeedback(fbGraphs, true, 'Perfect! Critical hit — variable tamed.');
-      s3.classList.add('done');
-      explain.textContent = current.why; explainBox.open = true;
-      damageEnemy(); // final blow
-      // victory handled in damageEnemy() if HP <= 0; if not (edge case), still celebrate
-      if(hpEnemy>0){ playWinFX(); progressMu(); updateMuCounter(); }
-    } else {
-      setFeedback(fbGraphs, false, `Close. Correct set: <b>${correct.map(prettyGraph).join(', ')}</b>. You take damage.`);
-      damageMe();
-    }
-  }
-
   function prettyType(t){
     return t==='categorical' ? 'Categorical (Qualitative)'
       : t==='quant_discrete' ? 'Quantitative — Discrete'
       : 'Quantitative — Continuous';
   }
   function prettyLevel(l){ return l[0].toUpperCase()+l.slice(1); }
-  function prettyGraph(id){ const f = GRAPH_CHOICES.find(g=>g.id===id); return f? f.label : id; }
+  function prettyGraph(id){ const ALL=[...GRAPH_CHOICES]; const f = ALL.find(g=>g.id===id); return f? f.label : id; }
+  function arraysEqualAsSets(a,b){ if (a.length!==b.length) return false; const A=[...a].sort(), B=[...b].sort(); return A.every((v,i)=>v===B[i]); }
 
-  // Wire up
-  renderGraphPills(); buildField(); resizeField(); updateMuCounter();
-  document.getElementById('submitType').addEventListener('click', submitType);
-  document.getElementById('submitLevel').addEventListener('click', submitLevel);
-  document.getElementById('submitGraphs').addEventListener('click', submitGraphs);
-  document.getElementById('revealType').addEventListener('click', ()=> setFeedback(fbType, true, `Hint: ${current.why.split('.')[0]}.`));
-  document.getElementById('revealLevel').addEventListener('click', ()=> setFeedback(fbLevel, true, `Hint: ${current.why.split('.')[0]}.`));
-  document.getElementById('revealGraphs').addEventListener('click', ()=> setFeedback(fbGraphs, true, `Appropriate: ${current.graphs.map(prettyGraph).join(', ')}`));
-  document.getElementById('newVar').addEventListener('click', pickNew);
-  document.getElementById('showExplain').addEventListener('click', ()=>{ explain.textContent=current.why; explainBox.open=true; });
-
-  // Keyboard: Enter submits current step; N = new; numbers toggle pills
-  window.addEventListener('keydown', (e)=>{
-    if(e.key==='Enter'){
-      if(step===1) submitType(); else if(step===2) submitLevel(); else submitGraphs();
+  // Submit handlers (popup)
+  document.getElementById('bSubmitType').addEventListener('click', ()=>{
+    const ans = bTypeSelect.value;
+    if(!ans){ setFeedback(bFbType,false,'Pick a type.'); return; }
+    if(ans===current.type){
+      setFeedback(bFbType,true,'Correct! Attack landed.');
+      damageEnemy(); sayCreature(true); setBattleScreen(2);
+    } else {
+      setFeedback(bFbType,false,`Not quite. This variable is <b>${prettyType(current.type)}</b>. You take damage.`);
+      damageMe(); sayCreature(false);
     }
-    const k = e.key.toLowerCase();
-    if(k==='n'){ pickNew(); }
-    if(/^[1-9]$/.test(e.key)){
-      if(step===3){ const idx = parseInt(e.key,10)-1; const btn = graphOptions.children[idx]; if(btn){ btn.click(); } }
+  });
+  document.getElementById('bSubmitLevel').addEventListener('click', ()=>{
+    const ans = bLevelSelect.value;
+    if(!ans){ setFeedback(bFbLevel,false,'Pick a level.'); return; }
+    if(ans===current.level){
+      setFeedback(bFbLevel,true,'Correct! Attack landed.');
+      damageEnemy(); sayCreature(true); setBattleScreen(3);
+    } else {
+      setFeedback(bFbLevel,false,`Not quite. The level is <b>${prettyLevel(current.level)}</b>. You take damage.`);
+      damageMe(); sayCreature(false);
+    }
+  });
+  document.getElementById('bSubmitGraphs').addEventListener('click', ()=>{
+    const chosen = getSelectedGraphs();
+    if(chosen.length===0){ setFeedback(bFbGraphs,false,'Choose at least one graph type.'); return; }
+    const correct = current.graphs;
+    if(arraysEqualAsSets(chosen, correct)){
+      setFeedback(bFbGraphs,true,'Perfect! Critical hit — variable tamed.');
+      bExplain.textContent = current.why; bExplainBox.style.display='block';
+      damageEnemy(); sayCreature(true);
+      if(hpEnemy>0){ playWinFX(); progressMu(); updateMuCounter(); }
+    } else {
+      setFeedback(bFbGraphs,false,`Close. Correct set: <b>${correct.map(prettyGraph).join(', ')}</b>. You take damage.`);
+      damageMe(); sayCreature(false);
     }
   });
 
-  // Keep squares perfect on load & resize
+  // Hints
+  document.getElementById('bHintType').addEventListener('click', ()=> setFeedback(bFbType,true,`Hint: ${current.why.split('.')[0]}.`));
+  document.getElementById('bHintLevel').addEventListener('click', ()=> setFeedback(bFbLevel,true,`Hint: ${current.why.split('.')[0]}.`));
+  document.getElementById('bHintGraphs').addEventListener('click', ()=> setFeedback(bFbGraphs,true,`Appropriate: ${current.graphs.map(prettyGraph).join(', ')}`));
+
+  // Open/Close + Encounter start
+  function startEncounter(){
+    playEncounterFX();
+    setTimeout(()=>{ pickNew(); }, 2000);
+  }
+  document.getElementById('bClose').addEventListener('click', closeBattle);
+  window.addEventListener('keydown',(e)=>{
+    const k=e.key.toLowerCase();
+    if(['arrowup','w'].includes(k)) { e.preventDefault(); tryMove(0,-1); }
+    if(['arrowdown','s'].includes(k)) { e.preventDefault(); tryMove(0,1); }
+    if(['arrowleft','a'].includes(k)) { e.preventDefault(); tryMove(-1,0); }
+    if(['arrowright','d'].includes(k)) { e.preventDefault(); tryMove(1,0); }
+    if(k==='escape' && battleEl.classList.contains('open')){ e.preventDefault(); closeBattle(); }
+    if(e.key==='Enter'){
+      if(step===1){ document.getElementById('bSubmitType').click(); }
+      else if(step===2){ document.getElementById('bSubmitLevel').click(); }
+      else { document.getElementById('bSubmitGraphs').click(); }
+    }
+    if(/^[1-9]$/.test(e.key) && step===3){
+      const idx = parseInt(e.key,10)-1; const btn = bGraphOptions.children[idx]; if(btn){ btn.click(); }
+    }
+  });
+
+  // Build/grid sizing
+  buildField(); resizeField(); updateMuCounter();
+  window.addEventListener('resize', ()=> requestAnimationFrame(resizeField));
   window.addEventListener('load', resizeField);
   </script>
 </body>
