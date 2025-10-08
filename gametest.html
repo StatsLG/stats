@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Variable Tamer — x̄ rescues μ</title>
+  <title>Variable Tamer — Catch ’Em All (μ Rescue)</title>
   <!-- Brand stylesheet (placed in /style/bctcstyle.css). If this page lives in /game/, switch to ../style/bctcstyle.css -->
   <link id="brandcss" rel="stylesheet" href="style/bctcstyle.css" />
   <style>
@@ -21,13 +21,20 @@
 
     /* Overworld */
     .field{
-      position:relative; height:clamp(200px, 35vh, 320px);
+      position:relative; height:clamp(220px, 38vh, 340px);
       overflow:hidden; background:var(--panel); border:1px solid var(--rule);
       display:grid; grid-template-columns:repeat(16, 1fr); grid-template-rows:repeat(10, 1fr)
     }
     .tile{ border:1px solid rgba(0,0,0,.04) }
     .grass{ background: linear-gradient(135deg, rgba(46,160,67,.18), rgba(46,160,67,.10)) }
     .path{ background: linear-gradient(135deg, rgba(140,95,60,.18), rgba(140,95,60,.10)) }
+
+    /* Zone tints (under tiles, very subtle) */
+    .zone-layer{ position:absolute; inset:0; display:grid; grid-template-columns:repeat(16, 1fr); pointer-events:none }
+    .zone-layer div{ grid-row:1/-1; filter:saturate(1.1); mix-blend-mode:multiply; opacity:.08 }
+    .zoneA{ background: var(--kctcs-blue) }   /* categorical bias */
+    .zoneB{ background: var(--kctcs-gold) }   /* discrete bias */
+    .zoneC{ background: #22c55e }             /* continuous bias */
 
     .hero{ position:absolute; display:grid; place-items:center; transition: transform .12s ease; will-change: transform }
     .hero .glyph{ font-weight:900; font-size:18px; line-height:1 }
@@ -117,13 +124,24 @@
       animation: pop 900ms ease-out forwards;
       pointer-events:none;
     }
-    .floater.me{ color:#ef4444 }
-    .floater.enemy{ color:#ef4444 }
     @keyframes pop{
       0%{ opacity:0; transform:translate(-50%, 10px) scale(.9) }
       15%{ opacity:1; transform:translate(-50%, 0) scale(1) }
       100%{ opacity:0; transform:translate(-50%, -28px) scale(1.06) }
     }
+
+    /* Caught tracker badges */
+    .caught{ display:flex; gap:8px; align-items:center; }
+    .badge{
+      display:inline-grid; place-items:center;
+      width:26px; height:26px; border-radius:50%;
+      border:2px solid var(--rule); color:#fff; font-weight:900; font-size:14px;
+      opacity:.45; transform: translateZ(0);
+    }
+    .badge.labelon{ background: var(--kctcs-blue) }
+    .badge.countaur{ background: var(--kctcs-gold); color:#000; }
+    .badge.flowdon{ background: #22c55e }
+    .badge.caught{ opacity:1; box-shadow:0 0 0 3px rgba(231,166,20,.25) }
   </style>
 </head>
 <body>
@@ -132,17 +150,38 @@
     <main>
       <header class="header">
         <h1>Variable Tamer</h1>
-        <p class="text-muted">Walk around as <strong>x̄</strong> to find a random encounter, then battle in the popup: <strong>Type → Level → Graphs</strong>. Rescue <strong>μ</strong> by winning 3 encounters.</p>
+        <p class="text-muted">
+          New goal: <strong>Catch all three types</strong> — Labelon (categorical), Countaur (discrete), Flowdon (continuous).
+          Zones bias what appears. Capture all three to <strong>free μ</strong>.
+        </p>
       </header>
 
       <!-- Playfield / Overworld -->
       <section class="panel pad" id="overworld" aria-label="Overworld">
         <div class="row" style="align-items:center; margin-bottom:8px">
           <div class="checkline"><input id="encOn" type="checkbox" checked><label for="encOn"> Random encounters</label></div>
-          <div class="text-muted">Use arrow keys / WASD to move. Step in tall grass for encounters.</div>
-          <div id="muCounter" class="brand-blue" style="margin-left:auto"><strong>Rescue μ:</strong> <span id="muCount">0</span>/3</div>
+          <div class="text-muted">Use arrow keys / WASD to move. Tall grass = more encounters. Zones: left (categorical), middle (discrete), right (continuous).</div>
+          <div id="muCounter" class="brand-blue" style="margin-left:auto; display:flex; gap:10px; align-items:center">
+            <div class="caught" title="Caught types">
+              <span id="bCat" class="badge labelon" aria-label="Labelon">L</span>
+              <span id="bDis" class="badge countaur" aria-label="Countaur">D</span>
+              <span id="bCon" class="badge flowdon" aria-label="Flowdon">C</span>
+            </div>
+            <span><strong>Caught:</strong> <span id="caughtCount">0</span>/3</span>
+          </div>
         </div>
-        <div id="field" class="field round shadow-1" tabindex="0" role="application" aria-label="Overworld field"></div>
+
+        <div style="position:relative">
+          <!-- subtle zone underlay -->
+          <div class="zone-layer" aria-hidden="true">
+            <!-- columns 1-5, 6-11, 12-16 -->
+            <div class="zoneA" style="grid-column:1/6"></div>
+            <div class="zoneB" style="grid-column:6/12"></div>
+            <div class="zoneC" style="grid-column:12/17"></div>
+          </div>
+
+          <div id="field" class="field round shadow-1" tabindex="0" role="application" aria-label="Overworld field"></div>
+        </div>
       </section>
     </main>
   </div>
@@ -253,12 +292,26 @@
     }
   })();
 
-  // OVERWORLD (x̄ + μ + encounters)
+  // ===== OVERWORLD (x̄ + μ + encounters) =====
   const field = document.getElementById('field');
   const encOn = document.getElementById('encOn');
   const COLS=16, ROWS=10;
   let grid=[]; let hero={x:8,y:5,el:null};
-  let mu={x:12,y:3,el:null,caged:true,progress:0};
+  let mu={x:12,y:3,el:null,caged:true};
+
+  // Capture progress (new goal)
+  const captured = { categorical:false, quant_discrete:false, quant_continuous:false };
+  const badges = {
+    categorical: document.getElementById('bCat'),
+    quant_discrete: document.getElementById('bDis'),
+    quant_continuous: document.getElementById('bCon'),
+  };
+  function updateCaughtUI(){
+    let count = 0;
+    for(const k in captured){ if(captured[k]){ count++; badges[k].classList.add('caught'); } else { badges[k].classList.remove('caught'); } }
+    document.getElementById('caughtCount').textContent = String(count);
+    if(count>=3) freeMu();
+  }
 
   function buildField(){
     if(!field) return;
@@ -294,15 +347,19 @@
   function placeMu(){ if(!mu.el) return; const {cw,ch}=cellSize(); mu.el.style.transform=`translate(${mu.x*cw}px, ${mu.y*ch}px)`; }
   function tileAt(x,y){ if(x<0||y<0||x>=COLS||y>=ROWS) return 'W'; return grid[y*COLS+x]; }
   function tryMove(dx,dy){ const nx=hero.x+dx, ny=hero.y+dy; if(tileAt(nx,ny)==='W') return; hero.x=nx; hero.y=ny; placeHero(); placeMu(); maybeEncounter(); }
+
   function maybeEncounter(){
     if(!encOn || !encOn.checked) return;
     if(tileAt(hero.x,hero.y)!=='G') return;
     if(Math.random()<0.20){ showToast('A wild variable appears!'); startEncounter(); }
   }
   function showToast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; field.appendChild(t); setTimeout(()=>t.remove(),1200); }
-  function updateMuCounter(){ const c=document.getElementById('muCount'); if(c) c.textContent = String(mu.progress); }
-  function progressMu(){ if(!mu.caged) return; mu.progress++; updateMuCounter(); if(mu.progress>=3) freeMu(); }
-  function freeMu(){ if(!mu.el) return; mu.el.classList.add('free'); const span = mu.el.querySelector('.mu'); if(span) span.classList.add('muFly'); setTimeout(()=>{ mu.el.remove(); mu.caged=false; showToast('μ is free!'); }, 1100); }
+
+  function freeMu(){
+    if(!mu.el || !mu.caged) return;
+    mu.el.classList.add('free'); const span = mu.el.querySelector('.mu'); if(span) span.classList.add('muFly');
+    setTimeout(()=>{ mu.el.remove(); mu.caged=false; showToast('μ is free!'); }, 1100);
+  }
 
   // Encounter/Win FX
   function playEncounterFX(){
@@ -322,9 +379,8 @@
       p.style.left = (Math.random()*w) + 'px';
       p.style.top = (-Math.random()*h*0.3) + 'px';
       p.style.opacity = 0.8 + Math.random()*0.2;
-      p.style.transform = `rotate(${Math.random()*180}deg)`;
-      if(i%3===0) p.classList.add('alt');
       p.style.animationDelay = (Math.random()*0.2)+'s';
+      if(i%3===0) p.classList.add('alt');
       layer.appendChild(p);
     }
     document.body.appendChild(layer);
@@ -349,7 +405,7 @@
   const spriteMe = document.getElementById('spriteMe');
   const spriteEnemy = document.getElementById('spriteEnemy');
 
-  // Battle step DOM
+  // Steps
   const bStepType = document.getElementById('bStepType');
   const bStepLevel = document.getElementById('bStepLevel');
   const bStepGraphs = document.getElementById('bStepGraphs');
@@ -369,47 +425,23 @@
     quant_continuous: { name:'Flowdon', build: (el)=>{ el.className='creature flowdon'; el.innerHTML=''; } },
   };
 
-  /* Creature one-liners (correct/wrong pools) */
+  /* Creature one-liners */
   const CREATURE_LINES = {
     categorical: {
-      correct:[
-        "Labelon: “Names only—no numbers needed!”",
-        "Labelon: “Qualitative and proud!”",
-        "Labelon: “Labels rule, order drools!”"
-      ],
-      wrong:[
-        "Labelon: “Trying to rank me? Hah!”",
-        "Labelon: “Numbers? Not in this house.”",
-        "Labelon: “No inherent order—gotcha!”"
-      ]
+      correct:["Labelon: “Names only—no numbers needed!”","Labelon: “Qualitative and proud!”","Labelon: “Labels rule, order drools!”"],
+      wrong:["Labelon: “Trying to rank me? Hah!”","Labelon: “Numbers? Not in this house.”","Labelon: “No inherent order—gotcha!”"]
     },
     quant_discrete: {
-      correct:[
-        "Countaur: “Clop! Integer steps only.”",
-        "Countaur: “Counts click like dice.”",
-        "Countaur: “Discrete wins—no in-betweens.”"
-      ],
-      wrong:[
-        "Countaur: “You can’t split a count!”",
-        "Countaur: “Half a sibling? Neigh!”",
-        "Countaur: “Discrete ≠ continuous, friend.”"
-      ]
+      correct:["Countaur: “Clop! Integer steps only.”","Countaur: “Counts click like dice.”","Countaur: “Discrete wins—no in-betweens.”"],
+      wrong:["Countaur: “You can’t split a count!”","Countaur: “Half a sibling? Neigh!”","Countaur: “Discrete ≠ continuous, friend.”"]
     },
     quant_continuous: {
-      correct:[
-        "Flowdon: “I flow between any two points.”",
-        "Flowdon: “Infinite granularity… smooth!”",
-        "Flowdon: “Continuum conquered.”"
-      ],
-      wrong:[
-        "Flowdon: “Don’t box me into integers!”",
-        "Flowdon: “I’m smoother than that.”",
-        "Flowdon: “Between any two, there’s more!”"
-      ]
+      correct:["Flowdon: “I flow between any two points.”","Flowdon: “Infinite granularity… smooth!”","Flowdon: “Continuum conquered.”"],
+      wrong:["Flowdon: “Don’t box me into integers!”","Flowdon: “I’m smoother than that.”","Flowdon: “Between any two, there’s more!”"]
     }
   };
 
-  /* Only 4 graph choices now */
+  /* Graph choices (only 4) */
   const GRAPH_CHOICES = [
     { id:"bar",  label:"Bar chart" },
     { id:"pie",  label:"Pie chart" },
@@ -424,24 +456,15 @@
   let hpMeVal = MAX_ME, hpEnemyVal = MAX_ENEMY;
 
   let current = null;
-  let step = 1; // 1,2,3
+  let step = 1;
 
   function setHP(fillEl, numEl, barEl, miniEl, val, max){
     const pct = Math.max(0, Math.min(100, (val/max)*100));
     fillEl.style.width = pct + '%';
     if (numEl) numEl.textContent = `${val}/${max}`;
-
-    // color states
     fillEl.classList.remove('med','low');
-    if (pct <= 35) fillEl.classList.add('low');
-    else if (pct <= 65) fillEl.classList.add('med');
-
-    // shake on change
-    if (barEl){
-      barEl.classList.remove('shake'); void barEl.offsetWidth; barEl.classList.add('shake');
-      setTimeout(()=> barEl.classList.remove('shake'), 260);
-    }
-
+    if (pct <= 35) fillEl.classList.add('low'); else if (pct <= 65) fillEl.classList.add('med');
+    if (barEl){ barEl.classList.remove('shake'); void barEl.offsetWidth; barEl.classList.add('shake'); setTimeout(()=> barEl.classList.remove('shake'), 260); }
     if (miniEl) miniEl.style.width = pct + '%';
   }
   function refreshAllHP(){
@@ -456,7 +479,6 @@
     c.build(enemySpriteEl);
     hpMeVal = MAX_ME; hpEnemyVal = MAX_ENEMY; refreshAllHP();
     battleMsgEl.innerHTML = `<strong>A wild variable appears:</strong> ${prompt}`;
-    // reset steps
     step=1;
     bTypeSelect.value=''; bLevelSelect.value='';
     bFbType.innerHTML=''; bFbLevel.innerHTML=''; bFbGraphs.innerHTML='';
@@ -465,10 +487,7 @@
     setBattleScreen(1);
     battleEl.classList.add('open'); battleEl.setAttribute('aria-hidden','false');
   }
-  function closeBattle(){
-    battleEl.classList.remove('open');
-    battleEl.setAttribute('aria-hidden','true');
-  }
+  function closeBattle(){ battleEl.classList.remove('open'); battleEl.setAttribute('aria-hidden','true'); }
   function setBattleScreen(n){
     step=n;
     bStepType.style.display = (n===1?'':'none');
@@ -479,7 +498,6 @@
     const div=document.createElement('div'); div.className=`feedback ${ok?'ok':'bad'}`; div.innerHTML=html; el.innerHTML=''; el.appendChild(div);
   }
 
-  /* ---- Damage + Floaters + Lines ---- */
   function randomLine(type, ok){
     const t = CREATURE_LINES[type] || CREATURE_LINES.categorical;
     const pool = ok ? t.correct : t.wrong;
@@ -498,30 +516,24 @@
 
   function damageEnemy(){
     hpEnemyVal = Math.max(0, hpEnemyVal - DAMAGE_ENEMY);
-    refreshAllHP();
-    floater(spriteEnemy, `−${DAMAGE_ENEMY}`);
+    refreshAllHP(); floater(spriteEnemy, `−${DAMAGE_ENEMY}`);
     if(hpEnemyVal<=0){ onWinBattle(); }
   }
   function damageMe(){
     hpMeVal = Math.max(0, hpMeVal - DAMAGE_ME);
-    refreshAllHP();
-    floater(spriteMe, `−${DAMAGE_ME}`);
+    refreshAllHP(); floater(spriteMe, `−${DAMAGE_ME}`);
     if(hpMeVal<=0){ onLoseBattle(); }
   }
-  function sayCreature(ok){
-    const t = current.type;
-    battleMsgEl.textContent = randomLine(t, ok);
-  }
+  function sayCreature(ok){ battleMsgEl.textContent = randomLine(current.type, ok); }
 
   function onWinBattle(){
     battleMsgEl.textContent = 'Victory! The variable is tamed.';
-    playWinFX(); progressMu(); updateMuCounter();
+    playWinFX();
+    // Mark type captured if first time
+    if(!captured[current.type]){ captured[current.type]=true; updateCaughtUI(); }
     setTimeout(()=> closeBattle(), 1200);
   }
-  function onLoseBattle(){
-    battleMsgEl.textContent = 'x̄ lost confidence and recalculates…';
-    setTimeout(()=>{ closeBattle(); }, 1200);
-  }
+  function onLoseBattle(){ battleMsgEl.textContent = 'x̄ lost confidence and recalculates…'; setTimeout(()=>{ closeBattle(); }, 1200); }
 
   // BANK (graphs restricted to {bar, pie, hist, box})
   const BANK = [
@@ -531,17 +543,18 @@
     {prompt:"Month of birth", type:"categorical", level:"nominal", graphs:["bar","pie"], why:"No inherent linear order."},
     {prompt:"Handedness (left/right)", type:"categorical", level:"nominal", graphs:["bar","pie"], why:"Binary categories ⇒ nominal."},
 
-    // Categorical — ordinal: Bar only to reinforce ordering
+    // Categorical — ordinal: Bar
     {prompt:"Class standing (freshman, sophomore, junior, senior)", type:"categorical", level:"ordinal", graphs:["bar"], why:"Ordered categories ⇒ bar chart (sorted order)."},
     {prompt:"Finishing position in a race (1st, 2nd, 3rd, …)", type:"categorical", level:"ordinal", graphs:["bar"], why:"Ranks ⇒ ordinal; bar chart communicates order."},
     {prompt:"Satisfaction (Likert: 1–5)", type:"categorical", level:"ordinal", graphs:["bar"], why:"Likert items are ordinal; use bar to show order."},
     {prompt:"Class period (1st, 2nd, …)", type:"categorical", level:"ordinal", graphs:["bar"], why:"Ordered labels ⇒ bar chart works best."},
 
-    // Quantitative — use Histogram and/or Box plot
+    // Quantitative — Discrete (Histogram/Box)
     {prompt:"Number of siblings", type:"quant_discrete", level:"ratio", graphs:["hist","box"], why:"Counts (discrete ratio). Histogram or box plot."},
     {prompt:"Daily step count", type:"quant_discrete", level:"ratio", graphs:["hist","box"], why:"Counts ⇒ discrete; histogram/box are appropriate."},
     {prompt:"Shots made out of 10 attempts", type:"quant_discrete", level:"ratio", graphs:["hist","box"], why:"Counts (binomial). Histogram/box."},
 
+    // Quantitative — Continuous (Histogram/Box)
     {prompt:"Weekly study hours", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"Time is continuous ratio. Histogram/box plot."},
     {prompt:"Height (cm)", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"Continuous ratio variable. Histogram/box."},
     {prompt:"Age (years)", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"True zero; histogram/box fit."},
@@ -549,7 +562,7 @@
     {prompt:"Distance (meters)", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"Physical measure (true zero)."},
     {prompt:"Finish time in 5K (minutes)", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"Time (ratio). Histogram/box."},
 
-    // Interval scale (still quantitative): Histogram/Box
+    // Interval
     {prompt:"Body temperature (°C)", type:"quant_continuous", level:"interval", graphs:["hist","box"], why:"Interval scale ⇒ histogram or box."},
     {prompt:"Temperature (°F)", type:"quant_continuous", level:"interval", graphs:["hist","box"], why:"Interval scale ⇒ histogram/box."},
     {prompt:"Temperature change from baseline (Δ°C)", type:"quant_continuous", level:"interval", graphs:["hist","box"], why:"Differences can be negative; histogram/box."},
@@ -558,12 +571,43 @@
     {prompt:"Body temperature (K)", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"Kelvin has a true zero ⇒ ratio. Histogram/box."},
   ];
 
+  // ====== ZONED ENCOUNTERS ======
+  // Left 5 cols (1–5): categorical heavy; middle 6–11: discrete heavy; right 12–16: continuous heavy
+  function zoneForX(x){
+    if(x <= 4) return 'A';          // cols 0..4 (1..5)
+    if(x <= 10) return 'B';         // cols 5..10 (6..11)
+    return 'C';                     // cols 11..15 (12..16)
+  }
+  function weightedTypeByZone(zone){
+    // Base weights
+    let w = { categorical:1, quant_discrete:1, quant_continuous:1 };
+    if(zone==='A') w = { categorical:0.6, quant_discrete:0.3, quant_continuous:0.1 };
+    if(zone==='B') w = { categorical:0.2, quant_discrete:0.6, quant_continuous:0.2 };
+    if(zone==='C') w = { categorical:0.15, quant_discrete:0.25, quant_continuous:0.60 };
+    // If you already caught a type, slightly downweight it so players tend to find new ones
+    for(const t in captured){ if(captured[t]) w[t] *= 0.35; }
+    // sample
+    const entries = Object.entries(w);
+    const total = entries.reduce((s,[,v])=>s+v,0);
+    let r = Math.random()*total, acc=0;
+    for(const [t,v] of entries){ acc+=v; if(r<=acc) return t; }
+    return 'categorical';
+  }
+  function startEncounter(){
+    playEncounterFX();
+    setTimeout(()=>{ pickNew(); }, 2000);
+  }
+
   function pickNew(){
-    current = BANK[Math.floor(Math.random()*BANK.length)];
+    const z = zoneForX(hero.x);
+    const wantType = weightedTypeByZone(z);
+    // pick a prompt of that type
+    const pool = BANK.filter(x=>x.type===wantType);
+    current = pool[Math.floor(Math.random()*pool.length)];
     openBattle(current.type, current.prompt);
   }
 
-  // Graph pills in popup (only 4)
+  // Graph pills (only 4)
   function renderGraphPills(){
     GRAPH_CHOICES.forEach((g, idx)=>{
       const btn = document.createElement('button');
@@ -589,7 +633,7 @@
   function prettyGraph(id){ const f = GRAPH_CHOICES.find(g=>g.id===id); return f? f.label : id; }
   function arraysEqualAsSets(a,b){ if (a.length!==b.length) return false; const A=[...a].sort(), B=[...b].sort(); return A.every((v,i)=>v===B[i]); }
 
-  // Submit handlers (popup)
+  // Submit handlers
   document.getElementById('bSubmitType').addEventListener('click', ()=>{
     const ans = bTypeSelect.value;
     if(!ans){ setFeedback(bFbType,false,'Pick a type.'); return; }
@@ -620,7 +664,8 @@
       setFeedback(bFbGraphs,true,'Perfect! Critical hit — variable tamed.');
       bExplain.textContent = current.why; bExplainBox.style.display='block';
       damageEnemy(); sayCreature(true);
-      if(hpEnemyVal>0){ playWinFX(); progressMu(); updateMuCounter(); }
+      // If enemy survives (e.g., mid-step win), still give progress + FX on KO
+      if(hpEnemyVal>0){ playWinFX(); }
     } else {
       setFeedback(bFbGraphs,false,`Close. Correct set: <b>${correct.map(prettyGraph).join(', ')}</b>. You take damage.`);
       damageMe(); sayCreature(false);
@@ -632,11 +677,7 @@
   document.getElementById('bHintLevel').addEventListener('click', ()=> setFeedback(bFbLevel,true,`Hint: ${current.why.split('.')[0]}.`));
   document.getElementById('bHintGraphs').addEventListener('click', ()=> setFeedback(bFbGraphs,true,`Appropriate: ${current.graphs.map(prettyGraph).join(', ')}`));
 
-  // Open/Close + Encounter start
-  function startEncounter(){
-    playEncounterFX();
-    setTimeout(()=>{ pickNew(); }, 2000);
-  }
+  // Close + controls
   document.getElementById('bClose').addEventListener('click', closeBattle);
   window.addEventListener('keydown',(e)=>{
     const k=e.key.toLowerCase();
@@ -645,7 +686,7 @@
     if(['arrowleft','a'].includes(k)) { e.preventDefault(); tryMove(-1,0); }
     if(['arrowright','d'].includes(k)) { e.preventDefault(); tryMove(1,0); }
     if(k==='escape' && battleEl.classList.contains('open')){ e.preventDefault(); closeBattle(); }
-    if(e.key==='Enter'){
+    if(e.key==='enter'){
       if(step===1){ document.getElementById('bSubmitType').click(); }
       else if(step===2){ document.getElementById('bSubmitLevel').click(); }
       else { document.getElementById('bSubmitGraphs').click(); }
@@ -655,8 +696,8 @@
     }
   });
 
-  // Build/grid sizing
-  buildField(); resizeField(); updateMuCounter();
+  // Build/grid sizing + init
+  buildField(); resizeField(); updateCaughtUI();
   window.addEventListener('resize', ()=> requestAnimationFrame(resizeField));
   window.addEventListener('load', resizeField);
   </script>
