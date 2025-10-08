@@ -151,7 +151,7 @@
       <header class="header">
         <h1>Variable Tamer</h1>
         <p class="text-muted">
-          New goal: <strong>Catch all three types</strong> — Labelon (categorical), Countaur (discrete), Flowdon (continuous).
+          Goal: <strong>Catch all three types</strong> — Labelon (categorical), Countaur (discrete), Flowdon (continuous).
           Zones bias what appears. Capture all three to <strong>free μ</strong>.
         </p>
       </header>
@@ -210,6 +210,13 @@
         </div>
       </div>
 
+      <!-- NEW: prompt card that stays for all steps -->
+      <div class="card" id="bPrompt" style="margin-bottom:10px">
+        <div class="step-title">Encounter</div>
+        <div id="varPrompt" class="muted"></div>
+        <div id="creatureLine" class="battle-msg" style="margin-top:6px">A wild variable challenges you!</div>
+      </div>
+
       <div class="sprite-stage">
         <div id="spriteMe" class="sprite">
           <div class="miniHp"><div id="miniMe" class="miniFill"></div></div>
@@ -221,8 +228,6 @@
           <div id="enemySprite" class="creature"></div>
         </div>
       </div>
-
-      <div class="battle-msg" id="battleMsg">A wild variable challenges you!</div>
 
       <!-- STEP 1: TYPE -->
       <div class="card" id="bStepType">
@@ -401,9 +406,10 @@
   const enemyNameEl = document.getElementById('enemyName');
   const enemyTagEl = document.getElementById('enemyTag');
   const enemySpriteEl = document.getElementById('enemySprite');
-  const battleMsgEl = document.getElementById('battleMsg');
-  const spriteMe = document.getElementById('spriteMe');
-  const spriteEnemy = document.getElementById('spriteEnemy');
+
+  // NEW: persistent prompt + dialogue line
+  const varPromptEl = document.getElementById('varPrompt');
+  const creatureLineEl = document.getElementById('creatureLine');
 
   // Steps
   const bStepType = document.getElementById('bStepType');
@@ -478,7 +484,11 @@
     enemyTagEl.textContent = type.replace('_',' ');
     c.build(enemySpriteEl);
     hpMeVal = MAX_ME; hpEnemyVal = MAX_ENEMY; refreshAllHP();
-    battleMsgEl.innerHTML = `<strong>A wild variable appears:</strong> ${prompt}`;
+
+    // Keep prompt visible entire battle; reset creature line
+    if (varPromptEl) varPromptEl.textContent = prompt;
+    if (creatureLineEl) creatureLineEl.textContent = 'A wild variable challenges you!';
+
     step=1;
     bTypeSelect.value=''; bLevelSelect.value='';
     bFbType.innerHTML=''; bFbLevel.innerHTML=''; bFbGraphs.innerHTML='';
@@ -503,6 +513,10 @@
     const pool = ok ? t.correct : t.wrong;
     return pool[Math.floor(Math.random()*pool.length)];
   }
+  function sayCreature(ok){
+    const t = current.type;
+    if (creatureLineEl) creatureLineEl.textContent = randomLine(t, ok);
+  }
   function floater(targetEl, text){
     if(!targetEl) return;
     const f = document.createElement('div');
@@ -516,24 +530,25 @@
 
   function damageEnemy(){
     hpEnemyVal = Math.max(0, hpEnemyVal - DAMAGE_ENEMY);
-    refreshAllHP(); floater(spriteEnemy, `−${DAMAGE_ENEMY}`);
+    refreshAllHP(); floater(document.getElementById('spriteEnemy'), `−${DAMAGE_ENEMY}`);
     if(hpEnemyVal<=0){ onWinBattle(); }
   }
   function damageMe(){
     hpMeVal = Math.max(0, hpMeVal - DAMAGE_ME);
-    refreshAllHP(); floater(spriteMe, `−${DAMAGE_ME}`);
+    refreshAllHP(); floater(document.getElementById('spriteMe'), `−${DAMAGE_ME}`);
     if(hpMeVal<=0){ onLoseBattle(); }
   }
-  function sayCreature(ok){ battleMsgEl.textContent = randomLine(current.type, ok); }
 
   function onWinBattle(){
-    battleMsgEl.textContent = 'Victory! The variable is tamed.';
+    if (creatureLineEl) creatureLineEl.textContent = 'Victory! The variable is tamed.';
     playWinFX();
-    // Mark type captured if first time
     if(!captured[current.type]){ captured[current.type]=true; updateCaughtUI(); }
     setTimeout(()=> closeBattle(), 1200);
   }
-  function onLoseBattle(){ battleMsgEl.textContent = 'x̄ lost confidence and recalculates…'; setTimeout(()=>{ closeBattle(); }, 1200); }
+  function onLoseBattle(){
+    if (creatureLineEl) creatureLineEl.textContent = 'x̄ lost confidence and recalculates…';
+    setTimeout(()=>{ closeBattle(); }, 1200);
+  }
 
   // BANK (graphs restricted to {bar, pie, hist, box})
   const BANK = [
@@ -584,7 +599,7 @@
     if(zone==='A') w = { categorical:0.6, quant_discrete:0.3, quant_continuous:0.1 };
     if(zone==='B') w = { categorical:0.2, quant_discrete:0.6, quant_continuous:0.2 };
     if(zone==='C') w = { categorical:0.15, quant_discrete:0.25, quant_continuous:0.60 };
-    // If you already caught a type, slightly downweight it so players tend to find new ones
+    // Downweight already-caught types
     for(const t in captured){ if(captured[t]) w[t] *= 0.35; }
     // sample
     const entries = Object.entries(w);
@@ -601,7 +616,6 @@
   function pickNew(){
     const z = zoneForX(hero.x);
     const wantType = weightedTypeByZone(z);
-    // pick a prompt of that type
     const pool = BANK.filter(x=>x.type===wantType);
     current = pool[Math.floor(Math.random()*pool.length)];
     openBattle(current.type, current.prompt);
@@ -664,7 +678,6 @@
       setFeedback(bFbGraphs,true,'Perfect! Critical hit — variable tamed.');
       bExplain.textContent = current.why; bExplainBox.style.display='block';
       damageEnemy(); sayCreature(true);
-      // If enemy survives (e.g., mid-step win), still give progress + FX on KO
       if(hpEnemyVal>0){ playWinFX(); }
     } else {
       setFeedback(bFbGraphs,false,`Close. Correct set: <b>${correct.map(prettyGraph).join(', ')}</b>. You take damage.`);
