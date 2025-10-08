@@ -75,14 +75,26 @@
     }
     .battle.open .panel{ transform: translateY(0) }
     .battle-hud{ display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:center; margin-bottom:10px }
-    .hpbar{ height:12px; background:#eee; border-radius:999px; overflow:hidden; border:1px solid var(--rule) }
+    .hud-row{ display:flex; gap:10px; align-items:center; justify-content:space-between; font-weight:700 }
+
+    /* HP bars + numbers */
+    .hpwrap{ display:flex; align-items:center; gap:8px; min-width:240px }
+    .hpnum{ font-weight:800; font-variant-numeric: tabular-nums; color: var(--muted) }
+    .hpbar{ height:14px; background:#eef2f7; border-radius:999px; overflow:hidden; border:1px solid var(--rule); flex:1 }
     .hpfill{ height:100%; width:100%; background:linear-gradient(90deg,#22c55e,#16a34a); transition: width .25s ease }
     .hpfill.enemy{ background:linear-gradient(90deg,#ef4444,#b91c1c) }
-    .hud-row{ display:flex; gap:10px; align-items:center; justify-content:space-between; font-weight:700 }
+    .hpfill.med{ background:linear-gradient(90deg,#f59e0b,#d97706) }
+    .hpfill.low{ background:linear-gradient(90deg,#ef4444,#b91c1c) }
+    .hpbar.shake{ animation: hpShake 250ms ease }
+    @keyframes hpShake { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-2px) } 75% { transform: translateX(2px) } }
+
     .sprite-stage{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; align-items:center; margin-bottom:10px }
     .sprite{ height:120px; border:1px solid var(--rule); border-radius:12px; display:grid; place-items:center; background:var(--panel); position:relative }
     .sprite .me{ font-weight:900; font-size:28px }
     .sprite .enemyTag{ font-weight:800; font-size:14px; color:var(--muted); position:absolute; top:6px; right:10px }
+    .sprite .miniHp { position:absolute; left:8px; right:8px; top:6px; height:6px; border-radius:999px; background:#eef2f7; border:1px solid var(--rule); overflow:hidden; }
+    .sprite .miniFill { height:100%; width:100%; background:#22c55e }
+    .sprite.enemy .miniFill { background:#ef4444 }
 
     /* Creature styles */
     .creature{ width:84px; height:84px; position:relative }
@@ -120,7 +132,7 @@
     <main>
       <header class="header">
         <h1>Variable Tamer</h1>
-        <p class="text-muted">Walk around as <strong>x̄</strong> to find a random encounter, then battle entirely in the popup: <strong>Type → Level → Graphs</strong>. Rescue <strong>μ</strong> by winning 3 encounters.</p>
+        <p class="text-muted">Walk around as <strong>x̄</strong> to find a random encounter, then battle in the popup: <strong>Type → Level → Graphs</strong>. Rescue <strong>μ</strong> by winning 3 encounters.</p>
       </header>
 
       <!-- Playfield / Overworld -->
@@ -141,17 +153,31 @@
       <div class="battle-hud">
         <div class="hud-row">
           <span>🧑‍🏫 x̄</span>
-          <div class="hpbar" aria-label="Player HP"><div id="hpMe" class="hpfill" style="width:100%"></div></div>
+          <div class="hpwrap">
+            <div class="hpbar" id="hpMeBar" aria-label="Player HP">
+              <div id="hpMeFill" class="hpfill"></div>
+            </div>
+            <div id="hpMeNum" class="hpnum">100/100</div>
+          </div>
         </div>
         <div class="hud-row">
           <span id="enemyName">Enemy</span>
-          <div class="hpbar" aria-label="Enemy HP"><div id="hpEnemy" class="hpfill enemy" style="width:100%"></div></div>
+          <div class="hpwrap">
+            <div class="hpbar" id="hpEnemyBar" aria-label="Enemy HP">
+              <div id="hpEnemyFill" class="hpfill enemy"></div>
+            </div>
+            <div id="hpEnemyNum" class="hpnum">100/100</div>
+          </div>
         </div>
       </div>
 
       <div class="sprite-stage">
-        <div id="spriteMe" class="sprite"><div class="me">x̄</div></div>
-        <div id="spriteEnemy" class="sprite">
+        <div id="spriteMe" class="sprite">
+          <div class="miniHp"><div id="miniMe" class="miniFill"></div></div>
+          <div class="me">x̄</div>
+        </div>
+        <div id="spriteEnemy" class="sprite enemy">
+          <div class="miniHp"><div id="miniEnemy" class="miniFill"></div></div>
           <div id="enemyTag" class="enemyTag"></div>
           <div id="enemySprite" class="creature"></div>
         </div>
@@ -307,8 +333,15 @@
 
   // ======== BATTLE SYSTEM (popup) ========
   const battleEl = document.getElementById('battle');
-  const hpMeEl = document.getElementById('hpMe');
-  const hpEnemyEl = document.getElementById('hpEnemy');
+  const hpMeFill = document.getElementById('hpMeFill');
+  const hpEnemyFill = document.getElementById('hpEnemyFill');
+  const hpMeBar = document.getElementById('hpMeBar');
+  const hpEnemyBar = document.getElementById('hpEnemyBar');
+  const hpMeNum = document.getElementById('hpMeNum');
+  const hpEnemyNum = document.getElementById('hpEnemyNum');
+  const miniMe = document.getElementById('miniMe');
+  const miniEnemy = document.getElementById('miniEnemy');
+
   const enemyNameEl = document.getElementById('enemyName');
   const enemyTagEl = document.getElementById('enemyTag');
   const enemySpriteEl = document.getElementById('enemySprite');
@@ -384,27 +417,51 @@
     { id:"box",  label:"Box plot" },
   ];
 
-  /* Damage numbers */
+  /* Damage & HP */
   const DAMAGE_ENEMY = 34;   // ~3 hits
   const DAMAGE_ME = 15;
-  let hpMe = 100, hpEnemy = 100;
+  const MAX_ME = 100, MAX_ENEMY = 100;
+  let hpMeVal = MAX_ME, hpEnemyVal = MAX_ENEMY;
+
   let current = null;
   let step = 1; // 1,2,3
+
+  function setHP(fillEl, numEl, barEl, miniEl, val, max){
+    const pct = Math.max(0, Math.min(100, (val/max)*100));
+    fillEl.style.width = pct + '%';
+    if (numEl) numEl.textContent = `${val}/${max}`;
+
+    // color states
+    fillEl.classList.remove('med','low');
+    if (pct <= 35) fillEl.classList.add('low');
+    else if (pct <= 65) fillEl.classList.add('med');
+
+    // shake on change
+    if (barEl){
+      barEl.classList.remove('shake'); void barEl.offsetWidth; barEl.classList.add('shake');
+      setTimeout(()=> barEl.classList.remove('shake'), 260);
+    }
+
+    if (miniEl) miniEl.style.width = pct + '%';
+  }
+  function refreshAllHP(){
+    setHP(hpMeFill, hpMeNum, hpMeBar, miniMe, hpMeVal, MAX_ME);
+    setHP(hpEnemyFill, hpEnemyNum, hpEnemyBar, miniEnemy, hpEnemyVal, MAX_ENEMY);
+  }
 
   function openBattle(type, prompt){
     const c = CREATURES[type] || CREATURES.categorical;
     enemyNameEl.textContent = c.name;
     enemyTagEl.textContent = type.replace('_',' ');
     c.build(enemySpriteEl);
-    hpMe = 100; hpEnemy = 100;
-    hpMeEl.style.width='100%'; hpEnemyEl.style.width='100%';
+    hpMeVal = MAX_ME; hpEnemyVal = MAX_ENEMY; refreshAllHP();
     battleMsgEl.innerHTML = `<strong>A wild variable appears:</strong> ${prompt}`;
     // reset steps
     step=1;
     bTypeSelect.value=''; bLevelSelect.value='';
     bFbType.innerHTML=''; bFbLevel.innerHTML=''; bFbGraphs.innerHTML='';
     bExplain.textContent=''; bExplainBox.style.display='none';
-    [...bGraphOptions.children].forEach(x=>x.setAttribute('aria-pressed','false'));
+    bGraphOptions.innerHTML=''; renderGraphPills();
     setBattleScreen(1);
     battleEl.classList.add('open'); battleEl.setAttribute('aria-hidden','false');
   }
@@ -428,10 +485,10 @@
     const pool = ok ? t.correct : t.wrong;
     return pool[Math.floor(Math.random()*pool.length)];
   }
-  function floater(targetEl, text, who){
+  function floater(targetEl, text){
     if(!targetEl) return;
     const f = document.createElement('div');
-    f.className = `floater ${who}`;
+    f.className = `floater`;
     f.textContent = text;
     targetEl.appendChild(f);
     const jitter = (Math.random()*24 - 12);
@@ -440,16 +497,16 @@
   }
 
   function damageEnemy(){
-    hpEnemy = Math.max(0, hpEnemy - DAMAGE_ENEMY);
-    hpEnemyEl.style.width = hpEnemy + '%';
-    floater(spriteEnemy, `−${DAMAGE_ENEMY}`, 'enemy');
-    if(hpEnemy<=0){ onWinBattle(); }
+    hpEnemyVal = Math.max(0, hpEnemyVal - DAMAGE_ENEMY);
+    refreshAllHP();
+    floater(spriteEnemy, `−${DAMAGE_ENEMY}`);
+    if(hpEnemyVal<=0){ onWinBattle(); }
   }
   function damageMe(){
-    hpMe = Math.max(0, hpMe - DAMAGE_ME);
-    hpMeEl.style.width = hpMe + '%';
-    floater(spriteMe, `−${DAMAGE_ME}`, 'me');
-    if(hpMe<=0){ onLoseBattle(); }
+    hpMeVal = Math.max(0, hpMeVal - DAMAGE_ME);
+    refreshAllHP();
+    floater(spriteMe, `−${DAMAGE_ME}`);
+    if(hpMeVal<=0){ onLoseBattle(); }
   }
   function sayCreature(ok){
     const t = current.type;
@@ -466,7 +523,7 @@
     setTimeout(()=>{ closeBattle(); }, 1200);
   }
 
-  // BANK (variables) — graph answers restricted to {bar, pie, hist, box}
+  // BANK (graphs restricted to {bar, pie, hist, box})
   const BANK = [
     // Categorical — nominal: Bar, Pie
     {prompt:"Favorite ice cream flavor", type:"categorical", level:"nominal", graphs:["bar","pie"], why:"Categories without order ⇒ nominal. Bar or pie both OK."},
@@ -474,7 +531,7 @@
     {prompt:"Month of birth", type:"categorical", level:"nominal", graphs:["bar","pie"], why:"No inherent linear order."},
     {prompt:"Handedness (left/right)", type:"categorical", level:"nominal", graphs:["bar","pie"], why:"Binary categories ⇒ nominal."},
 
-    // Categorical — ordinal: Bar (we avoid pie to reinforce ordering)
+    // Categorical — ordinal: Bar only to reinforce ordering
     {prompt:"Class standing (freshman, sophomore, junior, senior)", type:"categorical", level:"ordinal", graphs:["bar"], why:"Ordered categories ⇒ bar chart (sorted order)."},
     {prompt:"Finishing position in a race (1st, 2nd, 3rd, …)", type:"categorical", level:"ordinal", graphs:["bar"], why:"Ranks ⇒ ordinal; bar chart communicates order."},
     {prompt:"Satisfaction (Likert: 1–5)", type:"categorical", level:"ordinal", graphs:["bar"], why:"Likert items are ordinal; use bar to show order."},
@@ -483,7 +540,7 @@
     // Quantitative — use Histogram and/or Box plot
     {prompt:"Number of siblings", type:"quant_discrete", level:"ratio", graphs:["hist","box"], why:"Counts (discrete ratio). Histogram or box plot."},
     {prompt:"Daily step count", type:"quant_discrete", level:"ratio", graphs:["hist","box"], why:"Counts ⇒ discrete; histogram/box are appropriate."},
-    {prompt:"Shots made out of 10 attempts", type:"quant_discrete", level:"ratio", graphs:["hist","box"], why:"Counts ⇒ discrete. Histogram/box."},
+    {prompt:"Shots made out of 10 attempts", type:"quant_discrete", level:"ratio", graphs:["hist","box"], why:"Counts (binomial). Histogram/box."},
 
     {prompt:"Weekly study hours", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"Time is continuous ratio. Histogram/box plot."},
     {prompt:"Height (cm)", type:"quant_continuous", level:"ratio", graphs:["hist","box"], why:"Continuous ratio variable. Histogram/box."},
@@ -504,12 +561,10 @@
   function pickNew(){
     current = BANK[Math.floor(Math.random()*BANK.length)];
     openBattle(current.type, current.prompt);
-    renderGraphPills();
   }
 
   // Graph pills in popup (only 4)
   function renderGraphPills(){
-    bGraphOptions.innerHTML='';
     GRAPH_CHOICES.forEach((g, idx)=>{
       const btn = document.createElement('button');
       btn.className='pill'; btn.type='button';
@@ -531,10 +586,7 @@
       : 'Quantitative — Continuous';
   }
   function prettyLevel(l){ return l[0].toUpperCase()+l.slice(1); }
-  function prettyGraph(id){
-    const f = GRAPH_CHOICES.find(g=>g.id===id);
-    return f? f.label : id;
-  }
+  function prettyGraph(id){ const f = GRAPH_CHOICES.find(g=>g.id===id); return f? f.label : id; }
   function arraysEqualAsSets(a,b){ if (a.length!==b.length) return false; const A=[...a].sort(), B=[...b].sort(); return A.every((v,i)=>v===B[i]); }
 
   // Submit handlers (popup)
@@ -568,14 +620,14 @@
       setFeedback(bFbGraphs,true,'Perfect! Critical hit — variable tamed.');
       bExplain.textContent = current.why; bExplainBox.style.display='block';
       damageEnemy(); sayCreature(true);
-      if(hpEnemy>0){ playWinFX(); progressMu(); updateMuCounter(); }
+      if(hpEnemyVal>0){ playWinFX(); progressMu(); updateMuCounter(); }
     } else {
       setFeedback(bFbGraphs,false,`Close. Correct set: <b>${correct.map(prettyGraph).join(', ')}</b>. You take damage.`);
       damageMe(); sayCreature(false);
     }
   });
 
-  // Hints (trimmed to avoid removed chart types)
+  // Hints
   document.getElementById('bHintType').addEventListener('click', ()=> setFeedback(bFbType,true,`Hint: ${current.why.split('.')[0]}.`));
   document.getElementById('bHintLevel').addEventListener('click', ()=> setFeedback(bFbLevel,true,`Hint: ${current.why.split('.')[0]}.`));
   document.getElementById('bHintGraphs').addEventListener('click', ()=> setFeedback(bFbGraphs,true,`Appropriate: ${current.graphs.map(prettyGraph).join(', ')}`));
