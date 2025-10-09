@@ -6,13 +6,12 @@
   <title>StatsLG — Demos</title>
   <meta name="description" content="Interactive demos created by StatsLG." />
   <link rel="icon" href="/favicon.ico" />
-
-  <!-- Try root-relative CSS first; JS below will fix to relative if needed -->
+  <!-- Root-relative first; script below rewrites to ../ if needed -->
   <link id="site-css" rel="stylesheet" href="/style/bctcstyle.css">
 </head>
 <body>
   <div class="layout">
-    <!-- Sidebar gets injected here -->
+    <!-- Sidebar include -->
     <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
 
     <main>
@@ -21,11 +20,12 @@
         <p class="text-muted">Quick links to interactive classroom demos and prototypes.</p>
       </header>
 
+      <!-- Filter controls -->
       <section class="section">
         <div class="row">
           <div>
             <label for="demoSearch">Filter demos</label>
-            <input id="demoSearch" type="search" placeholder="Type to filter (e.g., regression, timer, Bengals)" />
+            <input id="demoSearch" type="search" placeholder="Type to filter (e.g., confidence, sampling, game)" />
           </div>
           <div>
             <label for="demoTag">Tag</label>
@@ -34,8 +34,10 @@
               <option value="stats">Stats</option>
               <option value="visualization">Visualization</option>
               <option value="classroom">Classroom</option>
-              <option value="sports">Sports</option>
-              <option value="hardware">Hardware</option>
+              <option value="inference">Inference</option>
+              <option value="sampling">Sampling</option>
+              <option value="modeling">Modeling</option>
+              <option value="game">Game</option>
             </select>
           </div>
         </div>
@@ -44,76 +46,63 @@
       <section class="section">
         <h2>Featured</h2>
         <div class="grid" id="demoGrid">
-          <!-- Update the hrefs to match your actual demo files in /demo/ -->
-          <article class="card" data-tags="stats visualization classroom">
+          <!-- 1. Confidence Interval Visualizer -->
+          <article class="card" data-tags="stats visualization classroom inference">
             <h3>Confidence Interval Visualizer</h3>
             <p>Animated coverage demo with repeated samples and intervals.</p>
             <div class="btns">
-              <a class="btn" href="./confidence-intervals.html">Open</a>
-              <a class="btn outline" href="./confidence-intervals.html#about">About</a>
+              <a class="btn" href="./cidemo.html">Open</a>
+              <a class="btn outline" href="./cidemo.html#about">About</a>
             </div>
           </article>
 
-          <article class="card" data-tags="stats visualization classroom">
-            <h3>Least Squares Regression Demo</h3>
-            <p>Shows how residuals drive the best-fit line.</p>
+          <!-- 2. Linear Model Demo -->
+          <article class="card" data-tags="stats visualization classroom modeling">
+            <h3>Linear Model Demo</h3>
+            <p>See how residuals and least squares determine the best-fit line.</p>
             <div class="btns">
-              <a class="btn" href="./linear-regression.html">Open</a>
-              <a class="btn outline" href="./linear-regression.html#about">About</a>
+              <a class="btn" href="./linearmodeldemo.html">Open</a>
+              <a class="btn outline" href="./linearmodeldemo.html#about">About</a>
             </div>
           </article>
 
-          <article class="card" data-tags="visualization classroom">
-            <h3>Box &amp; Whisker Playground</h3>
-            <p>Build and compare box plots; highlight outliers.</p>
+          <!-- 3. Sample Distribution Demo -->
+          <article class="card" data-tags="stats visualization classroom sampling">
+            <h3>Sample Distribution Demo</h3>
+            <p>Explore sample means and how distributions change with n.</p>
             <div class="btns">
-              <a class="btn" href="./boxplot.html">Open</a>
-              <a class="btn ghost" href="../graphing/">More Graphing</a>
+              <a class="btn" href="./sampledistdemo.html">Open</a>
+              <a class="btn outline" href="./sampledistdemo.html#about">About</a>
             </div>
           </article>
 
-          <article class="card" data-tags="sports visualization classroom">
-            <h3>Bengals LIVE Board</h3>
-            <p>Game state, first-down progress, and score animations.</p>
+          <!-- 4. Sample Types Demo -->
+          <article class="card" data-tags="stats classroom sampling">
+            <h3>Sample Types Demo</h3>
+            <p>Compare SRS, stratified, cluster, and systematic sampling.</p>
             <div class="btns">
-              <a class="btn" href="./bengals-live.html">Open</a>
-              <a class="btn outline" href="./bengals-live.html#setup">Setup</a>
+              <a class="btn" href="./sampledemo.html">Open</a>
+              <a class="btn outline" href="./sampledemo.html#about">About</a>
             </div>
           </article>
 
-          <article class="card" data-tags="hardware classroom visualization">
-            <h3>Visual Timer (Pi / Desktop)</h3>
-            <p>Clean countdown with circular and linear modes.</p>
+          <!-- 5. Variable Trainer game -->
+          <article class="card" data-tags="classroom game visualization stats">
+            <h3>Variable Trainer: Gotta Tame'em All</h3>
+            <p>Battle-style practice with variable types and stats questions.</p>
             <div class="btns">
-              <a class="btn" href="./visual-timer.html">Open</a>
-              <a class="btn outline" href="./visual-timer.html#docs">Docs</a>
+              <a class="btn" href="./gametest.html">Open</a>
+              <a class="btn outline" href="./gametest.html#about">About</a>
             </div>
           </article>
 
-          <article class="card" data-tags="stats classroom">
-            <h3>Yahtzee Probability Lab</h3>
-            <p>Explore discrete outcomes and exact probabilities.</p>
+          <!-- 6. CI & Hypothesis Test Visualized -->
+          <article class="card" data-tags="stats visualization classroom inference">
+            <h3>CI &amp; Hypothesis Test Visualized</h3>
+            <p>Confidence intervals and hypothesis tests shown side-by-side.</p>
             <div class="btns">
-              <a class="btn" href="./yahtzee-probability.html">Open</a>
-              <a class="btn outline" href="./yahtzee-probability.html#guide">Guide</a>
-            </div>
-          </article>
-
-          <article class="card" data-tags="sports classroom visualization">
-            <h3>Reds Scoreboard (Web)</h3>
-            <p>Linescore, roster, and fun event animations.</p>
-            <div class="btns">
-              <a class="btn" href="./reds-scoreboard.html">Open</a>
-              <a class="btn outline" href="./reds-scoreboard.html#about">About</a>
-            </div>
-          </article>
-
-          <article class="card" data-tags="classroom stats">
-            <h3>Sampling &amp; CLT Explorer</h3>
-            <p>See sampling distributions form as n increases.</p>
-            <div class="btns">
-              <a class="btn" href="./sampling-lab.html">Open</a>
-              <a class="btn outline" href="./sampling-lab.html#about">About</a>
+              <a class="btn" href="./cihpdemo.html">Open</a>
+              <a class="btn outline" href="./cihpdemo.html#about">About</a>
             </div>
           </article>
         </div>
@@ -125,25 +114,17 @@
     </main>
   </div>
 
-  <!-- Fix paths automatically if we're in a subfolder (e.g., /demo/) -->
+  <!-- Path fixer (handles /demo/ subdirectory hosting) -->
   <script>
     (function ensurePathsWorkEverywhere(){
-      // If "/style/bctcstyle.css" 404s, swap to "../style/bctcstyle.css"
-      const testImg = new Image();
-      testImg.onload = testImg.onerror = function(){
-        // do nothing; if it loaded, great
-      };
-      testImg.src = "/style/___pathcheck___"; // harmless ping
-      // If we're under a subpath and not at domain root, rewrite includes to ../partials/...
-      const inSubdir = location.pathname.split('/').filter(Boolean)[0] !== undefined
-                       && location.pathname.split('/').filter(Boolean)[0] !== '';
-      if (inSubdir) {
+      const isSubdir = location.pathname.replace(/\/index\.html?$/,'').split('/').filter(Boolean).length > 0;
+      if (isSubdir) {
         // Sidebar include path
         document.querySelectorAll('[data-include]').forEach(el=>{
           const url = el.getAttribute('data-include') || '';
           if (url.startsWith('/')) el.setAttribute('data-include', '..' + url);
         });
-        // CSS fallback if needed
+        // CSS fallback
         const link = document.getElementById('site-css');
         if (link && link.getAttribute('href').startsWith('/')) {
           link.setAttribute('href', '..' + link.getAttribute('href'));
@@ -152,23 +133,21 @@
     })();
   </script>
 
-  <!-- Inject /partials/sidebar.html and mark active link -->
+  <!-- Inject sidebar + highlight active link -->
   <script>
   (function () {
     async function injectIncludes() {
       const nodes = document.querySelectorAll('[data-include]');
       await Promise.all(Array.from(nodes).map(async (el) => {
         let url = el.getAttribute('data-include');
-
-        // If still root-absolute while on a project path, fix it one more time
-        if (!url.startsWith('http') && url.startsWith('/') && location.pathname.split('/').filter(Boolean).length > 0) {
+        if (!url.startsWith('http') && url.startsWith('/') &&
+            location.pathname.split('/').filter(Boolean).length > 0) {
           url = '..' + url;
         }
-
         const resp = await fetch(url, { cache: 'no-cache' });
         el.innerHTML = await resp.text();
 
-        // Sidebar tweaks: current year + active link highlight
+        // Sidebar tweaks: current year + active link
         const yr = el.querySelector('#yr'); if (yr) yr.textContent = new Date().getFullYear();
         const here = location.pathname.replace(/\/index\.html?$/, '/');
         el.querySelectorAll('a[href]').forEach(a => {
@@ -188,7 +167,7 @@
   })();
   </script>
 
-  <!-- Filter logic -->
+  <!-- Filter logic + last updated -->
   <script>
     (function(){
       const q = document.getElementById('demoSearch');
@@ -208,9 +187,11 @@
       q?.addEventListener('input', applyFilter);
       tag?.addEventListener('change', applyFilter);
       applyFilter();
+
       document.getElementById('lastUpdated').textContent =
         new Date(document.lastModified).toLocaleString();
     })();
   </script>
 </body>
 </html>
+
