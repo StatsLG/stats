@@ -349,36 +349,39 @@ body .card input[type="color"]{
   background: transparent !important;
 }
 
-/* =========================================================
-   HARD FIX: Always-on blue strip behind the left column
-   Paints a fixed blue bar that's as tall as the page,
-   unaffected by layout/container heights.
-   ========================================================= */
-html, body{
-  /* ensure no other background blocks our strip */
-  background: none;
-}
+/* ======== Always-on blue strip behind the left column ======== */
+
+/* Make the page tall and allow the html background to show through */
+html, body { min-height: 100%; }
+
+/* Paint the blue strip on the root element for the entire scroll height */
 html{
-  background: #ffffff; /* your page background */
+  /* layer 1: the left blue strip, fixed so it doesn't "run out" on scroll
+     layer 2: your normal page background color */
+  background:
+    linear-gradient(
+      to right,
+      var(--kctcs-blue) 0,
+      var(--kctcs-blue) var(--sidebar-w),
+      transparent var(--sidebar-w),
+      transparent 100%
+    ) fixed,
+    var(--bg);
 }
+
+/* Let the html gradient be visible (body was previously opaque white) */
 body{
-  position: relative;
+  background: transparent !important;
 }
 
-/* Permanent blue strip on the left */
-body::before{
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: var(--sidebar-w);            /* 280px */
-  height: 100vh;
-  background: var(--kctcs-blue);
-  pointer-events: none;               /* lets you click through */
-  /* no z-index needed; this paints behind normal content */
-}
-
-/* Keep the sidebar transparent so the strip shows through */
+/* Keep the sidebar itself transparent so the strip is visible */
 .sidebar{
   background: transparent !important;
+}
+
+/* Mobile: stacked layout—use solid blue instead of a left strip */
+@media (max-width: 760px){
+  html{
+    background: var(--kctcs-blue);
+  }
 }
