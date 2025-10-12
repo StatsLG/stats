@@ -365,3 +365,62 @@ body .card input[type="color"]{
 .sidebar *{
   background-color: transparent !important; /* buttons/cards keep their own borders */
 }
+
+/* ===== FINAL OVERRIDES: force blue sidebar in all cases ===== */
+
+/* 0) Quick visual: draw the sidebar box so you can see what is being targeted */
+/* (optional; remove once you confirm it hits the right element) */
+.sidebar { outline: 2px dashed #e7a614; }
+
+/* 1) Match common structures with VERY high specificity and set BOTH background & background-color.
+      Also kill any background-image from a shorthand applied elsewhere. */
+html body .layout > .sidebar,
+html body .layout > aside.sidebar,
+html body .layout > #sidebar,
+body .layout > .sidebar,
+aside.sidebar,
+#sidebar,
+.sidebar{
+  position: relative; /* create a stacking context */
+  z-index: 1;         /* keep it above any underlying white layers */
+  background-color: #00467f !important;
+  background: #00467f !important;      /* defeats 'background: transparent' shorthands */
+  background-image: none !important;    /* defeats gradient/image resets */
+  color: #e7a614 !important;
+}
+
+/* 2) If any pseudo-elements were painting white over it, neutralize them */
+.sidebar::before,
+.sidebar::after{
+  content: none !important;
+  background: transparent !important;
+}
+
+/* 3) If a full-bleed child is painting white, make children transparent by default */
+.sidebar *{
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* 4) Keep mobile stacked state blue as well */
+@media (max-width: 760px){
+  .sidebar{
+    background-color: #00467f !important;
+    background: #00467f !important;
+  }
+}
+
+/* 5) (Optional) If you want a guaranteed blue column behind everything on desktop, add the stripe.
+      This is independent of the sidebar element and cannot be “overpainted” by main content. */
+@media (min-width: 761px){
+  body::before{
+    content:"";
+    position: fixed;
+    inset: 0 auto 0 0;          /* top:0; right:auto; bottom:0; left:0 */
+    width: var(--sidebar-w, 280px);
+    background: #00467f;
+    z-index: 0;                 /* stays behind page content */
+    pointer-events: none;
+  }
+  .layout{ position: relative; z-index: 1; }
+}
