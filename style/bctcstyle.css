@@ -102,7 +102,7 @@ a:focus-visible{ outline:3px solid var(--kctcs-gold); outline-offset:3px; border
 }
 @media (max-width: 760px){
   .sidebar{
-    position: static; height: 100vh;
+    position: static; height: auto;
     border-bottom: 4px solid var(--kctcs-gold);
     background: transparent;
   }
