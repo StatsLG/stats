@@ -102,7 +102,7 @@ a:focus-visible{ outline:3px solid var(--kctcs-gold); outline-offset:3px; border
 }
 @media (max-width: 760px){
   .sidebar{
-    position: static; height: auto;
+    position: static; height: 100vh;
     border-bottom: 4px solid var(--kctcs-gold);
     background: transparent;
   }
@@ -349,39 +349,3 @@ body .card input[type="color"]{
   background: transparent !important;
 }
 
-/* ======== Always-on blue strip behind the left column ======== */
-
-/* Make the page tall and allow the html background to show through */
-html, body { min-height: 100%; }
-
-/* Paint the blue strip on the root element for the entire scroll height */
-html{
-  /* layer 1: the left blue strip, fixed so it doesn't "run out" on scroll
-     layer 2: your normal page background color */
-  background:
-    linear-gradient(
-      to right,
-      var(--kctcs-blue) 0,
-      var(--kctcs-blue) var(--sidebar-w),
-      transparent var(--sidebar-w),
-      transparent 100%
-    ) fixed,
-    var(--bg);
-}
-
-/* Let the html gradient be visible (body was previously opaque white) */
-body{
-  background: transparent !important;
-}
-
-/* Keep the sidebar itself transparent so the strip is visible */
-.sidebar{
-  background: transparent !important;
-}
-
-/* Mobile: stacked layout—use solid blue instead of a left strip */
-@media (max-width: 760px){
-  html{
-    background: var(--kctcs-blue);
-  }
-}
