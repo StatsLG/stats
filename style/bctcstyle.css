@@ -84,7 +84,7 @@ a:focus-visible{ outline:3px solid var(--kctcs-gold); outline-offset:3px; border
 
 /* ---------- Sidebar ---------- */
 .sidebar{
-  background: transparent;  /* ✅ permanent blue sidebar */
+  background: var(--kctcs-blue);  /* ✅ permanent blue sidebar */
   color: var(--kctcs-gold);
   padding: 18px 16px;
   display: flex;
@@ -330,5 +330,25 @@ body .card input[type="color"]{
   padding: 0;
   border: 2px solid var(--field-border) !important;
   background: transparent !important;
+}
+
+/* ===== HARD OVERRIDES: guaranteed blue sidebar column ===== */
+
+
+/* 2) Force the actual sidebar element to be blue even if other CSS overrides it */
+.sidebar{
+  background: var(--kctcs-blue) !important;
+  color: var(--kctcs-gold) !important;
+}
+
+/* 3) On mobile, keep sidebar blue when stacked */
+@media (max-width: 760px){
+  .layout{ background: var(--kctcs-blue) !important; }
+  .sidebar{ background: var(--kctcs-blue) !important; }
+}
+
+/* 4) If something is painting white over the sidebar, make sure it’s transparent */
+.sidebar *{
+  background-color: transparent !important; /* buttons/cards keep their own borders */
 }
 
