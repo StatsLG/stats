@@ -1,8 +1,8 @@
 /* =========================================================
-   StatsLG / BCTC — Brand CSS (FULL UPDATED)
+   StatsLG / BCTC — Brand CSS (FULL UPDATED, FINAL FIX)
    - KCTCS Blue (PMS 541): #00467f
    - KCTCS Gold (PMS 131): #e7a614
-   - Shared for Hub + Graphing/Analysis modules
+   - Sidebar background fixed to stay blue
    ========================================================= */
 
 /* ---------- CSS Variables (Light baseline) ---------- */
@@ -13,15 +13,15 @@
 
   /* Neutral UI */
   --bg: #ffffff;
-  --ink: #0f172a;      /* near-black text */
-  --muted: #4b5563;    /* secondary text */
-  --rule: #e5e7eb;     /* borders/dividers */
+  --ink: #0f172a;
+  --muted: #4b5563;
+  --rule: #e5e7eb;
 
   /* Cards & Panels */
   --panel: #f5f7fb;
   --card: #ffffff;
 
-  /* Controls (defaults; overridden by hard-fix at bottom) */
+  /* Controls */
   --input-bg: #ffffff;
   --input-border: #d1d5db;
   --input-ink: #111827;
@@ -32,20 +32,18 @@
   --btn-border: var(--kctcs-gold);
   --btn-ink: #ffffff;
 
-  /* Layout scales */
+  /* Layout */
   --radius: 14px;
   --shadow-1: 0 1px 2px rgba(0,0,0,.04);
   --shadow-2: 0 10px 30px rgba(0,0,0,.08);
-
-  /* Sidebar */
   --sidebar-w: 280px;
 }
 
-/* ---------- Optional Dark Mode (auto if user prefers) ---------- */
+/* ---------- Optional Dark Mode ---------- */
 @media (prefers-color-scheme: dark){
   :root{
-    --bg: #0f172a;          /* deep slate */
-    --ink: #e5e7eb;         /* light text */
+    --bg: #0f172a;
+    --ink: #e5e7eb;
     --muted: #9ca3af;
     --rule: #1f2937;
     --panel: #111827;
@@ -69,27 +67,44 @@ body{
 a{ color: inherit; text-decoration: none }
 a:focus-visible{ outline:3px solid var(--kctcs-gold); outline-offset:3px; border-radius:6px }
 
-/* ---------- Layout: Two-Column (Sidebar + Main for hub) ---------- */
+/* ---------- Layout ---------- */
 .layout{
   display: grid;
   grid-template-columns: var(--sidebar-w) 1fr;
   min-height: 100dvh;
+  position: relative;
+  background: var(--bg); /* no gradient anymore */
 }
 @media (max-width: 760px){
-  .layout{ grid-template-columns: 1fr }
+  .layout{
+    grid-template-columns: 1fr;
+    background: var(--kctcs-blue);
+  }
 }
 
-/* ---------- Sidebar (Left Panel for hub) ---------- */
+/* ---------- Sidebar ---------- */
 .sidebar{
-  background: var(--kctcs-blue);
+  background: var(--kctcs-blue);  /* ✅ permanent blue sidebar */
   color: var(--kctcs-gold);
   padding: 18px 16px;
-  display: flex; flex-direction: column; gap: 16px;
-  position: sticky; top: 0; align-self: start; height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  align-self: stretch;
+  height: auto;
+  min-height: 100dvh;
 }
 @media (max-width: 760px){
-  .sidebar{ position: static; height: auto; border-bottom: 4px solid var(--kctcs-gold) }
+  .sidebar{
+    position: static;
+    min-height: 0;
+    border-bottom: 4px solid var(--kctcs-gold);
+    background: var(--kctcs-blue);
+  }
 }
+
 .brand{
   display:flex; align-items:center; gap:10px;
   padding:10px 8px; border-radius:10px;
@@ -113,7 +128,13 @@ a:focus-visible{ outline:3px solid var(--kctcs-gold); outline-offset:3px; border
 .nav-divider{ height:1px; background: rgba(231,166,20,.4); margin:10px 0 }
 .sidebar .footer-note{ margin-top:auto; color:#fff; font-size:12px; opacity:.85 }
 
-/* ---------- Main Area (hub) ---------- */
+.nav a.active{
+  background: rgba(231,166,20,.12);
+  outline: 2px solid var(--kctcs-gold);
+  outline-offset: 0;
+}
+
+/* ---------- Main ---------- */
 main{ padding:24px; max-width:1100px }
 .header{
   border-bottom: 4px solid var(--kctcs-gold);
@@ -166,7 +187,7 @@ main{ padding:24px; max-width:1100px }
   color: var(--ink);
 }
 
-/* ---------- Forms / Inputs (baseline; hard-fix override at bottom) ---------- */
+/* ---------- Forms ---------- */
 label{ display:block; font-size:13px; color: var(--muted); margin-bottom:6px }
 input, select, textarea{
   width: 100%;
@@ -180,7 +201,7 @@ input::placeholder{ color: var(--input-placeholder) }
 input[type="color"]{ height: 40px; padding: 0 }
 fieldset{ border:1px solid var(--rule); border-radius:10px; padding:10px 12px }
 
-/* ---------- Panels used by graphing modules ---------- */
+/* ---------- Panels ---------- */
 .panel{
   background: var(--panel);
   border: 1px solid var(--rule);
@@ -192,7 +213,7 @@ fieldset{ border:1px solid var(--rule); border-radius:10px; padding:10px 12px }
   border: 1px solid var(--rule);
 }
 
-/* ---------- Chart module layout helpers (left controls + right chart) ---------- */
+/* ---------- Chart module layout ---------- */
 .wrap{
   display:grid;
   grid-template-columns: 320px 1fr;
@@ -215,27 +236,17 @@ fieldset{ border:1px solid var(--rule); border-radius:10px; padding:10px 12px }
   box-shadow: var(--shadow-1);
 }
 
-/* ---------- Small layout helpers used by module pages ---------- */
-.row{
-  display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;
-}
+/* ---------- Helpers ---------- */
+.row{ display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
 .row > div{ flex:1 1 140px; }
 
-.row3{
-  display:grid; grid-template-columns: 1fr 1fr auto; gap:12px; align-items:end;
-}
-@media (max-width: 720px){
-  .row3{ grid-template-columns: 1fr; }
-}
+.row3{ display:grid; grid-template-columns: 1fr 1fr auto; gap:12px; align-items:end; }
+@media (max-width: 720px){ .row3{ grid-template-columns: 1fr; } }
 
-.checkline{
-  display:flex; align-items:center; gap:8px; padding-bottom: 2px;
-}
-
-/* muted text utility used by modules */
+.checkline{ display:flex; align-items:center; gap:8px; padding-bottom: 2px; }
 .muted{ color: var(--muted); }
 
-/* ---------- Preview table (dataset) ---------- */
+/* ---------- Table ---------- */
 table{ width:100%; border-collapse:collapse }
 th, td{
   padding: 6px 8px;
@@ -270,30 +281,28 @@ footer.site-footer{
 /* ---------- Print tweaks ---------- */
 @media print{
   .sidebar{ display:none }
-  .layout{ grid-template-columns: 1fr }
+  .layout{ grid-template-columns: 1fr; background: none }
   .btn{ display:none }
 }
 
 /* =========================================================
-   HARD-FIX for input borders (always visible + black on focus)
-   (Place at the very end so it wins the cascade)
+   HARD-FIX for input borders
    ========================================================= */
 :root{
-  --field-border: #bbb;   /* mid grey */
+  --field-border: #bbb;
   --field-bg: #ffffff;
   --field-ink: #111;
 }
 
-/* High specificity + !important to defeat old inline/legacy rules */
 body .wrap .panel input,
 body .wrap .panel select,
 body .wrap .panel textarea,
 body .card input,
 body .card select,
 body .card textarea{
-  width: 95%;
+  width: 100%;
   padding: 8px;
-  border: 2px solid var(--field-border) !important;  /* always visible */
+  border: 2px solid var(--field-border) !important;
   border-radius: 8px !important;
   background: var(--field-bg) !important;
   color: var(--field-ink) !important;
@@ -304,7 +313,6 @@ body .card textarea{
   outline: none !important;
 }
 
-/* Focus: solid black border + subtle ring */
 body .wrap .panel input:focus,
 body .wrap .panel select:focus,
 body .wrap .panel textarea:focus,
@@ -316,7 +324,6 @@ body .card textarea:focus{
   outline: none !important;
 }
 
-/* Color picker: visible edge */
 body .wrap .panel input[type="color"],
 body .card input[type="color"]{
   height: 40px;
@@ -325,15 +332,36 @@ body .card input[type="color"]{
   background: transparent !important;
 }
 
-/* Active nav link highlight */
-.nav a.active{
-  background: rgba(231,166,20,.12);
-  outline: 2px solid var(--kctcs-gold);
-  outline-offset: 0;
+/* ===== HARD OVERRIDES: guaranteed blue sidebar column ===== */
+
+/* 1) Paint a fixed blue stripe on the left the width of the sidebar */
+@media (min-width: 761px){
+  body::before{
+    content:"";
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: var(--sidebar-w);
+    background: var(--kctcs-blue);
+    pointer-events: none;
+    z-index: 0; /* sit behind page content */
+  }
+  /* ensure your main grid renders above the stripe */
+  .layout{ position: relative; z-index: 1; }
 }
 
-.nav a.active{
-  background: rgba(231,166,20,.12);
-  outline: 2px solid var(--kctcs-gold);
-  outline-offset: 0;
+/* 2) Force the actual sidebar element to be blue even if other CSS overrides it */
+.sidebar{
+  background: var(--kctcs-blue) !important;
+  color: var(--kctcs-gold) !important;
+}
+
+/* 3) On mobile, keep sidebar blue when stacked */
+@media (max-width: 760px){
+  .layout{ background: var(--kctcs-blue) !important; }
+  .sidebar{ background: var(--kctcs-blue) !important; }
+}
+
+/* 4) If something is painting white over the sidebar, make sure it’s transparent */
+.sidebar *{
+  background-color: transparent !important; /* buttons/cards keep their own borders */
 }
