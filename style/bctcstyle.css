@@ -334,21 +334,3 @@ body .card input[type="color"]{
 
 /* ===== HARD OVERRIDES: guaranteed blue sidebar column ===== */
 
-
-/* 2) Force the actual sidebar element to be blue even if other CSS overrides it */
-.sidebar{
-  background: var(--kctcs-blue) !important;
-  color: var(--kctcs-gold) !important;
-}
-
-/* 3) On mobile, keep sidebar blue when stacked */
-@media (max-width: 760px){
-  .layout{ background: var(--kctcs-blue) !important; }
-  .sidebar{ background: var(--kctcs-blue) !important; }
-}
-
-/* 4) If something is painting white over the sidebar, make sure it’s transparent */
-.sidebar *{
-  background-color: transparent !important; /* buttons/cards keep their own borders */
-}
-
