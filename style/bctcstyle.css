@@ -1,39 +1,45 @@
 /* =========================================================
-   StatsLG / BCTC — Brand CSS (FINAL CLEAN STRIPE VERSION)
+   StatsLG / BCTC — Brand CSS (FULL UPDATED, FINAL FIX)
    - KCTCS Blue (PMS 541): #00467f
    - KCTCS Gold (PMS 131): #e7a614
-   - Single blue stripe behind sidebar
+   - Sidebar background fixed to stay blue
    ========================================================= */
 
-/* ---------- CSS Variables ---------- */
+/* ---------- CSS Variables (Light baseline) ---------- */
 :root{
+  /* Brand */
   --kctcs-blue: #00467f;
   --kctcs-gold: #e7a614;
 
+  /* Neutral UI */
   --bg: #ffffff;
   --ink: #0f172a;
   --muted: #4b5563;
   --rule: #e5e7eb;
 
+  /* Cards & Panels */
   --panel: #f5f7fb;
   --card: #ffffff;
 
+  /* Controls */
   --input-bg: #ffffff;
   --input-border: #d1d5db;
   --input-ink: #111827;
   --input-placeholder: #9ca3af;
 
+  /* Accents */
   --btn-bg: var(--kctcs-blue);
   --btn-border: var(--kctcs-gold);
   --btn-ink: #ffffff;
 
+  /* Layout */
   --radius: 14px;
   --shadow-1: 0 1px 2px rgba(0,0,0,.04);
   --shadow-2: 0 10px 30px rgba(0,0,0,.08);
   --sidebar-w: 280px;
 }
 
-/* ---------- Dark Mode ---------- */
+/* ---------- Optional Dark Mode ---------- */
 @media (prefers-color-scheme: dark){
   :root{
     --bg: #0f172a;
@@ -61,27 +67,13 @@ body{
 a{ color: inherit; text-decoration: none }
 a:focus-visible{ outline:3px solid var(--kctcs-gold); outline-offset:3px; border-radius:6px }
 
-/* ---------- Blue Stripe (fixed) ---------- */
-@media (min-width: 761px){
-  body::before{
-    content:"";
-    position: fixed;
-    left: 0; top: 0; bottom: 0;
-    width: var(--sidebar-w);
-    background: var(--kctcs-blue);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .layout{ position: relative; z-index: 1; }
-}
-
 /* ---------- Layout ---------- */
 .layout{
   display: grid;
   grid-template-columns: var(--sidebar-w) 1fr;
   min-height: 100dvh;
   position: relative;
-  background: var(--bg);
+  background: var(--bg); /* no gradient anymore */
 }
 @media (max-width: 760px){
   .layout{
@@ -92,7 +84,7 @@ a:focus-visible{ outline:3px solid var(--kctcs-gold); outline-offset:3px; border
 
 /* ---------- Sidebar ---------- */
 .sidebar{
-  background: transparent !important; /* ✨ no double bar */
+  background: var(--kctcs-blue);  /* ✅ permanent blue sidebar */
   color: var(--kctcs-gold);
   padding: 18px 16px;
   display: flex;
@@ -104,15 +96,12 @@ a:focus-visible{ outline:3px solid var(--kctcs-gold); outline-offset:3px; border
   height: auto;
   min-height: 100dvh;
 }
-.sidebar *{
-  background-color: transparent !important;
-}
 @media (max-width: 760px){
   .sidebar{
     position: static;
     min-height: 0;
     border-bottom: 4px solid var(--kctcs-gold);
-    background: transparent !important;
+    background: var(--kctcs-blue);
   }
 }
 
@@ -296,7 +285,9 @@ footer.site-footer{
   .btn{ display:none }
 }
 
-/* ---------- HARD-FIX for inputs ---------- */
+/* =========================================================
+   HARD-FIX for input borders
+   ========================================================= */
 :root{
   --field-border: #bbb;
   --field-bg: #ffffff;
@@ -340,3 +331,24 @@ body .card input[type="color"]{
   border: 2px solid var(--field-border) !important;
   background: transparent !important;
 }
+
+/* ===== HARD OVERRIDES: guaranteed blue sidebar column ===== */
+
+
+/* 2) Force the actual sidebar element to be blue even if other CSS overrides it */
+.sidebar{
+  background: var(--kctcs-blue) !important;
+  color: var(--kctcs-gold) !important;
+}
+
+/* 3) On mobile, keep sidebar blue when stacked */
+@media (max-width: 760px){
+  .layout{ background: var(--kctcs-blue) !important; }
+  .sidebar{ background: var(--kctcs-blue) !important; }
+}
+
+/* 4) If something is painting white over the sidebar, make sure it’s transparent */
+.sidebar *{
+  background-color: transparent !important; /* buttons/cards keep their own borders */
+}
+
