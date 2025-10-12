@@ -348,3 +348,37 @@ body .card input[type="color"]{
   border: 2px solid var(--field-border) !important;
   background: transparent !important;
 }
+
+/* =========================================================
+   HARD FIX: Always-on blue strip behind the left column
+   Paints a fixed blue bar that's as tall as the page,
+   unaffected by layout/container heights.
+   ========================================================= */
+html, body{
+  /* ensure no other background blocks our strip */
+  background: none;
+}
+html{
+  background: #ffffff; /* your page background */
+}
+body{
+  position: relative;
+}
+
+/* Permanent blue strip on the left */
+body::before{
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-w);            /* 280px */
+  height: 100vh;
+  background: var(--kctcs-blue);
+  pointer-events: none;               /* lets you click through */
+  /* no z-index needed; this paints behind normal content */
+}
+
+/* Keep the sidebar transparent so the strip shows through */
+.sidebar{
+  background: transparent !important;
+}
