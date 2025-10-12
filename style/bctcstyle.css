@@ -1,5 +1,5 @@
 /* =========================================================
-   StatsLG / BCTC — Brand CSS (FULL UPDATED)
+   StatsLG / BCTC — Brand CSS (FULL UPDATED, Option 1 applied)
    - KCTCS Blue (PMS 541): #00467f
    - KCTCS Gold (PMS 131): #e7a614
    - Shared for Hub + Graphing/Analysis modules
@@ -74,21 +74,38 @@ a:focus-visible{ outline:3px solid var(--kctcs-gold); outline-offset:3px; border
   display: grid;
   grid-template-columns: var(--sidebar-w) 1fr;
   min-height: 100dvh;
+
+  /* Paint the left column (sidebar width) blue for full document height */
+  background: linear-gradient(
+    to right,
+    var(--kctcs-blue) 0,
+    var(--kctcs-blue) var(--sidebar-w),
+    transparent var(--sidebar-w),
+    transparent 100%
+  );
 }
 @media (max-width: 760px){
-  .layout{ grid-template-columns: 1fr }
+  .layout{
+    grid-template-columns: 1fr;
+    /* On mobile (stacked), ensure a blue header band */
+    background: var(--kctcs-blue);
+  }
 }
 
 /* ---------- Sidebar (Left Panel for hub) ---------- */
 .sidebar{
-  background: var(--kctcs-blue);
+  background: transparent; /* column is already painted blue */
   color: var(--kctcs-gold);
   padding: 18px 16px;
   display: flex; flex-direction: column; gap: 16px;
   position: sticky; top: 0; align-self: start; height: 100dvh;
 }
 @media (max-width: 760px){
-  .sidebar{ position: static; height: auto; border-bottom: 4px solid var(--kctcs-gold) }
+  .sidebar{
+    position: static; height: auto;
+    border-bottom: 4px solid var(--kctcs-gold);
+    background: transparent;
+  }
 }
 .brand{
   display:flex; align-items:center; gap:10px;
@@ -112,6 +129,13 @@ a:focus-visible{ outline:3px solid var(--kctcs-gold); outline-offset:3px; border
 .nav a:hover{ background: rgba(231,166,20,.12) }
 .nav-divider{ height:1px; background: rgba(231,166,20,.4); margin:10px 0 }
 .sidebar .footer-note{ margin-top:auto; color:#fff; font-size:12px; opacity:.85 }
+
+/* Active nav link highlight */
+.nav a.active{
+  background: rgba(231,166,20,.12);
+  outline: 2px solid var(--kctcs-gold);
+  outline-offset: 0;
+}
 
 /* ---------- Main Area (hub) ---------- */
 main{ padding:24px; max-width:1100px }
@@ -270,7 +294,7 @@ footer.site-footer{
 /* ---------- Print tweaks ---------- */
 @media print{
   .sidebar{ display:none }
-  .layout{ grid-template-columns: 1fr }
+  .layout{ grid-template-columns: 1fr; background: none }
   .btn{ display:none }
 }
 
@@ -323,17 +347,4 @@ body .card input[type="color"]{
   padding: 0;
   border: 2px solid var(--field-border) !important;
   background: transparent !important;
-}
-
-/* Active nav link highlight */
-.nav a.active{
-  background: rgba(231,166,20,.12);
-  outline: 2px solid var(--kctcs-gold);
-  outline-offset: 0;
-}
-
-.nav a.active{
-  background: rgba(231,166,20,.12);
-  outline: 2px solid var(--kctcs-gold);
-  outline-offset: 0;
 }
