@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA210U — Notes | StatsLG</title>
+  <meta name="description" content="STA210U section notes index — StatsLG." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — loaded from one shared file ===== -->
+    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
+
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
+    <main>
+      <header>
+        <h1>STA210U — Statistics</h1>
+        <p class="subtitle">NOTES</p>
+      </header>
+
+      <!-- Search / filter -->
+      <section class="section">
+        <div class="row">
+          <div>
+            <label for="search">Filter sections</label>
+            <input id="search" type="text" placeholder="e.g., sampling, probability, 1A…" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Section cards -->
+      <section class="section">
+        <div id="cards" class="grid"></div>
+      </section>
+
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // ---- Page footer "last updated"
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
+
+    // ---- Shared sidebar include loader
+    // Set BASE = '/REPO_NAME' for GitHub *project* sites; leave '' for user/org sites.
+    const BASE = ''; // e.g., '/statslg' if your site is username.github.io/statslg
+
+    (async function injectSidebar(){
+      const el = document.querySelector('[data-include]');
+      if(!el) return;
+      let url = el.getAttribute('data-include') || '/partials/sidebar.html';
+      if (BASE && url.startsWith('/')) url = BASE + url;
+
+      try{
+        const resp = await fetch(url, {cache:'no-cache'});
+        if(!resp.ok) throw new Error(resp.statusText);
+        el.innerHTML = await resp.text();
+
+        // Set year inside the injected sidebar
+        const yr = el.querySelector('#yr');
+        if (yr) yr.textContent = new Date().getFullYear();
+
+        // Mark active nav link (only nav links, not the brand)
+        const here = location.pathname.replace(/\/index\.html$/, '/');
+        el.querySelectorAll('.nav a[href]').forEach(a=>{
+          const target = new URL(a.getAttribute('href'), location.origin).pathname
+            .replace(/\/index\.html$/, '/');
+          if (here === target || (here.startsWith(target) && target !== '/')) {
+            a.classList.add('active');
+          }
+        });
+      }catch(err){
+        console.error('Sidebar include failed:', err);
+        el.innerHTML = '<div class="muted">Sidebar failed to load.</div>';
+      }
+    })();
+
+    // ----- STA210U sections list -----
+    // Update "file" to match your actual HTML names once created.
+    const sections = [
+      {
+        id: "1A",
+        title: "Section 1A",
+        desc: "Intro foundations (placeholder — edit as needed).",
+        file: "1A.html",
+        updated: "2025-10-15"
+      },
+      {
+        id: "1B",
+        title: "Section 1B",
+        desc: "Data + variables (placeholder).",
+        file: "1B.html",
+        updated: "2025-10-15"
+      },
+      {
+        id: "1C",
+        title: "Section 1C",
+        desc: "Graphs & summaries (placeholder).",
+        file: "1C.html",
+        updated: "2025-10-15"
+      },
+      {
+        id: "3A",
+        title: "Section 2A",
+        desc: "Probability",
+        file: "section3a.html",
+        updated: "2025-10-15"
+      }
+    ];
+
+    // ----- Render cards -----
+    const cards = document.getElementById('cards');
+    function render(list){
+      cards.innerHTML = "";
+      list.forEach(s => {
+        const card = document.createElement('article');
+        card.className = "card";
+        card.innerHTML = `
+          <h3>${s.title}</h3>
+          <p class="muted">${s.desc || ""}</p>
+          <div class="btns">
+            <a class="btn" href="${s.file}">Open</a>
+            <span class="muted" style="margin-left:8px;">Updated: ${s.updated || "—"}</span>
+          </div>
+        `;
+        cards.appendChild(card);
+      });
+    }
+    render(sections);
+
+    // ----- Simple client-side filter -----
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if(!q){ render(sections); return; }
+      const filtered = sections.filter(s =>
+        (s.title && s.title.toLowerCase().includes(q)) ||
+        (s.desc && s.desc.toLowerCase().includes(q)) ||
+        (s.id && s.id.toLowerCase().includes(q))
+      );
+      render(filtered);
+    });
+  </script>
+</body>
+</html>

@@ -1,665 +1,215 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>STA220 — Probability Tree & Applets | StatsLG</title>
-  <meta name="description" content="Three-coin tree diagram plus quick probability applets (binomial, two dice, birthday problem, two cards)." />
-  <link rel="icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="/style/bctcstyle.css">
+<!-- === 3-Coin Tree Diagram (drop-in section) === -->
+<section id="tree-3-coins" class="section">
+  <h2>Tree Diagram — 3 Coins</h2>
+  <div class="card soft">
+    <div class="row" style="align-items:center; gap:12px;">
+      <div class="checkline">
+        <input id="hl-2tails" type="checkbox">
+        <label for="hl-2tails" style="margin:0;">Highlight “exactly 2 tails” (HTT, THT, TTH)</label>
+      </div>
+      <div class="checkline">
+        <input id="hl-1tail" type="checkbox">
+        <label for="hl-1tail" style="margin:0;">Highlight “exactly 1 tail” (HHT, HTH, THH)</label>
+      </div>
+    </div>
 
-  <!-- MathJax for inline math -->
-  <script>
-    window.MathJax = { tex: { inlineMath: [['\\(','\\)'], ['$', '$']] } };
-  </script>
-  <script id="MathJax-script" async
-          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <div class="preview" style="height:480px; margin-top:10px;">
+      <svg id="coinTree" width="100%" height="100%" role="img" aria-label="Tree diagram for three coin flips"></svg>
+    </div>
 
-  <style>
-    .note { font-size:12px; color: var(--muted) }
-    .w-auto { width:auto }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace }
-    .overflow-x { overflow-x:auto }
-    .viz { width:100%; height:100% }
-    .preview.tall { height:480px }
-    .btnbar { display:flex; gap:8px; flex-wrap:wrap }
-    .kpis { display:grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap:8px }
-    .kpis div { background:#fff; border:1px solid var(--rule); border-radius:8px; padding:8px; font-weight:700 }
-    .grid2 { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:12px }
-    .tight { gap:8px }
-    .legend { font-size:12px; color:#4b5563 }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <!-- ===== Shared sidebar include ===== -->
-    <aside class="sidebar" aria-label="Site navigation" data-include="partials/sidebar.html"></aside>
-
-    <!-- ===== Main ===== -->
-    <main>
-      <header>
-        <h1>Probability Tree & Applets</h1>
-        <p class="subtitle">Three-coin tree diagram plus quick interactive applets for binomial, dice events, birthday problem, and two-card draws.</p>
-      </header>
-
-      <!-- ===================== 3-Coin Tree Diagram ===================== -->
-      <section id="tree-3-coins" class="section">
-        <h2>Tree Diagram — 3 Coins</h2>
-        <div class="card soft">
-          <div class="row" style="align-items:center; gap:12px;">
-            <div class="checkline">
-              <input id="hl-2tails" type="checkbox">
-              <label for="hl-2tails" style="margin:0;">Highlight “exactly 2 tails” (HTT, THT, TTH)</label>
-            </div>
-            <div class="checkline">
-              <input id="hl-1tail" type="checkbox">
-              <label for="hl-1tail" style="margin:0;">Highlight “exactly 1 tail” (HHT, HTH, THH)</label>
-            </div>
-          </div>
-
-          <div class="preview tall" style="margin-top:10px;">
-            <svg id="coinTree" class="viz" role="img" aria-label="Tree diagram for three coin flips"></svg>
-          </div>
-
-          <p class="muted" style="margin:.6rem 0 0;">
-            Each edge has probability <span class="mono">1/2</span>. Each leaf (sequence) has probability <span class="mono">1/8</span>.
-            There are 3 sequences with exactly 2 tails ⇒ \(P(\text{exactly 2 tails})=3/8\).
-          </p>
-        </div>
-      </section>
-
-      <!-- ===================== Applet 1: Binomial (theory vs sim) ===================== -->
-      <section id="applet-binomial" class="section">
-        <h2>Applet — Coin Flips: Theory vs Simulation</h2>
-        <div class="card">
-          <div class="grid2">
-            <div class="card soft">
-              <label for="nFlips"># flips (n)</label>
-              <input id="nFlips" type="number" min="1" max="200" value="10">
-              <label style="margin-top:8px;" for="pHead">P(Head) \(p\)</label>
-              <input id="pHead" type="number" step="0.01" min="0" max="1" value="0.50">
-
-              <label style="margin-top:8px;" for="nTrials">Simulation trials</label>
-              <input id="nTrials" type="number" min="1" max="50000" value="5000">
-
-              <div class="btnbar" style="margin-top:8px;">
-                <button class="btn" id="runBinom">Run Simulation</button>
-                <button class="btn ghost" id="resetBinom">Reset</button>
-              </div>
-              <p class="note" style="margin:.5rem 0 0;">
-                Plots the <strong>exact</strong> binomial distribution \(X\sim \text{Bin}(n,p)\) and an <strong>empirical</strong> histogram of simulated # of heads.
-              </p>
-            </div>
-
-            <div class="card soft">
-              <div class="preview" style="height:300px;">
-                <svg id="binomPlot" class="viz" role="img" aria-label="Binomial theory vs simulation"></svg>
-              </div>
-              <div class="kpis" style="margin-top:8px;">
-                <div id="binomMean">Mean —</div>
-                <div id="binomVar">Var —</div>
-                <div id="binomSimMean">Sim mean —</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===================== Applet 2: Two Dice Events ===================== -->
-      <section id="applet-dice" class="section">
-        <h2>Applet — Two Dice Events</h2>
-        <div class="card">
-          <div class="grid2 tight">
-            <div class="card soft">
-              <div class="row">
-                <div>
-                  <label>Event A</label>
-                  <select id="diceA">
-                    <option value="sum7">Sum = 7</option>
-                    <option value="bothLE4">Both ≤ 4</option>
-                    <option value="double">Doubles</option>
-                    <option value="redEven">Red is even</option>
-                    <option value="greenGT4">Green > 4</option>
-                  </select>
-                </div>
-                <div>
-                  <label>Event B</label>
-                  <select id="diceB">
-                    <option value="sum7">Sum = 7</option>
-                    <option value="bothLE4">Both ≤ 4</option>
-                    <option value="double">Doubles</option>
-                    <option value="redEven">Red is even</option>
-                    <option value="greenGT4">Green > 4</option>
-                  </select>
-                </div>
-              </div>
-              <div class="btnbar" style="margin-top:8px;">
-                <button class="btn" id="drawDice">Update</button>
-                <button class="btn ghost" id="resetDice">Reset</button>
-              </div>
-              <p class="note">Green die = columns, Red die = rows (ordered pair is (red, green)).</p>
-            </div>
-
-            <div class="card soft overflow-x">
-              <div class="preview" style="height:300px;">
-                <svg id="diceGrid" class="viz" role="img" aria-label="Two dice 6x6 grid"></svg>
-              </div>
-              <div class="kpis" style="margin-top:8px;">
-                <div id="pA">P(A) —</div>
-                <div id="pB">P(B) —</div>
-                <div id="pAB">P(A∩B) —</div>
-                <div id="pAUB">P(A∪B) —</div>
-                <div id="pAgB">P(A|B) —</div>
-              </div>
-              <p class="legend">Gold = A only, Blue = B only, Green = A∩B, Light gray = neither.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===================== Applet 3: Birthday Problem ===================== -->
-      <section id="applet-birthday" class="section">
-        <h2>Applet — Birthday Problem</h2>
-        <div class="card">
-          <div class="grid2">
-            <div class="card soft">
-              <label for="classN">Class size</label>
-              <input id="classN" type="number" min="2" max="100" value="32">
-              <label style="margin-top:8px;" for="trialsB">Simulation trials</label>
-              <input id="trialsB" type="number" min="100" max="50000" value="5000">
-              <div class="btnbar" style="margin-top:8px;">
-                <button class="btn" id="runBday">Run</button>
-                <button class="btn ghost" id="resetBday">Reset</button>
-              </div>
-              <p class="note">Assume 365 equally likely birthdays; no Feb 29.</p>
-            </div>
-            <div class="card soft">
-              <div class="kpis">
-                <div id="bdayExact">Exact P(match) —</div>
-                <div id="bdaySim">Sim P(match) —</div>
-              </div>
-              <div class="preview" style="height:240px; margin-top:8px;">
-                <svg id="bdayPlot" class="viz" role="img" aria-label="Birthday probability vs class size"></svg>
-              </div>
-              <p class="legend">Curve = exact; dot = this class size simulated.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===================== Applet 4: Two Cards (Replacement vs Not) ===================== -->
-      <section id="applet-cards" class="section">
-        <h2>Applet — Two Cards from a Deck</h2>
-        <div class="card">
-          <div class="grid2">
-            <div class="card soft">
-              <label># of aces in deck</label>
-              <input id="aces" type="number" min="1" max="4" value="4">
-              <label style="margin-top:8px;">Deck size</label>
-              <input id="deckN" type="number" min="4" max="104" value="52">
-              <div class="btnbar" style="margin-top:8px;">
-                <button class="btn" id="cardsCalc">Calculate</button>
-              </div>
-              <p class="note" style="margin:.5rem 0 0;">Compare with and without replacement; check independence via \(P(B\mid A)\) vs \(P(B)\).</p>
-            </div>
-            <div class="card soft">
-              <div class="kpis">
-                <div id="noRep">No repl: P(AA) —</div>
-                <div id="withRep">With repl: P(AA) —</div>
-                <div id="condNoRep">No repl: P(B|A) —</div>
-                <div id="condWithRep">With repl: P(B|A) —</div>
-              </div>
-              <p class="legend" style="margin-top:8px;">Here \(A\)=“first is ace”, \(B\)=“second is ace”. With replacement → independent ( \(P(B\mid A)=P(B)\) ).</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <footer>
-        Last updated: <span id="lastUpdated"></span>
-      </footer>
-    </main>
+    <p class="muted" style="margin:.6rem 0 0;">
+      Each edge has probability <span class="mono">1/2</span>. Each leaf (sequence) has probability <span class="mono">1/8</span>.
+      There are 3 sequences with exactly 2 tails ⇒ \(P(\text{exactly 2 tails})=3/8\).
+    </p>
   </div>
+</section>
 
-  <!-- ===================== Scripts ===================== -->
-  <script>
-    // -------- Sidebar include (robust for user or project GitHub Pages) --------
-    (async function injectSidebar(){
-      const el = document.querySelector('[data-include]');
-      if(!el) return;
+<script>
+(function(){
+  const svg = document.getElementById('coinTree');
+  const HL2 = document.getElementById('hl-2tails');
+  const HL1 = document.getElementById('hl-1tail');
 
-      const given = el.getAttribute('data-include') || 'partials/sidebar.html';
-      const firstSeg = location.pathname.split('/').filter(Boolean)[0] || '';
-      const base = firstSeg ? ('/' + firstSeg) : '';
+  const NS = 'http://www.w3.org/2000/svg';
+  function S(tag, attrs={}){ const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); return el; }
 
-      const candidates = [
-        given,
-        '/' + given.replace(/^\//,''),
-        base + '/' + given.replace(/^\//,''),
-        base + '/partials/sidebar.html',
-        '/partials/sidebar.html'
-      ].filter((v,i,a)=>a.indexOf(v)===i);
+  function clear(){ while(svg.firstChild) svg.removeChild(svg.firstChild); }
 
-      let html = '';
-      for (const url of candidates){
-        try{
-          const r = await fetch(url, {cache:'no-cache'});
-          if (r.ok) { html = await r.text(); break; }
-        }catch(_){}
+  // Build all sequences for 3 flips
+  function buildTree(){
+    const leaves = [];
+    const gen = (seq, depth) => {
+      if (depth===3){ leaves.push(seq); return; }
+      gen(seq+'H', depth+1);
+      gen(seq+'T', depth+1);
+    };
+    gen('',0);
+    return leaves; // length 8
+  }
+
+  // Compute layout: x by depth, y equally spaced for leaves; internal nodes centered over their children.
+  function layout(leaves){
+    const W = svg.clientWidth || svg.getBoundingClientRect().width || 900;
+    const H = svg.clientHeight || svg.getBoundingClientRect().height || 480;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+    const margins = {t: 24, r: 24, b: 28, l: 80};
+    const plotW = W - margins.l - margins.r;
+    const plotH = H - margins.t - margins.b;
+
+    // x positions per depth (0..3)
+    const x = d => margins.l + (plotW * d / 3);
+
+    // y positions for leaves (8 rows)
+    const rows = 8;
+    const rowGap = plotH / (rows-1);
+    const leafY = i => margins.t + i * rowGap;
+
+    // map from sequence prefix to y: leaves fixed; internal nodes average their children
+    const yMap = {};
+    // leaves y
+    leaves.forEach((seq,i)=> yMap[seq] = leafY(i));
+
+    // internal nodes (depth 0..2): compute in reverse by averaging children
+    const prefixes = ['', 'H','T', 'HH','HT','TH','TT'];
+    prefixes.reverse().forEach(pref=>{
+      if (pref.length<3){
+        const y1 = yMap[pref+'H'];
+        const y2 = yMap[pref+'T'];
+        yMap[pref] = (y1 + y2)/2;
       }
-      el.innerHTML = html || '<div class="muted">Sidebar failed to load.</div>';
-      const yr = el.querySelector('#yr'); if (yr) yr.textContent = new Date().getFullYear();
-    })();
+    });
 
-    document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
+    return { x, yMap, W, H, margins };
+  }
 
-    // ===================== Tree Diagram (3 coins) =====================
-    (function(){
-      const svg = document.getElementById('coinTree');
-      const HL2 = document.getElementById('hl-2tails');
-      const HL1 = document.getElementById('hl-1tail');
-      const NS = 'http://www.w3.org/2000/svg';
-      function S(tag, attrs={}){ const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); return el; }
-      function clear(){ while(svg.firstChild) svg.removeChild(svg.firstChild); }
+  function labelText(x, y, text, opts={}){
+    const t = S('text', {x, y, 'font-size': opts.size||12, 'text-anchor': opts.anchor||'middle', fill: opts.fill||'#4b5563'});
+    t.textContent = text; return t;
+  }
 
-      function buildLeaves(){
-        const leaves = []; (function gen(s,d){ if(d===3){ leaves.push(s); return; } gen(s+'H',d+1); gen(s+'T',d+1); })('',0);
-        return leaves;
-      }
-      function layout(leaves){
-        const W = svg.clientWidth || svg.getBoundingClientRect().width || 900;
-        const H = svg.clientHeight || svg.getBoundingClientRect().height || 480;
-        svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-        const m={t:24,r:24,b:28,l:80}, plotW=W-m.l-m.r, plotH=H-m.t-m.b;
-        const x = d => m.l + (plotW * d / 3);
-        const rows=8, rowGap=plotH/(rows-1), leafY=i=>m.t + i*rowGap;
-        const yMap={}; leaves.forEach((seq,i)=> yMap[seq]=leafY(i));
-        ['', 'H','T','HH','HT','TH','TT'].reverse().forEach(pref=>{
-          if (pref.length<3){ yMap[pref]=(yMap[pref+'H']+yMap[pref+'T'])/2; }
-        });
-        return {x,yMap,W,H,m};
-      }
-      function labelText(x,y,text,opts={}){ const t=S('text',{x,y,'font-size':opts.size||12,'text-anchor':opts.anchor||'middle',fill:opts.fill||'#4b5563'}); t.textContent=text; return t; }
+  function draw(){
+    clear();
+    const leaves = buildTree();
+    const L = layout(leaves);
 
-      function draw(){
-        clear();
-        const leaves=buildLeaves();
-        const L=layout(leaves);
+    // Title on left
+    svg.appendChild(labelText(8, 16, 'Root → 3 flips → 8 outcomes', {anchor:'start', size:12}));
 
-        svg.appendChild(labelText(8,16,'Root → 3 flips → 8 outcomes',{anchor:'start',size:12}));
+    // Draw edges + edge labels
+    const strokeEdge = '#374151';
+    const strokeHL   = '#10b981';
+    const strokeMiss = '#ef4444';
 
-        function edge(x1,y1,x2,y2, lab){
-          const line=S('line',{x1,y1,x2,y2,stroke:'#374151','stroke-width':2}); svg.appendChild(line);
-          const mx=(x1+x2)/2, my=(y1+y2)/2;
-          svg.appendChild(labelText(mx,my-6,lab,{size:11}));
-          svg.appendChild(labelText(mx,my+12,'1/2',{size:10}));
-        }
+    const nodeRadius = 10;
 
-        const levels=[
-          {parents:[''], children:['H','T']},
-          {parents:['H','T'], children:['HH','HT','TH','TT']},
-          {parents:['HH','HT','TH','TT'], children:['HHH','HHT','HTH','HTT','THH','THT','TTH','TTT']}
-        ];
-        levels.forEach((lv,di)=>{
-          lv.parents.forEach(p=>{
-            const yP=L.yMap[p], xP=L.x(di);
-            [['H','H'],['T','T']].forEach(([b,lab])=>{
-              const c=p+b, yC=L.yMap[c], xC=L.x(di+1);
-              edge(xP,yP,xC,yC,lab);
-            });
-          });
-        });
+    // Helper: draw one edge with optional label (H/T)
+    function edge(x1,y1,x2,y2, lab){
+      const line = S('line', {x1,y1,x2,y2, stroke: strokeEdge, 'stroke-width': 2});
+      svg.appendChild(line);
 
-        ['', 'H','T','HH','HT','TH','TT'].forEach(id=>{
-          const cx=L.x(id.length), cy=L.yMap[id];
-          const c=S('circle',{cx,cy,r:10,fill:'#fff',stroke:'#111827','stroke-width':2}); svg.appendChild(c);
-          svg.appendChild(labelText(cx,cy+4,id||'Start',{size:11}));
-        });
+      // label midpoint slightly offset
+      const mx = (x1+x2)/2, my = (y1+y2)/2;
+      const t = labelText(mx, my - 6, lab, {size:11});
+      svg.appendChild(t);
 
-        leaves.forEach(seq=>{
-          const cx=L.x(3), cy=L.yMap[seq];
-          const twoT=(seq.match(/T/g)||[]).length===2;
-          const oneT=(seq.match(/T/g)||[]).length===1;
-          const rect=S('rect',{x:cx-28,y:cy-10,width:56,height:20,rx:8,ry:8,fill:'#fff',stroke:'#111827','stroke-width':1.5});
-          if (HL2.checked && twoT){ rect.setAttribute('fill','#10b981'); rect.setAttribute('stroke','#065f46'); }
-          else if (HL1.checked && oneT){ rect.setAttribute('fill','#60a5fa'); rect.setAttribute('stroke','#1e40af'); }
-          svg.appendChild(rect);
-          svg.appendChild(labelText(cx,cy+4,seq,{size:12,fill:'#111827'}));
-          svg.appendChild(labelText(cx+48,cy+4,'1/8',{size:11}));
-        });
-      }
-
-      draw();
-      HL2.addEventListener('change', draw);
-      HL1.addEventListener('change', draw);
-      const ro = new ResizeObserver(()=>draw()); ro.observe(document.body);
-    })();
-
-    // ===================== Helpers =====================
-    function binomPMF(n,k,p){
-      function comb(n,r){ r=Math.min(r,n-r); let num=1, den=1; for(let i=1;i<=r;i++){ num*= (n-r+i); den*= i; } return num/den; }
-      return comb(n,k)*Math.pow(p,k)*Math.pow(1-p,n-k);
+      // probability label 1/2 under branch
+      const pt = labelText(mx, my + 12, '1/2', {size:10});
+      svg.appendChild(pt);
     }
-    function clearSVG(s){ while(s.firstChild) s.removeChild(s.firstChild); }
 
-    // ===================== Applet 1: Binomial =====================
-    (function(){
-      const nEl = document.getElementById('nFlips');
-      const pEl = document.getElementById('pHead');
-      const tEl = document.getElementById('nTrials');
-      const runBtn = document.getElementById('runBinom');
-      const resetBtn = document.getElementById('resetBinom');
-      const svg = document.getElementById('binomPlot');
-      const meanBox = document.getElementById('binomMean');
-      const varBox  = document.getElementById('binomVar');
-      const simBox  = document.getElementById('binomSimMean');
+    // Draw edges depth by depth
+    const levels = [
+      { parents: [''], children: ['H','T'] },
+      { parents: ['H','T'], children: ['HH','HT','TH','TT'] },
+      { parents: ['HH','HT','TH','TT'], children: ['HHH','HHT','HTH','HTT','THH','THT','TTH','TTT'] }
+    ];
 
-      let simCounts = [];
-
-      function redraw(){
-        clearSVG(svg);
-        const W=svg.clientWidth||900, H=svg.clientHeight||300;
-        svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-        const m={l:40,r:16,t:16,b:28}, w=W-m.l-m.r, h=H-m.t-m.b;
-
-        const n = Math.max(1, Math.min(200, +nEl.value||10));
-        const p = Math.max(0, Math.min(1, +pEl.value||0.5));
-        const xs = [...Array(n+1).keys()];
-        const pmf = xs.map(k=>binomPMF(n,k,p));
-        const maxY = Math.max(...pmf, (simCounts.length? Math.max(...simCounts)/Math.max(1,simCounts.reduce((a,b)=>a+b,0)) : 0));
-        const x = k => m.l + (k/n)*w;
-        const y = v => m.t + h - (v/maxY)*h;
-
-        // axes
-        const ax=document.createElementNS('http://www.w3.org/2000/svg','line');
-        ax.setAttribute('x1',m.l); ax.setAttribute('x2',m.l); ax.setAttribute('y1',m.t); ax.setAttribute('y2',m.t+h+4);
-        ax.setAttribute('stroke','#111827'); svg.appendChild(ax);
-        const ax2=document.createElementNS('http://www.w3.org/2000/svg','line');
-        ax2.setAttribute('x1',m.l); ax2.setAttribute('x2',m.l+w); ax2.setAttribute('y1',m.t+h+4); ax2.setAttribute('y2',m.t+h+4);
-        ax2.setAttribute('stroke','#111827'); svg.appendChild(ax2);
-
-        // theory bars (thin)
-        const bw = Math.max(1, w/(n+1)*0.6);
-        xs.forEach(k=>{
-          const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
-          rect.setAttribute('x', x(k)-bw/2);
-          rect.setAttribute('y', y(pmf[k]));
-          rect.setAttribute('width', bw);
-          rect.setAttribute('height', m.t+h - y(pmf[k]));
-          rect.setAttribute('fill','#60a5fa'); // blue
-          rect.setAttribute('opacity','0.7');
-          svg.appendChild(rect);
+    levels.forEach((lv, di)=>{
+      lv.parents.forEach(p=>{
+        const yParent = L.yMap[p];
+        const xParent = L.x(di);
+        // two children for each parent
+        [['H', 'H'], ['T','T']].forEach(([branch, lab])=>{
+          const child = p + branch;
+          const yChild = L.yMap[child];
+          const xChild = L.x(di+1);
+          edge(xParent, yParent, xChild, yChild, lab);
         });
+      });
+    });
 
-        // simulation bars (overlay, semi-transparent gold)
-        if (simCounts.length){
-          const total = simCounts.reduce((a,b)=>a+b,0);
-          xs.forEach(k=>{
-            const prob = simCounts[k]/total;
-            const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
-            rect.setAttribute('x', x(k)-bw/2);
-            rect.setAttribute('y', y(prob));
-            rect.setAttribute('width', bw);
-            rect.setAttribute('height', m.t+h - y(prob));
-            rect.setAttribute('fill','#e7a614');
-            rect.setAttribute('opacity','0.55');
-            svg.appendChild(rect);
-          });
-        }
+    // Draw nodes (root + internal)
+    const allNodes = ['', 'H','T', 'HH','HT','TH','TT'];
+    allNodes.forEach((id, d)=>{
+      const cx = L.x(id.length);
+      const cy = L.yMap[id];
+      const c = S('circle', {cx, cy, r: nodeRadius, fill:'#ffffff', stroke:'#111827', 'stroke-width':2});
+      svg.appendChild(c);
+      const lab = id==='' ? 'Start' : id;
+      svg.appendChild(labelText(cx, cy+4, lab||'Start', {size:11}));
+    });
 
-        // ticks
-        const step=Math.max(1, Math.round(n/10));
-        for (let k=0;k<=n;k+=step){
-          const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
-          tx.setAttribute('x', x(k));
-          tx.setAttribute('y', m.t+h+20);
-          tx.setAttribute('text-anchor','middle'); tx.setAttribute('font-size','11'); tx.setAttribute('fill','#4b5563');
-          tx.textContent = k; svg.appendChild(tx);
-        }
+    // Draw leaves (sequences + p=1/8)
+    leaves.forEach((seq,i)=>{
+      const cx = L.x(3);
+      const cy = L.yMap[seq];
+      const covers2T = (seq.match(/T/g)||[]).length === 2;
+      const covers1T = (seq.match(/T/g)||[]).length === 1;
 
-        meanBox.textContent = `Mean = n·p = ${(n*p).toFixed(3)}`;
-        varBox.textContent  = `Var = n·p·(1-p) = ${(n*p*(1-p)).toFixed(3)}`;
-        if (simCounts.length){
-          const total=simCounts.reduce((a,b)=>a+b,0);
-          const simMean=simCounts.reduce((s,c,k)=>s+c*k,0)/Math.max(1,total);
-          simBox.textContent = `Sim mean ≈ ${simMean.toFixed(3)} (N=${total})`;
-        } else {
-          simBox.textContent='Sim mean —';
-        }
+      // small rounded rect for leaf tag
+      const rx = 28, ry = 10;
+      const rect = S('rect', {
+        x: cx - rx, y: cy - ry, width: rx*2, height: ry*2, rx: 8, ry: 8,
+        fill: '#ffffff', stroke: '#111827', 'stroke-width': 1.5
+      });
+      svg.appendChild(rect);
+
+      const color2 = '#065f46', fill2 = '#10b981';
+      const color1 = '#1e40af', fill1 = '#60a5fa';
+
+      if (HL2.checked && covers2T){
+        rect.setAttribute('fill', fill2);
+        rect.setAttribute('stroke', color2);
+      }else if (HL1.checked && covers1T){
+        rect.setAttribute('fill', fill1);
+        rect.setAttribute('stroke', color1);
       }
 
-      function run(){
-        const n = Math.max(1, Math.min(200, +nEl.value||10));
-        theP = Math.max(0, Math.min(1, +pEl.value||0.5));
-        const T = Math.max(1, Math.min(50000, +tEl.value||5000));
-        simCounts = Array(n+1).fill(0);
-        for (let t=0;t<T;t++){
-          let heads=0;
-          for (let i=0;i<n;i++){
-            if (Math.random() < theP) heads++;
-          }
-          simCounts[heads]++;
-        }
-        redraw();
+      const t = labelText(cx, cy+4, seq, {size:12, fill:'#111827'});
+      svg.appendChild(t);
+
+      const p = labelText(cx + 48, cy+4, '1/8', {size:11});
+      svg.appendChild(p);
+    });
+
+    // Legend bullets (only when highlighting)
+    const showLegend = HL2.checked || HL1.checked;
+    if (showLegend){
+      const baseX = L.W - 160, baseY = 28;
+      const legend = S('g', {});
+      svg.appendChild(legend);
+
+      if (HL2.checked){
+        const r = S('rect', {x: baseX, y: baseY, width: 14, height: 14, rx:3, ry:3, fill:'#10b981', stroke:'#065f46'});
+        const tx = labelText(baseX+20, baseY+11, 'Exactly 2 tails', {anchor:'start', size:12, fill:'#111827'});
+        legend.appendChild(r); legend.appendChild(tx);
       }
-      function reset(){ simCounts=[]; redraw(); }
-
-      let theP = +pEl.value || 0.5;
-      [nEl,pEl,tEl].forEach(el=>{ el.addEventListener('input', redraw); el.addEventListener('change', redraw); });
-      runBtn.addEventListener('click', run);
-      resetBtn.addEventListener('click', reset);
-      const ro=new ResizeObserver(()=>redraw()); ro.observe(document.body);
-      redraw();
-    })();
-
-    // ===================== Applet 2: Two Dice Grid =====================
-    (function(){
-      const svg = document.getElementById('diceGrid');
-      const selA = document.getElementById('diceA');
-      const selB = document.getElementById('diceB');
-      const pA = document.getElementById('pA');
-      const pB = document.getElementById('pB');
-      const pAB= document.getElementById('pAB');
-      const pAUB=document.getElementById('pAUB');
-      const pAgB=document.getElementById('pAgB');
-      const btn = document.getElementById('drawDice');
-      const reset = document.getElementById('resetDice');
-
-      function inEvent(code, r, g){
-        switch(code){
-          case 'sum7':    return (r+g===7);
-          case 'bothLE4': return (r<=4 && g<=4);
-          case 'double':  return (r===g);
-          case 'redEven': return (r%2===0);
-          case 'greenGT4':return (g>4);
-        }
-        return false;
+      if (HL1.checked){
+        const off = HL2.checked ? 20 : 0;
+        const r = S('rect', {x: baseX, y: baseY+off, width: 14, height: 14, rx:3, ry:3, fill:'#60a5fa', stroke:'#1e40af'});
+        const tx = labelText(baseX+20, baseY+off+11, 'Exactly 1 tail', {anchor:'start', size:12, fill:'#111827'});
+        legend.appendChild(r); legend.appendChild(tx);
       }
+    }
+  }
 
-      function draw(){
-        while(svg.firstChild) svg.removeChild(svg.firstChild);
-        const W=svg.clientWidth||600, H=svg.clientHeight||300;
-        svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
-        const m={l:60,r:16,t:28,b:40}, w=W-m.l-m.r, h=H-m.t-m.b;
-        const cw=w/6, ch=h/6;
-        const NS='http://www.w3.org/2000/svg';
-        const label=(x,y,t,anc='middle')=>{
-          const tx=document.createElementNS(NS,'text'); tx.setAttribute('x',x); tx.setAttribute('y',y);
-          tx.setAttribute('text-anchor',anc); tx.setAttribute('font-size','12'); tx.setAttribute('fill','#111827'); tx.textContent=t; svg.appendChild(tx);
-        };
-        label(m.l + w/2, m.t-10, 'Green (columns)');
-        label(m.l-40, m.t + h/2, 'Red (rows)','end');
-
-        let cntA=0, cntB=0, cntAB=0;
-
-        for (let r=1;r<=6;r++){
-          for (let g=1; g<=6; g++){
-            const x=m.l+(g-1)*cw, y=m.t+(r-1)*ch;
-            const A=inEvent(selA.value,r,g);
-            const B=inEvent(selB.value,r,g);
-            let fill='#f9fafb', stroke='#e5e7eb';
-            if (A && B){ fill='rgba(16,185,129,0.30)'; stroke='#10b981'; cntAB++; }
-            else if (A){ fill='rgba(231,166,20,0.35)'; stroke='#e7a614'; cntA++; }
-            else if (B){ fill='rgba(96,165,250,0.40)'; stroke='#60a5fa'; cntB++; }
-
-            const rect=document.createElementNS(NS,'rect');
-            rect.setAttribute('x',x); rect.setAttribute('y',y);
-            rect.setAttribute('width',cw-2); rect.setAttribute('height',ch-2);
-            rect.setAttribute('fill',fill); rect.setAttribute('stroke',stroke); rect.setAttribute('rx',8);
-            svg.appendChild(rect);
-
-            const tx=document.createElementNS(NS,'text');
-            tx.setAttribute('x',x+(cw-2)/2); tx.setAttribute('y',y+(ch-2)/2+4);
-            tx.setAttribute('text-anchor','middle'); tx.setAttribute('font-size','12'); tx.setAttribute('fill','#111827');
-            tx.textContent = `(${r},${g})`; svg.appendChild(tx);
-          }
-        }
-
-        for (let g=1; g<=6; g++){ label(m.l+(g-0.5)*cw, m.t+h+18, g); }
-        for (let r=1; r<=6; r++){ label(m.l-12, m.t+(r-0.5)*ch+4, r,'end'); }
-
-        const total=36;
-        const p_a=(cntA+cntAB)/total, p_b=(cntB+cntAB)/total, p_ab=cntAB/total;
-        const p_aub=p_a+p_b-p_ab;
-        const p_a_given_b = (p_b>0) ? (p_ab/p_b) : 0;
-
-        pA.textContent   = `P(A) = ${p_a.toFixed(3)}`;
-        pB.textContent   = `P(B) = ${p_b.toFixed(3)}`;
-        pAB.textContent  = `P(A∩B) = ${p_ab.toFixed(3)}`;
-        pAUB.textContent = `P(A∪B) = ${p_aub.toFixed(3)}`;
-        pAgB.textContent = `P(A|B) = ${p_a_given_b.toFixed(3)}`;
-      }
-
-      btn.addEventListener('click', draw);
-      reset.addEventListener('click', ()=>{ selA.value='sum7'; selB.value='bothLE4'; draw(); });
-      selA.addEventListener('change', draw);
-      selB.addEventListener('change', draw);
-      const ro=new ResizeObserver(()=>draw()); ro.observe(document.body);
-      draw();
-    })();
-
-    // ===================== Applet 3: Birthday Problem =====================
-    (function(){
-      const nEl=document.getElementById('classN');
-      const tEl=document.getElementById('trialsB');
-      const btn=document.getElementById('runBday');
-      const reset=document.getElementById('resetBday');
-      const exactBox=document.getElementById('bdayExact');
-      const simBox=document.getElementById('bdaySim');
-      const svg=document.getElementById('bdayPlot');
-
-      function exactPMatch(n){
-        let prod=1;
-        for (let i=0;i<n;i++) prod *= (365-i)/365;
-        return 1 - prod;
-      }
-      function simulate(n, T){
-        let hits=0;
-        const seen=new Array(365);
-        for (let t=0;t<T;t++){
-          seen.fill(false);
-          let dup=false;
-          for (let i=0;i<n;i++){
-            const b = Math.floor(Math.random()*365);
-            if (seen[b]){ dup=true; break; }
-            seen[b]=true;
-          }
-          if (dup) hits++;
-        }
-        return hits/T;
-      }
-
-      function drawCurve(n, simP){
-        while(svg.firstChild) svg.removeChild(svg.firstChild);
-        const W=svg.clientWidth||900, H=svg.clientHeight||240;
-        svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
-        const m={l:40,r:16,t:16,b:28}, w=W-m.l-m.r, h=H-m.t-m.b;
-        const x=k=>m.l + (k-2)/(100-2)*w;
-        const y=p=>m.t + h - p*h;
-
-        const NS='http://www.w3.org/2000/svg';
-        const ax1=document.createElementNS(NS,'line');
-        ax1.setAttribute('x1',m.l); ax1.setAttribute('x2',m.l); ax1.setAttribute('y1',m.t); ax1.setAttribute('y2',m.t+h+4);
-        ax1.setAttribute('stroke','#111827'); svg.appendChild(ax1);
-        const ax2=document.createElementNS(NS,'line');
-        ax2.setAttribute('x1',m.l); ax2.setAttribute('x2',m.l+w); ax2.setAttribute('y1',m.t+h+4); ax2.setAttribute('y2',m.t+h+4);
-        ax2.setAttribute('stroke','#111827'); svg.appendChild(ax2);
-
-        const path=document.createElementNS(NS,'path');
-        let d='';
-        for (let k=2;k<=100;k++){
-          const p=exactPMatch(k);
-          d += (k===2 ? `M ${x(k)} ${y(p)}` : ` L ${x(k)} ${y(p)}`);
-        }
-        path.setAttribute('d', d);
-        path.setAttribute('fill','none'); path.setAttribute('stroke','#60a5fa'); path.setAttribute('stroke-width','2');
-        svg.appendChild(path);
-
-        const dot=document.createElementNS(NS,'circle');
-        dot.setAttribute('cx', x(n)); dot.setAttribute('cy', y(simP));
-        dot.setAttribute('r','4'); dot.setAttribute('fill','#e7a614'); dot.setAttribute('stroke','#b45309');
-        svg.appendChild(dot);
-
-        for (let k=10; k<=100; k+=10){
-          const tx=document.createElementNS(NS,'text');
-          tx.setAttribute('x', x(k)); tx.setAttribute('y', m.t+h+20);
-          tx.setAttribute('text-anchor','middle'); tx.setAttribute('font-size','11'); tx.setAttribute('fill','#4b5563');
-          tx.textContent=k; svg.appendChild(tx);
-        }
-        const ylab=document.createElementNS(NS,'text');
-        ylab.setAttribute('x', m.l-8); ylab.setAttribute('y', m.t+12);
-        ylab.setAttribute('text-anchor','end'); ylab.setAttribute('font-size','11'); ylab.setAttribute('fill','#4b5563');
-        ylab.textContent='P(match)'; svg.appendChild(ylab);
-      }
-
-      function run(){
-        const n=Math.max(2, Math.min(100, +nEl.value||32));
-        const T=Math.max(100, Math.min(50000, +tEl.value||5000));
-        const exact=exactPMatch(n);
-        const sim=simulate(n,T);
-        exactBox.textContent=`Exact ≈ ${exact.toFixed(3)}`;
-        simBox.textContent  =`Sim  ≈ ${sim.toFixed(3)} (N=${T})`;
-        drawCurve(n, sim);
-      }
-      function reset(){ svg.innerHTML=''; exactBox.textContent='Exact P(match) —'; simBox.textContent='Sim P(match) —'; }
-
-      btn.addEventListener('click', run);
-      reset.addEventListener('click', reset);
-      const ro=new ResizeObserver(()=>drawCurve(+nEl.value||32, 0)); ro.observe(document.body);
-      drawCurve(+nEl.value||32, 0);
-    })();
-
-    // ===================== Applet 4: Two Cards =====================
-    (function(){
-      const aces=document.getElementById('aces');
-      const deckN=document.getElementById('deckN');
-      const out1=document.getElementById('noRep');
-      const out2=document.getElementById('withRep');
-      const out3=document.getElementById('condNoRep');
-      const out4=document.getElementById('condWithRep');
-      const btn=document.getElementById('cardsCalc');
-
-      function calc(){
-        const A = Math.max(1, Math.min(52, +aces.value||4));
-        const N = Math.max(4, Math.min(104, +deckN.value||52));
-
-        // No replacement
-        const pA = A/N;
-        const pBgA = (A-1)/(N-1);
-        const pAA_no = pA * pBgA;
-
-        // With replacement
-        const pB = A/N;
-        const pAA_with = pA * pB;
-
-        out1.textContent = `No repl: P(AA) = ${pAA_no.toFixed(5)}`;
-        out2.textContent = `With repl: P(AA) = ${pAA_with.toFixed(5)}`;
-        out3.textContent = `No repl: P(B|A) = ${pBgA.toFixed(5)} vs P(B)=${pB.toFixed(5)} → dependent`;
-        out4.textContent = `With repl: P(B|A) = ${pB.toFixed(5)} (equals P(B)) → independent`;
-      }
-      btn.addEventListener('click', calc);
-      calc();
-    })();
-  </script>
-</body>
-</html>
+  // Initial draw + listeners
+  draw();
+  HL2.addEventListener('change', draw);
+  HL1.addEventListener('change', draw);
+  // Redraw on resize for responsive sizing
+  const ro = new ResizeObserver(()=>draw());
+  ro.observe(document.body);
+})();
+</script>
