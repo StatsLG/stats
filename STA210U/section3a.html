@@ -4,11 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>STA210U — Section III-A | Introduction to Probability</title>
-  <meta name="description" content="Introduction to Probability — sample space, events, rules, common probabilities, independence, and misconceptions. STA220 notes on StatsLG." />
+  <meta name="description" content="Introduction to Probability — sample space, events, rules, common probabilities, independence, misconceptions. STA220 notes on StatsLG." />
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css">
 
-  <!-- MathJax -->
+  <!-- MathJax (LaTeX) -->
   <script>
     window.MathJax = {
       tex: {
@@ -30,6 +30,28 @@
     .w-auto { width:auto }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace }
     .overflow-x { overflow-x:auto }
+
+    /* Collapsible details styling (fits brand) */
+    details.collapsible {
+      border: 1px solid var(--rule);
+      border-radius: 12px;
+      background: var(--panel);
+      padding: 8px 10px;
+    }
+    details.collapsible > summary {
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--kctcs-blue);
+      list-style: none;
+      display: flex; align-items: center; gap: 8px;
+    }
+    details.collapsible > summary::before {
+      content: '▸';
+      display: inline-block;
+      transform: translateY(-1px);
+    }
+    details.collapsible[open] > summary::before { content: '▾'; }
+    details.collapsible .inside { margin-top: 10px }
   </style>
 </head>
 <body>
@@ -102,6 +124,33 @@
               <li>\(C=\) “exactly one tail”: \(P(C)=3/8\).</li>
               <li>\(D=\) “no tails”: \(P(D)=1/8\).</li>
             </ol>
+
+            <!-- Collapsible tree diagram inserted here -->
+            <details class="collapsible" id="tree-3-coins">
+              <summary>Show the full 3-coin tree diagram</summary>
+              <div class="inside">
+                <div class="row" style="align-items:center; gap:12px;">
+                  <div class="checkline">
+                    <input id="hl-2tails" type="checkbox">
+                    <label for="hl-2tails" style="margin:0;">Highlight “exactly 2 tails” (HTT, THT, TTH)</label>
+                  </div>
+                  <div class="checkline">
+                    <input id="hl-1tail" type="checkbox">
+                    <label for="hl-1tail" style="margin:0;">Highlight “exactly 1 tail” (HHT, HTH, THH)</label>
+                  </div>
+                </div>
+
+                <div class="preview" style="height:480px; margin-top:10px;">
+                  <svg id="coinTree" width="100%" height="100%" role="img" aria-label="Tree diagram for three coin flips"></svg>
+                </div>
+
+                <p class="muted" style="margin:.6rem 0 0;">
+                  Each edge has probability <span class="mono">1/2</span>. Each leaf (sequence) has probability <span class="mono">1/8</span>.
+                  There are 3 sequences with exactly 2 tails ⇒ \(P(\text{exactly 2 tails})=3/8\).
+                </p>
+              </div>
+            </details>
+            <!-- End collapsible diagram -->
           </article>
         </div>
       </section>
@@ -115,7 +164,7 @@
             <p>The complement of \(A\), often denoted \(A^c\), is “not \(A\)”.</p>
           </article>
           <article class="card">
-            <h3 style="margin:0 0 .4rem;">Joint & Conditional</h3>
+            <h3 style="margin:0 0 .4rem;">Joint, Union & Conditional</h3>
             <ul>
               <li><strong>Joint (AND)</strong> \(A\cap B\): both occur.</li>
               <li><strong>Union (OR)</strong> \(A\cup B\): at least one occurs.</li>
@@ -249,10 +298,6 @@
           <article class="card">
             <h3 style="margin:0 0 .4rem;">“Very Unlikely” Events</h3>
             <p>Low probability for a particular person/event doesn’t mean it won’t happen to <em>someone</em>. With many opportunities, “someone, somewhere, someday” sees rare events.</p>
-            <div class="card soft">
-              <h4 style="margin:0 0 .4rem;">Lottery anecdote</h4>
-              <p>One person winning a lottery twice may be individually unlikely, but across millions of players and many drawings, the chance that <em>someone</em> wins twice in a given period is not so small.</p>
-            </div>
           </article>
         </div>
       </section>
@@ -280,7 +325,7 @@
       </section>
 
       <footer>
-        <p class="text-muted">Section 3 Part A</p>
+        <p class="text-muted">These notes mirror your III-A handout with added web formatting and graphics.</p>
         <p>Last updated: <span id="lastUpdated"></span></p>
       </footer>
     </main>
@@ -318,6 +363,173 @@
 
     document.getElementById('lastUpdated').textContent =
       new Date(document.lastModified).toLocaleString();
+
+    // === 3-Coin Tree Diagram script (collapsible) ===
+    (function(){
+      const container = document.getElementById('tree-3-coins');
+      if(!container) return;
+
+      const svg = document.getElementById('coinTree');
+      const HL2 = document.getElementById('hl-2tails');
+      const HL1 = document.getElementById('hl-1tail');
+
+      const NS = 'http://www.w3.org/2000/svg';
+      function S(tag, attrs={}){ const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); return el; }
+      function clear(){ while(svg.firstChild) svg.removeChild(svg.firstChild); }
+
+      function buildTree(){
+        const leaves = [];
+        const gen = (seq, depth) => {
+          if (depth===3){ leaves.push(seq); return; }
+          gen(seq+'H', depth+1);
+          gen(seq+'T', depth+1);
+        };
+        gen('',0);
+        return leaves; // 8 leaves
+      }
+
+      function layout(leaves){
+        const W = svg.clientWidth || svg.getBoundingClientRect().width || 900;
+        const H = svg.clientHeight || svg.getBoundingClientRect().height || 480;
+        svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+        const margins = {t: 24, r: 24, b: 28, l: 80};
+        const plotW = W - margins.l - margins.r;
+        const plotH = H - margins.t - margins.b;
+
+        const x = d => margins.l + (plotW * d / 3);
+
+        const rows = 8;
+        const rowGap = plotH / (rows-1);
+        const leafY = i => margins.t + i * rowGap;
+
+        const yMap = {};
+        leaves.forEach((seq,i)=> yMap[seq] = leafY(i));
+        const prefixes = ['', 'H','T', 'HH','HT','TH','TT'];
+        prefixes.reverse().forEach(pref=>{
+          if (pref.length<3){
+            const y1 = yMap[pref+'H'];
+            const y2 = yMap[pref+'T'];
+            yMap[pref] = (y1 + y2)/2;
+          }
+        });
+
+        return { x, yMap, W, H, margins, plotW, plotH };
+      }
+
+      function labelText(x, y, text, opts={}){
+        const t = S('text', {x, y, 'font-size': opts.size||12, 'text-anchor': opts.anchor||'middle', fill: opts.fill||'#4b5563'});
+        t.textContent = text; return t;
+      }
+
+      function draw(){
+        clear();
+        const leaves = buildTree();
+        const L = layout(leaves);
+
+        svg.appendChild(labelText(8, 16, 'Root → 3 flips → 8 outcomes', {anchor:'start', size:12}));
+
+        const strokeEdge = '#374151';
+        const nodeRadius = 10;
+
+        function edge(x1,y1,x2,y2, lab){
+          const line = S('line', {x1,y1,x2,y2, stroke: strokeEdge, 'stroke-width': 2});
+          svg.appendChild(line);
+
+          const mx = (x1+x2)/2, my = (y1+y2)/2;
+          svg.appendChild(labelText(mx, my - 6, lab, {size:11}));
+          svg.appendChild(labelText(mx, my + 12, '1/2', {size:10}));
+        }
+
+        const levels = [
+          { parents: [''], children: ['H','T'] },
+          { parents: ['H','T'], children: ['HH','HT','TH','TT'] },
+          { parents: ['HH','HT','TH','TT'], children: ['HHH','HHT','HTH','HTT','THH','THT','TTH','TTT'] }
+        ];
+
+        levels.forEach((lv, di)=>{
+          lv.parents.forEach(p=>{
+            const yParent = L.yMap[p];
+            const xParent = L.x(di);
+            [['H', 'H'], ['T','T']].forEach(([branch, lab])=>{
+              const child = p + branch;
+              const yChild = L.yMap[child];
+              const xChild = L.x(di+1);
+              edge(xParent, yParent, xChild, yChild, lab);
+            });
+          });
+        });
+
+        // Internal nodes
+        const allNodes = ['', 'H','T', 'HH','HT','TH','TT'];
+        allNodes.forEach((id)=>{
+          const cx = L.x(id.length);
+          const cy = L.yMap[id];
+          const c = S('circle', {cx, cy, r: nodeRadius, fill:'#ffffff', stroke:'#111827', 'stroke-width':2});
+          svg.appendChild(c);
+          const lab = id==='' ? 'Start' : id;
+          svg.appendChild(labelText(cx, cy+4, lab||'Start', {size:11}));
+        });
+
+        // Leaves
+        leaves.forEach((seq)=>{
+          const cx = L.x(3);
+          const cy = L.yMap[seq];
+          const kT = (seq.match(/T/g)||[]).length;
+          const covers2T = kT === 2;
+          const covers1T = kT === 1;
+
+          const rx = 28, ry = 10;
+          const rect = S('rect', {
+            x: cx - rx, y: cy - ry, width: rx*2, height: ry*2, rx: 8, ry: 8,
+            fill: '#ffffff', stroke: '#111827', 'stroke-width': 1.5
+          });
+          if (HL2.checked && covers2T){ rect.setAttribute('fill', '#10b981'); rect.setAttribute('stroke', '#065f46'); }
+          else if (HL1.checked && covers1T){ rect.setAttribute('fill', '#60a5fa'); rect.setAttribute('stroke', '#1e40af'); }
+          svg.appendChild(rect);
+
+          svg.appendChild(labelText(cx, cy+4, seq, {size:12, fill:'#111827'}));
+          svg.appendChild(labelText(cx + 48, cy+4, '1/8', {size:11}));
+        });
+
+        // Legend if highlighting
+        const showLegend = HL2.checked || HL1.checked;
+        if (showLegend){
+          const baseX = L.W - 160, baseY = 28;
+          const legend = S('g', {});
+          svg.appendChild(legend);
+
+          if (HL2.checked){
+            const r = S('rect', {x: baseX, y: baseY, width: 14, height: 14, rx:3, ry:3, fill:'#10b981', stroke:'#065f46'});
+            const tx = labelText(baseX+20, baseY+11, 'Exactly 2 tails', {anchor:'start', size:12, fill:'#111827'});
+            legend.appendChild(r); legend.appendChild(tx);
+          }
+          if (HL1.checked){
+            const off = HL2.checked ? 20 : 0;
+            const r = S('rect', {x: baseX, y: baseY+off, width: 14, height: 14, rx:3, ry:3, fill:'#60a5fa', stroke:'#1e40af'});
+            const tx = labelText(baseX+20, baseY+off+11, 'Exactly 1 tail', {anchor:'start', size:12, fill:'#111827'});
+            legend.appendChild(r); legend.appendChild(tx);
+          }
+        }
+      }
+
+      // Only draw when details is opened the first time (ensures correct size)
+      let drawnOnce = false;
+      const details = document.getElementById('tree-3-coins');
+      details.addEventListener('toggle', () => {
+        if (details.open && !drawnOnce){ drawnOnce = true; setTimeout(draw, 0); }
+      });
+
+      // Redraw on checkbox toggle
+      ['change','input'].forEach(evt=>{
+        HL2.addEventListener(evt, ()=>drawnOnce && draw());
+        HL1.addEventListener(evt, ()=>drawnOnce && draw());
+      });
+
+      // Redraw on resize
+      const ro = new ResizeObserver(()=> drawnOnce && draw());
+      ro.observe(document.body);
+    })();
   </script>
 </body>
 </html>
