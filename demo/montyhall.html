@@ -138,9 +138,23 @@
             </div>
           </div>
         </div>
-      </section>
+        <div class="card" style="margin-top:1rem; max-width:600px">
+        <div class="hd">Results by Strategy</div>
+        <div class="bd">
+          <table class="table" style="width:100%; border-collapse: collapse; font-size:.95rem">
+            <thead>
+              <tr><th></th><th>Wins</th><th>Losses</th><th>Win %</th></tr>
+            </thead>
+            <tbody>
+              <tr><th>Switch</th><td id="swW">0</td><td id="swL">0</td><td id="swP">0%</td></tr>
+              <tr><th>Stay</th><td id="stW">0</td><td id="stL">0</td><td id="stP">0%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <section class="tab" id="tab-explain">
+    </section>
+    <section class="tab" id="tab-explain">
         <div class="card" style="max-width:900px">
           <div class="hd">Why Switching Wins</div>
           <div class="bd">
@@ -188,6 +202,12 @@ Pick goat (2/3) → Host reveals goat → Switch → WIN</pre>
 
   const kTotal = document.getElementById('kTotal');
   const kReveals = document.getElementById('kReveals');
+  const swW = document.getElementById('swW');
+  const swL = document.getElementById('swL');
+  const stW = document.getElementById('stW');
+  const stL = document.getElementById('stL');
+  const swP = document.getElementById('swP');
+  const stP = document.getElementById('stP');
 
   const PHASE = { PICK: 'pick', REVEAL: 'reveal', DECIDE: 'decide', FINISH: 'finish' };
   let state;
@@ -261,6 +281,16 @@ Pick goat (2/3) → Host reveals goat → Switch → WIN</pre>
   function updateStats(){
     kTotal.textContent = stats.total;
     kReveals.textContent = stats.reveals;
+    swW.textContent = stats.switchW;
+    swL.textContent = stats.switchL;
+    stW.textContent = stats.stayW;
+    stL.textContent = stats.stayL;
+    const swT = stats.switchW + stats.switchL;
+    const stT = stats.stayW + stats.stayL;
+    const swPct = swT ? Math.round((stats.switchW / swT) * 100) : 0;
+    const stPct = stT ? Math.round((stats.stayW / stT) * 100) : 0;
+    swP.textContent = swPct + '%';
+    stP.textContent = stPct + '%';
   }
 
   btnStay.addEventListener('click', ()=>{ finishRound(state.pick); });
