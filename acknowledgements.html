@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Acknowledgements | StatsLG</title>
+  <meta name="description" content="Acknowledgements page for StatsLG — recognizing those who inspired, supported, and guided this work." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main>
+      <header>
+        <h1>Acknowledgements</h1>
+        <p>StatsLG would not exist without the guidance, inspiration, and support of many people. I’m deeply grateful to each of them.</p>
+      </header>
+
+      <section class="section">
+        <div class="grid">
+          <article class="card">
+            <h3>Dr. Homer White</h3>
+            <p>For inspiring a deep appreciation for mathematical thinking, statistical reasoning, and excellence in teaching.</p>
+          </article>
+
+          <article class="card">
+            <h3>Dr. Will Harris</h3>
+            <p>For providing thoughtful mentorship, insight, and a spirit of collaboration that has shaped this work.</p>
+          </article>
+
+          <article class="card">
+            <h3>The Late Dr. Christine Leverenz</h3>
+            <p>For her dedication to student success and her lasting impact on our department and community.</p>
+          </article>
+
+          <article class="card">
+            <h3>The Late Dr. Connie Wood</h3>
+            <p>For her kindness, leadership, and commitment to making mathematics accessible to all students.</p>
+          </article>
+
+          <article class="card">
+            <h3>Professor Will Bradley</h3>
+            <p>For his support, collaboration, and shared vision for engaging students through innovative teaching.</p>
+          </article>
+
+          <article class="card">
+            <h3>Professor Hunter Chandler</h3>
+            <p>For his partnership and enthusiasm for creating meaningful student learning experiences.</p>
+          </article>
+
+          <article class="card">
+            <h3>My Wife Katie &amp; Son Max</h3>
+            <p>For their love, encouragement, and support throughout this journey. This work is dedicated to them.</p>
+          </article>
+        </div>
+      </section>
+
+      <footer>
+        Last updated: <span id="lastUpdated"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
+  </script>
+
+  <script>
+  (function () {
+    async function injectIncludes() {
+      const nodes = document.querySelectorAll('[data-include]');
+      await Promise.all(Array.from(nodes).map(async (el) => {
+        let url = el.getAttribute('data-include');
+        const resp = await fetch(url, { cache: 'no-cache' });
+        el.innerHTML = await resp.text();
+        const yr = el.querySelector('#yr'); if (yr) yr.textContent = new Date().getFullYear();
+        const here = location.pathname.replace(/\/index\.html$/, '/');
+        el.querySelectorAll('a[href]').forEach(a => {
+          const target = new URL(a.getAttribute('href'), location.origin).pathname
+            .replace(/\/index\.html$/, '/');
+          if (here === target || (here.startsWith(target) && target !== '/')) {
+            a.classList.add('active');
+          }
+        });
+      }));
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', injectIncludes);
+    } else {
+      injectIncludes();
+    }
+  })();
+  </script>
+</body>
+</html>
