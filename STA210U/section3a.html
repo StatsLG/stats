@@ -3,291 +3,227 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>STA220 — Section III-A | Introduction to Probability</title>
-  <meta name="description" content="Introduction to Probability — sample space, events, rules, common probabilities, independence, and misconceptions. STA220 notes on StatsLG." />
+  <title>STA210U — StatsLG</title>
+  <meta name="description" content="Three-coin tree diagram plus quick probability applets (binomial, two dice, birthday problem, two cards)." />
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css">
 
-  <!-- MathJax -->
+  <!-- MathJax for inline math -->
   <script>
-    window.MathJax = {
-      tex: {
-        inlineMath: [['\\(', '\\)'], ['$', '$']],
-        displayMath: [['\\[', '\\]'], ['$$', '$$']],
-        processEscapes: true
-      },
-      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
-    };
+    window.MathJax = { tex: { inlineMath: [['\\(','\\)'], ['$', '$']] } };
   </script>
   <script id="MathJax-script" async
           src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <style>
-    .note { font-size: 13px; color: var(--muted) }
-    .ex-grid { display:grid; grid-template-columns: 1fr; gap:10px }
-    .t-center { text-align:center }
-    .nowrap { white-space: nowrap }
+    .note { font-size:12px; color: var(--muted) }
     .w-auto { width:auto }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace }
     .overflow-x { overflow-x:auto }
+    .viz { width:100%; height:100% }
+    .preview.tall { height:480px }
+    .btnbar { display:flex; gap:8px; flex-wrap:wrap }
+    .kpis { display:grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap:8px }
+    .kpis div { background:#fff; border:1px solid var(--rule); border-radius:8px; padding:8px; font-weight:700 }
+    .grid2 { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:12px }
+    .tight { gap:8px }
+    .legend { font-size:12px; color:#4b5563 }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <!-- Shared sidebar (robust include for GitHub Pages) -->
+    <!-- ===== Shared sidebar include ===== -->
     <aside class="sidebar" aria-label="Site navigation" data-include="partials/sidebar.html"></aside>
 
+    <!-- ===== Main ===== -->
     <main>
       <header>
-        <h1>Section III-A — Introduction to Probability</h1>
-        <p class="subtitle">Simple probability, common probabilities, probability rules, event characteristics, and common misconceptions.</p>
+        <h1>Probability Tree & Applets</h1>
+        <p class="subtitle">Three-coin tree diagram plus quick interactive applets for binomial, dice events, birthday problem, and two-card draws.</p>
       </header>
 
-      <!-- On this page -->
-      <section class="section">
-        <h2>On this page</h2>
-        <div class="grid">
-          <article class="card"><a href="#simple"><strong>1.</strong> Simple Probability</a></article>
-          <article class="card"><a href="#common"><strong>2.</strong> Common Probabilities</a></article>
-          <article class="card"><a href="#rules"><strong>3.</strong> Probability Rules</a></article>
-          <article class="card"><a href="#two-dice"><strong>Example:</strong> Two Dice Table</a></article>
-          <article class="card"><a href="#contingency1"><strong>Example:</strong> Favorite Subject × Gender</a></article>
-          <article class="card"><a href="#events"><strong>4.</strong> Characteristics of Events</a></article>
-          <article class="card"><a href="#cards"><strong>Example:</strong> Cards — (No) Replacement</a></article>
-          <article class="card"><a href="#contingency2"><strong>Example:</strong> City × Government Preference</a></article>
-          <article class="card"><a href="#misconceptions"><strong>5.</strong> Misconceptions</a></article>
-          <article class="card"><a href="#birthday"><strong>Example:</strong> Birthday Problem</a></article>
-        </div>
-      </section>
-
-      <!-- 1. Simple Probability -->
-      <section id="simple" class="section">
-        <h2>1. Simple Probability</h2>
-
+      <!-- ===================== 3-Coin Tree Diagram ===================== -->
+      <section id="tree-3-coins" class="section">
+        <h2>Tree Diagram — 3 Coins</h2>
         <div class="card soft">
-          <p><strong>Sample space</strong>: the set of all possible outcomes of an experiment.</p>
-          <div class="grid">
-            <div class="card">
-              <h3 style="margin:0 0 .4rem;">Examples</h3>
-              <ul style="margin:.2rem 0;">
-                <li>Roll a die: \(S=\{1,2,3,4,5,6\}\)</li>
-                <li>Flip a coin: \(S=\{H,T\}\)</li>
-              </ul>
-              <p class="note">Die outcome is quantitative (discrete); coin outcome is qualitative (categorical).</p>
+          <div class="row" style="align-items:center; gap:12px;">
+            <div class="checkline">
+              <input id="hl-2tails" type="checkbox">
+              <label for="hl-2tails" style="margin:0;">Highlight “exactly 2 tails” (HTT, THT, TTH)</label>
             </div>
-            <div class="card">
-              <p><strong>Event</strong>: any subset of the sample space. If \(A\)=“even on a die,” then \(A=\{2,4,6\}\).</p>
+            <div class="checkline">
+              <input id="hl-1tail" type="checkbox">
+              <label for="hl-1tail" style="margin:0;">Highlight “exactly 1 tail” (HHT, HTH, THH)</label>
             </div>
           </div>
-          <p><strong>Probability</strong> of event \(A\), \(P(A)\), is the expected long-run proportion of times \(A\) occurs.</p>
-          <p class="mono">P(A) = (# outcomes in A) / (total # outcomes)</p>
-        </div>
 
-        <div class="grid">
-          <article class="card">
-            <h3 style="margin:0 0 .4rem;">Counting: Basic Setups</h3>
-            <ul>
-              <li><strong>Arrangements of SUNDAY</strong> (all letters distinct): \(6! = 720\).</li>
-              <li><strong>3-digit code</strong> (digits 0–9, allow repeats): \(10^3 = 1000\).</li>
-            </ul>
-          </article>
+          <div class="preview tall" style="margin-top:10px;">
+            <svg id="coinTree" class="viz" role="img" aria-label="Tree diagram for three coin flips"></svg>
+          </div>
 
-          <article class="card">
-            <h3 style="margin:0 0 .4rem;">Tree Diagram (Penny, Nickel, Dime)</h3>
-            <ol style="margin:.2rem 0;">
-              <li>Total outcomes: \(2^3=8\).</li>
-              <li>Sample space (ordered by coin): \(\{HHH,HHT,HTH,HTT,THH,THT,TTH,TTT\}\).</li>
-              <li>\(A=\) “all three tails”: \(P(A)=1/8\).</li>
-              <li>\(B=\) “exactly two tails”: \(P(B)=3/8\).</li>
-              <li>\(C=\) “exactly one tail”: \(P(C)=3/8\).</li>
-              <li>\(D=\) “no tails”: \(P(D)=1/8\).</li>
-            </ol>
-          </article>
+          <p class="muted" style="margin:.6rem 0 0;">
+            Each edge has probability <span class="mono">1/2</span>. Each leaf (sequence) has probability <span class="mono">1/8</span>.
+            There are 3 sequences with exactly 2 tails ⇒ \(P(\text{exactly 2 tails})=3/8\).
+          </p>
         </div>
       </section>
 
-      <!-- 2. Common Probabilities -->
-      <section id="common" class="section">
-        <h2>2. Common Probabilities</h2>
-        <div class="grid">
-          <article class="card">
-            <h3 style="margin:0 0 .4rem;">Complement</h3>
-            <p>The complement of \(A\), often denoted \(A^c\), is “not \(A\)”.</p>
-          </article>
-          <article class="card">
-            <h3 style="margin:0 0 .4rem;">Joint & Conditional</h3>
-            <ul>
-              <li><strong>Joint (AND)</strong> \(A\cap B\): both occur.</li>
-              <li><strong>Union (OR)</strong> \(A\cup B\): at least one occurs.</li>
-              <li><strong>Conditional</strong> \(P(A\mid B)\): probability of \(A\) given that \(B\) occurred.</li>
-            </ul>
-          </article>
-        </div>
-      </section>
-
-      <!-- 3. Probability Rules -->
-      <section id="rules" class="section">
-        <h2>3. Probability Rules</h2>
-        <div class="grid">
-          <article class="card">
-            <ul>
-              <li><strong>Complement:</strong> \(P(A^c) = 1 - P(A)\).</li>
-              <li><strong>Addition:</strong> \(P(A\cup B) = P(A) + P(B) - P(A\cap B)\).</li>
-              <li><strong>Conditional:</strong> \(P(A\mid B) = \dfrac{P(A\cap B)}{P(B)}\) (if \(P(B)>0\)).</li>
-              <li><strong>Multiplication:</strong> \(P(A\cap B)=P(A)\,P(B\mid A)\).</li>
-            </ul>
-          </article>
-        </div>
-      </section>
-
-      <!-- Example: two dice table -->
-      <section id="two-dice" class="section">
-        <h2>Example — Two Dice</h2>
-        <p>Roll a balanced green die and a balanced red die. Define:</p>
-        <ul>
-          <li>\(A=\{\text{sum is }7\}\)</li>
-          <li>\(B=\{\text{both numbers }\le 4\}\)</li>
-        </ul>
-        <div class="card soft overflow-x">
-          <table class="table w-auto">
-            <thead>
-              <tr><th class="t-center">Red ↓ / Green →</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
-            </thead>
-            <tbody>
-              <tr><th>1</th><td>(1,1)</td><td>(2,1)</td><td>(3,1)</td><td>(4,1)</td><td>(5,1)</td><td>(6,1)</td></tr>
-              <tr><th>2</th><td>(1,2)</td><td>(2,2)</td><td>(3,2)</td><td>(4,2)</td><td>(5,2)</td><td>(6,2)</td></tr>
-              <tr><th>3</th><td>(1,3)</td><td>(2,3)</td><td>(3,3)</td><td>(4,3)</td><td>(5,3)</td><td>(6,3)</td></tr>
-              <tr><th>4</th><td>(1,4)</td><td>(2,4)</td><td>(3,4)</td><td>(4,4)</td><td>(5,4)</td><td>(6,4)</td></tr>
-              <tr><th>5</th><td>(1,5)</td><td>(2,5)</td><td>(3,5)</td><td>(4,5)</td><td>(5,5)</td><td>(6,5)</td></tr>
-              <tr><th>6</th><td>(1,6)</td><td>(2,6)</td><td>(3,6)</td><td>(4,6)</td><td>(5,6)</td><td>(6,6)</td></tr>
-            </tbody>
-          </table>
-          <p class="note" style="margin:.4rem 0 0">Use the table to find: \(P(A)\), \(P(B)\), \(P(A^c)\), \(P(B^c)\), \(P(A\cap B)\), \(P(A\cup B)\), \(P(A\mid B)\), \(P(B\mid A)\).</p>
-        </div>
-      </section>
-
-      <!-- Example: contingency table (favorite subject × gender) -->
-      <section id="contingency1" class="section">
-        <h2>Example — Probability from a Contingency Table</h2>
-        <p>Choose 1 student at random. Let \(A=\{\text{female}\}\), \(B=\{\text{math as favorite subject}\}\).</p>
-        <div class="card soft overflow-x">
-          <table class="table w-auto">
-            <thead><tr><th></th><th>Math</th><th>Science</th><th>History</th><th>English</th><th>Total</th></tr></thead>
-            <tbody>
-              <tr><th>Female</th><td>1192</td><td>321</td><td>72</td><td>15</td><td>1600</td></tr>
-              <tr><th>Male</th>  <td>695</td><td>487</td><td>141</td><td>77</td><td>1400</td></tr>
-              <tr><th>Total</th> <td>1887</td><td>808</td><td>213</td><td>92</td><td>3000</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p>Find: \(P(A)\), \(P(B)\), \(P(A^c)\), \(P(A\cap B)\), \(P(A\cup B)\), \(P(A\mid B)\).</p>
-      </section>
-
-      <!-- 4. Characteristics of events -->
-      <section id="events" class="section">
-        <h2>4. Characteristics of Events</h2>
-        <div class="grid">
-          <article class="card">
-            <h3 style="margin:0 0 .4rem;">Mutually Exclusive (Disjoint)</h3>
-            <p>Two events can’t occur together: \(P(A\cap B)=0\). For disjoint events, the addition rule reduces to \(P(A\cup B)=P(A)+P(B)\).</p>
-          </article>
-          <article class="card">
-            <h3 style="margin:0 0 .4rem;">Independence</h3>
-            <p>\(A\) and \(B\) are independent if \(P(A\mid B)=P(A)\) (i.e., knowing \(B\) doesn’t change the probability of \(A\)). Otherwise they’re dependent.</p>
-          </article>
-        </div>
-      </section>
-
-      <!-- Example: cards (dependency & multiplication rule) -->
-      <section id="cards" class="section">
-        <h2>Example — Two Cards from a Standard Deck</h2>
-        <p>52 cards, 4 aces.</p>
-        <ul>
-          <li>Draw <em>without replacement</em> (don’t put the first card back). Let \(A=\{\text{first card ace}\}\), \(B=\{\text{second card ace}\}\).</li>
-          <li>Draw <em>with replacement</em> (return the first card, reshuffle), same \(A,B\).</li>
-        </ul>
-
-        <div class="grid">
-          <article class="card">
-            <h3 style="margin:0 0 .4rem;">Without Replacement (dependent)</h3>
-            <p>\(P(B\mid A)=\frac{3}{51}\), \(P(B\mid A^c)=\frac{4}{51}\) ⇒ \(B\) depends on \(A\).</p>
-            <p>Multiplication rule: \(P(A\cap B)=P(A)P(B\mid A)=\frac{4}{52}\cdot\frac{3}{51}=\frac{12}{2652}\approx 0.004525\).</p>
-          </article>
-          <article class="card">
-            <h3 style="margin:0 0 .4rem;">With Replacement (independent)</h3>
-            <p>\(P(B\mid A)=\frac{4}{52}\) (same as \(P(B)\)) ⇒ independent.</p>
-            <p>\(P(A\cap B)=\frac{4}{52}\cdot\frac{4}{52}=\frac{16}{2704}\approx 0.00591\).</p>
-          </article>
-        </div>
-      </section>
-
-      <!-- Example: contingency table (city × government) -->
-      <section id="contingency2" class="section">
-        <h2>Example — City Residence × Government Preference</h2>
-        <p>\(C=\{\text{lives in the city}\}\), \(F=\{\text{favors combining city \& county government}\}\).</p>
-        <div class="card soft overflow-x">
-          <table class="table w-auto">
-            <thead><tr><th></th><th>Favor (F)</th><th>Oppose</th><th>Total</th></tr></thead>
-            <tbody>
-              <tr><th>City (C)</th><td>80</td><td>40</td><td>120</td></tr>
-              <tr><th>Outside</th><td>20</td><td>10</td><td>30</td></tr>
-              <tr><th>Total</th><td>100</td><td>50</td><td>150</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p>Find: \(P(C)\), \(P(C^c)\), \(P(F)\), \(P(C\cap F)\), \(P(C\cup F)\), \(P(C^c\mid F)\). Are \(C\) and \(F\) independent?</p>
-      </section>
-
-      <!-- 5. Misconceptions -->
-      <section id="misconceptions" class="section">
-        <h2>5. Misconceptions of Probability</h2>
-        <div class="grid">
-          <article class="card">
-            <h3 style="margin:0 0 .4rem;">Gambler’s Fallacy</h3>
-            <p>Mistakenly believing the long-run frequency must appear in the short run. With independent trials, past outcomes don’t change the probability of the next outcome.</p>
-          </article>
-          <article class="card">
-            <h3 style="margin:0 0 .4rem;">“Very Unlikely” Events</h3>
-            <p>Low probability for a particular person/event doesn’t mean it won’t happen to <em>someone</em>. With many opportunities, “someone, somewhere, someday” sees rare events.</p>
+      <!-- ===================== Applet 1: Binomial (theory vs sim) ===================== -->
+      <section id="applet-binomial" class="section">
+        <h2>Applet — Coin Flips: Theory vs Simulation</h2>
+        <div class="card">
+          <div class="grid2">
             <div class="card soft">
-              <h4 style="margin:0 0 .4rem;">Lottery anecdote</h4>
-              <p>One person winning a lottery twice may be individually unlikely, but across millions of players and many drawings, the chance that <em>someone</em> wins twice in a given period is not so small.</p>
+              <label for="nFlips"># flips (n)</label>
+              <input id="nFlips" type="number" min="1" max="200" value="10">
+              <label style="margin-top:8px;" for="pHead">P(Head) \(p\)</label>
+              <input id="pHead" type="number" step="0.01" min="0" max="1" value="0.50">
+
+              <label style="margin-top:8px;" for="nTrials">Simulation trials</label>
+              <input id="nTrials" type="number" min="1" max="50000" value="5000">
+
+              <div class="btnbar" style="margin-top:8px;">
+                <button class="btn" id="runBinom">Run Simulation</button>
+                <button class="btn ghost" id="resetBinom">Reset</button>
+              </div>
+              <p class="note" style="margin:.5rem 0 0;">
+                Plots the **exact** binomial distribution \(X\sim \text{Bin}(n,p)\) and an **empirical** histogram of simulated # of heads.
+              </p>
             </div>
-          </article>
+
+            <div class="card soft">
+              <div class="preview" style="height:300px;">
+                <svg id="binomPlot" class="viz" role="img" aria-label="Binomial theory vs simulation"></svg>
+              </div>
+              <div class="kpis" style="margin-top:8px;">
+                <div id="binomMean">Mean —</div>
+                <div id="binomVar">Var —</div>
+                <div id="binomSimMean">Sim mean —</div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- Birthday problem -->
-      <section id="birthday" class="section">
-        <h2>Example — Birthday Problem</h2>
-        <p>Assume no Feb 29 and all birthdays equally likely.</p>
-        <div class="grid">
-          <article class="card">
-            <h3 style="margin:0 0 .4rem;">Four People</h3>
-            <p>Probability all 4 birthdays are different:</p>
-            <p>\[
-              \frac{365}{365}\cdot\frac{364}{365}\cdot\frac{363}{365}\cdot\frac{362}{365}
-              \approx 0.983
-            \]</p>
-            <p>So, \(P(\text{at least two share}) = 1 - 0.983 \approx 0.017\).</p>
-          </article>
-          <article class="card">
-            <h3 style="margin:0 0 .4rem;">Class of 32</h3>
-            <p>Probability all different \(\approx 0.255\) ⇒ \(P(\text{at least two share})\approx 0.745\) (74.5%).</p>
-            <p class="note">With more people, there are more opportunities for a match, so the probability of a match increases.</p>
-          </article>
+      <!-- ===================== Applet 2: Two Dice Events ===================== -->
+      <section id="applet-dice" class="section">
+        <h2>Applet — Two Dice Events</h2>
+        <div class="card">
+          <div class="grid2 tight">
+            <div class="card soft">
+              <div class="row">
+                <div>
+                  <label>Event A</label>
+                  <select id="diceA">
+                    <option value="sum7">Sum = 7</option>
+                    <option value="bothLE4">Both ≤ 4</option>
+                    <option value="double">Doubles</option>
+                    <option value="redEven">Red is even</option>
+                    <option value="greenGT4">Green > 4</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Event B</label>
+                  <select id="diceB">
+                    <option value="sum7">Sum = 7</option>
+                    <option value="bothLE4">Both ≤ 4</option>
+                    <option value="double">Doubles</option>
+                    <option value="redEven">Red is even</option>
+                    <option value="greenGT4">Green > 4</option>
+                  </select>
+                </div>
+              </div>
+              <div class="btnbar" style="margin-top:8px;">
+                <button class="btn" id="drawDice">Update</button>
+                <button class="btn ghost" id="resetDice">Reset</button>
+              </div>
+              <p class="note">Green die = columns, Red die = rows (ordered pair is (red, green)).</p>
+            </div>
+
+            <div class="card soft overflow-x">
+              <div class="preview" style="height:300px;">
+                <svg id="diceGrid" class="viz" role="img" aria-label="Two dice 6x6 grid"></svg>
+              </div>
+              <div class="kpis" style="margin-top:8px;">
+                <div id="pA">P(A) —</div>
+                <div id="pB">P(B) —</div>
+                <div id="pAB">P(A∩B) —</div>
+                <div id="pAUB">P(A∪B) —</div>
+                <div id="pAgB">P(A|B) —</div>
+              </div>
+              <p class="legend">Gold = A only, Blue = B only, Green = A∩B, Light gray = neither.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== Applet 3: Birthday Problem ===================== -->
+      <section id="applet-birthday" class="section">
+        <h2>Applet — Birthday Problem</h2>
+        <div class="card">
+          <div class="grid2">
+            <div class="card soft">
+              <label for="classN">Class size</label>
+              <input id="classN" type="number" min="2" max="100" value="32">
+              <label style="margin-top:8px;" for="trialsB">Simulation trials</label>
+              <input id="trialsB" type="number" min="100" max="50000" value="5000">
+              <div class="btnbar" style="margin-top:8px;">
+                <button class="btn" id="runBday">Run</button>
+                <button class="btn ghost" id="resetBday">Reset</button>
+              </div>
+              <p class="note">Assume 365 equally likely birthdays; no Feb 29.</p>
+            </div>
+            <div class="card soft">
+              <div class="kpis">
+                <div id="bdayExact">Exact P(match) —</div>
+                <div id="bdaySim">Sim P(match) —</div>
+              </div>
+              <div class="preview" style="height:240px; margin-top:8px;">
+                <svg id="bdayPlot" class="viz" role="img" aria-label="Birthday probability vs class size"></svg>
+              </div>
+              <p class="legend">Curve = exact; dot = this class size simulated.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== Applet 4: Two Cards (Replacement vs Not) ===================== -->
+      <section id="applet-cards" class="section">
+        <h2>Applet — Two Cards from a Deck</h2>
+        <div class="card">
+          <div class="grid2">
+            <div class="card soft">
+              <label># of aces in deck</label>
+              <input id="aces" type="number" min="1" max="4" value="4">
+              <label style="margin-top:8px;">Deck size</label>
+              <input id="deckN" type="number" min="4" max="104" value="52">
+              <div class="btnbar" style="margin-top:8px;">
+                <button class="btn" id="cardsCalc">Calculate</button>
+              </div>
+              <p class="note" style="margin:.5rem 0 0;">Compare with and without replacement; check independence via \(P(B\mid A)\) vs \(P(B)\).</p>
+            </div>
+            <div class="card soft">
+              <div class="kpis">
+                <div id="noRep">No repl: P(AA) —</div>
+                <div id="withRep">With repl: P(AA) —</div>
+                <div id="condNoRep">No repl: P(B|A) —</div>
+                <div id="condWithRep">With repl: P(B|A) —</div>
+              </div>
+              <p class="legend" style="margin-top:8px;">Here \(A\)=“first is ace”, \(B\)=“second is ace”. With replacement → independent ( \(P(B\mid A)=P(B)\) ).</p>
+            </div>
+          </div>
         </div>
       </section>
 
       <footer>
-        <p class="text-muted">These notes mirror your original III-A handout. Minor formatting added for web readability.</p>
-        <p>Last updated: <span id="lastUpdated"></span></p>
+        Last updated: <span id="lastUpdated"></span>
       </footer>
     </main>
   </div>
 
+  <!-- ===================== Scripts ===================== -->
   <script>
-    // Sidebar include (robust for user/project GitHub Pages)
+    // -------- Sidebar include (robust for user or project GitHub Pages) --------
     (async function injectSidebar(){
       const el = document.querySelector('[data-include]');
       if(!el) return;
@@ -312,12 +248,440 @@
         }catch(_){}
       }
       el.innerHTML = html || '<div class="muted">Sidebar failed to load.</div>';
-
       const yr = el.querySelector('#yr'); if (yr) yr.textContent = new Date().getFullYear();
     })();
 
-    document.getElementById('lastUpdated').textContent =
-      new Date(document.lastModified).toLocaleString();
+    document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
+
+    // ===================== Tree Diagram (3 coins) =====================
+    (function(){
+      const svg = document.getElementById('coinTree');
+      const HL2 = document.getElementById('hl-2tails');
+      const HL1 = document.getElementById('hl-1tail');
+      const NS = 'http://www.w3.org/2000/svg';
+      function S(tag, attrs={}){ const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); return el; }
+      function clear(){ while(svg.firstChild) svg.removeChild(svg.firstChild); }
+
+      function buildLeaves(){
+        const leaves = []; (function gen(s,d){ if(d===3){ leaves.push(s); return; } gen(s+'H',d+1); gen(s+'T',d+1); })('',0);
+        return leaves;
+      }
+      function layout(leaves){
+        const W = svg.clientWidth || svg.getBoundingClientRect().width || 900;
+        const H = svg.clientHeight || svg.getBoundingClientRect().height || 480;
+        svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+        const m={t:24,r:24,b:28,l:80}, plotW=W-m.l-m.r, plotH=H-m.t-m.b;
+        const x = d => m.l + (plotW * d / 3);
+        const rows=8, rowGap=plotH/(rows-1), leafY=i=>m.t + i*rowGap;
+        const yMap={}; leaves.forEach((seq,i)=> yMap[seq]=leafY(i));
+        ['', 'H','T','HH','HT','TH','TT'].reverse().forEach(pref=>{
+          if (pref.length<3){ yMap[pref]=(yMap[pref+'H']+yMap[pref+'T'])/2; }
+        });
+        return {x,yMap,W,H,m};
+      }
+      function labelText(x,y,text,opts={}){ const t=S('text',{x,y,'font-size':opts.size||12,'text-anchor':opts.anchor||'middle',fill:opts.fill||'#4b5563'}); t.textContent=text; return t; }
+
+      function draw(){
+        clear();
+        const leaves=buildLeaves();
+        const L=layout(leaves);
+
+        svg.appendChild(labelText(8,16,'Root → 3 flips → 8 outcomes',{anchor:'start',size:12}));
+
+        function edge(x1,y1,x2,y2, lab){
+          const line=S('line',{x1,y1,x2,y2,stroke:'#374151','stroke-width':2}); svg.appendChild(line);
+          const mx=(x1+x2)/2, my=(y1+y2)/2;
+          svg.appendChild(labelText(mx,my-6,lab,{size:11}));
+          svg.appendChild(labelText(mx,my+12,'1/2',{size:10}));
+        }
+
+        const levels=[
+          {parents:[''], children:['H','T']},
+          {parents:['H','T'], children:['HH','HT','TH','TT']},
+          {parents:['HH','HT','TH','TT'], children:['HHH','HHT','HTH','HTT','THH','THT','TTH','TTT']}
+        ];
+        levels.forEach((lv,di)=>{
+          lv.parents.forEach(p=>{
+            const yP=L.yMap[p], xP=L.x(di);
+            [['H','H'],['T','T']].forEach(([b,lab])=>{
+              const c=p+b, yC=L.yMap[c], xC=L.x(di+1);
+              edge(xP,yP,xC,yC,lab);
+            });
+          });
+        });
+
+        ['', 'H','T','HH','HT','TH','TT'].forEach(id=>{
+          const cx=L.x(id.length), cy=L.yMap[id];
+          const c=S('circle',{cx,cy,r:10,fill:'#fff',stroke:'#111827','stroke-width':2}); svg.appendChild(c);
+          svg.appendChild(labelText(cx,cy+4,id||'Start',{size:11}));
+        });
+
+        leaves.forEach(seq=>{
+          const cx=L.x(3), cy=L.yMap[seq];
+          const twoT=(seq.match(/T/g)||[]).length===2;
+          const oneT=(seq.match(/T/g)||[]).length===1;
+          const rect=S('rect',{x:cx-28,y:cy-10,width:56,height:20,rx:8,ry:8,fill:'#fff',stroke:'#111827','stroke-width':1.5});
+          if (HL2.checked && twoT){ rect.setAttribute('fill','#10b981'); rect.setAttribute('stroke','#065f46'); }
+          else if (HL1.checked && oneT){ rect.setAttribute('fill','#60a5fa'); rect.setAttribute('stroke','#1e40af'); }
+          svg.appendChild(rect);
+          svg.appendChild(labelText(cx,cy+4,seq,{size:12,fill:'#111827'}));
+          svg.appendChild(labelText(cx+48,cy+4,'1/8',{size:11}));
+        });
+      }
+
+      draw();
+      HL2.addEventListener('change', draw);
+      HL1.addEventListener('change', draw);
+      const ro = new ResizeObserver(()=>draw()); ro.observe(document.body);
+    })();
+
+    // ===================== Helpers =====================
+    function binomPMF(n,k,p){
+      // simple, stable-ish comb * p^k*(1-p)^(n-k)
+      function comb(n,r){
+        r=Math.min(r,n-r); let num=1, den=1;
+        for(let i=1;i<=r;i++){ num*= (n-r+i); den*= i; }
+        return num/den;
+      }
+      return comb(n,k)*Math.pow(p,k)*Math.pow(1-p,n-k);
+    }
+    function createSVG(W,H){
+      const NS='http://www.w3.org/2000/svg'; const s=document.createElementNS(NS,'svg');
+      s.setAttribute('viewBox', `0 0 ${W} ${H}`); return s;
+    }
+    function clearSVG(s){ while(s.firstChild) s.removeChild(s.firstChild); }
+
+    // ===================== Applet 1: Binomial =====================
+    (function(){
+      const nEl = document.getElementById('nFlips');
+      const pEl = document.getElementById('pHead');
+      const tEl = document.getElementById('nTrials');
+      const runBtn = document.getElementById('runBinom');
+      const resetBtn = document.getElementById('resetBinom');
+      const svg = document.getElementById('binomPlot');
+      const meanBox = document.getElementById('binomMean');
+      const varBox  = document.getElementById('binomVar');
+      const simBox  = document.getElementById('binomSimMean');
+
+      let simCounts = [];
+
+      function redraw(){
+        clearSVG(svg);
+        const W=svg.clientWidth||900, H=svg.clientHeight||300;
+        svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+        const m={l:40,r:16,t:16,b:28}, w=W-m.l-m.r, h=H-m.t-m.b;
+
+        const n = Math.max(1, Math.min(200, +nEl.value||10));
+        const p = Math.max(0, Math.min(1, +pEl.value||0.5));
+        const xs = [...Array(n+1).keys()];
+        const pmf = xs.map(k=>binomPMF(n,k,p));
+        const maxY = Math.max(...pmf, (simCounts.length? Math.max(...simCounts)/Math.max(1,simCounts.reduce((a,b)=>a+b,0)) : 0));
+        const x = k => m.l + (k/n)*w;
+        const y = v => m.t + h - (v/maxY)*h;
+
+        // axes
+        const ax=document.createElementNS('http://www.w3.org/2000/svg','line');
+        ax.setAttribute('x1',m.l); ax.setAttribute('x2',m.l); ax.setAttribute('y1',m.t); ax.setAttribute('y2',m.t+h+4);
+        ax.setAttribute('stroke','#111827'); svg.appendChild(ax);
+        const ax2=document.createElementNS('http://www.w3.org/2000/svg','line');
+        ax2.setAttribute('x1',m.l); ax2.setAttribute('x2',m.l+w); ax2.setAttribute('y1',m.t+h+4); ax2.setAttribute('y2',m.t+h+4);
+        ax2.setAttribute('stroke','#111827'); svg.appendChild(ax2);
+
+        // theory bars (thin)
+        const bw = Math.max(1, w/(n+1)*0.6);
+        xs.forEach(k=>{
+          const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+          rect.setAttribute('x', x(k)-bw/2);
+          rect.setAttribute('y', y(pmf[k]));
+          rect.setAttribute('width', bw);
+          rect.setAttribute('height', m.t+h - y(pmf[k]));
+          rect.setAttribute('fill','#60a5fa'); // blue
+          rect.setAttribute('opacity','0.7');
+          svg.appendChild(rect);
+        });
+
+        // simulation bars (overlay, semi-transparent gold)
+        if (simCounts.length){
+          const total = simCounts.reduce((a,b)=>a+b,0);
+          xs.forEach(k=>{
+            const prob = simCounts[k]/total;
+            const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+            rect.setAttribute('x', x(k)-bw/2);
+            rect.setAttribute('y', y(prob));
+            rect.setAttribute('width', bw);
+            rect.setAttribute('height', m.t+h - y(prob));
+            rect.setAttribute('fill','#e7a614');
+            rect.setAttribute('opacity','0.55');
+            svg.appendChild(rect);
+          });
+        }
+
+        // ticks
+        const step=Math.max(1, Math.round(n/10));
+        for (let k=0;k<=n;k+=step){
+          const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
+          tx.setAttribute('x', x(k));
+          tx.setAttribute('y', m.t+h+20);
+          tx.setAttribute('text-anchor','middle'); tx.setAttribute('font-size','11'); tx.setAttribute('fill','#4b5563');
+          tx.textContent = k; svg.appendChild(tx);
+        }
+
+        meanBox.textContent = `Mean = n·p = ${(n*p).toFixed(3)}`;
+        varBox.textContent  = `Var = n·p·(1-p) = ${(n*p*(1-p)).toFixed(3)}`;
+        if (simCounts.length){
+          const total=simCounts.reduce((a,b)=>a+b,0);
+          const simMean=simCounts.reduce((s,c,k)=>s+c*k,0)/Math.max(1,total);
+          simBox.textContent = `Sim mean ≈ ${simMean.toFixed(3)} (N=${total})`;
+        } else {
+          simBox.textContent='Sim mean —';
+        }
+      }
+
+      function run(){
+        const n = Math.max(1, Math.min(200, +nEl.value||10));
+        const p = Math.max(0, Math.min(1, +pEl.value||0.5));
+        const T = Math.max(1, Math.min(50000, +tEl.value||5000));
+        simCounts = Array(n+1).fill(0);
+        // simulate
+        for (let t=0;t<T;t++){
+          let heads=0;
+          for (let i=0;i<n;i++){
+            if (Math.random() < p) heads++;
+          }
+          simCounts[heads]++;
+        }
+        redraw();
+      }
+      function reset(){ simCounts=[]; redraw(); }
+
+      [nEl,pEl,tEl].forEach(el=>{ el.addEventListener('input', redraw); el.addEventListener('change', redraw); });
+      runBtn.addEventListener('click', run);
+      resetBtn.addEventListener('click', reset);
+      const ro=new ResizeObserver(()=>redraw()); ro.observe(document.body);
+      redraw();
+    })();
+
+    // ===================== Applet 2: Two Dice Grid =====================
+    (function(){
+      const svg = document.getElementById('diceGrid');
+      const selA = document.getElementById('diceA');
+      const selB = document.getElementById('diceB');
+      const pA = document.getElementById('pA');
+      const pB = document.getElementById('pB');
+      const pAB= document.getElementById('pAB');
+      const pAUB=document.getElementById('pAUB');
+      const pAgB=document.getElementById('pAgB');
+      const btn = document.getElementById('drawDice');
+      const reset = document.getElementById('resetDice');
+
+      function inEvent(code, r, g){
+        switch(code){
+          case 'sum7':    return (r+g===7);
+          case 'bothLE4': return (r<=4 && g<=4);
+          case 'double':  return (r===g);
+          case 'redEven': return (r%2===0);
+          case 'greenGT4':return (g>4);
+        }
+        return false;
+      }
+
+      function draw(){
+        while(svg.firstChild) svg.removeChild(svg.firstChild);
+        const W=svg.clientWidth||600, H=svg.clientHeight||300;
+        svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+        const m={l:60,r:16,t:28,b:40}, w=W-m.l-m.r, h=H-m.t-m.b;
+        const cw=w/6, ch=h/6;
+        // headers
+        const NS='http://www.w3.org/2000/svg';
+        const label=(x,y,t,anc='middle')=>{
+          const tx=document.createElementNS(NS,'text'); tx.setAttribute('x',x); tx.setAttribute('y',y);
+          tx.setAttribute('text-anchor',anc); tx.setAttribute('font-size','12'); tx.setAttribute('fill','#111827'); tx.textContent=t; svg.appendChild(tx);
+        };
+        label(m.l + w/2, m.t-10, 'Green (columns)');
+        label(m.l-40, m.t + h/2, 'Red (rows)','end');
+
+        // counts for A, B, intersection
+        let cntA=0, cntB=0, cntAB=0;
+
+        for (let r=1;r<=6;r++){
+          for (let g=1; g<=6; g++){
+            const x=m.l+(g-1)*cw, y=m.t+(r-1)*ch;
+            const A=inEvent(selA.value,r,g);
+            const B=inEvent(selB.value,r,g);
+            let fill='#f9fafb', stroke='#e5e7eb';
+            if (A && B){ fill='rgba(16,185,129,0.30)'; stroke='#10b981'; cntAB++; }
+            else if (A){ fill='rgba(231,166,20,0.35)'; stroke='#e7a614'; cntA++; }
+            else if (B){ fill='rgba(96,165,250,0.40)'; stroke='#60a5fa'; cntB++; }
+
+            const rect=document.createElementNS(NS,'rect');
+            rect.setAttribute('x',x); rect.setAttribute('y',y);
+            rect.setAttribute('width',cw-2); rect.setAttribute('height',ch-2);
+            rect.setAttribute('fill',fill); rect.setAttribute('stroke',stroke); rect.setAttribute('rx',8);
+            svg.appendChild(rect);
+
+            const tx=document.createElementNS(NS,'text');
+            tx.setAttribute('x',x+(cw-2)/2); tx.setAttribute('y',y+(ch-2)/2+4);
+            tx.setAttribute('text-anchor','middle'); tx.setAttribute('font-size','12'); tx.setAttribute('fill','#111827');
+            tx.textContent = `(${r},${g})`; svg.appendChild(tx);
+          }
+        }
+
+        // axes ticks
+        for (let g=1; g<=6; g++){
+          label(m.l+(g-0.5)*cw, m.t+h+18, g);
+        }
+        for (let r=1; r<=6; r++){
+          label(m.l-12, m.t+(r-0.5)*ch+4, r,'end');
+        }
+
+        const total=36;
+        const p_a=(cntA+cntAB)/total, p_b=(cntB+cntAB)/total, p_ab=cntAB/total;
+        const p_aub=p_a+p_b-p_ab;
+        const p_a_given_b = (p_b>0) ? (p_ab/p_b) : 0;
+
+        pA.textContent   = `P(A) = ${(p_a).toFixed(3)}`;
+        pB.textContent   = `P(B) = ${(p_b).toFixed(3)}`;
+        pAB.textContent  = `P(A∩B) = ${(p_ab).toFixed(3)}`;
+        pAUB.textContent = `P(A∪B) = ${(p_aub).toFixed(3)}`;
+        pAgB.textContent = `P(A|B) = ${(p_a_given_b).toFixed(3)}`;
+      }
+
+      btn.addEventListener('click', draw);
+      reset.addEventListener('click', ()=>{ selA.value='sum7'; selB.value='bothLE4'; draw(); });
+      selA.addEventListener('change', draw);
+      selB.addEventListener('change', draw);
+      const ro=new ResizeObserver(()=>draw()); ro.observe(document.body);
+      draw();
+    })();
+
+    // ===================== Applet 3: Birthday Problem =====================
+    (function(){
+      const nEl=document.getElementById('classN');
+      const tEl=document.getElementById('trialsB');
+      const btn=document.getElementById('runBday');
+      const reset=document.getElementById('resetBday');
+      const exactBox=document.getElementById('bdayExact');
+      const simBox=document.getElementById('bdaySim');
+      const svg=document.getElementById('bdayPlot');
+
+      function exactPMatch(n){
+        // 1 - prod_{i=0..n-1} ((365-i)/365)
+        let prod=1;
+        for (let i=0;i<n;i++) prod *= (365-i)/365;
+        return 1 - prod;
+      }
+      function simulate(n, T){
+        let hits=0;
+        const seen=new Array(366);
+        for (let t=0;t<T;t++){
+          // clear seen quickly
+          seen.fill(false);
+          let dup=false;
+          for (let i=0;i<n;i++){
+            const b = Math.floor(Math.random()*365); // 0..364
+            if (seen[b]){ dup=true; break; }
+            seen[b]=true;
+          }
+          if (dup) hits++;
+        }
+        return hits/T;
+      }
+
+      function drawCurve(n, simP){
+        while(svg.firstChild) svg.removeChild(svg.firstChild);
+        const W=svg.clientWidth||900, H=svg.clientHeight||240;
+        svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+        const m={l:40,r:16,t:16,b:28}, w=W-m.l-m.r, h=H-m.t-m.b;
+        const x=k=>m.l + (k-2)/(100-2)*w;
+        const y=p=>m.t + h - p*h;
+
+        // axis
+        const ax=document.createElementNS('http://www.w3.org/2000/svg','line');
+        ax.setAttribute('x1',m.l); ax.setAttribute('x2',m.l); ax.setAttribute('y1',m.t); ax.setAttribute('y2',m.t+h+4);
+        ax.setAttribute('stroke','#111827'); svg.appendChild(ax);
+        const ax2=document.createElementNS('http://www.w3.org/2000/svg','line');
+        ax2.setAttribute('x1',m.l); ax2.setAttribute('x2',m.l+w); ax2.setAttribute('y1',m.t+h+4); ax2.setAttribute('y2',m.t+h+4);
+        ax2.setAttribute('stroke','#111827'); svg.appendChild(ax2);
+
+        // curve
+        const NS='http://www.w3.org/2000/svg';
+        const path=document.createElementNS(NS,'path');
+        let d='';
+        for (let k=2;k<=100;k++){
+          const p=exactPMatch(k);
+          d += (k===2 ? `M ${x(k)} ${y(p)}` : ` L ${x(k)} ${y(p)}`);
+        }
+        path.setAttribute('d', d);
+        path.setAttribute('fill','none'); path.setAttribute('stroke','#60a5fa'); path.setAttribute('stroke-width','2');
+        svg.appendChild(path);
+
+        // dot for current n
+        const dot=document.createElementNS(NS,'circle');
+        dot.setAttribute('cx', x(n)); dot.setAttribute('cy', y(simP));
+        dot.setAttribute('r','4'); dot.setAttribute('fill','#e7a614'); dot.setAttribute('stroke','#b45309');
+        svg.appendChild(dot);
+
+        // ticks
+        for (let k=10; k<=100; k+=10){
+          const tx=document.createElementNS(NS,'text');
+          tx.setAttribute('x', x(k)); tx.setAttribute('y', m.t+h+20);
+          tx.setAttribute('text-anchor','middle'); tx.setAttribute('font-size','11'); tx.setAttribute('fill','#4b5563');
+          tx.textContent=k; svg.appendChild(tx);
+        }
+        const ylab=document.createElementNS(NS,'text');
+        ylab.setAttribute('x', m.l-8); ylab.setAttribute('y', m.t+12);
+        ylab.setAttribute('text-anchor','end'); ylab.setAttribute('font-size','11'); ylab.setAttribute('fill','#4b5563');
+        ylab.textContent='P(match)'; svg.appendChild(ylab);
+      }
+
+      function run(){
+        const n=Math.max(2, Math.min(100, +nEl.value||32));
+        const T=Math.max(100, Math.min(50000, +tEl.value||5000));
+        const exact=exactPMatch(n);
+        const sim=simulate(n,T);
+        exactBox.textContent=`Exact ≈ ${exact.toFixed(3)}`;
+        simBox.textContent  =`Sim  ≈ ${sim.toFixed(3)} (N=${T})`;
+        drawCurve(n, sim);
+      }
+      function reset(){ svg.innerHTML=''; exactBox.textContent='Exact P(match) —'; simBox.textContent='Sim P(match) —'; }
+
+      btn.addEventListener('click', run);
+      reset.addEventListener('click', reset);
+      const ro=new ResizeObserver(()=>drawCurve(+nEl.value||32, 0)); ro.observe(document.body);
+      drawCurve(+nEl.value||32, 0);
+    })();
+
+    // ===================== Applet 4: Two Cards =====================
+    (function(){
+      const aces=document.getElementById('aces');
+      const deckN=document.getElementById('deckN');
+      const out1=document.getElementById('noRep');
+      const out2=document.getElementById('withRep');
+      const out3=document.getElementById('condNoRep');
+      const out4=document.getElementById('condWithRep');
+      const btn=document.getElementById('cardsCalc');
+
+      function calc(){
+        const A = Math.max(1, Math.min(52, +aces.value||4));
+        const N = Math.max(4, Math.min(104, +deckN.value||52));
+
+        // No replacement
+        const pA = A/N;
+        const pBgA = (A-1)/(N-1);
+        const pAA_no = pA * pBgA;
+
+        // With replacement
+        const pB = A/N;
+        const pAA_with = pA * pB;
+
+        out1.textContent = `No repl: P(AA) = ${pAA_no.toFixed(5)}`;
+        out2.textContent = `With repl: P(AA) = ${pAA_with.toFixed(5)}`;
+        out3.textContent = `No repl: P(B|A) = ${(pBgA).toFixed(5)} vs P(B)=${pB.toFixed(5)} → dependent`;
+        out4.textContent = `With repl: P(B|A) = ${pB.toFixed(5)} (equals P(B)) → independent`;
+      }
+      btn.addEventListener('click', calc);
+      calc();
+    })();
   </script>
 </body>
 </html>
