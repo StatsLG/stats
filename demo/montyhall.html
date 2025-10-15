@@ -82,12 +82,21 @@
 
     <main>
       <h1 class="page-title">Monty Hall <span class="badge">Game</span></h1>
-      <p>Pick a door. The host will reveal a goat behind one of the other doors. Then choose to <strong>switch</strong> or <strong>stay</strong>. See how your choices turn out over time.</p>
-      <ol style="margin-top:-.25rem; margin-bottom:1rem;">
-        <li>What is the probability of picking the car?</li>
-        <li>After one of the doors has been revealed to be a goat, should you stay or switch?</li>
-        <li>Does it matter?</li>
-      </ol>
+
+      <div class="card" style="margin:.5rem 0 1rem; max-width:900px">
+        <div class="hd">Scenario &amp; Process</div>
+        <div class="bd">
+          <p style="margin-top:0">You are on a game show with <strong>three closed doors</strong>. Behind one door is a car; behind the other two are goats. Your goal is to pick the car.</p>
+          <ul style="margin:.4rem 0 .6rem 1.25rem">
+            <li><strong>Setup:</strong> The car is hidden uniformly at random behind one of the three doors. The host <em>knows</em> where the car is.</li>
+            <li><strong>Step 1 — You pick a door.</strong> You do <em>not</em> open it yet.</li>
+            <li><strong>Step 2 — Host reveals a goat</strong> behind one of the <em>other</em> doors. The host will never open your chosen door and will never reveal the car.</li>
+            <li><strong>Step 3 — Decision:</strong> You may <em>stay</em> with your original door or <em>switch</em> to the other unopened door.</li>
+            <li><strong>Outcome:</strong> Both remaining closed doors are resolved and you see whether you won the car.</li>
+          </ul>
+          <p style="margin:0; color:var(--muted); font-size:.95rem"><strong>Play tip:</strong> Try several rounds using both strategies. Use the table at the bottom to track wins and losses for <em>Stay</em> vs <em>Switch</em> before checking the Explanations tab.</p>
+        </div>
+      </div>
 
       <div class="tabs">
         <button class="tabbtn active" data-tab="game">Game</button>
