@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Monty Hall — Game (StatsLG)</title>
+  <!-- Brand CSS -->
+  <link rel="stylesheet" href="../style/bctcstyle.css" />
+  <style>
+    :root{
+      --kctcs-blue:#00467f; --kctcs-gold:#e7a614;
+      --bg:#ffffff; --ink:#0f172a; --muted:#6b7280; --panel:#f3f4f6; --rule:#e5e7eb;
+      --win:#22c55e; --lose:#ef4444; --accent:#2563eb;
+    }
+    html,body{height:100%}
+    body{margin:0; color:var(--ink); background:var(--bg); font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial}
+    .layout{display:grid; grid-template-columns: 280px 1fr; min-height:100vh}
+    #sidebar{background:var(--kctcs-blue); color:#fff}
+    #sidebar .sidebar-inner{position:sticky; top:0; min-height:100vh; padding:1rem}
+    main{padding:1.25rem; background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)}
+
+    .page-title{display:flex; align-items:center; gap:.75rem; margin:0 0 1rem}
+    .badge{display:inline-block; padding:.15rem .5rem; font-size:.8rem; border-radius:999px; background:var(--kctcs-gold); color:#1f2937; font-weight:600}
+
+    .card{background:#fff; border:1px solid var(--rule); border-radius:16px; box-shadow:0 6px 20px rgba(0,0,0,.05)}
+    .card .hd{padding:1rem 1.25rem; border-bottom:1px solid var(--rule); font-weight:700}
+    .card .bd{padding:1rem 1.25rem}
+
+    .game-grid{display:grid; grid-template-columns: repeat(12, 1fr); gap:1rem}
+    .left-col{grid-column: span 8}
+    .right-col{grid-column: span 4}
+
+    .doors{display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem; margin:1rem 0}
+
+    .door{position:relative; aspect-ratio: 3/5; border-radius:18px; overflow:hidden; cursor:pointer; user-select:none; border:2px solid #0b3b65; background:linear-gradient(145deg, #0f4e86, #09365a); box-shadow: inset 0 2px 8px rgba(255,255,255,.12), 0 8px 20px rgba(0,0,0,.15); transition: transform .12s ease}
+    .door:hover{transform: translateY(-2px)}
+    .door.disabled{opacity:.55; cursor:not-allowed; filter:saturate(.6)}
+
+    .door .panel{position:absolute; inset:0; transform-origin: left center; background:linear-gradient(145deg, #155fa3, #0d3f6a); transition: transform .6s ease}
+    .door.revealed .panel{transform: perspective(800px) rotateY(-85deg)}
+
+    .door .label{position:absolute; left:0; right:0; top:.5rem; text-align:center; color:#dbeafe; font-weight:800; letter-spacing:.5px}
+    .door .knob{position:absolute; right:.6rem; bottom:45%; width:.65rem; height:.65rem; border-radius:50%; background:#f59e0b; box-shadow:0 0 0 3px rgba(0,0,0,.15)}
+
+    .behind{position:absolute; inset:0; display:grid; place-items:center; font-size:2.25rem; font-weight:800}
+    .behind .goat{color:#9ca3af}
+    .behind .car{color:#16a34a}
+
+    .controls{display:flex; flex-wrap:wrap; gap:.5rem}
+    .btn{appearance:none; border:1px solid var(--rule); background:#fff; color:var(--ink); padding:.6rem .9rem; border-radius:10px; font-weight:600; cursor:pointer}
+    .btn.primary{background:var(--kctcs-blue); color:#fff; border-color:#07375e}
+    .btn.warn{background:#fff7ed; color:#7c2d12; border-color:#fed7aa}
+    .btn.ghost{background:transparent}
+    .btn:disabled{opacity:.6; cursor:not-allowed}
+
+    .status{display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; margin:.5rem 0 0}
+    .status .chip{background:#eef2ff; color:#1e3a8a; padding:.25rem .5rem; border-radius:999px; font-size:.82rem; border:1px solid #c7d2fe}
+
+    .stats-grid{display:grid; grid-template-columns: repeat(2, 1fr); gap:1rem}
+    .kpi{display:flex; align-items:center; justify-content:space-between; background:var(--panel); border:1px solid var(--rule); padding:.75rem 1rem; border-radius:12px}
+    .kpi .val{font-size:1.35rem; font-weight:800}
+
+    @media (max-width: 1100px){
+      .layout{grid-template-columns: 1fr}
+      #sidebar{min-height:auto}
+      .left-col{grid-column: 1/-1}
+      .right-col{grid-column: 1/-1}
+    }
+
+    .tabs{display:flex; gap:.5rem; margin:.75rem 0 1rem}
+    .tabbtn{appearance:none; border:1px solid var(--rule); background:#fff; color:var(--ink); padding:.5rem .9rem; border-radius:10px; font-weight:700; cursor:pointer}
+    .tabbtn.active{background:var(--kctcs-blue); color:#fff; border-color:#07375e}
+    .tab{display:none}
+    .tab.active{display:block}
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside id="sidebar"><div class="sidebar-inner">
+      <div id="sidebar-slot">Loading menu…</div>
+    </div></aside>
+
+    <main>
+      <h1 class="page-title">Monty Hall <span class="badge">Game</span></h1>
+      <p>Pick a door. The host will reveal a goat behind one of the other doors. Then choose to <strong>switch</strong> or <strong>stay</strong>. See how your choices turn out over time.</p>
+      <ol style="margin-top:-.25rem; margin-bottom:1rem;">
+        <li>What is the probability of picking the car?</li>
+        <li>After one of the doors has been revealed to be a goat, should you stay or switch?</li>
+        <li>Does it matter?</li>
+      </ol>
+
+      <div class="tabs">
+        <button class="tabbtn active" data-tab="game">Game</button>
+        <button class="tabbtn" data-tab="explain">Explanations</button>
+      </div>
+
+      <section class="game-grid tab active" id="tab-game">
+        <div class="left-col">
+          <div class="card">
+            <div class="hd">Game</div>
+            <div class="bd">
+              <div class="controls" style="margin-bottom:.5rem">
+                <button id="resetRound" class="btn">Reset Round</button>
+                <button id="resetAll" class="btn warn">Reset Stats</button>
+              </div>
+
+              <div id="phaseMsg" class="status"><span class="chip">Phase: Choose a door</span></div>
+              <div class="doors" id="doors"></div>
+              <div class="controls">
+                <button id="btnStay" class="btn" disabled>Stay</button>
+                <button id="btnSwitch" class="btn primary" disabled>Switch</button>
+                <button id="btnNext" class="btn ghost" disabled>Next Round</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="right-col">
+          <div class="card" style="margin-bottom:1rem">
+            <div class="hd">Instructions</div>
+            <div class="bd">
+              <ol style="margin:0 0 .25rem 1rem">
+                <li>What is the probability of picking the car?</li>
+                <li>After one of the doors has been revealed to be a goat, should you stay or switch?</li>
+                <li>Does it matter?</li>
+              </ol>
+              <p style="margin:.5rem 0 0; color:var(--muted); font-size:.9rem">Play several rounds first. Record your choices and outcomes, then discuss.</p>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:1rem">
+            <div class="hd">Live Stats</div>
+            <div class="bd">
+              <div class="stats-grid">
+                <div class="kpi"><div>Total Rounds</div><div class="val" id="kTotal">0</div></div>
+                <div class="kpi"><div>Reveals (Goat)</div><div class="val" id="kReveals">0</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab" id="tab-explain">
+        <div class="card" style="max-width:900px">
+          <div class="hd">Why Switching Wins</div>
+          <div class="bd">
+            <p><strong>Key idea:</strong> Your first pick has a 1/3 chance to be the car. The host then reveals a goat from the other two. If your first pick was wrong (2/3 of the time), the other closed door must have the car. Switching captures that 2/3.</p>
+            <ul>
+              <li><strong>Stay:</strong> Win ≈ 1/3 (only when your first pick was already the car).</li>
+              <li><strong>Switch:</strong> Win ≈ 2/3 (when your first pick was a goat).</li>
+            </ul>
+            <details>
+              <summary><strong>Quick tree view</strong></summary>
+              <pre style="background:#f8fafc;border:1px solid var(--rule);padding:.75rem;border-radius:8px;overflow:auto">Pick car (1/3) → Host reveals goat → Switch → lose
+Pick goat (2/3) → Host reveals goat → Switch → WIN</pre>
+            </details>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+  fetch('../partials/sidebar.html').then(r=>r.text()).then(html=>{
+    document.getElementById('sidebar-slot').innerHTML = html;
+  }).catch(()=>{
+    document.getElementById('sidebar-slot').innerHTML = '<h3 style="margin:0 0 .5rem">StatsLG</h3><p><em>Sidebar failed to load.</em></p>'
+  });
+
+  document.querySelectorAll('.tabbtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const target = btn.getAttribute('data-tab');
+      document.querySelectorAll('.tab').forEach(sec=>{
+        sec.classList.toggle('active', sec.id === 'tab-' + target);
+      });
+    });
+  });
+
+  const doorsEl = document.getElementById('doors');
+  const phaseMsg = document.getElementById('phaseMsg');
+  const btnStay = document.getElementById('btnStay');
+  const btnSwitch = document.getElementById('btnSwitch');
+  const btnNext = document.getElementById('btnNext');
+  const btnResetRound = document.getElementById('resetRound');
+  const btnResetAll = document.getElementById('resetAll');
+
+  const kTotal = document.getElementById('kTotal');
+  const kReveals = document.getElementById('kReveals');
+
+  const PHASE = { PICK: 'pick', REVEAL: 'reveal', DECIDE: 'decide', FINISH: 'finish' };
+  let state;
+  let stats = { total:0, reveals:0, switchW:0, switchL:0, stayW:0, stayL:0 };
+
+  function initRound(){
+    state = {
+      phase: PHASE.PICK,
+      prize: Math.floor(Math.random()*3),
+      pick: null,
+      revealed: null,
+      finalChoice: null
+    };
+    phaseMsg.innerHTML = '<span class="chip">Phase: Choose a door</span>';
+    renderDoors();
+    btnStay.disabled = true; btnSwitch.disabled = true; btnNext.disabled = true;
+  }
+
+  function doorTemplate(i){
+    const isPicked = state.pick === i;
+    const isRevealed = state.revealed === i;
+    const isDisabled = (state.phase === PHASE.REVEAL || state.phase === PHASE.DECIDE || state.phase === PHASE.FINISH);
+    const behind = (isRevealed || state.phase === PHASE.FINISH) ? (i===state.prize ? '<span class="car">🚗</span>' : '<span class="goat">🐐</span>') : '';
+    return `
+      <button class="door ${isRevealed?'revealed':''} ${isDisabled && !isPicked ? 'disabled':''}" data-door="${i}" aria-label="Door ${i+1}">
+        <div class="panel"></div>
+        <div class="label">Door ${i+1}${isPicked?' • Your pick':''}</div>
+        <div class="knob"></div>
+        <div class="behind">${behind}</div>
+      </button>
+    `;
+  }
+
+  function renderDoors(){
+    doorsEl.innerHTML = [0,1,2].map(doorTemplate).join('');
+    [...doorsEl.querySelectorAll('.door')].forEach(btn=>{
+      btn.addEventListener('click', onDoorClick);
+    });
+  }
+
+  function onDoorClick(e){
+    const d = Number(e.currentTarget.getAttribute('data-door'));
+    if(state.phase===PHASE.PICK){
+      state.pick = d;
+      phaseMsg.innerHTML = '<span class="chip">Phase: Host reveals a goat…</span>';
+      const candidates = [0,1,2].filter(x => x!==state.pick && x!==state.prize);
+      state.revealed = candidates[Math.floor(Math.random()*candidates.length)];
+      stats.reveals++;
+      state.phase = PHASE.DECIDE;
+      renderDoors();
+      btnStay.disabled = false; btnSwitch.disabled = false; btnNext.disabled = true;
+    }
+  }
+
+  function finishRound(finalChoice){
+    state.finalChoice = finalChoice;
+    state.phase = PHASE.FINISH;
+    renderDoors();
+    const win = (finalChoice === state.prize);
+    if(finalChoice === state.pick){
+      if(win) stats.stayW++; else stats.stayL++;
+    } else {
+      if(win) stats.switchW++; else stats.switchL++;
+    }
+    stats.total++;
+    updateStats();
+    phaseMsg.innerHTML = `<span class="chip" style="background:${win?'#dcfce7':'#fee2e2'}; color:${win?'#166534':'#991b1b'}">Result: ${win?'You WON! 🚗':'You lost 🐐'}</span>`;
+    btnStay.disabled = true; btnSwitch.disabled = true; btnNext.disabled = false;
+  }
+
+  function updateStats(){
+    kTotal.textContent = stats.total;
+    kReveals.textContent = stats.reveals;
+  }
+
+  btnStay.addEventListener('click', ()=>{ finishRound(state.pick); });
+  btnSwitch.addEventListener('click', ()=>{
+    const otherClosed = [0,1,2].find(x => x!==state.pick && x!==state.revealed);
+    finishRound(otherClosed);
+  });
+  btnNext.addEventListener('click', ()=> initRound());
+  btnResetRound.addEventListener('click', ()=> initRound());
+  btnResetAll.addEventListener('click', ()=>{
+    stats = { total:0, reveals:0, switchW:0, switchL:0, stayW:0, stayL:0 };
+    updateStats();
+    initRound();
+  });
+
+  updateStats();
+  initRound();
+  </script>
+</body>
+</html>
