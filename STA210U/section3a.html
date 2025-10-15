@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>STA210U — StatsLG</title>
+  <title>STA220 — Probability Tree & Applets | StatsLG</title>
   <meta name="description" content="Three-coin tree diagram plus quick probability applets (binomial, two dice, birthday problem, two cards)." />
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css">
@@ -87,7 +87,7 @@
                 <button class="btn ghost" id="resetBinom">Reset</button>
               </div>
               <p class="note" style="margin:.5rem 0 0;">
-                Plots the **exact** binomial distribution \(X\sim \text{Bin}(n,p)\) and an **empirical** histogram of simulated # of heads.
+                Plots the <strong>exact</strong> binomial distribution \(X\sim \text{Bin}(n,p)\) and an <strong>empirical</strong> histogram of simulated # of heads.
               </p>
             </div>
 
@@ -337,17 +337,8 @@
 
     // ===================== Helpers =====================
     function binomPMF(n,k,p){
-      // simple, stable-ish comb * p^k*(1-p)^(n-k)
-      function comb(n,r){
-        r=Math.min(r,n-r); let num=1, den=1;
-        for(let i=1;i<=r;i++){ num*= (n-r+i); den*= i; }
-        return num/den;
-      }
+      function comb(n,r){ r=Math.min(r,n-r); let num=1, den=1; for(let i=1;i<=r;i++){ num*= (n-r+i); den*= i; } return num/den; }
       return comb(n,k)*Math.pow(p,k)*Math.pow(1-p,n-k);
-    }
-    function createSVG(W,H){
-      const NS='http://www.w3.org/2000/svg'; const s=document.createElementNS(NS,'svg');
-      s.setAttribute('viewBox', `0 0 ${W} ${H}`); return s;
     }
     function clearSVG(s){ while(s.firstChild) s.removeChild(s.firstChild); }
 
@@ -439,14 +430,13 @@
 
       function run(){
         const n = Math.max(1, Math.min(200, +nEl.value||10));
-        const p = Math.max(0, Math.min(1, +pEl.value||0.5));
+        theP = Math.max(0, Math.min(1, +pEl.value||0.5));
         const T = Math.max(1, Math.min(50000, +tEl.value||5000));
         simCounts = Array(n+1).fill(0);
-        // simulate
         for (let t=0;t<T;t++){
           let heads=0;
           for (let i=0;i<n;i++){
-            if (Math.random() < p) heads++;
+            if (Math.random() < theP) heads++;
           }
           simCounts[heads]++;
         }
@@ -454,6 +444,7 @@
       }
       function reset(){ simCounts=[]; redraw(); }
 
+      let theP = +pEl.value || 0.5;
       [nEl,pEl,tEl].forEach(el=>{ el.addEventListener('input', redraw); el.addEventListener('change', redraw); });
       runBtn.addEventListener('click', run);
       resetBtn.addEventListener('click', reset);
@@ -491,7 +482,6 @@
         svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
         const m={l:60,r:16,t:28,b:40}, w=W-m.l-m.r, h=H-m.t-m.b;
         const cw=w/6, ch=h/6;
-        // headers
         const NS='http://www.w3.org/2000/svg';
         const label=(x,y,t,anc='middle')=>{
           const tx=document.createElementNS(NS,'text'); tx.setAttribute('x',x); tx.setAttribute('y',y);
@@ -500,7 +490,6 @@
         label(m.l + w/2, m.t-10, 'Green (columns)');
         label(m.l-40, m.t + h/2, 'Red (rows)','end');
 
-        // counts for A, B, intersection
         let cntA=0, cntB=0, cntAB=0;
 
         for (let r=1;r<=6;r++){
@@ -526,24 +515,19 @@
           }
         }
 
-        // axes ticks
-        for (let g=1; g<=6; g++){
-          label(m.l+(g-0.5)*cw, m.t+h+18, g);
-        }
-        for (let r=1; r<=6; r++){
-          label(m.l-12, m.t+(r-0.5)*ch+4, r,'end');
-        }
+        for (let g=1; g<=6; g++){ label(m.l+(g-0.5)*cw, m.t+h+18, g); }
+        for (let r=1; r<=6; r++){ label(m.l-12, m.t+(r-0.5)*ch+4, r,'end'); }
 
         const total=36;
         const p_a=(cntA+cntAB)/total, p_b=(cntB+cntAB)/total, p_ab=cntAB/total;
         const p_aub=p_a+p_b-p_ab;
         const p_a_given_b = (p_b>0) ? (p_ab/p_b) : 0;
 
-        pA.textContent   = `P(A) = ${(p_a).toFixed(3)}`;
-        pB.textContent   = `P(B) = ${(p_b).toFixed(3)}`;
-        pAB.textContent  = `P(A∩B) = ${(p_ab).toFixed(3)}`;
-        pAUB.textContent = `P(A∪B) = ${(p_aub).toFixed(3)}`;
-        pAgB.textContent = `P(A|B) = ${(p_a_given_b).toFixed(3)}`;
+        pA.textContent   = `P(A) = ${p_a.toFixed(3)}`;
+        pB.textContent   = `P(B) = ${p_b.toFixed(3)}`;
+        pAB.textContent  = `P(A∩B) = ${p_ab.toFixed(3)}`;
+        pAUB.textContent = `P(A∪B) = ${p_aub.toFixed(3)}`;
+        pAgB.textContent = `P(A|B) = ${p_a_given_b.toFixed(3)}`;
       }
 
       btn.addEventListener('click', draw);
@@ -565,20 +549,18 @@
       const svg=document.getElementById('bdayPlot');
 
       function exactPMatch(n){
-        // 1 - prod_{i=0..n-1} ((365-i)/365)
         let prod=1;
         for (let i=0;i<n;i++) prod *= (365-i)/365;
         return 1 - prod;
       }
       function simulate(n, T){
         let hits=0;
-        const seen=new Array(366);
+        const seen=new Array(365);
         for (let t=0;t<T;t++){
-          // clear seen quickly
           seen.fill(false);
           let dup=false;
           for (let i=0;i<n;i++){
-            const b = Math.floor(Math.random()*365); // 0..364
+            const b = Math.floor(Math.random()*365);
             if (seen[b]){ dup=true; break; }
             seen[b]=true;
           }
@@ -595,16 +577,14 @@
         const x=k=>m.l + (k-2)/(100-2)*w;
         const y=p=>m.t + h - p*h;
 
-        // axis
-        const ax=document.createElementNS('http://www.w3.org/2000/svg','line');
-        ax.setAttribute('x1',m.l); ax.setAttribute('x2',m.l); ax.setAttribute('y1',m.t); ax.setAttribute('y2',m.t+h+4);
-        ax.setAttribute('stroke','#111827'); svg.appendChild(ax);
-        const ax2=document.createElementNS('http://www.w3.org/2000/svg','line');
+        const NS='http://www.w3.org/2000/svg';
+        const ax1=document.createElementNS(NS,'line');
+        ax1.setAttribute('x1',m.l); ax1.setAttribute('x2',m.l); ax1.setAttribute('y1',m.t); ax1.setAttribute('y2',m.t+h+4);
+        ax1.setAttribute('stroke','#111827'); svg.appendChild(ax1);
+        const ax2=document.createElementNS(NS,'line');
         ax2.setAttribute('x1',m.l); ax2.setAttribute('x2',m.l+w); ax2.setAttribute('y1',m.t+h+4); ax2.setAttribute('y2',m.t+h+4);
         ax2.setAttribute('stroke','#111827'); svg.appendChild(ax2);
 
-        // curve
-        const NS='http://www.w3.org/2000/svg';
         const path=document.createElementNS(NS,'path');
         let d='';
         for (let k=2;k<=100;k++){
@@ -615,13 +595,11 @@
         path.setAttribute('fill','none'); path.setAttribute('stroke','#60a5fa'); path.setAttribute('stroke-width','2');
         svg.appendChild(path);
 
-        // dot for current n
         const dot=document.createElementNS(NS,'circle');
         dot.setAttribute('cx', x(n)); dot.setAttribute('cy', y(simP));
         dot.setAttribute('r','4'); dot.setAttribute('fill','#e7a614'); dot.setAttribute('stroke','#b45309');
         svg.appendChild(dot);
 
-        // ticks
         for (let k=10; k<=100; k+=10){
           const tx=document.createElementNS(NS,'text');
           tx.setAttribute('x', x(k)); tx.setAttribute('y', m.t+h+20);
@@ -676,7 +654,7 @@
 
         out1.textContent = `No repl: P(AA) = ${pAA_no.toFixed(5)}`;
         out2.textContent = `With repl: P(AA) = ${pAA_with.toFixed(5)}`;
-        out3.textContent = `No repl: P(B|A) = ${(pBgA).toFixed(5)} vs P(B)=${pB.toFixed(5)} → dependent`;
+        out3.textContent = `No repl: P(B|A) = ${pBgA.toFixed(5)} vs P(B)=${pB.toFixed(5)} → dependent`;
         out4.textContent = `With repl: P(B|A) = ${pB.toFixed(5)} (equals P(B)) → independent`;
       }
       btn.addEventListener('click', calc);
