@@ -1,215 +1,323 @@
-<!-- === 3-Coin Tree Diagram (drop-in section) === -->
-<section id="tree-3-coins" class="section">
-  <h2>Tree Diagram — 3 Coins</h2>
-  <div class="card soft">
-    <div class="row" style="align-items:center; gap:12px;">
-      <div class="checkline">
-        <input id="hl-2tails" type="checkbox">
-        <label for="hl-2tails" style="margin:0;">Highlight “exactly 2 tails” (HTT, THT, TTH)</label>
-      </div>
-      <div class="checkline">
-        <input id="hl-1tail" type="checkbox">
-        <label for="hl-1tail" style="margin:0;">Highlight “exactly 1 tail” (HHT, HTH, THH)</label>
-      </div>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STA220 — Section III-A | Introduction to Probability</title>
+  <meta name="description" content="Introduction to Probability — sample space, events, rules, common probabilities, independence, and misconceptions. STA220 notes on StatsLG." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
 
-    <div class="preview" style="height:480px; margin-top:10px;">
-      <svg id="coinTree" width="100%" height="100%" role="img" aria-label="Tree diagram for three coin flips"></svg>
-    </div>
-
-    <p class="muted" style="margin:.6rem 0 0;">
-      Each edge has probability <span class="mono">1/2</span>. Each leaf (sequence) has probability <span class="mono">1/8</span>.
-      There are 3 sequences with exactly 2 tails ⇒ \(P(\text{exactly 2 tails})=3/8\).
-    </p>
-  </div>
-</section>
-
-<script>
-(function(){
-  const svg = document.getElementById('coinTree');
-  const HL2 = document.getElementById('hl-2tails');
-  const HL1 = document.getElementById('hl-1tail');
-
-  const NS = 'http://www.w3.org/2000/svg';
-  function S(tag, attrs={}){ const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); return el; }
-
-  function clear(){ while(svg.firstChild) svg.removeChild(svg.firstChild); }
-
-  // Build all sequences for 3 flips
-  function buildTree(){
-    const leaves = [];
-    const gen = (seq, depth) => {
-      if (depth===3){ leaves.push(seq); return; }
-      gen(seq+'H', depth+1);
-      gen(seq+'T', depth+1);
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
     };
-    gen('',0);
-    return leaves; // length 8
-  }
+  </script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-  // Compute layout: x by depth, y equally spaced for leaves; internal nodes centered over their children.
-  function layout(leaves){
-    const W = svg.clientWidth || svg.getBoundingClientRect().width || 900;
-    const H = svg.clientHeight || svg.getBoundingClientRect().height || 480;
-    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  <style>
+    .note { font-size: 13px; color: var(--muted) }
+    .ex-grid { display:grid; grid-template-columns: 1fr; gap:10px }
+    .t-center { text-align:center }
+    .nowrap { white-space: nowrap }
+    .w-auto { width:auto }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace }
+    .overflow-x { overflow-x:auto }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Shared sidebar (robust include for GitHub Pages) -->
+    <aside class="sidebar" aria-label="Site navigation" data-include="partials/sidebar.html"></aside>
 
-    const margins = {t: 24, r: 24, b: 28, l: 80};
-    const plotW = W - margins.l - margins.r;
-    const plotH = H - margins.t - margins.b;
+    <main>
+      <header>
+        <h1>Section III-A — Introduction to Probability</h1>
+        <p class="subtitle">Simple probability, common probabilities, probability rules, event characteristics, and common misconceptions.</p>
+      </header>
 
-    // x positions per depth (0..3)
-    const x = d => margins.l + (plotW * d / 3);
+      <!-- On this page -->
+      <section class="section">
+        <h2>On this page</h2>
+        <div class="grid">
+          <article class="card"><a href="#simple"><strong>1.</strong> Simple Probability</a></article>
+          <article class="card"><a href="#common"><strong>2.</strong> Common Probabilities</a></article>
+          <article class="card"><a href="#rules"><strong>3.</strong> Probability Rules</a></article>
+          <article class="card"><a href="#two-dice"><strong>Example:</strong> Two Dice Table</a></article>
+          <article class="card"><a href="#contingency1"><strong>Example:</strong> Favorite Subject × Gender</a></article>
+          <article class="card"><a href="#events"><strong>4.</strong> Characteristics of Events</a></article>
+          <article class="card"><a href="#cards"><strong>Example:</strong> Cards — (No) Replacement</a></article>
+          <article class="card"><a href="#contingency2"><strong>Example:</strong> City × Government Preference</a></article>
+          <article class="card"><a href="#misconceptions"><strong>5.</strong> Misconceptions</a></article>
+          <article class="card"><a href="#birthday"><strong>Example:</strong> Birthday Problem</a></article>
+        </div>
+      </section>
 
-    // y positions for leaves (8 rows)
-    const rows = 8;
-    const rowGap = plotH / (rows-1);
-    const leafY = i => margins.t + i * rowGap;
+      <!-- 1. Simple Probability -->
+      <section id="simple" class="section">
+        <h2>1. Simple Probability</h2>
 
-    // map from sequence prefix to y: leaves fixed; internal nodes average their children
-    const yMap = {};
-    // leaves y
-    leaves.forEach((seq,i)=> yMap[seq] = leafY(i));
+        <div class="card soft">
+          <p><strong>Sample space</strong>: the set of all possible outcomes of an experiment.</p>
+          <div class="grid">
+            <div class="card">
+              <h3 style="margin:0 0 .4rem;">Examples</h3>
+              <ul style="margin:.2rem 0;">
+                <li>Roll a die: \(S=\{1,2,3,4,5,6\}\)</li>
+                <li>Flip a coin: \(S=\{H,T\}\)</li>
+              </ul>
+              <p class="note">Die outcome is quantitative (discrete); coin outcome is qualitative (categorical).</p>
+            </div>
+            <div class="card">
+              <p><strong>Event</strong>: any subset of the sample space. If \(A\)=“even on a die,” then \(A=\{2,4,6\}\).</p>
+            </div>
+          </div>
+          <p><strong>Probability</strong> of event \(A\), \(P(A)\), is the expected long-run proportion of times \(A\) occurs.</p>
+          <p class="mono">P(A) = (# outcomes in A) / (total # outcomes)</p>
+        </div>
 
-    // internal nodes (depth 0..2): compute in reverse by averaging children
-    const prefixes = ['', 'H','T', 'HH','HT','TH','TT'];
-    prefixes.reverse().forEach(pref=>{
-      if (pref.length<3){
-        const y1 = yMap[pref+'H'];
-        const y2 = yMap[pref+'T'];
-        yMap[pref] = (y1 + y2)/2;
+        <div class="grid">
+          <article class="card">
+            <h3 style="margin:0 0 .4rem;">Counting: Basic Setups</h3>
+            <ul>
+              <li><strong>Arrangements of SUNDAY</strong> (all letters distinct): \(6! = 720\).</li>
+              <li><strong>3-digit code</strong> (digits 0–9, allow repeats): \(10^3 = 1000\).</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3 style="margin:0 0 .4rem;">Tree Diagram (Penny, Nickel, Dime)</h3>
+            <ol style="margin:.2rem 0;">
+              <li>Total outcomes: \(2^3=8\).</li>
+              <li>Sample space (ordered by coin): \(\{HHH,HHT,HTH,HTT,THH,THT,TTH,TTT\}\).</li>
+              <li>\(A=\) “all three tails”: \(P(A)=1/8\).</li>
+              <li>\(B=\) “exactly two tails”: \(P(B)=3/8\).</li>
+              <li>\(C=\) “exactly one tail”: \(P(C)=3/8\).</li>
+              <li>\(D=\) “no tails”: \(P(D)=1/8\).</li>
+            </ol>
+          </article>
+        </div>
+      </section>
+
+      <!-- 2. Common Probabilities -->
+      <section id="common" class="section">
+        <h2>2. Common Probabilities</h2>
+        <div class="grid">
+          <article class="card">
+            <h3 style="margin:0 0 .4rem;">Complement</h3>
+            <p>The complement of \(A\), often denoted \(A^c\), is “not \(A\)”.</p>
+          </article>
+          <article class="card">
+            <h3 style="margin:0 0 .4rem;">Joint & Conditional</h3>
+            <ul>
+              <li><strong>Joint (AND)</strong> \(A\cap B\): both occur.</li>
+              <li><strong>Union (OR)</strong> \(A\cup B\): at least one occurs.</li>
+              <li><strong>Conditional</strong> \(P(A\mid B)\): probability of \(A\) given that \(B\) occurred.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <!-- 3. Probability Rules -->
+      <section id="rules" class="section">
+        <h2>3. Probability Rules</h2>
+        <div class="grid">
+          <article class="card">
+            <ul>
+              <li><strong>Complement:</strong> \(P(A^c) = 1 - P(A)\).</li>
+              <li><strong>Addition:</strong> \(P(A\cup B) = P(A) + P(B) - P(A\cap B)\).</li>
+              <li><strong>Conditional:</strong> \(P(A\mid B) = \dfrac{P(A\cap B)}{P(B)}\) (if \(P(B)>0\)).</li>
+              <li><strong>Multiplication:</strong> \(P(A\cap B)=P(A)\,P(B\mid A)\).</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <!-- Example: two dice table -->
+      <section id="two-dice" class="section">
+        <h2>Example — Two Dice</h2>
+        <p>Roll a balanced green die and a balanced red die. Define:</p>
+        <ul>
+          <li>\(A=\{\text{sum is }7\}\)</li>
+          <li>\(B=\{\text{both numbers }\le 4\}\)</li>
+        </ul>
+        <div class="card soft overflow-x">
+          <table class="table w-auto">
+            <thead>
+              <tr><th class="t-center">Red ↓ / Green →</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+            </thead>
+            <tbody>
+              <tr><th>1</th><td>(1,1)</td><td>(2,1)</td><td>(3,1)</td><td>(4,1)</td><td>(5,1)</td><td>(6,1)</td></tr>
+              <tr><th>2</th><td>(1,2)</td><td>(2,2)</td><td>(3,2)</td><td>(4,2)</td><td>(5,2)</td><td>(6,2)</td></tr>
+              <tr><th>3</th><td>(1,3)</td><td>(2,3)</td><td>(3,3)</td><td>(4,3)</td><td>(5,3)</td><td>(6,3)</td></tr>
+              <tr><th>4</th><td>(1,4)</td><td>(2,4)</td><td>(3,4)</td><td>(4,4)</td><td>(5,4)</td><td>(6,4)</td></tr>
+              <tr><th>5</th><td>(1,5)</td><td>(2,5)</td><td>(3,5)</td><td>(4,5)</td><td>(5,5)</td><td>(6,5)</td></tr>
+              <tr><th>6</th><td>(1,6)</td><td>(2,6)</td><td>(3,6)</td><td>(4,6)</td><td>(5,6)</td><td>(6,6)</td></tr>
+            </tbody>
+          </table>
+          <p class="note" style="margin:.4rem 0 0">Use the table to find: \(P(A)\), \(P(B)\), \(P(A^c)\), \(P(B^c)\), \(P(A\cap B)\), \(P(A\cup B)\), \(P(A\mid B)\), \(P(B\mid A)\).</p>
+        </div>
+      </section>
+
+      <!-- Example: contingency table (favorite subject × gender) -->
+      <section id="contingency1" class="section">
+        <h2>Example — Probability from a Contingency Table</h2>
+        <p>Choose 1 student at random. Let \(A=\{\text{female}\}\), \(B=\{\text{math as favorite subject}\}\).</p>
+        <div class="card soft overflow-x">
+          <table class="table w-auto">
+            <thead><tr><th></th><th>Math</th><th>Science</th><th>History</th><th>English</th><th>Total</th></tr></thead>
+            <tbody>
+              <tr><th>Female</th><td>1192</td><td>321</td><td>72</td><td>15</td><td>1600</td></tr>
+              <tr><th>Male</th>  <td>695</td><td>487</td><td>141</td><td>77</td><td>1400</td></tr>
+              <tr><th>Total</th> <td>1887</td><td>808</td><td>213</td><td>92</td><td>3000</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Find: \(P(A)\), \(P(B)\), \(P(A^c)\), \(P(A\cap B)\), \(P(A\cup B)\), \(P(A\mid B)\).</p>
+      </section>
+
+      <!-- 4. Characteristics of events -->
+      <section id="events" class="section">
+        <h2>4. Characteristics of Events</h2>
+        <div class="grid">
+          <article class="card">
+            <h3 style="margin:0 0 .4rem;">Mutually Exclusive (Disjoint)</h3>
+            <p>Two events can’t occur together: \(P(A\cap B)=0\). For disjoint events, the addition rule reduces to \(P(A\cup B)=P(A)+P(B)\).</p>
+          </article>
+          <article class="card">
+            <h3 style="margin:0 0 .4rem;">Independence</h3>
+            <p>\(A\) and \(B\) are independent if \(P(A\mid B)=P(A)\) (i.e., knowing \(B\) doesn’t change the probability of \(A\)). Otherwise they’re dependent.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Example: cards (dependency & multiplication rule) -->
+      <section id="cards" class="section">
+        <h2>Example — Two Cards from a Standard Deck</h2>
+        <p>52 cards, 4 aces.</p>
+        <ul>
+          <li>Draw <em>without replacement</em> (don’t put the first card back). Let \(A=\{\text{first card ace}\}\), \(B=\{\text{second card ace}\}\).</li>
+          <li>Draw <em>with replacement</em> (return the first card, reshuffle), same \(A,B\).</li>
+        </ul>
+
+        <div class="grid">
+          <article class="card">
+            <h3 style="margin:0 0 .4rem;">Without Replacement (dependent)</h3>
+            <p>\(P(B\mid A)=\frac{3}{51}\), \(P(B\mid A^c)=\frac{4}{51}\) ⇒ \(B\) depends on \(A\).</p>
+            <p>Multiplication rule: \(P(A\cap B)=P(A)P(B\mid A)=\frac{4}{52}\cdot\frac{3}{51}=\frac{12}{2652}\approx 0.004525\).</p>
+          </article>
+          <article class="card">
+            <h3 style="margin:0 0 .4rem;">With Replacement (independent)</h3>
+            <p>\(P(B\mid A)=\frac{4}{52}\) (same as \(P(B)\)) ⇒ independent.</p>
+            <p>\(P(A\cap B)=\frac{4}{52}\cdot\frac{4}{52}=\frac{16}{2704}\approx 0.00591\).</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Example: contingency table (city × government) -->
+      <section id="contingency2" class="section">
+        <h2>Example — City Residence × Government Preference</h2>
+        <p>\(C=\{\text{lives in the city}\}\), \(F=\{\text{favors combining city \& county government}\}\).</p>
+        <div class="card soft overflow-x">
+          <table class="table w-auto">
+            <thead><tr><th></th><th>Favor (F)</th><th>Oppose</th><th>Total</th></tr></thead>
+            <tbody>
+              <tr><th>City (C)</th><td>80</td><td>40</td><td>120</td></tr>
+              <tr><th>Outside</th><td>20</td><td>10</td><td>30</td></tr>
+              <tr><th>Total</th><td>100</td><td>50</td><td>150</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Find: \(P(C)\), \(P(C^c)\), \(P(F)\), \(P(C\cap F)\), \(P(C\cup F)\), \(P(C^c\mid F)\). Are \(C\) and \(F\) independent?</p>
+      </section>
+
+      <!-- 5. Misconceptions -->
+      <section id="misconceptions" class="section">
+        <h2>5. Misconceptions of Probability</h2>
+        <div class="grid">
+          <article class="card">
+            <h3 style="margin:0 0 .4rem;">Gambler’s Fallacy</h3>
+            <p>Mistakenly believing the long-run frequency must appear in the short run. With independent trials, past outcomes don’t change the probability of the next outcome.</p>
+          </article>
+          <article class="card">
+            <h3 style="margin:0 0 .4rem;">“Very Unlikely” Events</h3>
+            <p>Low probability for a particular person/event doesn’t mean it won’t happen to <em>someone</em>. With many opportunities, “someone, somewhere, someday” sees rare events.</p>
+            <div class="card soft">
+              <h4 style="margin:0 0 .4rem;">Lottery anecdote</h4>
+              <p>One person winning a lottery twice may be individually unlikely, but across millions of players and many drawings, the chance that <em>someone</em> wins twice in a given period is not so small.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Birthday problem -->
+      <section id="birthday" class="section">
+        <h2>Example — Birthday Problem</h2>
+        <p>Assume no Feb 29 and all birthdays equally likely.</p>
+        <div class="grid">
+          <article class="card">
+            <h3 style="margin:0 0 .4rem;">Four People</h3>
+            <p>Probability all 4 birthdays are different:</p>
+            <p>\[
+              \frac{365}{365}\cdot\frac{364}{365}\cdot\frac{363}{365}\cdot\frac{362}{365}
+              \approx 0.983
+            \]</p>
+            <p>So, \(P(\text{at least two share}) = 1 - 0.983 \approx 0.017\).</p>
+          </article>
+          <article class="card">
+            <h3 style="margin:0 0 .4rem;">Class of 32</h3>
+            <p>Probability all different \(\approx 0.255\) ⇒ \(P(\text{at least two share})\approx 0.745\) (74.5%).</p>
+            <p class="note">With more people, there are more opportunities for a match, so the probability of a match increases.</p>
+          </article>
+        </div>
+      </section>
+
+      <footer>
+        <p class="text-muted">These notes mirror your original III-A handout. Minor formatting added for web readability.</p>
+        <p>Last updated: <span id="lastUpdated"></span></p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Sidebar include (robust for user/project GitHub Pages)
+    (async function injectSidebar(){
+      const el = document.querySelector('[data-include]');
+      if(!el) return;
+
+      const given = el.getAttribute('data-include') || 'partials/sidebar.html';
+      const firstSeg = location.pathname.split('/').filter(Boolean)[0] || '';
+      const base = firstSeg ? ('/' + firstSeg) : '';
+
+      const candidates = [
+        given,
+        '/' + given.replace(/^\//,''),
+        base + '/' + given.replace(/^\//,''),
+        base + '/partials/sidebar.html',
+        '/partials/sidebar.html'
+      ].filter((v,i,a)=>a.indexOf(v)===i);
+
+      let html = '';
+      for (const url of candidates){
+        try{
+          const r = await fetch(url, {cache:'no-cache'});
+          if (r.ok) { html = await r.text(); break; }
+        }catch(_){}
       }
-    });
+      el.innerHTML = html || '<div class="muted">Sidebar failed to load.</div>';
 
-    return { x, yMap, W, H, margins };
-  }
+      const yr = el.querySelector('#yr'); if (yr) yr.textContent = new Date().getFullYear();
+    })();
 
-  function labelText(x, y, text, opts={}){
-    const t = S('text', {x, y, 'font-size': opts.size||12, 'text-anchor': opts.anchor||'middle', fill: opts.fill||'#4b5563'});
-    t.textContent = text; return t;
-  }
-
-  function draw(){
-    clear();
-    const leaves = buildTree();
-    const L = layout(leaves);
-
-    // Title on left
-    svg.appendChild(labelText(8, 16, 'Root → 3 flips → 8 outcomes', {anchor:'start', size:12}));
-
-    // Draw edges + edge labels
-    const strokeEdge = '#374151';
-    const strokeHL   = '#10b981';
-    const strokeMiss = '#ef4444';
-
-    const nodeRadius = 10;
-
-    // Helper: draw one edge with optional label (H/T)
-    function edge(x1,y1,x2,y2, lab){
-      const line = S('line', {x1,y1,x2,y2, stroke: strokeEdge, 'stroke-width': 2});
-      svg.appendChild(line);
-
-      // label midpoint slightly offset
-      const mx = (x1+x2)/2, my = (y1+y2)/2;
-      const t = labelText(mx, my - 6, lab, {size:11});
-      svg.appendChild(t);
-
-      // probability label 1/2 under branch
-      const pt = labelText(mx, my + 12, '1/2', {size:10});
-      svg.appendChild(pt);
-    }
-
-    // Draw edges depth by depth
-    const levels = [
-      { parents: [''], children: ['H','T'] },
-      { parents: ['H','T'], children: ['HH','HT','TH','TT'] },
-      { parents: ['HH','HT','TH','TT'], children: ['HHH','HHT','HTH','HTT','THH','THT','TTH','TTT'] }
-    ];
-
-    levels.forEach((lv, di)=>{
-      lv.parents.forEach(p=>{
-        const yParent = L.yMap[p];
-        const xParent = L.x(di);
-        // two children for each parent
-        [['H', 'H'], ['T','T']].forEach(([branch, lab])=>{
-          const child = p + branch;
-          const yChild = L.yMap[child];
-          const xChild = L.x(di+1);
-          edge(xParent, yParent, xChild, yChild, lab);
-        });
-      });
-    });
-
-    // Draw nodes (root + internal)
-    const allNodes = ['', 'H','T', 'HH','HT','TH','TT'];
-    allNodes.forEach((id, d)=>{
-      const cx = L.x(id.length);
-      const cy = L.yMap[id];
-      const c = S('circle', {cx, cy, r: nodeRadius, fill:'#ffffff', stroke:'#111827', 'stroke-width':2});
-      svg.appendChild(c);
-      const lab = id==='' ? 'Start' : id;
-      svg.appendChild(labelText(cx, cy+4, lab||'Start', {size:11}));
-    });
-
-    // Draw leaves (sequences + p=1/8)
-    leaves.forEach((seq,i)=>{
-      const cx = L.x(3);
-      const cy = L.yMap[seq];
-      const covers2T = (seq.match(/T/g)||[]).length === 2;
-      const covers1T = (seq.match(/T/g)||[]).length === 1;
-
-      // small rounded rect for leaf tag
-      const rx = 28, ry = 10;
-      const rect = S('rect', {
-        x: cx - rx, y: cy - ry, width: rx*2, height: ry*2, rx: 8, ry: 8,
-        fill: '#ffffff', stroke: '#111827', 'stroke-width': 1.5
-      });
-      svg.appendChild(rect);
-
-      const color2 = '#065f46', fill2 = '#10b981';
-      const color1 = '#1e40af', fill1 = '#60a5fa';
-
-      if (HL2.checked && covers2T){
-        rect.setAttribute('fill', fill2);
-        rect.setAttribute('stroke', color2);
-      }else if (HL1.checked && covers1T){
-        rect.setAttribute('fill', fill1);
-        rect.setAttribute('stroke', color1);
-      }
-
-      const t = labelText(cx, cy+4, seq, {size:12, fill:'#111827'});
-      svg.appendChild(t);
-
-      const p = labelText(cx + 48, cy+4, '1/8', {size:11});
-      svg.appendChild(p);
-    });
-
-    // Legend bullets (only when highlighting)
-    const showLegend = HL2.checked || HL1.checked;
-    if (showLegend){
-      const baseX = L.W - 160, baseY = 28;
-      const legend = S('g', {});
-      svg.appendChild(legend);
-
-      if (HL2.checked){
-        const r = S('rect', {x: baseX, y: baseY, width: 14, height: 14, rx:3, ry:3, fill:'#10b981', stroke:'#065f46'});
-        const tx = labelText(baseX+20, baseY+11, 'Exactly 2 tails', {anchor:'start', size:12, fill:'#111827'});
-        legend.appendChild(r); legend.appendChild(tx);
-      }
-      if (HL1.checked){
-        const off = HL2.checked ? 20 : 0;
-        const r = S('rect', {x: baseX, y: baseY+off, width: 14, height: 14, rx:3, ry:3, fill:'#60a5fa', stroke:'#1e40af'});
-        const tx = labelText(baseX+20, baseY+off+11, 'Exactly 1 tail', {anchor:'start', size:12, fill:'#111827'});
-        legend.appendChild(r); legend.appendChild(tx);
-      }
-    }
-  }
-
-  // Initial draw + listeners
-  draw();
-  HL2.addEventListener('change', draw);
-  HL1.addEventListener('change', draw);
-  // Redraw on resize for responsive sizing
-  const ro = new ResizeObserver(()=>draw());
-  ro.observe(document.body);
-})();
-</script>
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>
