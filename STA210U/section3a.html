@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>STA210U — Section III-A | Introduction to Probability</title>
+  <title>STA220 — Section III-A | Introduction to Probability</title>
   <meta name="description" content="Introduction to Probability — sample space, events, rules, common probabilities, independence, misconceptions. STA220 notes on StatsLG." />
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css">
@@ -24,7 +24,6 @@
 
   <style>
     .note { font-size: 13px; color: var(--muted) }
-    .ex-grid { display:grid; grid-template-columns: 1fr; gap:10px }
     .t-center { text-align:center }
     .nowrap { white-space: nowrap }
     .w-auto { width:auto }
@@ -52,6 +51,24 @@
     }
     details.collapsible[open] > summary::before { content: '▾'; }
     details.collapsible .inside { margin-top: 10px }
+
+    /* Always stack Counting + Tree vertically (more room for diagram) */
+    .ex-stack { display: grid; grid-template-columns: 1fr; gap: 12px; }
+
+    /* Fix checkboxes that were restyled by global input hard-fix */
+    .tree-controls input[type="checkbox"]{
+      appearance: auto !important;
+      -webkit-appearance: checkbox !important;
+      width: auto !important;
+      height: auto !important;
+      border: none !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+      outline: none !important;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    .tree-controls label { display: inline-flex; align-items: center; gap: 6px; }
   </style>
 </head>
 <body>
@@ -105,7 +122,9 @@
           <p class="mono">P(A) = (# outcomes in A) / (total # outcomes)</p>
         </div>
 
-        <div class="grid">
+        <!-- Counting + Tree stacked vertically -->
+        <div class="ex-stack">
+          <!-- Counting basics (top) -->
           <article class="card">
             <h3 style="margin:0 0 .4rem;">Counting: Basic Setups</h3>
             <ul>
@@ -114,6 +133,7 @@
             </ul>
           </article>
 
+          <!-- Tree Diagram (below; collapsible, bigger canvas) -->
           <article class="card">
             <h3 style="margin:0 0 .4rem;">Tree Diagram (Penny, Nickel, Dime)</h3>
             <ol style="margin:.2rem 0;">
@@ -125,22 +145,22 @@
               <li>\(D=\) “no tails”: \(P(D)=1/8\).</li>
             </ol>
 
-            <!-- Collapsible tree diagram inserted here -->
             <details class="collapsible" id="tree-3-coins">
               <summary>Show the full 3-coin tree diagram</summary>
               <div class="inside">
-                <div class="row" style="align-items:center; gap:12px;">
+                <div class="row tree-controls" style="align-items:center; gap:12px;">
                   <div class="checkline">
                     <input id="hl-2tails" type="checkbox">
-                    <label for="hl-2tails" style="margin:0;">Highlight “exactly 2 tails” (HTT, THT, TTH)</label>
+                    <label for="hl-2tails">Highlight “exactly 2 tails” (HTT, THT, TTH)</label>
                   </div>
                   <div class="checkline">
                     <input id="hl-1tail" type="checkbox">
-                    <label for="hl-1tail" style="margin:0;">Highlight “exactly 1 tail” (HHT, HTH, THH)</label>
+                    <label for="hl-1tail">Highlight “exactly 1 tail” (HHT, HTH, THH)</label>
                   </div>
                 </div>
 
-                <div class="preview" style="height:480px; margin-top:10px;">
+                <!-- Taller canvas -->
+                <div class="preview" style="height:560px; margin-top:10px;">
                   <svg id="coinTree" width="100%" height="100%" role="img" aria-label="Tree diagram for three coin flips"></svg>
                 </div>
 
@@ -150,7 +170,6 @@
                 </p>
               </div>
             </details>
-            <!-- End collapsible diagram -->
           </article>
         </div>
       </section>
@@ -325,7 +344,7 @@
       </section>
 
       <footer>
-        <p class="text-muted">These notes mirror your III-A handout with added web formatting and graphics.</p>
+        <p class="text-muted">Web notes with diagram and layout tweaks for readability.</p>
         <p>Last updated: <span id="lastUpdated"></span></p>
       </footer>
     </main>
@@ -366,8 +385,8 @@
 
     // === 3-Coin Tree Diagram script (collapsible) ===
     (function(){
-      const container = document.getElementById('tree-3-coins');
-      if(!container) return;
+      const details = document.getElementById('tree-3-coins');
+      if(!details) return;
 
       const svg = document.getElementById('coinTree');
       const HL2 = document.getElementById('hl-2tails');
@@ -390,7 +409,7 @@
 
       function layout(leaves){
         const W = svg.clientWidth || svg.getBoundingClientRect().width || 900;
-        const H = svg.clientHeight || svg.getBoundingClientRect().height || 480;
+        const H = svg.clientHeight || svg.getBoundingClientRect().height || 560;
         svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
 
         const margins = {t: 24, r: 24, b: 28, l: 80};
@@ -414,7 +433,7 @@
           }
         });
 
-        return { x, yMap, W, H, margins, plotW, plotH };
+        return { x, yMap, W, H };
       }
 
       function labelText(x, y, text, opts={}){
@@ -513,9 +532,8 @@
         }
       }
 
-      // Only draw when details is opened the first time (ensures correct size)
+      // Draw only when opened first time (ensures correct sizing)
       let drawnOnce = false;
-      const details = document.getElementById('tree-3-coins');
       details.addEventListener('toggle', () => {
         if (details.open && !drawnOnce){ drawnOnce = true; setTimeout(draw, 0); }
       });
