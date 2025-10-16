@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Central Limit Theorem Demo | StatsLG</title>
+  <meta name="description" content="Interactive CLT demo: choose a population distribution, sample repeatedly, and visualize the sampling distribution of the mean.">
+  <link rel="icon" href="/favicon.ico" />
+  <!-- Your brand stylesheet -->
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- Chart.js 4 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Chart.js plugin for annotation (optional for vertical lines) -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+
+  <style>
+    /* Small local tweaks that play nice with bctcstyle.css */
+    .controls { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .card { background: var(--card, #ffffff); border: 1px solid var(--rule, #e5e7eb); border-radius: 14px; padding: 1rem; }
+    .row { display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; }
+    .row > .card { min-height: 420px; }
+    .kv{ display:flex; align-items:center; justify-content:space-between; gap:.75rem; }
+    .kv input[type="number"], .kv input[type="range"], .kv select { width: 100%; }
+    .statgrid { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap:.5rem; }
+    .pill { background: var(--panel, #f5f7fb); border:1px solid var(--rule,#e5e7eb); border-radius: 999px; padding:.4rem .75rem; font-size:.95rem; }
+    .btnrow { display:flex; flex-wrap:wrap; gap:.5rem; }
+    .muted { color: var(--muted,#6b7280); }
+    .subtitle { margin-top:.25rem; }
+    canvas { max-height: 340px; }
+    .footnote { font-size: .9rem; }
+    .warn { color: var(--warn,#f59e0b); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
+
+    <!-- ===== MAIN ===== -->
+    <main>
+      <header>
+        <h1>Central Limit Theorem Demo</h1>
+        <p class="subtitle muted">Pick a population distribution, draw many samples of size <em>n</em>, and watch the sampling distribution of the mean trend toward normality.</p>
+      </header>
+
+      <!-- Controls -->
+      <section class="card">
+        <div class="controls">
+          <div class="kv">
+            <label for="dist">Population</label>
+            <select id="dist">
+              <option value="normal" selected>Normal(μ, σ)</option>
+              <option value="uniform">Uniform(a, b)</option>
+              <option value="exponential">Exponential(λ)</option>
+              <option value="chisq">Chi-Square(k)</option>
+              <option value="bernoulli">Bernoulli(p)</option>
+              <option value="bimodal">Bimodal: w·N(μ₁,σ₁) + (1−w)·N(μ₂,σ₂)</option>
+            </select>
+          </div>
+
+          <!-- Parameter blocks (show/hide depending on dist) -->
+          <div class="kv dist normal">
+            <label>μ</label><input id="p_mu" type="number" step="0.1" value="0">
+          </div>
+          <div class="kv dist normal">
+            <label>σ</label><input id="p_sigma" type="number" step="0.1" value="3">
+          </div>
+
+          <div class="kv dist uniform" style="display:none">
+            <label>a</label><input id="p_a" type="number" step="0.1" value="-5">
+          </div>
+          <div class="kv dist uniform" style="display:none">
+            <label>b</label><input id="p_b" type="number" step="0.1" value="7">
+          </div>
+
+          <div class="kv dist exponential" style="display:none">
+            <label>λ (rate)</label><input id="p_lambda" type="number" step="0.1" value="0.5">
+          </div>
+
+          <div class="kv dist chisq" style="display:none">
+            <label>k (df)</label><input id="p_k" type="number" step="1" min="1" value="4">
+          </div>
+
+          <div class="kv dist bernoulli" style="display:none">
+            <label>p</label><input id="p_p" type="number" step="0.01" min="0" max="1" value="0.3">
+          </div>
+
+          <div class="kv dist bimodal" style="display:none">
+            <label>w</label><input id="p_w" type="number" step="0.05" min="0" max="1" value="0.5">
+          </div>
+          <div class="kv dist bimodal" style="display:none">
+            <label>μ₁</label><input id="p_mu1" type="number" step="0.1" value="-3">
+          </div>
+          <div class="kv dist bimodal" style="display:none">
+            <label>σ₁</label><input id="p_sigma1" type="number" step="0.1" value="1.2">
+          </div>
+          <div class="kv dist bimodal" style="display:none">
+            <label>μ₂</label><input id="p_mu2" type="number" step="0.1" value="3">
+          </div>
+          <div class="kv dist bimodal" style="display:none">
+            <label>σ₂</label><input id="p_sigma2" type="number" step="0.1" value="1.2">
+          </div>
+
+          <div class="kv">
+            <label>Sample size (n): <span id="nval" class="muted"></span></label>
+          </div>
+          <div class="kv">
+            <input id="n" type="range" min="1" max="200" value="30">
+          </div>
+
+          <div class="kv">
+            <label>Samples per click: <span id="mval" class="muted"></span></label>
+          </div>
+          <div class="kv">
+            <input id="m" type="range" min="1" max="2000" value="200">
+          </div>
+
+          <div class="kv">
+            <label>Histogram bins</label>
+            <input id="bins" type="number" min="5" max="80" value="30">
+          </div>
+
+          <div class="kv">
+            <label><input id="overlayNormal" type="checkbox" checked> Overlay Normal(μ, σ/√n)</label>
+          </div>
+
+          <div class="btnrow">
+            <button id="drawBtn" class="btn">Add Samples</button>
+            <button id="autorunBtn" class="btn">Start Auto-Run</button>
+            <button id="resetBtn" class="btn secondary">Reset</button>
+          </div>
+        </div>
+
+        <div class="statgrid" style="margin-top: .75rem;">
+          <div class="pill">Population μ: <span id="mu_pop">—</span></div>
+          <div class="pill">Population σ: <span id="sd_pop">—</span></div>
+          <div class="pill">Theoretical SE = σ/√n: <span id="se_theory">—</span></div>
+          <div class="pill">Sampling Mean (emp): <span id="mean_emp">—</span></div>
+          <div class="pill">Sampling SD (emp): <span id="sd_emp">—</span></div>
+          <div class="pill">Total Samples: <span id="count_emp">0</span></div>
+        </div>
+      </section>
+
+      <!-- Charts -->
+      <section class="row" style="margin-top: 1rem;">
+        <div class="card">
+          <h3>Population Preview</h3>
+          <p class="muted">A quick look at draws from your chosen population (not the sampling distribution).</p>
+          <canvas id="popChart" aria-label="Population Histogram"></canvas>
+        </div>
+        <div class="card">
+          <h3>Sampling Distribution of the Mean</h3>
+          <p class="muted">Histogram of sample means from many samples of size <span id="nlabel">n</span>. CLT predicts approximate Normal with mean μ and SD σ/√n (overlay optional).</p>
+          <canvas id="sampChart" aria-label="Sampling Distribution Histogram"></canvas>
+        </div>
+      </section>
+
+      <p class="footnote muted" style="margin-top:1rem;">
+        Notes: CLT tends to kick in faster for light-tailed, symmetric populations. For heavy skew (e.g., Exponential, small df Chi-Square) and discrete Bernoulli, larger <em>n</em> is often needed. Bimodal populations can take longer to “look normal” without large <em>n</em>.
+      </p>
+    </main>
+  </div>
+
+  <!-- Simple include loader for sidebar -->
+  <script>
+    (async function includePartials(){
+      const els = document.querySelectorAll('[data-include]');
+      for (const el of els) {
+        const url = el.getAttribute('data-include');
+        try { const resp = await fetch(url); el.innerHTML = await resp.text(); }
+        catch(e){ el.innerHTML = '<div class="warn">Could not load sidebar.</div>'; }
+      }
+    })();
+  </script>
+
+  <script>
+    // ---------- Utilities ----------
+    const randn = (() => {
+      // Box-Muller
+      let spare = null;
+      return function() {
+        if (spare !== null) { const v = spare; spare = null; return v; }
+        let u=0, v=0, s=0;
+        while (s===0 || s>=1) { u = Math.random()*2-1; v = Math.random()*2-1; s = u*u+v*v; }
+        const mul = Math.sqrt(-2.0*Math.log(s)/s);
+        spare = v * mul;
+        return u * mul;
+      }
+    })();
+
+    function normalSample(mu, sigma){ return mu + sigma*randn(); }
+    function uniformSample(a,b){ return a + (b-a)*Math.random(); }
+    function exponentialSample(lambda){ return -Math.log(1-Math.random())/lambda; } // rate λ
+    // Chi-square via sum of squared N(0,1)
+    function chisqSample(k){ let s=0; for(let i=0;i<k;i++) s += randn()**2; return s; }
+    function bernoulliSample(p){ return Math.random()<p ? 1 : 0; }
+
+    // Bimodal mixture of two normals
+    function bimodalSample(w, mu1, s1, mu2, s2){
+      return (Math.random()<w) ? normalSample(mu1, s1) : normalSample(mu2, s2);
+    }
+
+    // Theoretical mean and variance by population
+    function populationMoments(dist, P){
+      switch(dist){
+        case 'normal': {
+          const mu = P.mu, v = P.sigma**2;
+          return {mu, var:v};
+        }
+        case 'uniform': {
+          const a=P.a, b=P.b;
+          const mu=(a+b)/2, v=((b-a)**2)/12;
+          return {mu, var:v};
+        }
+        case 'exponential': {
+          const lambda=P.lambda;
+          const mu=1/lambda, v=1/(lambda**2);
+          return {mu, var:v};
+        }
+        case 'chisq': {
+          const k=P.k;
+          const mu=k, v=2*k;
+          return {mu, var:v};
+        }
+        case 'bernoulli': {
+          const p=P.p;
+          const mu=p, v=p*(1-p);
+          return {mu, var:v};
+        }
+        case 'bimodal': {
+          const w=P.w, mu1=P.mu1, s1=P.sigma1, mu2=P.mu2, s2=P.sigma2;
+          const mu = w*mu1 + (1-w)*mu2;
+          // Var = w(s1^2 + mu1^2) + (1-w)(s2^2 + mu2^2) - mu^2
+          const second = w*(s1**2 + mu1**2) + (1-w)*(s2**2 + mu2**2);
+          const v = second - mu**2;
+          return {mu, var:v};
+        }
+      }
+    }
+
+    // Draw one value from chosen population
+    function popDraw(dist, P){
+      switch(dist){
+        case 'normal':    return normalSample(P.mu, P.sigma);
+        case 'uniform':   return uniformSample(P.a, P.b);
+        case 'exponential': return exponentialSample(P.lambda);
+        case 'chisq':     return chisqSample(P.k);
+        case 'bernoulli': return bernoulliSample(P.p);
+        case 'bimodal':   return bimodalSample(P.w, P.mu1, P.sigma1, P.mu2, P.sigma2);
+      }
+    }
+
+    // Sample mean of n draws
+    function sampleMean(dist, P, n){
+      let s=0;
+      for(let i=0;i<n;i++) s += popDraw(dist,P);
+      return s/n;
+    }
+
+    // Compute histogram bins
+    function histogram(data, bins){
+      if (data.length===0) return {edges:[], counts:[]};
+      const min = Math.min(...data), max = Math.max(...data);
+      const pad = (max-min)*0.04 || 1e-6;
+      const lo = min - pad, hi = max + pad;
+      const w = (hi-lo)/bins;
+      const edges = Array.from({length: bins+1}, (_,i)=>lo+i*w);
+      const counts = new Array(bins).fill(0);
+      for (const x of data){
+        let idx = Math.floor((x-lo)/w);
+        if (idx<0) idx=0;
+        if (idx>=bins) idx=bins-1;
+        counts[idx]++;
+      }
+      return {edges, counts};
+    }
+
+    function linspace(a,b,k){
+      if (k<=1) return [a];
+      const step = (b-a)/(k-1);
+      return Array.from({length:k}, (_,i)=>a+i*step);
+    }
+
+    function gaussianPdf(x, mu, sd){
+      const z = (x-mu)/sd;
+      return Math.exp(-0.5*z*z) / (sd*Math.sqrt(2*Math.PI));
+    }
+
+    // ---------- State ----------
+    const distSel = document.getElementById('dist');
+    const nSlider = document.getElementById('n');
+    const mSlider = document.getElementById('m');
+    const binsInput = document.getElementById('bins');
+    const overlayChk = document.getElementById('overlayNormal');
+
+    const nLabel = document.getElementById('nlabel');
+    const nVal = document.getElementById('nval');
+    const mVal = document.getElementById('mval');
+
+    const muPopEl = document.getElementById('mu_pop');
+    const sdPopEl = document.getElementById('sd_pop');
+    const seTheoryEl = document.getElementById('se_theory');
+    const meanEmpEl = document.getElementById('mean_emp');
+    const sdEmpEl = document.getElementById('sd_emp');
+    const countEmpEl = document.getElementById('count_emp');
+
+    const params = {
+      mu: document.getElementById('p_mu'),
+      sigma: document.getElementById('p_sigma'),
+      a: document.getElementById('p_a'),
+      b: document.getElementById('p_b'),
+      lambda: document.getElementById('p_lambda'),
+      k: document.getElementById('p_k'),
+      p: document.getElementById('p_p'),
+      w: document.getElementById('p_w'),
+      mu1: document.getElementById('p_mu1'),
+      sigma1: document.getElementById('p_sigma1'),
+      mu2: document.getElementById('p_mu2'),
+      sigma2: document.getElementById('p_sigma2'),
+    };
+
+    let sampleMeans = [];
+    let autorun = false;
+    let autorunHandle = null;
+
+    function currentDist(){ return distSel.value; }
+    function currentParams(){
+      switch(currentDist()){
+        case 'normal': return {mu: +params.mu.value, sigma: Math.max(0.0001, +params.sigma.value)};
+        case 'uniform': {
+          let a=+params.a.value, b=+params.b.value;
+          if (b<a){ const t=a; a=b; b=t; }
+          return {a, b};
+        }
+        case 'exponential': return {lambda: Math.max(0.0001, +params.lambda.value)};
+        case 'chisq': return {k: Math.max(1, Math.floor(+params.k.value))};
+        case 'bernoulli': return {p: Math.min(1, Math.max(0, +params.p.value))};
+        case 'bimodal': return {
+          w: Math.min(1, Math.max(0, +params.w.value)),
+          mu1: +params.mu1.value, sigma1: Math.max(0.0001, +params.sigma1.value),
+          mu2: +params.mu2.value, sigma2: Math.max(0.0001, +params.sigma2.value),
+        };
+      }
+    }
+    function currentN(){ return Math.max(1, Math.floor(+nSlider.value)); }
+    function currentM(){ return Math.max(1, Math.floor(+mSlider.value)); }
+    function currentBins(){ return Math.max(5, Math.min(80, Math.floor(+binsInput.value))); }
+
+    // ---------- Charts ----------
+    const popCtx = document.getElementById('popChart').getContext('2d');
+    const sampCtx = document.getElementById('sampChart').getContext('2d');
+
+    let popChart = new Chart(popCtx, {
+      type: 'bar',
+      data: { labels: [], datasets: [{ label: 'Population draws', data: [], borderWidth:1 }]},
+      options: {
+        animation: false,
+        scales: { x: { title: {display:true, text:'Value'}}, y: { title: {display:true, text:'Count'}, beginAtZero:true }},
+        plugins: { legend: {display:false} }
+      }
+    });
+
+    let sampChart = new Chart(sampCtx, {
+      type: 'bar',
+      data: { labels: [], datasets: [
+        { label: 'Sample means', data: [], borderWidth:1 },
+        { label: 'Normal overlay (scaled)', data: [], type:'line', yAxisID:'y2', borderWidth:2, borderDash:[6,4], hidden: !overlayChk.checked }
+      ]},
+      options: {
+        interaction: { mode:'nearest', intersect:false },
+        animation: false,
+        scales: {
+          x: { title: {display:true, text:'Sample mean'} },
+          y: { title: {display:true, text:'Count'}, beginAtZero:true, stacked:false },
+          y2: { display:false, beginAtZero:true } // used to plot scaled density
+        },
+        plugins: { legend: {labels: {filter: item => item.text !== undefined}} }
+      },
+      plugins: [Chart.registry.getPlugin('annotation')]
+    });
+
+    function updatePopulationPreview(){
+      // Draw many single observations to show population shape
+      const dist = currentDist();
+      const P = currentParams();
+      const draws = [];
+      const N = 5000; // for smooth hist preview
+      for (let i=0;i<N;i++) draws.push(popDraw(dist,P));
+      const {edges, counts} = histogram(draws, 40);
+      const mids = edges.slice(0,-1).map((e,i)=> (e+edges[i+1])/2);
+      popChart.data.labels = mids.map(v=>v.toFixed(2));
+      popChart.data.datasets[0].data = counts;
+      popChart.update();
+
+      // Update population stats & theoretical SE
+      const mom = populationMoments(dist,P);
+      const n = currentN();
+      muPopEl.textContent = mom.mu.toFixed(3);
+      sdPopEl.textContent = Math.sqrt(mom.var).toFixed(3);
+      seTheoryEl.textContent = (Math.sqrt(mom.var)/Math.sqrt(n)).toFixed(3);
+    }
+
+    function updateSamplingChart(){
+      const bins = currentBins();
+      const {edges, counts} = histogram(sampleMeans, bins);
+      const mids = edges.slice(0,-1).map((e,i)=> (e+edges[i+1])/2);
+
+      sampChart.data.labels = mids.map(v=>v.toFixed(3));
+      sampChart.data.datasets[0].data = counts;
+
+      // Normal overlay (scaled to histogram counts)
+      const showOverlay = overlayChk.checked && sampleMeans.length>0;
+      sampChart.data.datasets[1].hidden = !showOverlay;
+      if (showOverlay){
+        const dist = currentDist();
+        const P = currentParams();
+        const mom = populationMoments(dist,P);
+        const mu = mom.mu;
+        const sd = Math.sqrt(mom.var)/Math.sqrt(currentN());
+
+        // Convert density to approx counts per bin by multiplying by bin width and total samples
+        const width = edges[1]-edges[0];
+        const xs = mids;
+        const dens = xs.map(x => gaussianPdf(x, mu, sd));
+        const total = sampleMeans.length;
+        const scaled = dens.map(d => d * width * total);
+
+        sampChart.data.datasets[1].data = scaled;
+      }
+      sampChart.update();
+
+      // Empirical stats
+      if (sampleMeans.length>0){
+        const m = sampleMeans.reduce((a,b)=>a+b,0)/sampleMeans.length;
+        const v = sampleMeans.reduce((a,b)=>a+(b-m)*(b-m),0)/(sampleMeans.length-1 || 1);
+        meanEmpEl.textContent = m.toFixed(3);
+        sdEmpEl.textContent = Math.sqrt(v).toFixed(3);
+      } else {
+        meanEmpEl.textContent = '—';
+        sdEmpEl.textContent = '—';
+      }
+      countEmpEl.textContent = sampleMeans.length.toString();
+    }
+
+    function addSamples(k){
+      const dist = currentDist();
+      const P = currentParams();
+      const n = currentN();
+      for (let i=0;i<k;i++){
+        sampleMeans.push(sampleMean(dist,P,n));
+      }
+      updateSamplingChart();
+    }
+
+    function resetAll(){
+      sampleMeans = [];
+      updatePopulationPreview();
+      updateSamplingChart();
+    }
+
+    // ---------- Wire up UI ----------
+    function showParamsFor(dist){
+      document.querySelectorAll('.dist').forEach(el => el.style.display='none');
+      document.querySelectorAll('.dist.'+dist).forEach(el => el.style.display='flex');
+      // Bimodal needs multiple rows; already handled.
+    }
+
+    distSel.addEventListener('change', () => {
+      showParamsFor(currentDist());
+      resetAll();
+    });
+
+    Object.values(params).forEach(inp => {
+      inp.addEventListener('change', ()=> { resetAll(); });
+      inp.addEventListener('input', ()=> { /* live feedback */ });
+    });
+
+    nSlider.addEventListener('input', ()=>{
+      nVal.textContent = currentN();
+      nLabel.textContent = currentN();
+      const mom = populationMoments(currentDist(), currentParams());
+      seTheoryEl.textContent = (Math.sqrt(mom.var)/Math.sqrt(currentN())).toFixed(3);
+    });
+    mSlider.addEventListener('input', ()=>{ mVal.textContent = currentM(); });
+    binsInput.addEventListener('change', ()=> updateSamplingChart());
+    overlayChk.addEventListener('change', ()=> updateSamplingChart());
+
+    document.getElementById('drawBtn').addEventListener('click', ()=>{
+      addSamples(currentM());
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', ()=>{
+      resetAll();
+    });
+
+    document.getElementById('autorunBtn').addEventListener('click', (e)=>{
+      autorun = !autorun;
+      e.target.textContent = autorun ? 'Stop Auto-Run' : 'Start Auto-Run';
+      if (autorun){
+        const step = ()=> {
+          if (!autorun) return;
+          addSamples(currentM());
+          // modest throttle
+          autorunHandle = setTimeout(step, 200);
+        };
+        step();
+      } else {
+        if (autorunHandle) clearTimeout(autorunHandle);
+      }
+    });
+
+    // ---------- Init ----------
+    function init(){
+      nVal.textContent = currentN();
+      nLabel.textContent = currentN();
+      mVal.textContent = currentM();
+      showParamsFor(currentDist());
+      updatePopulationPreview();
+      updateSamplingChart();
+    }
+    init();
+  </script>
+</body>
+</html>
