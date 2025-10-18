@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stats Tycoon — Research Lab Idle</title>
+  <meta name="description" content="An idle tycoon game themed for statistics: build a research lab, unlock sampling & inference upgrades, and grow your Data Points." />
+  <link rel="icon" href="/favicon.ico" />
+  <!-- Site brand CSS (BCTC / StatsLG). Safe to omit if not present. -->
+  <link rel="stylesheet" href="/style/bctcstyle.css" />
+  <style>
+    :root{
+      --kctcs-blue:#00467f; --kctcs-gold:#e7a614;
+      --bg: #0f172a0a; --panel:#ffffff; --ink:#0f172a; --muted:#475569; --rule:#e5e7eb;
+      --accent: var(--kctcs-blue); --accent-2: var(--kctcs-gold);
+    }
+    /* Basic layout fallback if site CSS is absent */
+    body{margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; color:var(--ink); background:#f7fafc}
+    .wrap{display:grid; grid-template-columns:280px 1fr; min-height:100dvh}
+    .sidebar{background:linear-gradient(180deg,var(--kctcs-blue),#053a66); color:#fff}
+    main{padding:1rem 1.25rem}
+
+    header h1{margin:.25rem 0}
+    header .subtitle{color:var(--muted); margin-top:0}
+
+    .grid{display:grid; gap:1rem}
+    .columns{grid-template-columns: 1fr 1.3fr 1fr}
+
+    .card{background:var(--panel); border:1px solid var(--rule); border-radius:14px; box-shadow:0 4px 14px rgba(0,0,0,.05)}
+    .card h2{margin:0 0 .5rem 0; font-size:1.125rem}
+    .card .card-body{padding:1rem}
+    .row{display:flex; gap:.5rem; align-items:center}
+    .stack{display:flex; flex-direction:column; gap:.5rem}
+
+    .statstrip{display:flex; gap:1rem; flex-wrap:wrap; align-items:center}
+    .pill{background:#f1f5f9; border:1px solid var(--rule); border-radius:999px; padding:.4rem .75rem; font-weight:600}
+    .meter{height:10px; background:#e5e7eb; border-radius:999px; position:relative; overflow:hidden}
+    .meter > i{position:absolute; inset:0; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent-2));}
+
+    .big-btn{background:linear-gradient(180deg,#ffffff,#f3f4f6); border:1px solid var(--rule); border-radius:14px; padding:1rem; font-size:1.125rem; font-weight:700; cursor:pointer}
+    .big-btn:active{transform:translateY(1px)}
+    .btn{border:1px solid var(--rule); background:#ffffff; border-radius:10px; padding:.5rem .75rem; cursor:pointer}
+    .btn[disabled]{opacity:.5; cursor:not-allowed}
+    .btn.primary{background:var(--accent); color:#fff; border-color:transparent}
+    .btn.gold{background:var(--accent-2); color:#0f172a; border-color:transparent; font-weight:700}
+    .btn.small{font-size:.85rem; padding:.25rem .5rem}
+
+    .shop-item{display:grid; grid-template-columns: 1fr auto; align-items:center; gap:.5rem; padding:.5rem; border:1px dashed var(--rule); border-radius:12px}
+    .shop-item.locked{opacity:.5; filter:grayscale(30%)}
+    .shop-item h3{margin:.25rem 0; font-size:1rem}
+    .shop-item p{margin:0; color:var(--muted); font-size:.9rem}
+    .shop-item .price{font-weight:700}
+
+    .mono{font-variant-numeric:tabular-nums}
+    .muted{color:var(--muted)}
+
+    .footer{opacity:.8; font-size:.9rem; margin-top:.5rem}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#e2e8f0; padding:.1rem .35rem; border-radius:6px; border:1px solid #cbd5e1}
+
+    .flex-between{display:flex; justify-content:space-between; align-items:center}
+    .nowrap{white-space:nowrap}
+
+    @media (max-width: 980px){
+      .wrap{grid-template-columns:1fr}
+      .columns{grid-template-columns: 1fr}
+      .sidebar{min-height:56px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== SIDEBAR (loaded if partial exists) ===== -->
+    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html">
+      <div style="padding:1rem">
+        <strong>Stats Tycoon</strong>
+        <p class="muted" style="margin:.25rem 0 0">(Sidebar loads from partials if available)</p>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main>
+      <header>
+        <h1>Stats Tycoon — Research Lab Idle</h1>
+        <p class="subtitle">Collect <strong>Data Points</strong>, upgrade your lab with real statistics concepts, and automate your research empire.</p>
+      </header>
+
+      <section class="grid statstrip" style="margin:.75rem 0 1rem">
+        <div class="pill mono" id="dpDisplay">DP: 0</div>
+        <div class="pill mono" id="dpsDisplay">DP/s: 0</div>
+        <div class="pill mono" id="clickDisplay">Per Click: 1</div>
+        <div class="pill mono" id="repDisplay">Reputation: 1.00×</div>
+        <div class="pill mono" id="prestigeDisplay">Meta-Analysis Bonus: 0%</div>
+      </section>
+
+      <section class="grid columns">
+        <!-- ===== LEFT: Upgrades / Shop ===== -->
+        <div class="card">
+          <div class="card-body stack">
+            <h2>Upgrades & Automation</h2>
+            <div id="shopList" class="stack"></div>
+          </div>
+        </div>
+
+        <!-- ===== CENTER: Core Gameplay ===== -->
+        <div class="card">
+          <div class="card-body stack">
+            <h2>Lab Controls</h2>
+            <button id="clickBtn" class="big-btn" title="Collect data manually (shortcut: Space)">🧪 Survey 1 Person (+<span id="clickPowerLabel">1</span> DP)</button>
+
+            <div class="stack">
+              <div class="flex-between">
+                <strong>Progress to Next Reputation Tier</strong>
+                <span class="mono" id="repInfo">Tier 1 → 2 at 1,000 DP</span>
+              </div>
+              <div class="meter" aria-label="Reputation progress">
+                <i id="repMeter" style="width:0%"></i>
+              </div>
+            </div>
+
+            <div class="card" style="border:1px solid var(--rule)">
+              <div class="card-body stack">
+                <div class="flex-between">
+                  <h3 style="margin:0">Automation Toggles</h3>
+                  <div class="row">
+                    <button class="btn small" id="autosaveNow">💾 Save Now</button>
+                    <button class="btn small" id="resetBtn" title="Hard reset (keep prestige)">♻️ Reset</button>
+                  </div>
+                </div>
+                <label class="row" style="justify-content:space-between">
+                  <span>Click Assist (adds 10% of DPS to each click)</span>
+                  <input type="checkbox" id="clickAssistToggle" />
+                </label>
+                <label class="row" style="justify-content:space-between">
+                  <span>Fast Tick (visuals at 20 FPS)</span>
+                  <input type="checkbox" id="fastTickToggle" checked />
+                </label>
+              </div>
+            </div>
+
+            <div class="footer muted">
+              Shortcuts: <span class="kbd">Space</span> to survey, <span class="kbd">S</span> to save.
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== RIGHT: Achievements / Prestige / Stats ===== -->
+        <div class="card">
+          <div class="card-body stack">
+            <h2>Milestones</h2>
+            <div id="achievements" class="stack"></div>
+
+            <h2 style="margin-top:.75rem">Prestige</h2>
+            <p class="muted">Publish a <strong>Meta-Analysis</strong> to reset progress for a permanent global bonus.</p>
+            <div class="row">
+              <button class="btn gold" id="prestigeBtn" disabled>Publish Meta-Analysis (+0%)</button>
+              <span id="prestigeHint" class="muted">Requires 1,000,000 total DP earned.</span>
+            </div>
+
+            <h2 style="margin-top:.75rem">Session Stats</h2>
+            <ul id="statsList" style="margin:.25rem 0 0 1rem; padding:0; line-height:1.6"></ul>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+  // ======= Utility functions =======
+  const fmt = (n) => {
+    if (n >= 1e12) return (n/1e12).toFixed(2)+"T";
+    if (n >= 1e9) return (n/1e9).toFixed(2)+"B";
+    if (n >= 1e6) return (n/1e6).toFixed(2)+"M";
+    if (n >= 1e3) return (n/1e3).toFixed(2)+"K";
+    return Math.floor(n).toString();
+  };
+  const pct = (p) => (p*100).toFixed(1)+"%";
+
+  // Soft include for partials/sidebar.html (works on your site; safe no-op elsewhere)
+  (function includePartials(){
+    const nodes = document.querySelectorAll('[data-include]');
+    nodes.forEach(async n => {
+      const src = n.getAttribute('data-include');
+      try{
+        const res = await fetch(src, {cache:'no-store'});
+        if(res.ok){ n.innerHTML = await res.text(); }
+      }catch(e){ /* ignore if offline */ }
+    });
+  })();
+
+  // ======= Game Data =======
+  const BASE_STATE = {
+    dp: 0,                 // current Data Points
+    dps: 0,                // passive DP per second
+    clickPower: 1,         // manual click DP
+    reputationTier: 1,
+    reputationBonus: 1,    // multiplier (1.0 = no boost)
+    metaBonus: 0,          // permanent prestige bonus (as fraction, e.g., 0.10 = +10%)
+    totalEarned: 0,        // lifetime DP earned (for prestige unlock)
+    clickAssist: false,    // 10% of DPS added to each click if enabled
+    fastTick: true,
+    timeStarted: Date.now(),
+    upgrades: {},          // {key: qty}
+    achievements: {},      // {id: true}
+    clickMult: 1           // NEW: multiplicative bonus to click power (e.g., from Bayesian Oracle)
+  };
+
+  // Shop catalog — costs scale ~1.15^qty, DPS scales linearly per unit unless noted.
+  const CATALOG = [
+    {
+      key:'manual1', name:'Clipboard Survey', emoji:'🧪', baseCost: 15, dps:0, clickBoost:1,
+      desc:'Increases manual survey power by +1 DP per click.', unlock: 0
+    },
+    {
+      key:'bot', name:'Random Sample Robot', emoji:'🤖', baseCost: 50, dps: 1,
+      desc:'Automates unbiased random sampling for +1 DPS each.', unlock: 0
+    },
+    {
+      key:'strata', name:'Stratified Sampling Dept.', emoji:'📊', baseCost: 250, dps: 0,
+      desc:'Variance reduction! Global DPS +10% per purchase.', unlock: 100,
+      onBuy(state){ state.reputationBonus *= 1.10; }
+    },
+    {
+      key:'clt', name:'CLT Machine', emoji:'🏗️', baseCost: 1200, dps: 12,
+      desc:'Consolidates many small samples into stable means (+12 DPS).', unlock: 500
+    },
+    {
+      key:'reg', name:'Regression Engine', emoji:'🧮', baseCost: 6000, dps: 80,
+      desc:'Predictive pipeline. +80 DPS plus 2% global boost per unit.', unlock: 2500,
+      onBuy(state){ state.reputationBonus *= 1.02; }
+    },
+    {
+      key:'bayes', name:'Bayesian Oracle', emoji:'🔮', baseCost: 25000, dps: 350,
+      desc:'Prior-powered automation: +350 DPS and +5% clicks per unit.', unlock: 10000,
+      onBuy(state){ state.clickMult *= 1.05; }
+    },
+  ];
+
+  const ACHIEVEMENTS = [
+    {id:'first100', label:'Getting Warmed Up', test:s=>s.totalEarned>=100, hint:'Earn 100 DP total.'},
+    {id:'first1k', label:'Apprentice Researcher', test:s=>s.totalEarned>=1000, hint:'Earn 1,000 DP total.'},
+    {id:'first10k', label:'Funded Project', test:s=>s.totalEarned>=10000, hint:'Earn 10,000 DP total.'},
+    {id:'rep2', label:'Reputable', test:s=>s.reputationTier>=2, hint:'Reach Reputation Tier 2.'},
+    {id:'rep3', label:'Esteemed', test:s=>s.reputationTier>=3, hint:'Reach Reputation Tier 3.'},
+    {id:'robot5', label:'Automation Nation', test:s=>(s.upgrades.bot||0)>=5, hint:'Own 5 Random Sample Robots.'},
+  ];
+
+  const PRESTIGE_REQ = 1_000_000; // totalEarned needed
+
+  // ======= State & Save/Load =======
+  let state = load() || {...BASE_STATE};
+  // ensure keys exist
+  CATALOG.forEach(c=>{ if(!(c.key in state.upgrades)) state.upgrades[c.key]=0; });
+  // backward compat: older saves won't have clickMult
+  if(typeof state.clickMult !== 'number') state.clickMult = 1;
+
+  function save(){
+    try{ localStorage.setItem('statsTycoonSave', JSON.stringify(state)); }catch(e){}
+  }
+  function load(){
+    try{ const raw = localStorage.getItem('statsTycoonSave'); return raw? JSON.parse(raw): null; }catch(e){ return null; }
+  }
+  function hardReset(){
+    const meta = state.metaBonus; // keep prestige bonus
+    state = {...BASE_STATE};
+    CATALOG.forEach(c=>state.upgrades[c.key]=0);
+    state.metaBonus = meta;
+    save();
+    renderAll();
+  }
+
+  // ======= Core Calculations =======
+  function calcDPS(){
+    let dps = 0;
+    for(const item of CATALOG){ dps += (item.dps||0) * (state.upgrades[item.key]||0); }
+    const rep = state.reputationBonus * (1 + state.metaBonus);
+    return dps * rep;
+  }
+  function calcClickPower(){
+    let base = 1 + (state.upgrades.manual1||0) * 1; // +1 per Clipboard Survey
+    base *= (1 + state.metaBonus);
+    base *= state.clickMult; // apply multiplicative click bonuses (e.g., Bayesian Oracle)
+    return base;
+  }
+
+  function prestigeAvailable(){ return state.totalEarned >= PRESTIGE_REQ; }
+
+  // Reputation tiers based on lifetime earnings; boost is in reputationBonus multipliers done via certain upgrades.
+  function reputationProgress(){
+    const tiers = [0, 1_000, 50_000, 500_000, 5_000_000];
+    const t = state.reputationTier;
+    const current = tiers[t-1] || 0;
+    const next = tiers[t] || tiers[tiers.length-1];
+    const p = Math.max(0, Math.min(1, (state.totalEarned - current) / (next - current)));
+    return {current, next, p};
+  }
+
+  // ======= Game Loop =======
+  let lastFrame = performance.now();
+  function loop(now){
+    const dtSec = Math.min(0.25, (now - lastFrame)/1000); // clamp for tab-thrashing
+    lastFrame = now;
+
+    // passive income
+    const dps = calcDPS();
+    const gained = dps * dtSec;
+    state.dp += gained;
+    state.totalEarned += gained;
+
+    // tier check
+    const {next} = reputationProgress();
+    if(state.totalEarned >= next && state.reputationTier < 5){ state.reputationTier++; }
+
+    // render at 10-20 fps based on toggle
+    if(state.fastTick){ if(now % 50 < 17) renderAll(); }
+    else if(now % 100 < 17) renderAll();
+
+    requestAnimationFrame(loop);
+  }
+
+  // ======= UI Bindings =======
+  const els = {
+    dp: document.getElementById('dpDisplay'),
+    dps: document.getElementById('dpsDisplay'),
+    click: document.getElementById('clickDisplay'),
+    rep: document.getElementById('repDisplay'),
+    meta: document.getElementById('prestigeDisplay'),
+    clickBtn: document.getElementById('clickBtn'),
+    clickPowerLabel: document.getElementById('clickPowerLabel'),
+    shop: document.getElementById('shopList'),
+    ach: document.getElementById('achievements'),
+    stats: document.getElementById('statsList'),
+    repInfo: document.getElementById('repInfo'),
+    repMeter: document.getElementById('repMeter'),
+    prestigeBtn: document.getElementById('prestigeBtn'),
+    prestigeHint: document.getElementById('prestigeHint'),
+    autosaveNow: document.getElementById('autosaveNow'),
+    resetBtn: document.getElementById('resetBtn'),
+    clickAssistToggle: document.getElementById('clickAssistToggle'),
+    fastTickToggle: document.getElementById('fastTickToggle'),
+  };
+
+  // click action
+  els.clickBtn.addEventListener('click', ()=>{
+    const extra = state.clickAssist ? calcDPS()*0.10 : 0;
+    const inc = calcClickPower() + extra;
+    state.dp += inc;
+    state.totalEarned += inc;
+    // small visual pulse
+    els.clickBtn.style.transform = 'translateY(1px) scale(0.997)';
+    setTimeout(()=>{ els.clickBtn.style.transform=''; }, 60);
+    renderTopbar();
+  });
+
+  // keyboard shortcuts
+  window.addEventListener('keydown', (e)=>{
+    if(e.code==='Space'){ e.preventDefault(); els.clickBtn.click(); }
+    if(e.key==='s' || e.key==='S'){ e.preventDefault(); save(); flash(els.autosaveNow); }
+  });
+
+  // autosave & toggles
+  els.autosaveNow.onclick = ()=>{ save(); flash(els.autosaveNow); };
+  els.resetBtn.onclick = ()=>{ if(confirm('Reset current run? (Prestige bonus is kept)')) hardReset(); };
+  els.clickAssistToggle.onchange = (e)=>{ state.clickAssist = e.target.checked; };
+  els.fastTickToggle.onchange = (e)=>{ state.fastTick = e.target.checked; };
+
+  function flash(btn){ const old=btn.textContent; btn.textContent='Saved!'; setTimeout(()=>btn.textContent=old, 900); }
+
+  // Shop rendering & purchase logic
+  // Shop rendering & purchase logic
+  const GROWTH = 1.15;
+  function itemCost1(item){
+    const q = state.upgrades[item.key]||0;
+    return Math.floor(item.baseCost * Math.pow(GROWTH, q));
+  }
+  function itemCostN(item, n){
+    const owned = state.upgrades[item.key]||0;
+    // geometric series: base * r^owned * (r^n - 1) / (r - 1)
+    const rPowOwned = Math.pow(GROWTH, owned);
+    const total = item.baseCost * rPowOwned * (Math.pow(GROWTH, n) - 1) / (GROWTH - 1);
+    return Math.floor(total + 1e-9);
+  }
+  function canAfford(cost){ return state.dp + 1e-9 >= cost; } // tiny epsilon to avoid float jitter at exact boundaries // tiny epsilon to avoid float jitter at exact boundaries
+
+  function buyQty(item, n){
+    const unlockNeed = (item.unlock||0);
+    if(state.totalEarned < unlockNeed){
+      toast(`🔒 Unlocks at ${fmt(unlockNeed)} lifetime DP`);
+      return;
+    }
+    const cost = n===1 ? itemCost1(item) : itemCostN(item, n);
+    if(!canAfford(cost)){
+      toast(`❌ Need ${fmt(cost)} DP for ×${n} (you have ${Math.floor(state.dp)})`);
+      return;
+    }
+    state.dp -= cost;
+    state.upgrades[item.key] = (state.upgrades[item.key]||0)+n;
+    if(item.onBuy){ for(let i=0;i<n;i++) item.onBuy(state); }
+    save();
+    toast(`✅ Purchased ${item.name} ×${n}!`);
+    renderAll();
+  }
+
+  function renderShop(){
+    els.shop.innerHTML = '';
+    for(const item of CATALOG){
+      if(typeof state.upgrades[item.key] !== 'number') state.upgrades[item.key] = 0; // safety for old saves
+      const qty = state.upgrades[item.key]||0;
+      const cost1 = itemCost1(item);
+      const cost10 = itemCostN(item, 10);
+      const locked = state.totalEarned < (item.unlock||0);
+      const afford1 = canAfford(cost1);
+      const afford10 = canAfford(cost10);
+
+      const unlockText = locked ? (' • Unlock at ' + fmt(item.unlock||0) + ' total DP') : '';
+      const need1 = (!afford1 && !locked) ? ('<small class="muted">Need ' + fmt(cost1 - Math.floor(state.dp)) + ' more for ×1</small>') : '';
+      const need10 = (!afford10 && !locked) ? ('<small class="muted">Need ' + fmt(cost10 - Math.floor(state.dp)) + ' more for ×10</small>') : '';
+
+      const div = document.createElement('div');
+      div.className = 'shop-item'+(locked?' locked':'');
+      div.innerHTML =
+        '<div class="stack">' +
+          '<h3>' + item.emoji + ' ' + item.name + ' <span class="muted">×' + qty + '</span></h3>' +
+          '<p>' + item.desc + '</p>' +
+          '<small class="muted">Next ×1: <span class="mono">' + fmt(cost1) + '</span> • Next ×10: <span class="mono">' + fmt(cost10) + '</span>' + unlockText + '</small>' +
+        '</div>' +
+        '<div class="stack" style="align-items:end">' +
+          '<div class="price mono">' + fmt(cost1) + ' DP</div>' +
+          '<div class="row">' +
+            '<button class="btn primary" type="button" data-action="buy" data-key="' + item.key + '" data-qty="1" ' + (locked?'disabled':'') + '>Buy 1</button>' +
+            '<button class="btn small" type="button" data-action="buy" data-key="' + item.key + '" data-qty="10" ' + (locked?'disabled':'') + '>Buy 10</button>' +
+          '</div>' +
+          need1 +
+          need10 +
+        '</div>';
+
+      const btns = div.querySelectorAll('button');
+      if(btns[0]) btns[0].disabled = locked || !afford1;
+      if(btns[1]) btns[1].disabled = locked || !afford10;
+      els.shop.appendChild(div);
+    }
+  }
+
+  // Delegate clicks for Buy buttons (more robust than per-item handlers)
+  els.shop.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button[data-action="buy"]');
+    if(!btn || btn.disabled) return;
+    const key = btn.getAttribute('data-key');
+    const qty = parseInt(btn.getAttribute('data-qty')||'1',10);
+    const item = CATALOG.find(i=>i.key===key);
+    if(!item){ toast('⚠️ Unknown item'); return; }
+    buyQty(item, qty);
+  });
+
+  // Achievements & prestige
+  function renderAchievements(){
+    els.ach.innerHTML = '';
+    for(const a of ACHIEVEMENTS){
+      const done = !!state.achievements[a.id] || a.test(state);
+      if(done) state.achievements[a.id]=true;
+      const row = document.createElement('div');
+      row.className='row';
+      row.innerHTML = `<span>${done?'🏅':'⬜️'} ${a.label}</span> <span class="muted" style="margin-left:auto">${a.hint}</span>`;
+      els.ach.appendChild(row);
+    }
+    const canPrestige = prestigeAvailable();
+    els.prestigeBtn.disabled = !canPrestige;
+    const bonusPct = Math.floor((state.totalEarned / PRESTIGE_REQ) * 5); // up to +500% cap visually
+    els.prestigeBtn.textContent = `Publish Meta-Analysis (+${Math.floor(state.metaBonus*100)}%)`;
+    els.prestigeHint.textContent = canPrestige ? 'Ready! Publishes and resets current run.' : `Requires ${fmt(PRESTIGE_REQ)} total DP earned.`;
+  }
+
+  els.prestigeBtn.addEventListener('click', ()=>{
+    if(!prestigeAvailable()) return;
+    const gained = 0.10; // +10% each publish (tune as desired)
+    state.metaBonus += gained;
+    alert(`Published! Permanent lab bonus increased by +${Math.round(gained*100)}%.`);
+    hardReset();
+  });
+
+  // Topbar & stats
+  function renderTopbar(){
+    state.dps = calcDPS();
+    state.clickPower = calcClickPower();
+
+    // Show tenths below 1000 so passive DPS feels responsive
+    const dpPretty = state.dp < 1000 ? (Math.round(state.dp*10)/10).toFixed(1) : fmt(state.dp);
+    els.dp.textContent = `DP: ${dpPretty}`;
+    els.dps.textContent = `DP/s: ${Math.max(0, state.dps).toFixed(1)}`;
+    els.click.textContent = `Per Click: ${Math.floor(state.clickPower)}`;
+    els.rep.textContent = `Reputation: ${state.reputationBonus.toFixed(2)}× (Tier ${state.reputationTier})`;
+    els.meta.textContent = `Meta-Analysis Bonus: ${Math.floor(state.metaBonus*100)}%`;
+    els.clickPowerLabel.textContent = Math.floor(state.clickPower);
+
+    const prog = reputationProgress();
+    els.repInfo.textContent = `Tier ${state.reputationTier} → ${Math.min(5,state.reputationTier+1)} at ${fmt(prog.next)} DP`;
+    els.repMeter.style.width = pct(prog.p);
+  }
+
+  function renderStats(){
+    const uptime = (Date.now()-state.timeStarted)/1000;
+    const li = [];
+    li.push(`<li><strong>Lifetime Earned:</strong> <span class="mono">${fmt(state.totalEarned)}</span></li>`);
+    li.push(`<li><strong>Uptime:</strong> ${Math.floor(uptime/60)}m ${Math.floor(uptime%60)}s</li>`);
+    li.push(`<li><strong>Owned Upgrades:</strong> ${Object.values(state.upgrades).reduce((a,b)=>a+b,0)}</li>`);
+    li.push(`<li><strong>Reputation Tier:</strong> ${state.reputationTier}</li>`);
+    els.stats.innerHTML = li.join('');
+  }
+
+  function renderAll(){
+    renderTopbar();
+    renderShop();
+    renderAchievements();
+    renderStats();
+  }
+
+  // ======= Boot =======
+  // restore toggles
+  document.getElementById('clickAssistToggle').checked = !!state.clickAssist;
+  document.getElementById('fastTickToggle').checked = !!state.fastTick;
+
+  // periodic autosave
+  setInterval(save, 5000);
+
+  renderAll();
+  requestAnimationFrame(loop);
+
+  // Lightweight toast utility
+  const toastBox = document.createElement('div');
+  toastBox.style.position='fixed'; toastBox.style.right='12px'; toastBox.style.bottom='12px'; toastBox.style.display='grid'; toastBox.style.gap='8px';
+  document.body.appendChild(toastBox);
+  function toast(msg){
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.style.background = '#111827';
+    t.style.color = 'white';
+    t.style.padding = '8px 12px';
+    t.style.borderRadius = '10px';
+    t.style.boxShadow='0 6px 18px rgba(0,0,0,.25)';
+    t.style.fontSize = '.95rem';
+    t.style.opacity='0.98';
+    toastBox.appendChild(t);
+    setTimeout(()=>{ t.style.transition='opacity .4s'; t.style.opacity='0'; }, 1200);
+    setTimeout(()=>{ t.remove(); }, 1700);
+  }
+  // Basic runtime error catcher so a syntax error doesn't blank the page silently
+  window.addEventListener('error', (e)=>{
+    try{ toast('⚠️ JS Error: ' + e.message); }catch(_){ /* no-op */ }
+  });
+  </script>
+</body>
+</html>
