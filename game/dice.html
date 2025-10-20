@@ -8,25 +8,24 @@
   <link rel="icon" href="/favicon.ico"/>
   <link rel="stylesheet" href="/style/bctcstyle.css">
   <style>
-    .wrap-grid{display:grid; grid-template-columns: 340px 1fr; gap:1rem; align-items:start}
-    .card{background:var(--card, #fff); border:1px solid var(--rule,#e5e7eb); border-radius:12px; padding:1rem; box-shadow:0 1px 2px rgba(0,0,0,.04)}
+    .wrap-grid{display:grid; grid-template-columns:340px 1fr; gap:1rem; align-items:start}
+    .card{background:var(--card,#fff); border:1px solid var(--rule,#e5e7eb); border-radius:12px; padding:1rem; box-shadow:0 1px 2px rgba(0,0,0,.04)}
     .muted{color:var(--muted,#4b5563)}
     .row{display:flex; gap:.5rem; align-items:center; flex-wrap:wrap}
-    .row > *{margin:.15rem 0}
+    .row>*{margin:.15rem 0}
     .btn{cursor:pointer; border:1px solid var(--rule,#e5e7eb); background:var(--panel,#f5f7fb); border-radius:10px; padding:.5rem .8rem; font-weight:600}
-    .btn.primary{background:var(--kctcs-blue,#00467f); color:white; border-color:transparent}
+    .btn.primary{background:var(--kctcs-blue,#00467f); color:#fff; border-color:transparent}
     .btn[disabled]{opacity:.55; cursor:not-allowed}
-    .die-pill{padding:.45rem .7rem; border-radius:12px; border:1px solid var(--rule,#e5e7eb); background:#fff; cursor:pointer; font-weight:700; display:flex; align-items:center; gap:.5rem}
-    .die-pill .stats{font-weight:600; font-size:.85rem; color:var(--muted,#4b5563)}
+    .die-pill{padding:.45rem .7rem; border-radius:12px; border:1px solid var(--rule,#e5e7eb); background:#fff; cursor:pointer; font-weight:700}
     .die-pill.active{background:var(--kctcs-gold,#e7a614); border-color:transparent}
     .grid{display:grid; gap:.75rem}
     .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
     .table{width:100%; border-collapse:collapse}
     .table th,.table td{border-bottom:1px solid var(--rule,#e5e7eb); padding:.5rem .25rem; text-align:center}
     .pill{display:inline-block; padding:.2rem .6rem; border-radius:999px; background:var(--panel,#f5f7fb); font-weight:700}
-    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
     .progress{height:8px; background:var(--rule,#e5e7eb); border-radius:999px; overflow:hidden}
-    .progress > div{height:100%; width:0%; background:var(--kctcs-blue,#00467f)}
+    .progress>div{height:100%; width:0%; background:var(--kctcs-blue,#00467f)}
     .leader-wrap{overflow:auto; max-height:420px; border:1px solid var(--rule,#e5e7eb); border-radius:12px}
     .leader-wrap table{width:100%; border-collapse:collapse}
     .leader-wrap th,.leader-wrap td{padding:.5rem; border-bottom:1px solid var(--rule,#e5e7eb); text-align:center; white-space:nowrap}
@@ -46,11 +45,8 @@
       100%{transform:rotate(180deg) scale(1)}
     }
     .bignum{font-size:48px; font-weight:800}
-    .faces{font-size:.9rem}
-    .face-tag{display:inline-block; margin:.1rem; padding:.15rem .45rem; border:1px dashed var(--rule,#e5e7eb); border-radius:8px; background:#fff}
-    .toolbar select, .toolbar input[type="text"]{
-      padding:.5rem .6rem; border-radius:8px; border:1px solid var(--rule,#e5e7eb)
-    }
+    .faces{font-size:.95rem}
+    .face-tag{display:inline-block; margin:.12rem; padding:.18rem .5rem; border:1px dashed var(--rule,#e5e7eb); border-radius:8px; background:#fff}
   </style>
 </head>
 <body>
@@ -64,13 +60,13 @@
     <section class="card">
       <header>
         <h1 class="h2">Dice Averages Challenge</h1>
-        <p class="muted">Choose a die using <strong>expected value (μ)</strong> and <strong>standard deviation (σ)</strong>. Then run 3 / 10 / 25 / 100 rolls and compare sample means.</p>
+        <p class="muted">Pick a die by inspecting its <strong>faces</strong>. Don’t show or compute EV/SD for them—students will! Then run 3 / 10 / 25 / 100 rolls and compare sample means.</p>
       </header>
 
       <div class="grid">
         <div class="row">
           <label for="player">Your name</label>
-          <input id="player" type="text" placeholder="e.g., Alex M." style="flex:1"/>
+          <input id="player" type="text" placeholder="e.g., Alex M." style="flex:1; padding:.5rem .6rem; border-radius:8px; border:1px solid var(--rule,#e5e7eb)"/>
         </div>
 
         <div>
@@ -96,7 +92,7 @@
         </div>
 
         <div class="notice small">
-          Classroom prompt: “If you want the <strong>highest expected score</strong>, which die is best? Which die is the <strong>most consistent</strong> (smallest σ)?”
+          Classroom prompt: “Estimate the EV and SD from the faces. Which die is most volatile? Which stabilizes fastest by 100 rolls?”
         </div>
 
         <div class="row right">
@@ -113,8 +109,6 @@
         <thead>
           <tr>
             <th>Die</th>
-            <th>μ (true)</th>
-            <th>σ (true)</th>
             <th>3-roll mean</th>
             <th>10-roll mean</th>
             <th>25-roll mean</th>
@@ -124,8 +118,6 @@
         <tbody>
           <tr>
             <td><span id="selDie" class="pill">—</span></td>
-            <td id="trueMu">—</td>
-            <td id="trueSd">—</td>
             <td id="m3">—</td>
             <td id="m10">—</td>
             <td id="m25">—</td>
@@ -157,14 +149,14 @@
       .catch(()=>{ /* silent */ });
   })();
 
-  // ====== Five dice only ======
-  // Die 1 is standard. Others are “wild” (including negatives) but all keep mean 3.5 (sum 21).
+  // ====== Five dice (Die 1 standard; others wild, with big negatives/positives) ======
+  // Each die sums to 21 -> true mean = 3.5 (students infer this themselves).
   const DICE_5 = {
-    "1": [1,2,3,4,5,6],              // standard — μ=3.5
-    "2": [-3,-1,6,6,6,7],            // wild highs to offset negatives — μ=3.5
-    "3": [-4,0,0,0,9,16],            // very swingy / skewed — μ=3.5
-    "4": [-5,-5,8,8,8,7],            // bimodal-ish with negatives — μ=3.5
-    "5": [-10,1,5,6,9,10]            // extreme tails — μ=3.5
+    "1": [1, 2, 3, 4, 5, 6],                 // standard
+    "2": [-20, -5, 5, 10, 15, 16],           // big negatives & highs
+    "3": [-30, 0, 0, 20, 15, 16],            // very swingy / skewed
+    "4": [-10, -10, -10, 25, 13, 13],        // heavy negatives vs clustered highs
+    "5": [-50, 1, 1, 30, 19, 20]             // extreme tails (chaos mode)
   };
 
   // State
@@ -186,28 +178,14 @@
   const m25El= document.getElementById('m25');
   const m100El=document.getElementById('m100');
   const playerEl = document.getElementById('player');
-  const trueMuEl = document.getElementById('trueMu');
-  const trueSdEl = document.getElementById('trueSd');
 
   // Persist player name locally
   playerEl.value = localStorage.getItem('dice_player_name') || '';
   playerEl.addEventListener('input', ()=> localStorage.setItem('dice_player_name', playerEl.value.trim()));
 
-  // Stats helpers
-  function statsForFaces(faces){
-    const n = faces.length;
-    const mu = faces.reduce((a,b)=>a+b,0)/n;
-    const varPop = faces.reduce((acc,x)=>acc+Math.pow(x-mu,2),0)/n; // population variance
-    const sd = Math.sqrt(varPop);
-    return { mu, sd };
-  }
-  const as3 = x => (Math.round(x*1000)/1000).toFixed(3);
-
   function resetResults(){
     ['3','10','25','100'].forEach(k=>{ currentAverages[k]=null; });
     [m3El,m10El,m25El,m100El].forEach(el=>el.textContent='—');
-    trueMuEl.textContent = '—';
-    trueSdEl.textContent = '—';
     submitBtn.disabled = true;
   }
 
@@ -220,18 +198,15 @@
 
     Object.keys(DICE_5).forEach(key=>{
       const faces = DICE_5[key];
-      const {mu, sd} = statsForFaces(faces);
       const b = document.createElement('button');
       b.className = 'die-pill';
       b.setAttribute('data-key', key);
-      b.innerHTML = `<span>Die ${key}</span><span class="stats">μ ${as3(mu)}, σ ${as3(sd)}</span>`;
+      b.textContent = `Die ${key}`;
       b.addEventListener('click', ()=>{
         Array.from(dieListEl.children).forEach(x=>x.classList.remove('active'));
         b.classList.add('active');
         selectedDieKey = key;
         selDieEl.textContent = `Die ${key}`;
-        trueMuEl.textContent = as3(mu);
-        trueSdEl.textContent = as3(sd);
         facesEl.innerHTML = `<span class="muted">Faces:</span> ` + faces.map(v=>`<span class="face-tag">${v}</span>`).join('');
       });
       dieListEl.appendChild(b);
@@ -297,15 +272,12 @@
     if(!selectedDieKey){ alert('Pick a die first.'); return; }
 
     const faces = DICE_5[selectedDieKey];
-    const {mu, sd} = statsForFaces(faces);
-
     const payload = {
       name,
       dieSet: '5-dice wild',
       dieKey: `Die ${selectedDieKey}`,
+      faces,                    // included for audit; backend safely ignores extra fields
       averages: currentAverages,
-      trueMu: +as3(mu),
-      trueSd: +as3(sd),
       userAgent: navigator.userAgent,
       tzOffsetMinutes: new Date().getTimezoneOffset()
     };
