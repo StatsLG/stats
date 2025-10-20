@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Dice Averages Challenge — StatsLG</title>
+  <meta name="description" content="Pick a custom 6-sided die and compare 3/10/25/100-roll sample means. Submit your results to the class leaderboard."/>
+  <link rel="icon" href="/favicon.ico"/>
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+  <style>
+    /* --- Page-specific light CSS (keeps your brand CSS as primary) --- */
+    .wrap-grid{display:grid; grid-template-columns: 320px 1fr; gap:1rem; align-items:start}
+    .card{background:var(--card, #fff); border:1px solid var(--rule,#e5e7eb); border-radius:12px; padding:1rem; box-shadow:0 1px 2px rgba(0,0,0,.04)}
+    .muted{color:var(--muted,#4b5563)}
+    .row{display:flex; gap:.5rem; align-items:center; flex-wrap:wrap}
+    .row > *{margin: .15rem 0}
+    .btn{cursor:pointer; border:1px solid var(--rule,#e5e7eb); background:var(--panel,#f5f7fb); border-radius:10px; padding:.5rem .8rem; font-weight:600}
+    .btn.primary{background:var(--kctcs-blue,#00467f); color:white; border-color:transparent}
+    .btn.ghost{background:transparent}
+    .btn[disabled]{opacity:.55; cursor:not-allowed}
+    .die-pill{padding:.4rem .7rem; border-radius:999px; border:1px solid var(--rule,#e5e7eb); background:#fff; cursor:pointer; font-weight:700}
+    .die-pill.active{background:var(--kctcs-gold,#e7a614); border-color:transparent}
+    .grid{display:grid; gap:.75rem}
+    .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .table{width:100%; border-collapse:collapse}
+    .table th,.table td{border-bottom:1px solid var(--rule,#e5e7eb); padding:.5rem .25rem; text-align:center}
+    .pill{display:inline-block; padding:.2rem .6rem; border-radius:999px; background:var(--panel,#f5f7fb); font-weight:700}
+    .good{color:#16a34a} .warn{color:#f59e0b}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
+    .progress{height:8px; background:var(--rule,#e5e7eb); border-radius:999px; overflow:hidden}
+    .progress > div{height:100%; width:0%; background:var(--kctcs-blue,#00467f)}
+
+    /* Roll animation */
+    .roller{
+      width:110px; height:110px; border-radius:16px; border:1px solid var(--rule,#e5e7eb);
+      display:grid; place-items:center; background:#fff; user-select:none; position:relative; overflow:hidden
+    }
+    .roller.spin{animation:rollspin .6s ease-in-out infinite}
+    @keyframes rollspin{
+      0%{transform:rotate(0deg) scale(1)}
+      50%{transform:rotate(90deg) scale(1.05)}
+      100%{transform:rotate(180deg) scale(1)}
+    }
+    .bignum{font-size:48px; font-weight:800}
+    .faces{font-size:.9rem}
+    .face-tag{display:inline-block; margin:.1rem; padding:.15rem .45rem; border:1px dashed var(--rule,#e5e7eb); border-radius:8px; background:#fff}
+
+    /* Leaderboard table */
+    .leader-wrap{overflow:auto; max-height:420px; border:1px solid var(--rule,#e5e7eb); border-radius:12px}
+    .leader-wrap table{width:100%; border-collapse:collapse}
+    .leader-wrap th,.leader-wrap td{padding:.5rem; border-bottom:1px solid var(--rule,#e5e7eb); text-align:center; white-space:nowrap}
+    .small{font-size:.9rem}
+    .right{justify-content:flex-end}
+    .notice{padding:.5rem .75rem; border-left:4px solid var(--kctcs-blue,#00467f); background:var(--panel,#f5f7fb); border-radius:8px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="wrap-grid">
+    <!-- LEFT: Controls -->
+    <section class="card">
+      <header>
+        <h1 class="h2">Dice Averages Challenge</h1>
+        <p class="muted">Pick a custom 6-sided die. Run 3 / 10 / 25 / 100 rolls. Compare sample means (hello CLT!). Submit to the class leaderboard.</p>
+      </header>
+
+      <div class="grid">
+        <div class="row">
+          <label for="player">Your name</label>
+          <input id="player" type="text" placeholder="e.g., Alex M." style="flex:1; padding:.5rem .6rem; border-radius:8px; border:1px solid var(--rule,#e5e7eb)"/>
+        </div>
+
+        <div>
+          <div class="row" role="group" aria-label="Set size">
+            <button class="btn" id="set5Btn" aria-pressed="true">Use 5 Dice</button>
+            <button class="btn ghost" id="set10Btn" aria-pressed="false">Use 10 Dice</button>
+          </div>
+          <p class="small muted">Each die has repeated faces and quirky distributions. Means are similar; variances differ—great for sampling demos.</p>
+        </div>
+
+        <div>
+          <h3 class="h4">Choose your die</h3>
+          <div id="dieList" class="row" aria-live="polite"></div>
+          <div class="faces muted small" id="facesPreview" aria-live="polite"></div>
+        </div>
+
+        <div class="grid two">
+          <div class="roller" id="roller"><div class="bignum" id="rollNum">–</div></div>
+          <div>
+            <div class="row">
+              <button class="btn" data-n="3">Run 3</button>
+              <button class="btn" data-n="10">Run 10</button>
+              <button class="btn" data-n="25">Run 25</button>
+              <button class="btn" data-n="100">Run 100</button>
+            </div>
+            <div class="row">
+              <button class="btn primary" id="runAllBtn">Run All (3→10→25→100)</button>
+            </div>
+            <div class="progress" aria-hidden="true"><div id="prog"></div></div>
+          </div>
+        </div>
+
+        <div class="notice small">
+          Tip: Run multiple times and talk about <strong>stability</strong> of the 100-roll mean vs 3-roll mean. Which dice feel “swingy”?
+        </div>
+
+        <div class="row right">
+          <button class="btn primary" id="submitBtn" disabled>Submit to Leaderboard</button>
+        </div>
+        <p id="submitMsg" class="small muted"></p>
+      </div>
+    </section>
+
+    <!-- RIGHT: Results & Leaderboard -->
+    <section class="card">
+      <h2 class="h4">Your Results</h2>
+      <table class="table mono" aria-describedby="desc">
+        <thead>
+          <tr>
+            <th>Die</th>
+            <th>3-roll mean</th>
+            <th>10-roll mean</th>
+            <th>25-roll mean</th>
+            <th>100-roll mean</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span id="selDie" class="pill">—</span></td>
+            <td id="m3">—</td>
+            <td id="m10">—</td>
+            <td id="m25">—</td>
+            <td id="m100">—</td>
+          </tr>
+        </tbody>
+      </table>
+      <p id="desc" class="small muted">Means update after each run. “Run All” fills each column in sequence.</p>
+
+      <hr style="border:none; border-top:1px solid var(--rule,#e5e7eb); margin:.75rem 0"/>
+
+      <h2 class="h4">Class Leaderboard (Top by 100-roll mean)</h2>
+      <div class="row">
+        <button class="btn" id="refreshBtn">Refresh</button>
+        <span class="small muted">Sorted by highest 100-roll mean.</span>
+      </div>
+      <div class="leader-wrap" id="leaderWrap" aria-live="polite"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // ---- Sidebar include (keeps your pattern) ----
+  (function includePartials(){
+    const inc = document.querySelector("[data-include]");
+    if(!inc) return;
+    fetch(inc.getAttribute("data-include"))
+      .then(r=>r.text()).then(html=>{ inc.innerHTML = html; })
+      .catch(()=>{ /* silent */ });
+  })();
+
+  // ====== Dice definitions ======
+  // Ten custom 6-sided dice (repeated faces, means around 3.33–3.50)
+  const DICE_10 = {
+    A:[1,1,3,5,5,6],     // μ≈3.50
+    B:[1,2,3,4,5,6],     // μ=3.50 (standard)
+    C:[0,0,4,4,6,6],     // μ≈3.33
+    D:[2,2,3,3,5,5],     // μ≈3.33
+    E:[1,1,1,6,6,6],     // μ=3.50
+    F:[0,3,3,4,4,6],     // μ≈3.33
+    G:[2,2,2,4,5,6],     // μ=3.50
+    H:[1,2,2,5,5,6],     // μ=3.50
+    I:[0,2,3,4,5,6],     // μ≈3.33
+    J:[1,3,3,3,4,6]      // μ≈3.33
+  };
+  // A smaller 5-die subset (less obvious “best”)
+  const DICE_5 = { A:DICE_10.A, C:DICE_10.C, E:DICE_10.E, F:DICE_10.F, H:DICE_10.H };
+
+  let useTen = false;              // start with 5 dice
+  let selectedDieKey = null;
+  let currentAverages = {3:null,10:null,25:null,100:null};
+  let rolling = false;
+
+  const dieListEl = document.getElementById('dieList');
+  const facesEl   = document.getElementById('facesPreview');
+  const selDieEl  = document.getElementById('selDie');
+  const rollNumEl = document.getElementById('rollNum');
+  const rollerEl  = document.getElementById('roller');
+  const progBar   = document.getElementById('prog');
+  const submitBtn = document.getElementById('submitBtn');
+  const submitMsg = document.getElementById('submitMsg');
+  const m3El = document.getElementById('m3');
+  const m10El= document.getElementById('m10');
+  const m25El= document.getElementById('m25');
+  const m100El=document.getElementById('m100');
+  const playerEl = document.getElementById('player');
+
+  // Persist player name locally
+  playerEl.value = localStorage.getItem('dice_player_name') || '';
+  playerEl.addEventListener('input', ()=> localStorage.setItem('dice_player_name', playerEl.value.trim()));
+
+  function currentDiceSet(){ return useTen ? DICE_10 : DICE_5; }
+
+  function renderDiePicker(){
+    dieListEl.innerHTML = '';
+    facesEl.textContent = '';
+    selectedDieKey = null;
+    selDieEl.textContent = '—';
+    ['3','10','25','100'].forEach(k=>{ currentAverages[k]=null; });
+    [m3El,m10El,m25El,m100El].forEach(el=>el.textContent='—');
+    submitBtn.disabled = true;
+
+    Object.keys(currentDiceSet()).forEach(key=>{
+      const b = document.createElement('button');
+      b.className = 'die-pill';
+      b.textContent = key;
+      b.setAttribute('data-key', key);
+      b.addEventListener('click', ()=>{
+        Array.from(dieListEl.children).forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        selectedDieKey = key;
+        selDieEl.textContent = key;
+        const faces = currentDiceSet()[key];
+        facesEl.innerHTML = `<span class="muted">Faces:</span> ` + faces.map(v=>`<span class="face-tag">${v}</span>`).join('');
+      });
+      dieListEl.appendChild(b);
+    });
+  }
+
+  function randFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  function animateRollOnce(value){
+    return new Promise(res=>{
+      rollerEl.classList.add('spin');
+      // brief scramble period, then show the landed value
+      setTimeout(()=>{
+        rollerEl.classList.remove('spin');
+        rollNumEl.textContent = value;
+        res();
+      }, 420);
+    });
+  }
+
+  async function runExperiment(n){
+    if(rolling) return;
+    if(!selectedDieKey){ alert('Pick a die first.'); return; }
+    rolling = true; submitBtn.disabled = true; submitMsg.textContent='';
+
+    const faces = currentDiceSet()[selectedDieKey];
+    let sum = 0;
+    progBar.style.width = '0%';
+    for(let i=1;i<=n;i++){
+      const v = randFrom(faces);
+      sum += v;
+      // show a fast animation burst every few rolls to keep it fun but quick
+      if(i<=10 || i===n || i%Math.ceil(n/10)===0){
+        await animateRollOnce(v);
+      }
+      progBar.style.width = ((i/n)*100).toFixed(1)+'%';
+    }
+    const mean = +(sum/n).toFixed(3);
+    currentAverages[n] = mean;
+    if(n===3) m3El.textContent = mean;
+    if(n===10) m10El.textContent = mean;
+    if(n===25) m25El.textContent = mean;
+    if(n===100) m100El.textContent = mean;
+
+    // Enable submit after at least one mean (or after all if you prefer)
+    const anyDone = Object.values(currentAverages).some(v=>v!==null);
+    submitBtn.disabled = !anyDone;
+    rolling = false;
+  }
+
+  async function runAllSequential(){
+    for (const n of [3,10,25,100]){
+      await runExperiment(n);
+    }
+  }
+
+  // Buttons
+  document.getElementById('set5Btn').addEventListener('click', (e)=>{
+    useTen = false;
+    e.currentTarget.classList.add('primary');
+    document.getElementById('set10Btn').classList.remove('primary');
+    renderDiePicker();
+  });
+  document.getElementById('set10Btn').addEventListener('click', (e)=>{
+    useTen = true;
+    e.currentTarget.classList.add('primary');
+    document.getElementById('set5Btn').classList.remove('primary');
+    renderDiePicker();
+  });
+
+  document.querySelectorAll('button[data-n]').forEach(btn=>{
+    btn.addEventListener('click', ()=> runExperiment(+btn.getAttribute('data-n')));
+  });
+  document.getElementById('runAllBtn').addEventListener('click', runAllSequential);
+
+  // ===== Leaderboard integration (Google Apps Script) =====
+  const GAS_URL = "YOUR_GAS_WEBAPP_URL_HERE"; // <-- replace after deploy
+
+  async function submitLeaderboard(){
+    const name = playerEl.value.trim();
+    if(!name){ alert('Enter your name to submit.'); return; }
+    if(!selectedDieKey){ alert('Pick a die first.'); return; }
+
+    const payload = {
+      name,
+      dieSet: useTen ? '10-dice' : '5-dice',
+      dieKey: selectedDieKey,
+      averages: currentAverages,
+      userAgent: navigator.userAgent,
+      tzOffsetMinutes: new Date().getTimezoneOffset()
+    };
+
+    try{
+      submitBtn.disabled = true;
+      submitMsg.textContent = 'Submitting…';
+      const resp = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload),
+        mode: 'cors'
+      });
+      const data = await resp.json();
+      if(data && data.ok){
+        submitMsg.textContent = 'Submitted! Refresh the leaderboard to see your entry.';
+      }else{
+        submitMsg.textContent = 'Submission failed. Check backend URL / permissions.';
+      }
+    }catch(err){
+      console.error(err);
+      submitMsg.textContent = 'Network error submitting to leaderboard.';
+    }finally{
+      submitBtn.disabled = false;
+    }
+  }
+
+  async function loadLeaderboard(){
+    const wrap = document.getElementById('leaderWrap');
+    wrap.innerHTML = '<div class="small muted" style="padding:.5rem">Loading…</div>';
+    try{
+      const resp = await fetch(GAS_URL+'?top=30', {mode:'cors'});
+      const data = await resp.json();
+      const rows = (data && data.rows) ? data.rows : [];
+      if(!rows.length){
+        wrap.innerHTML = '<div class="small muted" style="padding:.5rem">No entries yet. Be the first!</div>';
+        return;
+      }
+      // Build table
+      let html = '<table><thead><tr>' +
+        '<th>#</th><th>Name</th><th>Set</th><th>Die</th>' +
+        '<th>Mean(3)</th><th>Mean(10)</th><th>Mean(25)</th><th>Mean(100)</th>' +
+        '<th class="small">When</th></tr></thead><tbody>';
+      rows.forEach((r,i)=>{
+        html += `<tr>
+          <td>${i+1}</td>
+          <td>${r.name || ''}</td>
+          <td>${r.dieSet || ''}</td>
+          <td>${r.dieKey || ''}</td>
+          <td>${r.m3 ?? ''}</td>
+          <td>${r.m10 ?? ''}</td>
+          <td>${r.m25 ?? ''}</td>
+          <td><strong>${r.m100 ?? ''}</strong></td>
+          <td class="small muted">${r.when || ''}</td>
+        </tr>`;
+      });
+      html += '</tbody></table>';
+      wrap.innerHTML = html;
+    }catch(err){
+      console.error(err);
+      wrap.innerHTML = '<div class="small muted" style="padding:.5rem">Error loading leaderboard.</div>';
+    }
+  }
+
+  document.getElementById('submitBtn').addEventListener('click', submitLeaderboard);
+  document.getElementById('refreshBtn').addEventListener('click', loadLeaderboard);
+
+  // init
+  renderDiePicker();
+  loadLeaderboard();
+</script>
+</body>
+</html>
