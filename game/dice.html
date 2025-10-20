@@ -4,38 +4,28 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Dice Averages Challenge — StatsLG</title>
-  <meta name="description" content="Pick a custom 6-sided die and compare 3/10/25/100-roll sample means. Submit your results to the class leaderboard."/>
+  <meta name="description" content="Pick custom dice for 3/10/25/100 rolls, compare sample means, submit to leaderboard."/>
   <link rel="icon" href="/favicon.ico"/>
   <link rel="stylesheet" href="/style/bctcstyle.css">
   <style>
-    .wrap-grid{display:grid; grid-template-columns:340px 1fr; gap:1rem; align-items:start}
-    .card{background:#fff; border:1px solid var(--rule,#e5e7eb); border-radius:12px; padding:1rem; box-shadow:0 1px 2px rgba(0,0,0,.04)}
+    .wrap-grid{display:grid; grid-template-columns:360px 1fr; gap:1rem; align-items:start}
+    .card{background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:1rem; box-shadow:0 1px 2px rgba(0,0,0,.04)}
     .muted{color:#4b5563}
     .row{display:flex; gap:.5rem; align-items:center; flex-wrap:wrap}
     .row>*{margin:.15rem 0}
-    .btn{cursor:pointer; border:1px solid var(--rule,#e5e7eb); background:var(--panel,#f5f7fb); border-radius:10px; padding:.5rem .8rem; font-weight:600}
+    .btn{cursor:pointer; border:1px solid #e5e7eb; background:#f5f7fb; border-radius:10px; padding:.5rem .8rem; font-weight:600}
     .btn.primary{background:#00467f; color:#fff; border-color:transparent}
     .btn[disabled]{opacity:.55; cursor:not-allowed}
-    .die-pill{padding:.45rem .7rem; border-radius:12px; border:1px solid var(--rule,#e5e7eb); background:#fff; cursor:pointer; font-weight:700}
-    .die-pill.active{background:#e7a614; border-color:transparent}
     .grid{display:grid; gap:.75rem}
     .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .table{width:100%; border-collapse:collapse}
-    .table th,.table td{border-bottom:1px solid var(--rule,#e5e7eb); padding:.5rem .25rem; text-align:center}
     .pill{display:inline-block; padding:.2rem .6rem; border-radius:999px; background:#f5f7fb; font-weight:700}
-    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
-    .progress{height:8px; background:#e5e7eb; border-radius:999px; overflow:hidden}
-    .progress>div{height:100%; width:0%; background:#00467f}
-    .leader-wrap{overflow:auto; max-height:420px; border:1px solid #e5e7eb; border-radius:12px}
-    .leader-wrap table{width:100%; border-collapse:collapse}
-    .leader-wrap th,.leader-wrap td{padding:.5rem; border-bottom:1px solid #e5e7eb; text-align:center; white-space:nowrap}
-    .small{font-size:.9rem}
-    .right{justify-content:flex-end}
-    .notice{padding:.5rem .75rem; border-left:4px solid #00467f; background:#f5f7fb; border-radius:8px}
+    .table{width:100%; border-collapse:collapse}
+    .table th,.table td{border-bottom:1px solid #e5e7eb; padding:.5rem .25rem; text-align:center}
+    .section-title{margin:.5rem 0 .25rem; font-weight:800}
     .faces{font-size:.95rem}
     .face-tag{display:inline-block; margin:.12rem; padding:.18rem .5rem; border:1px dashed #e5e7eb; border-radius:8px; background:#fff}
 
-    /* Roll animation */
+    /* Roller */
     .roller{
       width:110px; height:110px; border-radius:16px; border:1px solid #e5e7eb;
       display:grid; place-items:center; background:#fff; user-select:none; overflow:hidden
@@ -43,13 +33,24 @@
     .roller.spin{animation:rollspin .6s ease-in-out infinite}
     @keyframes rollspin{0%{transform:rotate(0) scale(1)}50%{transform:rotate(90deg) scale(1.05)}100%{transform:rotate(180deg) scale(1)}}
     .bignum{font-size:48px; font-weight:800}
+    .progress{height:8px; background:#e5e7eb; border-radius:999px; overflow:hidden}
+    .progress>div{height:100%; width:0%; background:#00467f}
+
+    /* Selectors */
+    .sel-grid{display:grid; grid-template-columns: 1fr auto; gap:.4rem .6rem; align-items:center}
+    .sel-grid label{font-weight:700}
+    select{padding:.45rem .55rem; border:1px solid #e5e7eb; border-radius:8px}
 
     /* Rolls log */
     .rolls-log{max-height:220px; overflow:auto; border:1px solid #e5e7eb; border-radius:8px; padding:.5rem}
     .roll-line{margin:.25rem 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
-    .roll-line strong{display:inline-block; width:5.5rem}
+    .roll-line strong{display:inline-block; width:6.5rem}
     .chips{display:inline; word-break:break-word}
     .chip{display:inline-block; margin:.12rem .2rem; padding:.1rem .4rem; border:1px solid #e5e7eb; border-radius:6px}
+
+    /* Leaderboards layout */
+    .lb-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem}
+    @media (max-width: 920px){ .wrap-grid{grid-template-columns:1fr} .lb-grid{grid-template-columns:1fr} }
   </style>
 </head>
 <body>
@@ -61,7 +62,7 @@
     <section class="card">
       <header>
         <h1 class="h2">Dice Averages Challenge</h1>
-        <p class="muted">Pick a die by inspecting its <strong>faces</strong>. (Students compute EV &amp; SD themselves.) Then run 3 / 10 / 25 / 100 rolls and compare sample means.</p>
+        <p class="muted">Pick a <em>different die</em> for each roll count (3 / 10 / 25 / 100). Faces are shown; students compute EV/SD themselves. Then run and compare sample means.</p>
       </header>
 
       <div class="grid">
@@ -70,20 +71,39 @@
           <input id="player" type="text" placeholder="e.g., Alex M." style="flex:1; padding:.5rem .6rem; border-radius:8px; border:1px solid #e5e7eb"/>
         </div>
 
+        <!-- Die faces (5 total; only two have negatives; one is all 3s & 4s) -->
         <div>
-          <h3 class="h4">Choose your die (5 total)</h3>
-          <div id="dieList" class="row" aria-live="polite"></div>
-          <div class="faces muted small" id="facesPreview" aria-live="polite"></div>
+          <div class="section-title">Available dice (faces)</div>
+          <div id="facesCatalog" class="faces muted small"></div>
+        </div>
+
+        <!-- NEW: per-run die selectors -->
+        <div>
+          <div class="section-title">Choose a die for each run</div>
+          <div class="sel-grid">
+            <label for="sel3">3 rolls</label>
+            <select id="sel3"></select>
+
+            <label for="sel10">10 rolls</label>
+            <select id="sel10"></select>
+
+            <label for="sel25">25 rolls</label>
+            <select id="sel25"></select>
+
+            <label for="sel100">100 rolls</label>
+            <select id="sel100"></select>
+          </div>
+          <div class="faces muted small" id="facesPreview" style="margin-top:.35rem;"></div>
         </div>
 
         <div class="grid two">
           <div class="roller" id="roller"><div class="bignum" id="rollNum">–</div></div>
           <div>
             <div class="row">
-              <button class="btn" data-n="3">Run 3</button>
-              <button class="btn" data-n="10">Run 10</button>
-              <button class="btn" data-n="25">Run 25</button>
-              <button class="btn" data-n="100">Run 100</button>
+              <button class="btn" id="run3">Run 3</button>
+              <button class="btn" id="run10">Run 10</button>
+              <button class="btn" id="run25">Run 25</button>
+              <button class="btn" id="run100">Run 100</button>
             </div>
             <div class="row">
               <button class="btn primary" id="runAllBtn">Run All (3→10→25→100)</button>
@@ -93,7 +113,7 @@
         </div>
 
         <div class="notice small">
-          Prompt: “From the faces alone, which die do you predict has the highest EV? Which will have the largest SD?”
+          Prompt: “Predict which choices will give you the highest 3-roll mean vs the most stable 100-roll mean. After running, compare your results to your predictions.”
         </div>
 
         <div class="row right">
@@ -109,25 +129,25 @@
       <table class="table mono">
         <thead>
           <tr>
-            <th>Die</th>
-            <th>3-roll mean</th>
-            <th>10-roll mean</th>
-            <th>25-roll mean</th>
-            <th>100-roll mean</th>
+            <th>3-roll die</th><th>10-roll die</th><th>25-roll die</th><th>100-roll die</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody><tr>
+          <td id="die3">—</td><td id="die10">—</td><td id="die25">—</td><td id="die100">—</td>
+        </tr></tbody>
+      </table>
+      <table class="table mono" style="margin-top:.5rem">
+        <thead>
           <tr>
-            <td><span id="selDie" class="pill">—</span></td>
-            <td id="m3">—</td>
-            <td id="m10">—</td>
-            <td id="m25">—</td>
-            <td id="m100">—</td>
+            <th>3-roll mean</th><th>10-roll mean</th><th>25-roll mean</th><th>100-roll mean</th>
           </tr>
-        </tbody>
+        </thead>
+        <tbody><tr>
+          <td id="m3">—</td><td id="m10">—</td><td id="m25">—</td><td id="m100">—</td>
+        </tr></tbody>
       </table>
 
-      <h3 class="h5" style="margin-top:.9rem">Rolls log (shows actual values)</h3>
+      <h3 class="h5" style="margin-top:.9rem">Rolls log</h3>
       <div class="rolls-log" id="rollsLog">
         <div class="roll-line"><strong>3 rolls:</strong> <span class="chips" id="rolls3">—</span></div>
         <div class="roll-line"><strong>10 rolls:</strong> <span class="chips" id="rolls10">—</span></div>
@@ -135,14 +155,31 @@
         <div class="roll-line"><strong>100 rolls:</strong> <span class="chips" id="rolls100">—</span></div>
       </div>
 
-      <hr style="border:none; border-top:1px solid #e5e7eb; margin:.75rem 0"/>
+      <hr style="border:none; border-top:1px solid #e5e7eb; margin:.9rem 0"/>
 
-      <h2 class="h4">Class Leaderboard (Top by 100-roll mean)</h2>
-      <div class="row">
-        <button class="btn" id="refreshBtn">Refresh</button>
-        <span class="small muted">Sorted by highest 100-roll mean.</span>
+      <h2 class="h4">Leaderboards</h2>
+      <div class="lb-grid">
+        <div>
+          <h3 class="h5">Top by 3-roll mean</h3>
+          <div class="leader-wrap" id="lb3"></div>
+        </div>
+        <div>
+          <h3 class="h5">Top by 10-roll mean</h3>
+          <div class="leader-wrap" id="lb10"></div>
+        </div>
+        <div>
+          <h3 class="h5">Top by 25-roll mean</h3>
+          <div class="leader-wrap" id="lb25"></div>
+        </div>
+        <div>
+          <h3 class="h5">Top by 100-roll mean</h3>
+          <div class="leader-wrap" id="lb100"></div>
+        </div>
       </div>
-      <div class="leader-wrap" id="leaderWrap" aria-live="polite"></div>
+      <div class="row" style="margin-top:.5rem">
+        <button class="btn" id="refreshBtn">Refresh Leaderboards</button>
+        <span class="small muted">Each table is sorted by the corresponding mean.</span>
+      </div>
     </section>
   </main>
 </div>
@@ -157,31 +194,30 @@
       .catch(()=>{});
   })();
 
-  // ====== Five dice (exact mean 3.5; only two have negatives; one is 3s & 4s) ======
-  // Sums of each array = 21 → true mean = 21/6 = 3.5
+  // ===== Dice set (5 total): two with negatives; one is only 3s & 4s; all sum to 21 (true mean 3.5) =====
   const DICE_5 = {
-    "1": [1, 2, 3, 4, 5, 6],                // standard
-    "2": [-10, -2, 10, 8, 8, 7],            // negatives + highs
-    "3": [-6, -1, 6, 6, 8, 8],              // milder negatives, still swingy
-    "4": [3, 3, 3, 4, 4, 4],                 // only 3s and 4s
-    "5": [1, 1, 1, 6, 6, 6]                  // bimodal, no negatives
+    "Die 1": [1, 2, 3, 4, 5, 6],           // standard
+    "Die 2": [-10, -2, 10, 8, 8, 7],       // negatives + highs
+    "Die 3": [-6, -1, 6, 6, 8, 8],         // milder negatives, swingy
+    "Die 4": [3, 3, 3, 4, 4, 4],           // only 3s & 4s
+    "Die 5": [1, 1, 1, 6, 6, 6]            // bimodal (no negatives)
   };
+  const DIE_KEYS = Object.keys(DICE_5);
 
   // State
-  let selectedDieKey = null;
-  let currentAverages = {3:null,10:null,25:null,100:null};
+  const selectedDie = {3:null,10:null,25:null,100:null}; // e.g., "Die 2"
+  const rollsByN = {3:null,10:null,25:null,100:null};
+  const meansByN = {3:null,10:null,25:null,100:null};
   let rolling = false;
-  const rollsByN = {3: null, 10: null, 25: null, 100: null}; // store actual rolls
 
   // Elements
-  const dieListEl = document.getElementById('dieList');
-  const facesEl   = document.getElementById('facesPreview');
-  const selDieEl  = document.getElementById('selDie');
-  const rollNumEl = document.getElementById('rollNum');
-  const rollerEl  = document.getElementById('roller');
-  const progBar   = document.getElementById('prog');
-  const submitBtn = document.getElementById('submitBtn');
-  const submitMsg = document.getElementById('submitMsg');
+  const facesCatalog = document.getElementById('facesCatalog');
+  const facesPreview = document.getElementById('facesPreview');
+  const playerEl = document.getElementById('player');
+  const die3El = document.getElementById('die3');
+  const die10El = document.getElementById('die10');
+  const die25El = document.getElementById('die25');
+  const die100El= document.getElementById('die100');
   const m3El = document.getElementById('m3');
   const m10El= document.getElementById('m10');
   const m25El= document.getElementById('m25');
@@ -190,106 +226,121 @@
   const rolls10El= document.getElementById('rolls10');
   const rolls25El= document.getElementById('rolls25');
   const rolls100El= document.getElementById('rolls100');
-  const playerEl = document.getElementById('player');
+  const submitBtn = document.getElementById('submitBtn');
+  const submitMsg = document.getElementById('submitMsg');
+  const progBar   = document.getElementById('prog');
+  const rollerEl  = document.getElementById('roller');
+  const rollNumEl = document.getElementById('rollNum');
+
+  const sel3 = document.getElementById('sel3');
+  const sel10= document.getElementById('sel10');
+  const sel25= document.getElementById('sel25');
+  const sel100= document.getElementById('sel100');
 
   // Persist name
   playerEl.value = localStorage.getItem('dice_player_name') || '';
   playerEl.addEventListener('input', ()=> localStorage.setItem('dice_player_name', playerEl.value.trim()));
 
+  // Build faces catalog (static reference of all dice)
+  function renderFacesCatalog(){
+    const blocks = DIE_KEYS.map(k=>{
+      const faces = DICE_5[k].map(v=>`<span class="face-tag">${v}</span>`).join('');
+      return `<div class="small" style="margin:.25rem 0"><strong>${k}:</strong> ${faces}</div>`;
+    }).join('');
+    facesCatalog.innerHTML = blocks;
+  }
+
+  // Fill selects and preview handlers
+  function fillSelect(sel){
+    sel.innerHTML = `<option value="">— choose a die —</option>` + DIE_KEYS.map(k=>`<option value="${k}">${k}</option>`).join('');
+    sel.addEventListener('change', ()=>{
+      const map = {sel3:3, sel10:10, sel25:25, sel100:100};
+      const n = map[sel.id];
+      selectedDie[n] = sel.value || null;
+      updateSelectedDieUI();
+      showPreviewFor(n);
+      checkSubmitEnabled();
+    });
+  }
+  function showPreviewFor(n){
+    const key = selectedDie[n];
+    if(!key){ facesPreview.textContent = ''; return; }
+    const f = DICE_5[key];
+    facesPreview.innerHTML = `<span class="muted">Faces for ${n}-roll die (${key}):</span> ` + f.map(v=>`<span class="face-tag">${v}</span>`).join('');
+  }
+
+  function updateSelectedDieUI(){
+    die3El.textContent = selectedDie[3] || '—';
+    die10El.textContent = selectedDie[10] || '—';
+    die25El.textContent = selectedDie[25] || '—';
+    die100El.textContent = selectedDie[100] || '—';
+  }
   function resetResults(){
-    ['3','10','25','100'].forEach(k=>{ currentAverages[k]=null; rollsByN[k]=null; });
+    for (const k of [3,10,25,100]){ rollsByN[k]=null; meansByN[k]=null; }
     [m3El,m10El,m25El,m100El].forEach(el=>el.textContent='—');
-    [rolls3El, rolls10El, rolls25El, rolls100El].forEach(el=>el.textContent='—');
+    [rolls3El,rolls10El,rolls25El,rolls100El].forEach(el=>el.textContent='—');
     submitBtn.disabled = true;
   }
-
-  function renderDiePicker(){
-    dieListEl.innerHTML = '';
-    facesEl.textContent = '';
-    selectedDieKey = null;
-    selDieEl.textContent = '—';
-    resetResults();
-
-    Object.keys(DICE_5).forEach(key=>{
-      const faces = DICE_5[key];
-      const b = document.createElement('button');
-      b.className = 'die-pill';
-      b.setAttribute('data-key', key);
-      b.textContent = `Die ${key}`;
-      b.addEventListener('click', ()=>{
-        Array.from(dieListEl.children).forEach(x=>x.classList.remove('active'));
-        b.classList.add('active');
-        selectedDieKey = key;
-        selDieEl.textContent = `Die ${key}`;
-        facesEl.innerHTML = `<span class="muted">Faces:</span> ` + faces.map(v=>`<span class="face-tag">${v}</span>`).join('');
-        // clear old results for clarity after switching dice
-        resetResults();
-      });
-      dieListEl.appendChild(b);
-    });
+  function checkSubmitEnabled(){
+    const any = Object.values(meansByN).some(v=>v!=null);
+    submitBtn.disabled = !any;
   }
-
-  function randFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-  function animateRollOnce(value){
-    return new Promise(res=>{
-      rollerEl.classList.add('spin');
-      setTimeout(()=>{
-        rollerEl.classList.remove('spin');
-        rollNumEl.textContent = value;
-        res();
-      }, 420);
-    });
-  }
-
-  function renderRollsLog(){
-    function chipsHTML(arr){ return arr ? arr.map(v=>`<span class="chip">${v}</span>`).join('') : '—'; }
+  function chipsHTML(arr){ return arr ? arr.map(v=>`<span class="chip">${v}</span>`).join('') : '—'; }
+  function renderLogs(){
     rolls3El.innerHTML = chipsHTML(rollsByN[3]);
     rolls10El.innerHTML = chipsHTML(rollsByN[10]);
     rolls25El.innerHTML = chipsHTML(rollsByN[25]);
     rolls100El.innerHTML = chipsHTML(rollsByN[100]);
   }
 
-  async function runExperiment(n){
-    if(rolling) return;
-    if(!selectedDieKey){ alert('Pick a die first.'); return; }
-    rolling = true; submitBtn.disabled = true; submitMsg.textContent='';
+  function randFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function animateRollOnce(value){
+    return new Promise(res=>{
+      rollerEl.classList.add('spin');
+      setTimeout(()=>{ rollerEl.classList.remove('spin'); rollNumEl.textContent = value; res(); }, 420);
+    });
+  }
 
-    const faces = DICE_5[selectedDieKey];
+  async function runN(n){
+    if(rolling) return;
+    if(!selectedDie[n]){ alert(`Choose a die for the ${n}-roll run first.`); return; }
+    rolling = true; submitMsg.textContent=''; submitBtn.disabled = true;
+
+    const faces = DICE_5[selectedDie[n]];
     const rolls = [];
     let sum = 0;
     progBar.style.width = '0%';
     for(let i=1;i<=n;i++){
       const v = randFrom(faces);
-      rolls.push(v);
-      sum += v;
-      if(i<=10 || i===n || i%Math.ceil(n/10)===0){
-        await animateRollOnce(v);
-      }
+      rolls.push(v); sum += v;
+      if(i<=10 || i===n || i%Math.ceil(n/10)===0){ await animateRollOnce(v); }
       progBar.style.width = ((i/n)*100).toFixed(1)+'%';
     }
     const mean = +(sum/n).toFixed(3);
-    currentAverages[n] = mean;
-    rollsByN[n] = rolls;
-    if(n===3) m3El.textContent = mean;
+    meansByN[n] = mean; rollsByN[n] = rolls;
+
+    if(n===3)  m3El.textContent = mean;
     if(n===10) m10El.textContent = mean;
     if(n===25) m25El.textContent = mean;
     if(n===100) m100El.textContent = mean;
-    renderRollsLog();
-
-    const anyDone = Object.values(currentAverages).some(v=>v!==null);
-    submitBtn.disabled = !anyDone;
+    renderLogs();
+    checkSubmitEnabled();
     rolling = false;
   }
 
-  async function runAllSequential(){
-    for (const n of [3,10,25,100]){ await runExperiment(n); }
+  async function runAll(){
+    for (const n of [3,10,25,100]){
+      if(!selectedDie[n]){ alert(`Choose a die for the ${n}-roll run first.`); return; }
+    }
+    await runN(3); await runN(10); await runN(25); await runN(100);
   }
 
-  document.querySelectorAll('button[data-n]').forEach(btn=>{
-    btn.addEventListener('click', ()=> runExperiment(+btn.getAttribute('data-n')));
-  });
-  document.getElementById('runAllBtn').addEventListener('click', runAllSequential);
+  // Bind
+  document.getElementById('run3').onclick = ()=>runN(3);
+  document.getElementById('run10').onclick = ()=>runN(10);
+  document.getElementById('run25').onclick = ()=>runN(25);
+  document.getElementById('run100').onclick = ()=>runN(100);
+  document.getElementById('runAllBtn').onclick = runAll;
 
   // ===== Leaderboard integration (Google Apps Script) =====
   const GAS_URL = "https://script.google.com/macros/s/AKfycbzcd_m3_a8GjIsQFxNnlioG2zb_sibIZ18XB6WDPp9ovfyJnHTRZDUxreaIx0Ia9JgJuw/exec";
@@ -297,15 +348,17 @@
   async function submitLeaderboard(){
     const name = playerEl.value.trim();
     if(!name){ alert('Enter your name to submit.'); return; }
-    if(!selectedDieKey){ alert('Pick a die first.'); return; }
+
+    // Summarize chosen dice in a compact string for the single dieKey column
+    const dieKeySummary = `3:${selectedDie[3]||'-'} | 10:${selectedDie[10]||'-'} | 25:${selectedDie[25]||'-'} | 100:${selectedDie[100]||'-'}`;
 
     const payload = {
       name,
-      dieSet: '5-dice (2 negative, 1=3&4s)',
-      dieKey: `Die ${selectedDieKey}`,
-      faces: DICE_5[selectedDieKey],        // extra metadata (safe to include)
-      rolls: rollsByN,                      // include actual rolls (optional)
-      averages: currentAverages,
+      dieSet: 'per-run selection',
+      dieKey: dieKeySummary,
+      selectedDice: selectedDie,   // extra metadata (safe)
+      averages: meansByN,          // {3,10,25,100}
+      rolls: rollsByN,             // actual roll lists
       userAgent: navigator.userAgent,
       tzOffsetMinutes: new Date().getTimezoneOffset()
     };
@@ -315,16 +368,15 @@
       submitMsg.textContent = 'Submitting…';
       const resp = await fetch(GAS_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
+        headers: { 'Content-Type': 'text/plain' }, // simple request; no preflight
         body: JSON.stringify(payload)
       });
-
       let data;
       try { data = await resp.json(); }
       catch { const raw = await resp.text(); console.log('Raw response:', raw); data = {}; }
 
       if (data && data.ok){
-        submitMsg.textContent = 'Submitted! Refresh the leaderboard to see your entry.';
+        submitMsg.textContent = 'Submitted! Refresh the leaderboards to see your entry.';
       } else {
         submitMsg.textContent = 'Submission failed. Check backend URL / permissions.';
       }
@@ -335,53 +387,53 @@
       submitBtn.disabled = false;
     }
   }
+  document.getElementById('submitBtn').onclick = submitLeaderboard;
 
-  async function loadLeaderboard(){
-    const wrap = document.getElementById('leaderWrap');
-    wrap.innerHTML = '<div class="small muted" style="padding:.5rem">Loading…</div>';
+  async function loadLeaderboards(){
+    const targets = {3:document.getElementById('lb3'),10:document.getElementById('lb10'),
+                     25:document.getElementById('lb25'),100:document.getElementById('lb100')};
+    for (const k in targets) targets[k].innerHTML = '<div class="small muted" style="padding:.5rem">Loading…</div>';
+
     try{
-      const resp = await fetch(GAS_URL + '?top=30');
-      let data;
-      try { data = await resp.json(); }
-      catch { const raw = await resp.text(); console.log('Raw response:', raw); data = {}; }
-
+      const resp = await fetch(GAS_URL + '?top=200'); // get a bigger slice once
+      let data; try { data = await resp.json(); } catch { data = {}; }
       const rows = (data && data.rows) ? data.rows : [];
-      if(!rows.length){
-        wrap.innerHTML = '<div class="small muted" style="padding:.5rem">No entries yet. Be the first!</div>';
-        return;
-      }
-      let html = '<table><thead><tr>' +
-        '<th>#</th><th>Name</th><th>Set</th><th>Die</th>' +
-        '<th>Mean(3)</th><th>Mean(10)</th><th>Mean(25)</th><th>Mean(100)</th>' +
-        '<th class="small">When</th></tr></thead><tbody>';
-      rows.forEach((r,i)=>{
-        html += `<tr>
-          <td>${i+1}</td>
-          <td>${r.name || ''}</td>
-          <td>${r.dieSet || ''}</td>
-          <td>${r.dieKey || ''}</td>
-          <td>${r.m3 ?? ''}</td>
-          <td>${r.m10 ?? ''}</td>
-          <td>${r.m25 ?? ''}</td>
-          <td><strong>${r.m100 ?? ''}</strong></td>
-          <td class="small muted">${r.when || ''}</td>
-        </tr>`;
-      });
-      html += '</tbody></table>';
-      wrap.innerHTML = html;
+
+      const render = (n, el) => {
+        const key = 'm'+n;
+        const sorted = [...rows].filter(r=>r[key]!=='' && r[key]!=null)
+          .sort((a,b)=>(parseFloat(b[key])||-Infinity)-(parseFloat(a[key])||-Infinity))
+          .slice(0, 20);
+        if (!sorted.length){ el.innerHTML = '<div class="small muted" style="padding:.5rem">No entries yet.</div>'; return; }
+        let html = '<table class="table mono"><thead><tr><th>#</th><th>Name</th><th>Die choices</th><th>Mean('+n+')</th><th class="small">When</th></tr></thead><tbody>';
+        sorted.forEach((r,i)=>{
+          html += `<tr>
+            <td>${i+1}</td>
+            <td>${r.name || ''}</td>
+            <td class="small">${r.dieKey || ''}</td>
+            <td><strong>${r[key] ?? ''}</strong></td>
+            <td class="small muted">${r.when || ''}</td>
+          </tr>`;
+        });
+        html += '</tbody></table>';
+        el.innerHTML = html;
+      };
+
+      render(3, targets[3]); render(10, targets[10]); render(25, targets[25]); render(100, targets[100]);
     }catch(err){
       console.error(err);
-      wrap.innerHTML = '<div class="small muted" style="padding:.5rem)">Error loading leaderboard.</div>';
+      for (const k in targets) targets[k].innerHTML = '<div class="small muted" style="padding:.5rem)">Error loading leaderboard.</div>';
     }
   }
+  document.getElementById('refreshBtn').onclick = loadLeaderboards;
 
-  document.getElementById('submitBtn').addEventListener('click', submitLeaderboard);
-  document.getElementById('refreshBtn').addEventListener('click', loadLeaderboard);
-
-  // init
+  // Init
   function init(){
-    renderDiePicker();
-    loadLeaderboard();
+    renderFacesCatalog();
+    [sel3, sel10, sel25, sel100].forEach(fillSelect);
+    resetResults();
+    updateSelectedDieUI();
+    loadLeaderboards();
   }
   init();
 </script>
