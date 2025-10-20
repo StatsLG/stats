@@ -26,10 +26,15 @@
     .table{width:100%; border-collapse:collapse}
     .table th,.table td{border-bottom:1px solid var(--rule,#e5e7eb); padding:.5rem .25rem; text-align:center}
     .pill{display:inline-block; padding:.2rem .6rem; border-radius:999px; background:var(--panel,#f5f7fb); font-weight:700}
-    .good{color:#16a34a} .warn{color:#f59e0b}
     .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
     .progress{height:8px; background:var(--rule,#e5e7eb); border-radius:999px; overflow:hidden}
     .progress > div{height:100%; width:0%; background:var(--kctcs-blue,#00467f)}
+    .leader-wrap{overflow:auto; max-height:420px; border:1px solid var(--rule,#e5e7eb); border-radius:12px}
+    .leader-wrap table{width:100%; border-collapse:collapse}
+    .leader-wrap th,.leader-wrap td{padding:.5rem; border-bottom:1px solid var(--rule,#e5e7eb); text-align:center; white-space:nowrap}
+    .small{font-size:.9rem}
+    .right{justify-content:flex-end}
+    .notice{padding:.5rem .75rem; border-left:4px solid var(--kctcs-blue,#00467f); background:var(--panel,#f5f7fb); border-radius:8px}
 
     /* Roll animation */
     .roller{
@@ -45,15 +50,6 @@
     .bignum{font-size:48px; font-weight:800}
     .faces{font-size:.9rem}
     .face-tag{display:inline-block; margin:.1rem; padding:.15rem .45rem; border:1px dashed var(--rule,#e5e7eb); border-radius:8px; background:#fff}
-
-    /* Leaderboard table */
-    .leader-wrap{overflow:auto; max-height:420px; border:1px solid var(--rule,#e5e7eb); border-radius:12px}
-    .leader-wrap table{width:100%; border-collapse:collapse}
-    .leader-wrap th,.leader-wrap td{padding:.5rem; border-bottom:1px solid var(--rule,#e5e7eb); text-align:center; white-space:nowrap}
-    .small{font-size:.9rem}
-    .right{justify-content:flex-end}
-    .notice{padding:.5rem .75rem; border-left:4px solid var(--kctcs-blue,#00467f); background:var(--panel,#f5f7fb); border-radius:8px}
-    .hidden{display:none}
   </style>
 </head>
 <body>
@@ -78,7 +74,7 @@
 
         <div>
           <div class="row" role="group" aria-label="Set size">
-            <button class="btn" id="set5Btn" aria-pressed="true">Use 5 Dice</button>
+            <button class="btn primary" id="set5Btn" aria-pressed="true">Use 5 Dice</button>
             <button class="btn ghost" id="set10Btn" aria-pressed="false">Use 10 Dice</button>
           </div>
           <p class="small muted">Each die has repeated faces and quirky distributions. Means are similar; variances differ—great for sampling demos.</p>
@@ -155,7 +151,7 @@
 </div>
 
 <script>
-  // ---- Sidebar include (keeps your pattern) ----
+  // ---- Sidebar include ----
   (function includePartials(){
     const inc = document.querySelector("[data-include]");
     if(!inc) return;
@@ -165,7 +161,6 @@
   })();
 
   // ====== Dice definitions ======
-  // Ten custom 6-sided dice (repeated faces, means around 3.33–3.50)
   const DICE_10 = {
     A:[1,1,3,5,5,6],     // μ≈3.50
     B:[1,2,3,4,5,6],     // μ=3.50 (standard)
@@ -178,14 +173,14 @@
     I:[0,2,3,4,5,6],     // μ≈3.33
     J:[1,3,3,3,4,6]      // μ≈3.33
   };
-  // A smaller 5-die subset (less obvious “best”)
   const DICE_5 = { A:DICE_10.A, C:DICE_10.C, E:DICE_10.E, F:DICE_10.F, H:DICE_10.H };
 
-  let useTen = false;              // start with 5 dice
+  let useTen = false; // default to 5-die set
   let selectedDieKey = null;
   let currentAverages = {3:null,10:null,25:null,100:null};
   let rolling = false;
 
+  // Elements
   const dieListEl = document.getElementById('dieList');
   const facesEl   = document.getElementById('facesPreview');
   const selDieEl  = document.getElementById('selDie');
@@ -200,7 +195,7 @@
   const m100El=document.getElementById('m100');
   const playerEl = document.getElementById('player');
 
-  // Persist player name locally
+  // Keep player name locally
   playerEl.value = localStorage.getItem('dice_player_name') || '';
   playerEl.addEventListener('input', ()=> localStorage.setItem('dice_player_name', playerEl.value.trim()));
 
@@ -237,7 +232,6 @@
   function animateRollOnce(value){
     return new Promise(res=>{
       rollerEl.classList.add('spin');
-      // brief scramble period, then show the landed value
       setTimeout(()=>{
         rollerEl.classList.remove('spin');
         rollNumEl.textContent = value;
@@ -257,7 +251,6 @@
     for(let i=1;i<=n;i++){
       const v = randFrom(faces);
       sum += v;
-      // show a fast animation burst every few rolls to keep it fun but quick
       if(i<=10 || i===n || i%Math.ceil(n/10)===0){
         await animateRollOnce(v);
       }
@@ -270,19 +263,15 @@
     if(n===25) m25El.textContent = mean;
     if(n===100) m100El.textContent = mean;
 
-    // Enable submit after at least one mean (or after all if you prefer)
     const anyDone = Object.values(currentAverages).some(v=>v!==null);
     submitBtn.disabled = !anyDone;
     rolling = false;
   }
 
   async function runAllSequential(){
-    for (const n of [3,10,25,100]){
-      await runExperiment(n);
-    }
+    for (const n of [3,10,25,100]){ await runExperiment(n); }
   }
 
-  // Buttons
   document.getElementById('set5Btn').addEventListener('click', (e)=>{
     useTen = false;
     e.currentTarget.classList.add('primary');
@@ -302,7 +291,7 @@
   document.getElementById('runAllBtn').addEventListener('click', runAllSequential);
 
   // ===== Leaderboard integration (Google Apps Script) =====
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbwAdJQGoUnnD-3k2UIUJGfsJXGowEyvD6b2FXglNyIco7WtpBUSMyYS7oPoufOvoKovqA/exec"; // <-- replace after deploy
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbxlLNTLr-mXOI-JhUcfUYII3PeyUIBKObvXQGc06cP8avc9BgeMFgrrzBXuLw5TJXzUuw/exec"; // <-- your /exec URL
 
   async function submitLeaderboard(){
     const name = playerEl.value.trim();
@@ -321,16 +310,21 @@
     try{
       submitBtn.disabled = true;
       submitMsg.textContent = 'Submitting…';
+      // IMPORTANT: text/plain to avoid preflight; server still parses JSON string
       const resp = await fetch(GAS_URL, {
         method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(payload),
-        mode: 'cors'
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
       });
-      const data = await resp.json();
-      if(data && data.ok){
+
+      // If server accidentally returns HTML (auth page), this will throw; fall back to text.
+      let data;
+      try { data = await resp.json(); }
+      catch { const raw = await resp.text(); console.log('Raw response:', raw); data = {}; }
+
+      if (data && data.ok){
         submitMsg.textContent = 'Submitted! Refresh the leaderboard to see your entry.';
-      }else{
+      } else {
         submitMsg.textContent = 'Submission failed. Check backend URL / permissions.';
       }
     }catch(err){
@@ -345,14 +339,16 @@
     const wrap = document.getElementById('leaderWrap');
     wrap.innerHTML = '<div class="small muted" style="padding:.5rem">Loading…</div>';
     try{
-      const resp = await fetch(GAS_URL+'?top=30', {mode:'cors'});
-      const data = await resp.json();
+      const resp = await fetch(GAS_URL + '?top=30'); // GET
+      let data;
+      try { data = await resp.json(); }
+      catch { const raw = await resp.text(); console.log('Raw response:', raw); data = {}; }
+
       const rows = (data && data.rows) ? data.rows : [];
       if(!rows.length){
         wrap.innerHTML = '<div class="small muted" style="padding:.5rem">No entries yet. Be the first!</div>';
         return;
       }
-      // Build table
       let html = '<table><thead><tr>' +
         '<th>#</th><th>Name</th><th>Set</th><th>Die</th>' +
         '<th>Mean(3)</th><th>Mean(10)</th><th>Mean(25)</th><th>Mean(100)</th>' +
@@ -374,7 +370,7 @@
       wrap.innerHTML = html;
     }catch(err){
       console.error(err);
-      wrap.innerHTML = '<div class="small muted" style="padding:.5rem">Error loading leaderboard.</div>';
+      wrap.innerHTML = '<div class="small muted" style="padding:.5rem)">Error loading leaderboard.</div>';
     }
   }
 
@@ -382,8 +378,12 @@
   document.getElementById('refreshBtn').addEventListener('click', loadLeaderboard);
 
   // init
-  renderDiePicker();
-  loadLeaderboard();
+  function init(){
+    // prefer 5-die set as default visual state
+    renderDiePicker();
+    loadLeaderboard();
+  }
+  init();
 </script>
 </body>
 </html>
