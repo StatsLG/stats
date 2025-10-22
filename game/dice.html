@@ -13,17 +13,12 @@
     .muted{color:#4b5563}
     .row{display:flex; gap:.5rem; align-items:center; flex-wrap:wrap}
     .row>*{margin:.15rem 0}
-
-    /* >>> Improved contrast buttons <<< */
-    .btn{
-      cursor:pointer; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a;
-      border-radius:10px; padding:.55rem .9rem; font-weight:700; letter-spacing:.2px
-    }
+    .btn{cursor:pointer; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a;
+      border-radius:10px; padding:.55rem .9rem; font-weight:700; letter-spacing:.2px}
     .btn:hover{background:#f1f5f9}
     .btn.primary{background:#00467f; color:#ffffff; border-color:#00467f}
     .btn.primary:hover{filter:brightness(1.05)}
     .btn[disabled]{opacity:.6; cursor:not-allowed}
-
     .grid{display:grid; gap:.75rem}
     .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
     .pill{display:inline-block; padding:.2rem .6rem; border-radius:999px; background:#f5f7fb; font-weight:700}
@@ -32,7 +27,6 @@
     .section-title{margin:.5rem 0 .25rem; font-weight:800}
     .faces{font-size:.95rem}
     .face-tag{display:inline-block; margin:.12rem; padding:.18rem .5rem; border:1px dashed #e5e7eb; border-radius:8px; background:#fff}
-
     .roller{width:110px; height:110px; border-radius:16px; border:1px solid #e5e7eb;
       display:grid; place-items:center; background:#fff; user-select:none; overflow:hidden}
     .roller.spin{animation:rollspin .6s ease-in-out infinite}
@@ -40,17 +34,14 @@
     .bignum{font-size:48px; font-weight:800}
     .progress{height:8px; background:#e5e7eb; border-radius:999px; overflow:hidden}
     .progress>div{height:100%; width:0%; background:#00467f}
-
     .sel-grid{display:grid; grid-template-columns: 1fr auto; gap:.4rem .6rem; align-items:center}
     .sel-grid label{font-weight:700}
     select{padding:.45rem .55rem; border:1px solid #cbd5e1; border-radius:8px; color:#0f172a; background:#fff}
-
     .rolls-log{max-height:220px; overflow:auto; border:1px solid #e5e7eb; border-radius:8px; padding:.5rem}
     .roll-line{margin:.25rem 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
     .roll-line strong{display:inline-block; width:6.5rem}
     .chips{display:inline; word-break:break-word}
     .chip{display:inline-block; margin:.12rem .2rem; padding:.1rem .4rem; border:1px solid #e5e7eb; border-radius:6px}
-
     .lb-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem}
     @media (max-width: 920px){ .wrap-grid{grid-template-columns:1fr} .lb-grid{grid-template-columns:1fr} }
   </style>
@@ -85,13 +76,10 @@
           <div class="sel-grid">
             <label for="sel3">3 rolls</label>
             <select id="sel3"></select>
-
             <label for="sel10">10 rolls</label>
             <select id="sel10"></select>
-
             <label for="sel25">25 rolls</label>
             <select id="sel25"></select>
-
             <label for="sel100">100 rolls</label>
             <select id="sel100"></select>
           </div>
@@ -125,9 +113,7 @@
       <h2 class="h4">Your Results</h2>
       <table class="table mono">
         <thead>
-          <tr>
-            <th>3-roll die</th><th>10-roll die</th><th>25-roll die</th><th>100-roll die</th>
-          </tr>
+          <tr><th>3-roll die</th><th>10-roll die</th><th>25-roll die</th><th>100-roll die</th></tr>
         </thead>
         <tbody><tr>
           <td id="die3">—</td><td id="die10">—</td><td id="die25">—</td><td id="die100">—</td>
@@ -135,9 +121,7 @@
       </table>
       <table class="table mono" style="margin-top:.5rem">
         <thead>
-          <tr>
-            <th>3-roll mean</th><th>10-roll mean</th><th>25-roll mean</th><th>100-roll mean</th>
-          </tr>
+          <tr><th>3-roll mean</th><th>10-roll mean</th><th>25-roll mean</th><th>100-roll mean</th></tr>
         </thead>
         <tbody><tr>
           <td id="m3">—</td><td id="m10">—</td><td id="m25">—</td><td id="m100">—</td>
@@ -193,16 +177,16 @@
 
   // Dice set (5 total)
   const DICE_5 = {
-    "Die 1": [1, 2, 3, 4, 5, 6],           // standard
-    "Die 2": [-10, -2, 10, 8, 8, 7],       // negatives + highs
-    "Die 3": [-6, -1, 6, 6, 7, 8],         // milder negatives, swingy
-    "Die 4": [3, 3, 3, 4, 4, 4],           // only 3s & 4s
-    "Die 5": [-5, -5, -5, -5, -5, 47]      // High Var
+    "Die 1": [1, 2, 3, 4, 5, 6],
+    "Die 2": [-10, -2, 10, 8, 8, 7],
+    "Die 3": [-6, -1, 6, 6, 7, 8],
+    "Die 4": [3, 3, 3, 4, 4, 4],
+    "Die 5": [-5, -5, -5, -5, -5, 47]
   };
   const DIE_KEYS = Object.keys(DICE_5);
 
   // One-submission client lock (per browser)
-  const SUBMIT_KEY = 'dice_submitted_v1'; // bump for a new assignment
+  const SUBMIT_KEY = 'dice_submitted_v1';
   function markSubmitted() {
     localStorage.setItem(SUBMIT_KEY, '1');
     submitBtn.disabled = true;
@@ -341,19 +325,34 @@
     await runN(3); await runN(10); await runN(25); await runN(100);
   }
 
-  // Bind ONLY the Run All button; disable while running; keep disabled after run; re-enable after successful submit
+  // Run All behavior:
+  // - BEFORE submission: disable during run, stay disabled until they submit.
+  // - AFTER  submission: never disable; just change text while running.
   runAllBtn.addEventListener('click', async ()=>{
+    // validate selections
     for (const n of [3,10,25,100]){
       if (!selectedDie[n]) {
         alert(`Choose a die for the ${n}-roll run first.`);
         return;
       }
     }
-    runAllBtn.disabled = true;
+    const alreadySubmitted = localStorage.getItem(SUBMIT_KEY) === '1';
+
+    if (!alreadySubmitted) {
+      runAllBtn.disabled = true;
+    }
+    const originalText = runAllBtn.textContent;
     runAllBtn.textContent = 'Running…';
+
     await runAll();
-    runAllBtn.textContent = 'Run complete — submit now';
-    // stays disabled until a successful submission (see submitLeaderboard)
+
+    if (!alreadySubmitted) {
+      runAllBtn.textContent = 'Run complete — submit now';
+      // stays disabled until a successful submission
+    } else {
+      runAllBtn.textContent = originalText; // reverts back and stays enabled
+      runAllBtn.disabled = false;
+    }
   });
 
   // Leaderboard (Apps Script)
@@ -369,9 +368,9 @@
       name,
       dieSet: 'per-run selection',
       dieKey: dieKeySummary,
-      selectedDice: selectedDie,   // extra metadata (safe)
-      averages: meansByN,          // {3,10,25,100}
-      rolls: rollsByN,             // actual roll lists
+      selectedDice: selectedDie,
+      averages: meansByN,
+      rolls: rollsByN,
       userAgent: navigator.userAgent,
       tzOffsetMinutes: new Date().getTimezoneOffset()
     };
@@ -381,7 +380,7 @@
       submitMsg.textContent = 'Submitting…';
       const resp = await fetch(GAS_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' }, // simple request; no preflight
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify(payload)
       });
       let data;
@@ -390,9 +389,9 @@
 
       if (data && data.ok){
         submitMsg.textContent = 'Submitted! Loading leaderboards…';
-        markSubmitted(); // reveals + loads leaderboards
+        markSubmitted();
 
-        // Re-enable Run All for more exploration (submission remains locked)
+        // After submission: keep Run All permanently enabled for exploration
         runAllBtn.disabled = false;
         runAllBtn.textContent = 'Run All (3→10→25→100)';
       } else {
@@ -402,19 +401,17 @@
       console.error(err);
       submitMsg.textContent = 'Network error submitting to leaderboard.';
     }finally{
-      // keep submit disabled if already submitted; otherwise, restore based on state
-      checkSubmitEnabled();
+      checkSubmitEnabled(); // respects submission lock
     }
   }
   document.getElementById('submitBtn').onclick = submitLeaderboard;
 
-  // --- Helpers for leaderboards ---
+  // --- Leaderboards helpers (unchanged except rendering) ---
   function dieFor(dieKey, n){
     if(!dieKey) return '';
     const m = new RegExp(String(n).replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\s*:\\s*([^|]+)').exec(dieKey);
     return m ? m[1].trim() : '';
   }
-
   function renderTable(el, rows, headerHtml){
     if (!rows.length){ el.innerHTML = '<div class="small muted" style="padding:.5rem">No entries yet.</div>'; return; }
     let html = `<table class="table mono"><thead>${headerHtml}</thead><tbody>`;
@@ -429,7 +426,6 @@
     html += '</tbody></table>';
     el.innerHTML = html;
   }
-
   function buildRankMap(rows, metricKey){
     const withVal = rows
       .map((r, idx) => ({idx, val: parseFloat(r[metricKey])}))
@@ -447,17 +443,9 @@
     });
     return { rankMap, countWithVal: withVal.length };
   }
-
   async function loadLeaderboards(){
-    const targets = {
-      3: document.getElementById('lb3'),
-      10: document.getElementById('lb10'),
-      25: document.getElementById('lb25'),
-      100: document.getElementById('lb100'),
-      avg: document.getElementById('lbAvg')
-    };
+    const targets = {3: lb3, 10: lb10, 25: lb25, 100: lb100, avg: lbAvg};
     for (const k in targets) targets[k].innerHTML = '<div class="small muted" style="padding:.5rem">Loading…</div>';
-
     try{
       const resp = await fetch(GAS_URL + '?top=500');
       let data; try { data = await resp.json(); } catch { data = {}; }
@@ -523,7 +511,6 @@
       .slice(0, 20);
 
       renderTable(targets.avg, withAvg, `<tr><th>#</th><th>Name</th><th>Avg rank (details)</th><th class="small">When</th></tr>`);
-
     }catch(err){
       console.error(err);
       for (const k in targets) targets[k].innerHTML = '<div class="small muted" style="padding:.5rem)">Error loading leaderboard.</div>';
@@ -536,11 +523,11 @@
     [sel3, sel10, sel25, sel100].forEach(fillSelect);
     resetResults();
     updateSelectedDieUI();
-    restoreSubmitLock(); // shows + loads if already submitted previously
+    restoreSubmitLock();
   }
   init();
 
-  // Refresh button (inside leaderboard container)
+  // Refresh button
   document.getElementById('refreshBtn').onclick = loadLeaderboards;
 </script>
 </body>
