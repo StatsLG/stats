@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Dice Averages Challenge — StatsLG</title>
+  <title>Unnamed Dice Challenge — StatsLG</title>
   <meta name="description" content="Pick custom dice for 3/10/25/100 rolls, compare sample means, submit to leaderboard."/>
   <link rel="icon" href="/favicon.ico"/>
   <link rel="stylesheet" href="/style/bctcstyle.css">
@@ -63,7 +63,7 @@
     <!-- LEFT -->
     <section class="card">
       <header>
-        <h1 class="h2">Dice Averages Challenge</h1>
+        <h1 class="h2">Unnamed Dice Challenge</h1>
         <p class="muted">Pick a <em>different die</em> for each roll count (3 / 10 / 25 / 100). Faces are shown; students compute EV/SD themselves. Then run and compare sample means.</p>
       </header>
 
@@ -211,14 +211,14 @@
   function markSubmitted() {
     localStorage.setItem(SUBMIT_KEY, '1');
     submitBtn.disabled = true;
-    submitMsg.textContent = 'Submitted (one submission per student on this device).';
+    submitMsg.textContent = 'Submitted (one submission per student).';
     document.getElementById('leaderboardContainer').style.display = 'block';
     loadLeaderboards();
   }
   function restoreSubmitLock() {
     if (localStorage.getItem(SUBMIT_KEY) === '1') {
       submitBtn.disabled = true;
-      submitMsg.textContent = 'You already submitted from this browser.';
+      submitMsg.textContent = 'You already submitted scores!.';
       document.getElementById('leaderboardContainer').style.display = 'block';
       loadLeaderboards();
     }
