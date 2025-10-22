@@ -115,7 +115,7 @@
         </div>
 
         <div class="notice small">
-          Prompt: “Predict which choices will give you the highest 3-roll mean vs the most stable 100-roll mean. After running, compare to your predictions.”
+          Prompt: “Predict which choices will give you the highest average for each number of rolls. After running, compare to your predictions.”
         </div>
 
         <div class="row right">
@@ -200,9 +200,9 @@
   const DICE_5 = {
     "Die 1": [1, 2, 3, 4, 5, 6],           // standard
     "Die 2": [-10, -2, 10, 8, 8, 7],       // negatives + highs
-    "Die 3": [-6, -1, 6, 6, 8, 8],         // milder negatives, swingy
+    "Die 3": [-6, -1, 6, 6, 7, 8],         // milder negatives, swingy
     "Die 4": [3, 3, 3, 4, 4, 4],           // only 3s & 4s
-    "Die 5": [-5, -5, -5, -5, -5, 50]          // High Var
+    "Die 5": [-5, -5, -5, -5, -5, 47]          // High Var
   };
   const DIE_KEYS = Object.keys(DICE_5);
 
@@ -383,6 +383,9 @@
       if (data && data.ok){
         submitMsg.textContent = 'Submitted! Loading leaderboards…';
         markSubmitted(); // reveals + loads leaderboards
+          // Re-enable Run All for more play (submission remains locked)
+        runAllBtn.disabled = false;
+        runAllBtn.textContent = 'Run All (3→10→25→100)';
       } else {
         submitMsg.textContent = 'Submission failed. Check backend URL / permissions.';
       }
