@@ -1,3 +1,9 @@
+Absolutely—here’s the **full page** updated to include a **5th leaderboard: “Best average rank”**.
+It computes each submission’s **rank** on the 3/10/25/100 leaderboards (1 = best) and then shows the **average of those four ranks** (lower is better). If a submission is **missing** a mean for any run, it’s assigned the **worst possible rank** for that run to prevent gaming.
+
+Paste this in as-is:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -153,15 +159,26 @@
       <div id="leaderboardContainer" style="display:none;">
         <hr style="border:none; border-top:1px solid #e5e7eb; margin:.9rem 0"/>
         <h2 class="h4">Leaderboards</h2>
+
         <div class="lb-grid">
           <div><h3 class="h5">Top by 3-roll mean</h3><div class="leader-wrap" id="lb3"></div></div>
           <div><h3 class="h5">Top by 10-roll mean</h3><div class="leader-wrap" id="lb10"></div></div>
           <div><h3 class="h5">Top by 25-roll mean</h3><div class="leader-wrap" id="lb25"></div></div>
           <div><h3 class="h5">Top by 100-roll mean</h3><div class="leader-wrap" id="lb100"></div></div>
         </div>
+
+        <!-- NEW: 5th leaderboard -->
+        <div style="margin-top:1rem">
+          <h3 class="h5">Best average rank (across 3/10/25/100)</h3>
+          <div class="leader-wrap" id="lbAvg"></div>
+          <p class="small muted" style="margin-top:.25rem">
+            Average rank is computed from each submission’s place on the four leaderboards (1 = best). Missing a mean counts as the worst rank.
+          </p>
+        </div>
+
         <div class="row" style="margin-top:.5rem">
           <button class="btn" id="refreshBtn">Refresh Leaderboards</button>
-          <span class="small muted">Each table is sorted by the corresponding mean.</span>
+          <span class="small muted">Each table is sorted by the corresponding metric.</span>
         </div>
       </div>
     </section>
@@ -194,7 +211,6 @@
     localStorage.setItem(SUBMIT_KEY, '1');
     submitBtn.disabled = true;
     submitMsg.textContent = 'Submitted (one submission per student on this device).';
-    // Reveal and load leaderboard
     document.getElementById('leaderboardContainer').style.display = 'block';
     loadLeaderboards();
   }
@@ -202,7 +218,6 @@
     if (localStorage.getItem(SUBMIT_KEY) === '1') {
       submitBtn.disabled = true;
       submitMsg.textContent = 'You already submitted from this browser.';
-      // Reveal and load leaderboard for returning students
       document.getElementById('leaderboardContainer').style.display = 'block';
       loadLeaderboards();
     }
@@ -381,41 +396,101 @@
   }
   document.getElementById('submitBtn').onclick = submitLeaderboard;
 
+  // Helper: render any leaderboard table
+  function renderTable(el, rows, headerHtml){
+    if (!rows.length){ el.innerHTML = '<div class="small muted" style="padding:.5rem">No entries yet.</div>'; return; }
+    let html = `<table class="table mono"><thead>${headerHtml}</thead><tbody>`;
+    rows.forEach((r,i)=>{
+      html += `<tr>
+        <td>${i+1}</td>
+        <td>${r.name || ''}</td>
+        <td class="small">${r.dieKey || ''}</td>
+        <td><strong>${r.valueDisplay ?? r.value ?? ''}</strong></td>
+        <td class="small muted">${r.when || ''}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  }
+
+  // Build rank map for a metric (e.g., 'm3'). Higher values get better ranks (1 = best).
+  function buildRankMap(rows, metricKey){
+    const withVal = rows
+      .map((r, idx) => ({idx, val: parseFloat(r[metricKey]), when: r.when}))
+      .filter(x => !Number.isNaN(x.val));
+    // Sort descending by value
+    withVal.sort((a,b)=> b.val - a.val);
+    const rankMap = {};
+    let currentRank = 0;
+    let lastVal = null;
+    withVal.forEach((x, pos) => {
+      // Tie-aware: same value => same rank
+      if (lastVal === null || x.val !== lastVal) {
+        currentRank = pos + 1;
+        lastVal = x.val;
+      }
+      rankMap[x.idx] = currentRank;
+    });
+    return { rankMap, countWithVal: withVal.length };
+  }
+
   async function loadLeaderboards(){
     const targets = {
       3: document.getElementById('lb3'),
       10: document.getElementById('lb10'),
       25: document.getElementById('lb25'),
-      100: document.getElementById('lb100')
+      100: document.getElementById('lb100'),
+      avg: document.getElementById('lbAvg')
     };
     for (const k in targets) targets[k].innerHTML = '<div class="small muted" style="padding:.5rem">Loading…</div>';
 
     try{
-      const resp = await fetch(GAS_URL + '?top=200'); // fetch once
+      const resp = await fetch(GAS_URL + '?top=500'); // grab a generous slice
       let data; try { data = await resp.json(); } catch { data = {}; }
-      const rows = (data && data.rows) ? data.rows : [];
+      const rowsRaw = (data && data.rows) ? data.rows : [];
+      const rows = rowsRaw.map(r => ({...r})); // shallow copy
 
-      const render = (n, el) => {
-        const key = 'm'+n;
-        const sorted = [...rows].filter(r=>r[key]!=='' && r[key]!=null)
-          .sort((a,b)=>(parseFloat(b[key])||-Infinity)-(parseFloat(a[key])||-Infinity))
+      // Render individual metric leaderboards
+      const renderMetric = (n) => {
+        const key = 'm' + n;
+        const sorted = rows
+          .filter(r => r[key] !== '' && r[key] != null && !Number.isNaN(parseFloat(r[key])))
+          .map(r => ({...r, value: parseFloat(r[key]), valueDisplay: r[key]}))
+          .sort((a,b)=> b.value - a.value)
           .slice(0, 20);
-        if (!sorted.length){ el.innerHTML = '<div class="small muted" style="padding:.5rem">No entries yet.</div>'; return; }
-        let html = '<table class="table mono"><thead><tr><th>#</th><th>Name</th><th>Die choices</th><th>Mean('+n+')</th><th class="small">When</th></tr></thead><tbody>';
-        sorted.forEach((r,i)=>{
-          html += `<tr>
-            <td>${i+1}</td>
-            <td>${r.name || ''}</td>
-            <td class="small">${r.dieKey || ''}</td>
-            <td><strong>${r[key] ?? ''}</strong></td>
-            <td class="small muted">${r.when || ''}</td>
-          </tr>`;
-        });
-        html += '</tbody></table>';
-        el.innerHTML = html;
+        renderTable(targets[n], sorted, `<tr><th>#</th><th>Name</th><th>Die choices</th><th>Mean(${n})</th><th class="small">When</th></tr>`);
       };
+      renderMetric(3); renderMetric(10); renderMetric(25); renderMetric(100);
 
-      render(3, targets[3]); render(10, targets[10]); render(25, targets[25]); render(100, targets[100]);
+      // --- NEW: Average rank leaderboard ---
+      // Build rank maps for each metric
+      const r3   = buildRankMap(rows, 'm3');
+      const r10  = buildRankMap(rows, 'm10');
+      const r25  = buildRankMap(rows, 'm25');
+      const r100 = buildRankMap(rows, 'm100');
+
+      const totalRows = rows.length;
+      const worstRank = totalRows > 0 ? totalRows : 1; // missing metric → worst rank
+
+      const withAvg = rows.map((r, idx) => {
+        const rk3   = r3.rankMap[idx]   ?? worstRank;
+        const rk10  = r10.rankMap[idx]  ?? worstRank;
+        const rk25  = r25.rankMap[idx]  ?? worstRank;
+        const rk100 = r100.rankMap[idx] ?? worstRank;
+        const avgRank = (rk3 + rk10 + rk25 + rk100) / 4;
+        return {
+          ...r,
+          value: avgRank,
+          valueDisplay: avgRank.toFixed(2) + `  (3:${rk3}, 10:${rk10}, 25:${rk25}, 100:${rk100})`
+        };
+      })
+      // Exclude rows with no metrics at all (all empty/NaN)
+      .filter(x => !(Number.isNaN(parseFloat(x.m3)) && Number.isNaN(parseFloat(x.m10)) && Number.isNaN(parseFloat(x.m25)) && Number.isNaN(parseFloat(x.m100))))
+      .sort((a,b)=> a.value - b.value) // lower average rank is better
+      .slice(0, 20);
+
+      renderTable(targets.avg, withAvg, `<tr><th>#</th><th>Name</th><th>Die choices</th><th>Avg rank</th><th class="small">When</th></tr>`);
+
     }catch(err){
       console.error(err);
       for (const k in targets) targets[k].innerHTML = '<div class="small muted" style="padding:.5rem)">Error loading leaderboard.</div>';
@@ -435,3 +510,6 @@
 </script>
 </body>
 </html>
+```
+
+Want the average-rank board to **break ties** by best 100-roll mean (or another priority)? I can add that tie-break in one line.
