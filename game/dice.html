@@ -64,7 +64,7 @@
     <section class="card">
       <header>
         <h1 class="h2">Unnamed Dice Challenge</h1>
-        <p class="muted">Pick a <em>different die</em> for each roll count (3 / 10 / 25 / 100). Faces are shown; students compute EV/SD themselves. Then run and compare sample means.</p>
+        <p class="muted">Pick a die for each roll count (3 / 10 / 25 / 100). Faces are shown and are equally as likely. Then run and compare sample means.</p>
       </header>
 
       <div class="grid">
@@ -202,7 +202,7 @@
     "Die 2": [-10, -2, 10, 8, 8, 7],       // negatives + highs
     "Die 3": [-6, -1, 6, 6, 8, 8],         // milder negatives, swingy
     "Die 4": [3, 3, 3, 4, 4, 4],           // only 3s & 4s
-    "Die 5": [1, 1, 1, 6, 6, 6]            // bimodal (no negatives)
+    "Die 5": [-5, -5, -5, -5, -5, 50]          // High Var
   };
   const DIE_KEYS = Object.keys(DICE_5);
 
