@@ -71,13 +71,13 @@
           <input id="player" type="text" placeholder="e.g., Alex M." style="flex:1; padding:.5rem .6rem; border-radius:8px; border:1px solid #e5e7eb"/>
         </div>
 
-        <!-- Die faces (5 total; only two have negatives; one is all 3s & 4s) -->
+        <!-- Dice faces (5 total; only two have negatives; one is all 3s & 4s) -->
         <div>
           <div class="section-title">Available dice (faces)</div>
           <div id="facesCatalog" class="faces muted small"></div>
         </div>
 
-        <!-- NEW: per-run die selectors -->
+        <!-- Per-run die selectors -->
         <div>
           <div class="section-title">Choose a die for each run</div>
           <div class="sel-grid">
@@ -113,7 +113,7 @@
         </div>
 
         <div class="notice small">
-          Prompt: “Predict which choices will give you the highest 3-roll mean vs the most stable 100-roll mean. After running, compare your results to your predictions.”
+          Prompt: “Predict which choices will give you the highest 3-roll mean vs the most stable 100-roll mean. After running, compare to your predictions.”
         </div>
 
         <div class="row right">
@@ -204,6 +204,20 @@
   };
   const DIE_KEYS = Object.keys(DICE_5);
 
+  // ===== One-submission client lock (per browser) =====
+  const SUBMIT_KEY = 'dice_submitted_v1'; // bump suffix for a new assignment
+  function markSubmitted() {
+    localStorage.setItem(SUBMIT_KEY, '1');
+    submitBtn.disabled = true;
+    submitMsg.textContent = 'Submitted (one submission per student on this device).';
+  }
+  function restoreSubmitLock() {
+    if (localStorage.getItem(SUBMIT_KEY) === '1') {
+      submitBtn.disabled = true;
+      submitMsg.textContent = 'You already submitted from this browser.';
+    }
+  }
+
   // State
   const selectedDie = {3:null,10:null,25:null,100:null}; // e.g., "Die 2"
   const rollsByN = {3:null,10:null,25:null,100:null};
@@ -241,7 +255,7 @@
   playerEl.value = localStorage.getItem('dice_player_name') || '';
   playerEl.addEventListener('input', ()=> localStorage.setItem('dice_player_name', playerEl.value.trim()));
 
-  // Build faces catalog (static reference of all dice)
+  // Build faces catalog
   function renderFacesCatalog(){
     const blocks = DIE_KEYS.map(k=>{
       const faces = DICE_5[k].map(v=>`<span class="face-tag">${v}</span>`).join('');
@@ -270,9 +284,9 @@
   }
 
   function updateSelectedDieUI(){
-    die3El.textContent = selectedDie[3] || '—';
-    die10El.textContent = selectedDie[10] || '—';
-    die25El.textContent = selectedDie[25] || '—';
+    die3El.textContent   = selectedDie[3]   || '—';
+    die10El.textContent  = selectedDie[10]  || '—';
+    die25El.textContent  = selectedDie[25]  || '—';
     die100El.textContent = selectedDie[100] || '—';
   }
   function resetResults(){
@@ -287,9 +301,9 @@
   }
   function chipsHTML(arr){ return arr ? arr.map(v=>`<span class="chip">${v}</span>`).join('') : '—'; }
   function renderLogs(){
-    rolls3El.innerHTML = chipsHTML(rollsByN[3]);
-    rolls10El.innerHTML = chipsHTML(rollsByN[10]);
-    rolls25El.innerHTML = chipsHTML(rollsByN[25]);
+    rolls3El.innerHTML   = chipsHTML(rollsByN[3]);
+    rolls10El.innerHTML  = chipsHTML(rollsByN[10]);
+    rolls25El.innerHTML  = chipsHTML(rollsByN[25]);
     rolls100El.innerHTML = chipsHTML(rollsByN[100]);
   }
 
@@ -349,7 +363,6 @@
     const name = playerEl.value.trim();
     if(!name){ alert('Enter your name to submit.'); return; }
 
-    // Summarize chosen dice in a compact string for the single dieKey column
     const dieKeySummary = `3:${selectedDie[3]||'-'} | 10:${selectedDie[10]||'-'} | 25:${selectedDie[25]||'-'} | 100:${selectedDie[100]||'-'}`;
 
     const payload = {
@@ -377,6 +390,7 @@
 
       if (data && data.ok){
         submitMsg.textContent = 'Submitted! Refresh the leaderboards to see your entry.';
+        markSubmitted(); // <-- client-side one-submission lock
       } else {
         submitMsg.textContent = 'Submission failed. Check backend URL / permissions.';
       }
@@ -434,6 +448,7 @@
     resetResults();
     updateSelectedDieUI();
     loadLeaderboards();
+    restoreSubmitLock(); // <-- enforce client-side one-submission lock on load
   }
   init();
 </script>
