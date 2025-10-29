@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Riemann Sum Visualizer — StatsLG</title>
+  <meta name="description" content="Interactive demo of Left/Right/Midpoint Riemann sums with equations and live plot."/>
+  <link rel="icon" href="/favicon.ico"/>
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <!-- Plotly -->
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <!-- MathJax v3 -->
+  <script>
+    window.MathJax = {
+      tex: {inlineMath: [['\\(','\\)'], ['$', '$']]},
+      svg: {fontCache: 'global'}
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <style>
+    /* small, focused tweaks that sit atop bctcstyle.css */
+    .wrap-grid{
+      display:grid; grid-template-columns: 360px 1fr; gap: 18px; align-items:start;
+    }
+    @media (max-width: 1000px){
+      .wrap-grid{grid-template-columns: 1fr}
+    }
+    .panel{
+      background: var(--panel, #f5f7fb);
+      border: 1px solid var(--rule, #e5e7eb);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .control{
+      margin-bottom: 14px;
+    }
+    .control label{ display:block; font-weight:600; margin-bottom:6px; }
+    .row{ display:flex; gap:10px; }
+    .row > *{ flex:1; }
+    .value-badge{
+      display:inline-block; padding:2px 8px; border-radius:999px;
+      border:1px solid var(--rule,#e5e7eb); font-variant-numeric: tabular-nums;
+      background:#fff;
+    }
+    .math{
+      background:#fff; border:1px solid var(--rule,#e5e7eb);
+      border-radius:10px; padding:12px; overflow:auto;
+    }
+    .pill-toggle{
+      display:flex; gap:8px; flex-wrap:wrap;
+    }
+    .pill-toggle button{
+      border:1px solid var(--rule,#e5e7eb); background:#fff; padding:6px 10px;
+      border-radius:999px; cursor:pointer;
+    }
+    .pill-toggle button.active{
+      background:var(--kctcs-blue,#00467f); color:#fff; border-color:transparent;
+    }
+    #plot{width:100%; height:520px;}
+    .muted{color:var(--muted,#4b5563); font-size:0.95rem;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
+
+    <!-- ===== MAIN ===== -->
+    <main>
+      <header>
+        <h1>Riemann Sum Visualizer</h1>
+        <p class="subtitle">Explore Left / Right / Midpoint sums and see how increasing the number of rectangles improves the area approximation.</p>
+      </header>
+
+      <div class="wrap-grid">
+        <!-- Controls -->
+        <section class="panel" aria-label="Controls">
+          <div class="control">
+            <label for="fnSelect">Function</label>
+            <select id="fnSelect">
+              <option value="2*x+3">Linear: \(f(x)=2x+3\)</option>
+              <option value="x*x">Quadratic: \(f(x)=x^2\)</option>
+              <option value="x*x*x - x">Cubic: \(f(x)=x^3 - x\)</option>
+              <option value="Math.sin(x)">Sine: \(f(x)=\sin(x)\)</option>
+              <option value="Math.exp(0.3*x)">Exponential: \(f(x)=e^{0.3x}\)</option>
+              <option value="custom">Custom…</option>
+            </select>
+          </div>
+
+          <div class="control" id="customFnWrap" style="display:none;">
+            <label for="customFn">Custom \(f(x)\) (JavaScript expression; <span class="muted">you can use <code>Math</code> functions</span>)</label>
+            <input id="customFn" type="text" placeholder="e.g., Math.cos(x) + x*x" />
+          </div>
+
+          <div class="control">
+            <label>Interval \([a,b]\)</label>
+            <div class="row">
+              <div>
+                <label for="a" class="muted">a</label>
+                <input id="a" type="number" step="0.1" value="0"/>
+              </div>
+              <div>
+                <label for="b" class="muted">b</label>
+                <input id="b" type="number" step="0.1" value="3"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="control">
+            <label for="n">Number of rectangles \(n\)</label>
+            <input id="n" type="range" min="1" max="1000" value="20">
+            <div><span class="muted">n = </span><span id="nVal" class="value-badge">20</span></div>
+          </div>
+
+          <div class="control">
+            <label>Method</label>
+            <div class="pill-toggle" role="group" aria-label="Riemann method">
+              <button data-method="left" class="active">Left</button>
+              <button data-method="mid">Midpoint</button>
+              <button data-method="right">Right</button>
+            </div>
+          </div>
+
+          <div class="control">
+            <button id="resetView">Reset view</button>
+          </div>
+
+          <p class="muted">Tip: Try increasing \(n\) to see the rectangles “hug” the curve. Switch methods to compare over- vs under-approximation on different functions.</p>
+        </section>
+
+        <!-- Plot + Math -->
+        <section class="panel" aria-label="Visualization and equations">
+          <div id="plot" role="img" aria-label="Function plot with Riemann rectangles"></div>
+
+          <div class="math" id="mathBox">
+            <div>
+              <strong>Definitions</strong><br/>
+              \(\displaystyle \Delta x = \frac{b-a}{n}, \quad
+                x_i = \begin{cases}
+                  a + i\,\Delta x & \text{(Left)}\\
+                  a + \big(i+\tfrac12\big)\Delta x & \text{(Midpoint)}\\
+                  a + (i+1)\,\Delta x & \text{(Right)}
+                \end{cases}\)
+              <br/>\(\displaystyle R_n = \sum_{i=0}^{n-1} f(x_i)\,\Delta x\)
+            </div>
+            <hr/>
+            <div id="mathValues" class="muted">
+              <!-- Filled dynamically -->
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // --------- Sidebar include (same pattern as your other demos) ----------
+    document.querySelectorAll('[data-include]').forEach(el=>{
+      fetch(el.getAttribute('data-include'))
+        .then(r=>r.text()).then(html=>{ el.innerHTML = html; });
+    });
+
+    // --------- Helpers ----------
+    function buildFunction(expr){
+      // Build an f(x) from a JS expression string using Math.* namespace
+      // Example expr: "Math.sin(x) + x*x"
+      try{
+        return new Function('x', 'with (Math) { return ('+expr+'); }');
+      }catch(e){
+        return null;
+      }
+    }
+
+    function numericIntegralTrap(f, a, b, steps=4000){
+      if (steps < 1) steps = 1;
+      const h = (b-a)/steps;
+      let sum = 0.5*(f(a)+f(b));
+      for (let i=1;i<steps;i++){
+        sum += f(a + i*h);
+      }
+      return sum*h;
+    }
+
+    function linspace(a, b, num){
+      const arr = new Array(num);
+      const h = (b-a)/(num-1);
+      for(let i=0;i<num;i++){ arr[i] = a + i*h; }
+      return arr;
+    }
+
+    // --------- UI Elements ----------
+    const fnSelect = document.getElementById('fnSelect');
+    const customFnWrap = document.getElementById('customFnWrap');
+    const customFnInput = document.getElementById('customFn');
+    const aInput = document.getElementById('a');
+    const bInput = document.getElementById('b');
+    const nSlider = document.getElementById('n');
+    const nVal = document.getElementById('nVal');
+    const methodButtons = [...document.querySelectorAll('.pill-toggle button')];
+    const resetBtn = document.getElementById('resetView');
+    const plotDiv = document.getElementById('plot');
+    const mathValues = document.getElementById('mathValues');
+
+    let state = {
+      expr: fnSelect.value,
+      f: buildFunction(fnSelect.value),
+      a: parseFloat(aInput.value),
+      b: parseFloat(bInput.value),
+      n: parseInt(nSlider.value,10),
+      method: 'left'
+    };
+
+    fnSelect.addEventListener('change', ()=>{
+      if(fnSelect.value === 'custom'){
+        customFnWrap.style.display = '';
+        // Keep prior custom string if present
+        if(!customFnInput.value) customFnInput.value = 'Math.cos(x) + x*x';
+        state.expr = customFnInput.value;
+        state.f = buildFunction(state.expr);
+      }else{
+        customFnWrap.style.display = 'none';
+        state.expr = fnSelect.value;
+        state.f = buildFunction(state.expr);
+      }
+      render();
+    });
+
+    customFnInput.addEventListener('input', ()=>{
+      state.expr = customFnInput.value;
+      state.f = buildFunction(state.expr);
+      render();
+    });
+
+    aInput.addEventListener('input', ()=>{
+      state.a = parseFloat(aInput.value);
+      render();
+    });
+    bInput.addEventListener('input', ()=>{
+      state.b = parseFloat(bInput.value);
+      render();
+    });
+
+    nSlider.addEventListener('input', ()=>{
+      state.n = parseInt(nSlider.value,10);
+      nVal.textContent = state.n;
+      render();
+    });
+
+    methodButtons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        methodButtons.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        state.method = btn.dataset.method;
+        render();
+      });
+    });
+
+    resetBtn.addEventListener('click', ()=>{
+      Plotly.relayout(plotDiv, { 'xaxis.autorange': true, 'yaxis.autorange': true });
+    });
+
+    // --------- Core render ----------
+    function computeRiemann(f, a, b, n, method){
+      if(!isFinite(a) || !isFinite(b) || !isFinite(n) || n < 1) return {sum: NaN, dx: NaN, xs:[], ys:[]};
+      if(a === b){ return {sum: 0, dx: 0, xs:[], ys:[]}; }
+      const dx = (b-a)/n;
+      const xs = new Array(n);
+      const ys = new Array(n);
+
+      for(let i=0;i<n;i++){
+        let x_i;
+        if(method==='left') x_i = a + i*dx;
+        else if(method==='right') x_i = a + (i+1)*dx;
+        else x_i = a + (i+0.5)*dx; // midpoint
+        xs[i] = x_i;
+        ys[i] = f(x_i);
+      }
+      const sum = ys.reduce((acc,y)=>acc + y*dx, 0);
+      return {sum, dx, xs, ys};
+    }
+
+    function render(){
+      if(!state.f){
+        mathValues.innerHTML = `<span style="color:#b91c1c">Parse error in function. Check your custom expression.</span>`;
+        Plotly.react(plotDiv, [], {margin:{t:20,r:10,b:40,l:50}});
+        return;
+      }
+      let {a,b,n,method,f} = state;
+      if (b < a){ [a,b] = [b,a]; } // normalize silently for plotting
+      const {sum, dx, xs, ys} = computeRiemann(f, a, b, n, method);
+
+      // Build rectangle bars (centered at each subinterval midpoint to cover full width Δx visually)
+      const barX = new Array(n);
+      for(let i=0;i<n;i++){
+        // Visual centers for bars always midpoints of subintervals for proper width coverage
+        barX[i] = a + (i+0.5)*( (b-a)/n );
+      }
+
+      // Sample dense line for the curve
+      const X = linspace(a, b, 600);
+      const Y = X.map(f);
+
+      const rectTrace = {
+        type:'bar',
+        x: barX,
+        y: ys,                // heights come from chosen method's f(x_i)
+        width: (b-a)/n,
+        base: 0,
+        marker:{opacity:0.35},
+        hoverinfo:'x+y',
+        name: `Rectangles (${method})`
+      };
+      const curveTrace = {
+        type:'scatter',
+        mode:'lines',
+        x: X, y: Y,
+        name: 'f(x)',
+        line:{width:3}
+      };
+
+      const layout = {
+        barmode:'overlay',
+        margin:{t:20,r:10,b:40,l:50},
+        xaxis:{title:'x', zeroline:true},
+        yaxis:{title:'y = f(x)', zeroline:true},
+        showlegend:true,
+        hovermode:'x unified'
+      };
+
+      Plotly.react(plotDiv, [rectTrace, curveTrace], layout, {responsive:true});
+
+      // Numerical integral for comparison
+      // Increase steps automatically with n, capped for perf.
+      const trapSteps = Math.min(20000, Math.max(4000, n*10));
+      const trueArea = numericIntegralTrap(f, a, b, trapSteps);
+      const err = sum - trueArea;
+
+      // Update MathJax values
+      const prettyExpr = state.expr.replace(/Math\./g,''); // light prettify
+      mathValues.innerHTML = `
+        <div><strong>Current settings</strong>:
+          \\( f(x)= ${escapeHtml(prettyExpr)} \\), \\( [a,b]=[${fmt(a)},\\,${fmt(b)}] \\),
+          \\( n=${n} \\), method = ${method}.
+        </div>
+        <div style="margin-top:6px">
+          \\( \\Delta x = \\dfrac{${fmt(b)}-${fmt(a)}}{${n}} = ${fmt(dx)} \\)
+        </div>
+        <div style="margin-top:6px">
+          \\( R_n = \\sum_{i=0}^{${n-1}} f(x_i)\\,\\Delta x = ${fmt(sum)} \\)
+        </div>
+        <div style="margin-top:6px">
+          <span class="muted">Numerical integral (trapezoid, ${trapSteps} steps):</span>
+          \\( \\int_{${fmt(a)}}^{${fmt(b)}} f(x)\\,dx \\approx ${fmt(trueArea)} \\)
+        </div>
+        <div style="margin-top:6px">
+          <span class="muted">Error:</span> \\( R_n - \\text{(true)} = ${fmt(err)} \\)
+        </div>
+      `;
+      queueMathTypeset();
+    }
+
+    function fmt(x){
+      if (!isFinite(x)) return 'NaN';
+      const ax = Math.abs(x);
+      if (ax !== 0 && (ax < 1e-3 || ax > 1e6)) return x.toExponential(4);
+      return x.toFixed(6).replace(/(\.\d*?[1-9])0+$/,'$1').replace(/\.0+$/,'');
+    }
+
+    function escapeHtml(s){
+      return String(s)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+    }
+
+    let mathQueued = false;
+    function queueMathTypeset(){
+      if (mathQueued) return;
+      mathQueued = true;
+      requestAnimationFrame(()=>{
+        mathQueued = false;
+        if (window.MathJax && MathJax.typesetPromise){
+          MathJax.typesetPromise([document.getElementById('mathBox')]);
+        }
+      });
+    }
+
+    // --------- Initial draw ----------
+    render();
+
+    // Resize handling for responsive plot
+    window.addEventListener('resize', ()=>Plotly.Plots.resize(plotDiv));
+  </script>
+</body>
+</html>
