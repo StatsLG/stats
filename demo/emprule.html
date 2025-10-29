@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Normal Distribution & Empirical Rule — StatsLG</title>
+  <meta name="description" content="Interactive demo of the Normal distribution with empirical rule shading (68–95–99.7)." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <!-- MathJax for rendering the PDF formula nicely -->
+  <script>
+    window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }, svg: { fontCache: 'global' } };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    .controls-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem 1rem;align-items:start}
+    .full-span{grid-column:1/-1}
+    .check-grid{display:grid;grid-template-columns:repeat(3,minmax(140px,1fr));gap:.5rem;margin-top:.25rem}
+    .check-grid label{display:flex;align-items:center;gap:.4rem;line-height:1.2}
+    .slider-label{display:flex;justify-content:space-between;align-items:center}
+    .slider-output{font-weight:bold;font-size:.9rem}
+    input[type=range]{width:100%}
+    .card-compact{padding:1rem;border:1px solid var(--rule);border-radius:.75rem;background:var(--card)}
+    canvas{max-height:600px;min-height:400px}
+    .legend-row{display:flex;align-items:center;gap:.5rem;margin:.25rem 0}
+    .legend-swatch{width:14px;height:14px;border-radius:3px;display:inline-block}
+    .muted{color:var(--muted)}
+    .check-title{font-weight:600;margin:.25rem 0}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+    .small{font-size:.9rem}
+    .badge{display:inline-block;padding:.1rem .5rem;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+    @media (max-width:900px){.check-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
+    <main>
+      <header>
+        <h1>Normal Distribution & Empirical Rule</h1>
+        <p class="subtitle">Use the sliders to adjust the mean (μ) and standard deviation (σ). The curve updates instantly to visualize the 68–95–99.7 rule.</p>
+      </header>
+
+      <section class="card-compact">
+        <div class="controls-grid">
+          <div>
+            <div class="slider-label">
+              <label for="mean">Mean (μ)</label>
+              <span class="slider-output" id="meanVal">0.0</span>
+            </div>
+            <input id="mean" type="range" min="-10" max="10" value="0" step="0.1" />
+          </div>
+
+          <div>
+            <div class="slider-label">
+              <label for="sd">Std. Dev. (σ)</label>
+              <span class="slider-output" id="sdVal">1.0</span>
+            </div>
+            <input id="sd" type="range" min="0.1" max="5" value="1" step="0.1" />
+          </div>
+
+          <div class="full-span"><div class="check-title">Bands (non-overlapping slices)</div>
+            <div class="check-grid" role="group" aria-label="Empirical rule bands">
+              <label><input type="checkbox" id="chk1" checked/> ≤1σ (≈ <span id="p1">68.27%</span>)</label>
+              <label><input type="checkbox" id="chk2" checked/> 1–2σ (≈ <span id="p12">27.18%</span>)</label>
+              <label><input type="checkbox" id="chk3" checked/> 2–3σ (≈ <span id="p23">4.28%</span>)</label>
+            </div>
+          </div>
+
+          <div class="full-span"><div class="check-title">Cumulative regions (≤kσ)</div>
+            <div class="check-grid" role="group" aria-label="Cumulative empirical regions">
+              <label><input type="checkbox" id="chkC1"/> ≤1σ total (≈ <span id="cp1">68.27%</span>)</label>
+              <label><input type="checkbox" id="chkC2"/> ≤2σ total (≈ <span id="cp2">95.45%</span>)</label>
+              <label><input type="checkbox" id="chkC3"/> ≤3σ total (≈ <span id="cp3">99.73%</span>)</label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card-compact">
+        <canvas id="pdfChart" aria-label="Normal curve with shaded empirical-rule regions"></canvas>
+      </section>
+
+      <section class="card-compact">
+        <h3>Density (PDF) Formula</h3>
+        <p>Symbolic form:</p>
+        <p class="small">\( f(x) = \dfrac{1}{\sigma\sqrt{2\pi}}\; e^{-\dfrac{(x-\mu)^2}{2\sigma^2}} \)</p>
+      </section>
+
+      <section class="card-compact">
+        <h3>Empirical Rule Summary</h3>
+        <div class="legend-row"><span class="legend-swatch" id="swBand1"></span> ≤1σ band (center): <b id="cum1">≈ 68.27%</b></div>
+        <div class="legend-row"><span class="legend-swatch" id="swBand2"></span> 1–2σ band (shoulders): <b id="band12">≈ 27.18%</b> — cumulative ≤2σ: <b id="cum2">≈ 95.45%</b></div>
+        <div class="legend-row"><span class="legend-swatch" id="swBand3"></span> 2–3σ band (tails): <b id="band23">≈ 4.28%</b> — cumulative ≤3σ: <b id="cum3">≈ 99.73%</b></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const SQRT2 = Math.SQRT2;
+    function pdf(x, mu, sigma){ const z=(x-mu)/sigma; return Math.exp(-0.5*z*z)/(sigma*Math.sqrt(2*Math.PI)); }
+    function erf(x){ const sign = x < 0 ? -1 : 1; x = Math.abs(x); const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911; const t = 1/(1+p*x); const y = 1 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*Math.exp(-x*x); return sign*y; }
+    function cdf(x,mu,sigma){ const z=(x-mu)/(sigma*SQRT2); return 0.5*(1+erf(z)); }
+
+    function buildCurve(mu,sigma){ const XMIN=-10, XMAX=10, n=801; const xs = Array.from({length:n}, (_,i) => XMIN + (i*(XMAX - XMIN)/(n-1))); const ys = xs.map(x => pdf(x, mu, sigma)); return { xs, ys, left: XMIN, right: XMAX }; }
+    function band(xs, mu, sigma, k1, k2){ return xs.map(x => { const z=Math.abs((x-mu)/sigma); return (z>k1 && z<=k2) ? pdf(x,mu,sigma) : null; }); }
+    function cum(xs, mu, sigma, k){ return xs.map(x => { const z=Math.abs((x-mu)/sigma); return (z<=k) ? pdf(x,mu,sigma) : null; }); }
+
+    const ctx = document.getElementById('pdfChart');
+    let chart;
+
+    function updateNumericFormula(){
+      const mu = parseFloat(document.getElementById('mean').value);
+      const sigma = Math.max(0.1, parseFloat(document.getElementById('sd').value));
+      const block = document.getElementById('numFormula');
+      block.textContent = `f(x) = 1/(σ√(2π)) · exp(-((x-μ)^2)/(2σ^2))\\nμ = ${mu.toFixed(1)}, σ = ${sigma.toFixed(1)}`;
+    }
+
+    function draw(){
+      const mu = parseFloat(document.getElementById('mean').value);
+      const sigma = Math.max(0.1, parseFloat(document.getElementById('sd').value));
+      document.getElementById('meanVal').textContent = mu.toFixed(1);
+      document.getElementById('sdVal').textContent = sigma.toFixed(1);
+
+      const show1 = document.getElementById('chk1').checked;
+      const show2 = document.getElementById('chk2').checked;
+      const show3 = document.getElementById('chk3').checked;
+      const showC1 = document.getElementById('chkC1').checked;
+      const showC2 = document.getElementById('chkC2').checked;
+      const showC3 = document.getElementById('chkC3').checked;
+
+      const { xs, ys } = buildCurve(mu, sigma);
+      const datasets = [
+        showC3 ? { type:'line', data: cum(xs,mu,sigma,3), fill:'origin', borderWidth:0, pointRadius:0, tension:0.25, backgroundColor:'rgba(0,70,127,0.10)' } : null,
+        showC2 ? { type:'line', data: cum(xs,mu,sigma,2), fill:'origin', borderWidth:0, pointRadius:0, tension:0.25, backgroundColor:'rgba(231,166,20,0.18)' } : null,
+        showC1 ? { type:'line', data: cum(xs,mu,sigma,1), fill:'origin', borderWidth:0, pointRadius:0, tension:0.25, backgroundColor:'rgba(0,70,127,0.22)' } : null,
+        show3 ? { type:'line', data: band(xs,mu,sigma,2,3), fill:'origin', borderWidth:0, pointRadius:0, tension:0.25, backgroundColor:'rgba(0,70,127,0.12)' } : null,
+        show2 ? { type:'line', data: band(xs,mu,sigma,1,2), fill:'origin', borderWidth:0, pointRadius:0, tension:0.25, backgroundColor:'rgba(231,166,20,0.35)' } : null,
+        show1 ? { type:'line', data: band(xs,mu,sigma,0,1), fill:'origin', borderWidth:0, pointRadius:0, tension:0.25, backgroundColor:'rgba(0,70,127,0.30)' } : null,
+        { type:'line', data: ys, borderWidth: 2, pointRadius: 0, tension: 0.25, borderColor: '#00467f' }
+      ].filter(Boolean);
+
+      const data = { labels: xs, datasets };
+      const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        transitions: { active: { animation: { duration: 0 } }, resize: { animation: { duration: 0 } } },
+        scales: {
+          x: { type:'linear', min: -10, max: 10, title:{ display:true, text:'x' }, grid:{ color:'rgba(0,0,0,0.05)' } },
+          y: { beginAtZero:true, min: 0, max: 1, title:{ display:true, text:'density f(x)' }, grid:{ color:'rgba(0,0,0,0.05)' } }
+        },
+        plugins: { legend:{ display:false } }
+      };
+
+      if(chart){ chart.data = data; chart.options = options; chart.update('none'); }
+      else { chart = new Chart(ctx, { type:'line', data, options }); }
+
+      updateNumericFormula();
+    }
+
+    ['mean','sd','chk1','chk2','chk3','chkC1','chkC2','chkC3'].forEach(id => {
+      document.getElementById(id).addEventListener('input', draw);
+    });
+
+    draw();
+  </script>
+</body>
+</html>
