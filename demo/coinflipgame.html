@@ -1,167 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Rigged Coin Flip — StatsLG</title>
-  <link rel="stylesheet" href="/style/bctcstyle.css">
-  <style>
-    .wrap {
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      min-height: 100vh;
-    }
-    main {
-      padding: 2rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .card {
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 6px 16px rgba(0,0,0,.15);
-      text-align: center;
-      max-width: 520px;
-      width: 100%;
-    }
-    .scene { perspective: 1000px; margin: 1.5rem auto; }
-    .coin {
-      width: 150px; height: 150px; margin: auto; position: relative;
-      transform-style: preserve-3d; transition: transform 1s ease-in-out;
-    }
-    .side {
-      position: absolute; width: 100%; height: 100%; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 64px; font-weight: bold; backface-visibility: hidden;
-      background: radial-gradient(circle at 30% 30%, #fdfdfd, #ccc);
-      box-shadow: 0 6px 12px rgba(0,0,0,.3);
-    }
-    .tails {
-      transform: rotateY(180deg);
-      background: radial-gradient(circle at 70% 30%, #fff, #bbb);
-    }
-    button {
-      margin:.3rem; padding:.6rem 1.2rem; font-size:16px;
-      border:none; border-radius:6px; background:#00467f; color:#fff;
-      cursor:pointer;
-    }
-    button:hover { background:#005da8; }
-    button:disabled { opacity:0.5; cursor:not-allowed; }
-    .scoreboard {
-      display:flex; justify-content:center; gap:2rem; margin-top:1rem;
-    }
-    .score h3 { margin:.2rem; font-size:15px; color:#555; }
-    .score p { font-size:30px; font-weight:bold; margin:0; }
-    .history {
-      margin-top:1rem; font-family:monospace; max-height:150px;
-      overflow:auto; border-top:1px dashed #ccc; padding-top:.5rem;
-      text-align:left; font-size:14px; color:#333;
-    }
-    .progress {
-      margin-top: 1rem;
-      font-size: 16px;
-      color: #333;
-    }
-    @media (max-width:700px){
-      .wrap{grid-template-columns:1fr;}
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Coin Flip Experiment — StatsLG</title>
+<link rel="stylesheet" href="/style/bctcstyle.css">
+<style>
+  .wrap { display: grid; grid-template-columns: 320px 1fr; min-height: 100vh; }
+  main { padding: 2rem; display: flex; justify-content: center; align-items: center; }
+  .card {
+    background: white; padding: 2rem; border-radius: 10px;
+    box-shadow: 0 6px 16px rgba(0,0,0,.15); text-align: center;
+    max-width: 520px; width: 100%;
+  }
+  .scene { perspective: 1000px; margin: 1.5rem auto; }
+  .coin {
+    width: 150px; height: 150px; margin: auto; position: relative;
+    transform-style: preserve-3d; transition: transform 1s ease-in-out;
+  }
+  .side {
+    position: absolute; width: 100%; height: 100%; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 64px; font-weight: bold; backface-visibility: hidden;
+    background: radial-gradient(circle at 30% 30%, #fdfdfd, #ccc);
+    box-shadow: 0 6px 12px rgba(0,0,0,.3);
+  }
+  .tails { transform: rotateY(180deg); background: radial-gradient(circle at 70% 30%, #fff, #bbb); }
+  button {
+    margin: .3rem; padding: .5rem 1rem; font-size: 16px;
+    border: none; border-radius: 6px; background: #00467f; color: #fff; cursor: pointer;
+  }
+  button:hover { background: #005da8; }
+  .scoreboard { display: flex; justify-content: center; gap: 2rem; margin-top: 1rem; }
+  .score h3 { margin: .2rem; font-size: 15px; color: #555; }
+  .score p { font-size: 30px; font-weight: bold; margin: 0; }
+  .history {
+    margin-top: 1rem; font-family: monospace; max-height: 150px;
+    overflow: auto; border-top: 1px dashed #ccc; padding-top: .5rem;
+    text-align: left; font-size: 14px; color: #333;
+  }
+  .progress { margin-top:1rem; font-size:15px; color:#555; }
+  #resultsPanel {
+    margin-top: 1.5rem; padding:1rem; border-radius:8px;
+    background:#f9f9f9; box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    display:none; text-align:left;
+  }
+  #resultsPanel h2 { color:#00467f; margin-top:0; }
+  .mathbox {
+    background:white; padding:.6rem 1rem; border-left:4px solid #00467f;
+    margin:.7rem 0; font-family:monospace; font-size:15px;
+  }
+  @media (max-width:700px){ .wrap{grid-template-columns:1fr;} }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <!-- ===== SIDEBAR ===== -->
-    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
+<div class="wrap">
+  <!-- Sidebar -->
+  <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
 
-    <!-- ===== MAIN ===== -->
-    <main>
-      <div class="card">
-        <h1>Rigged Coin Flip</h1>
-        <p style="color:#666">Heads = House (H) • Tails = Player (T)</p>
+  <!-- Main -->
+  <main>
+    <div class="card">
+      <h1>Coin Flip Experiment</h1>
+      <p style="color:#666">Flip a coin 100 times and explore the probability results.</p>
 
-        <div class="scene">
-          <div class="coin" id="coin">
-            <div class="side heads">H</div>
-            <div class="side tails">T</div>
-          </div>
+      <div class="scene">
+        <div class="coin" id="coin">
+          <div class="side heads">H</div>
+          <div class="side tails">T</div>
         </div>
-
-        <div>
-          <button id="flip100Btn">Flip Until 100 Trials</button>
-          <button id="resetBtn">Reset</button>
-        </div>
-
-        <div class="scoreboard">
-          <div class="score"><h3>House (H)</h3><p id="houseScore">0</p></div>
-          <div class="score"><h3>Player (T)</h3><p id="playerScore">0</p></div>
-        </div>
-
-        <div class="progress" id="progressText">0 / 100 Flips</div>
-        <div class="history" id="log"></div>
       </div>
-    </main>
-  </div>
 
-  <script>
-  const HEADS_PROB = 0.75;  // 75% chance for Heads (House)
-  let house = 0, player = 0, total = 0;
-  const coin = document.getElementById('coin');
-  const log = document.getElementById('log');
-  const houseEl = document.getElementById('houseScore');
-  const playerEl = document.getElementById('playerScore');
-  const progressText = document.getElementById('progressText');
-  const flip100Btn = document.getElementById('flip100Btn');
-  const resetBtn = document.getElementById('resetBtn');
+      <div>
+        <button id="flipBtn">Start 100 Flips</button>
+        <button id="resetBtn">Reset</button>
+      </div>
 
-  function riggedFlip() {
-    return Math.random() < HEADS_PROB ? 'heads' : 'tails';
+      <div class="progress" id="progressText">0 / 100 flips</div>
+
+      <div class="scoreboard">
+        <div class="score"><h3>Heads</h3><p id="houseScore">0</p></div>
+        <div class="score"><h3>Tails</h3><p id="playerScore">0</p></div>
+      </div>
+
+      <p style="font-size:14px;margin-top:8px;color:#444" id="percentText"></p>
+      <div class="history" id="log"></div>
+
+      <!-- === RESULTS PANEL === -->
+      <div id="resultsPanel">
+        <h2>Probability of This Outcome</h2>
+        <p>
+          After <strong>100 flips</strong>, you observed <strong><span id="obsHeads"></span></strong> heads.
+          Assuming a <em>fair coin</em> (p = 0.5), we can calculate:
+        </p>
+        <div class="mathbox">
+          P(X ≥ observed heads) where X ~ Binomial(n=100, p=0.5)
+        </div>
+        <p id="calcResult"></p>
+        <p style="font-size:14px;color:#444;">
+          This represents the probability of getting this many or more heads
+          if the coin were truly fair.
+        </p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ====== Sidebar include loader ======
+document.querySelectorAll('[data-include]').forEach(el=>{
+  fetch(el.getAttribute('data-include'))
+    .then(r=>r.text())
+    .then(t=>el.innerHTML=t)
+    .catch(()=>el.innerHTML="<p>Sidebar failed to load.</p>");
+});
+
+// ====== Hidden probability bias (not shown to students) ======
+const HEADS_PROB = 0.75; // secretly biased
+const TOTAL_FLIPS = 100;
+let heads=0, tails=0, flips=0;
+
+const coin=document.getElementById('coin');
+const log=document.getElementById('log');
+const headsEl=document.getElementById('houseScore');
+const tailsEl=document.getElementById('playerScore');
+const progressText=document.getElementById('progressText');
+const percentText=document.getElementById('percentText');
+const flipBtn=document.getElementById('flipBtn');
+const resetBtn=document.getElementById('resetBtn');
+const resultsPanel=document.getElementById('resultsPanel');
+const obsHeadsEl=document.getElementById('obsHeads');
+const calcResultEl=document.getElementById('calcResult');
+
+function riggedFlip(){return Math.random()<HEADS_PROB?'heads':'tails';}
+
+async function flipOnce(){
+  const result=riggedFlip();
+  const spins=Math.floor(Math.random()*8)+3;
+  const extra=result==='heads'?0:180;
+  const duration=(Math.random()*0.5+0.7).toFixed(2);
+  coin.style.transition=`transform ${duration}s cubic-bezier(.45,1.8,.45,.95)`;
+  coin.style.transform=`rotateY(${360*spins+extra}deg)`;
+  await new Promise(r=>setTimeout(r,duration*1000));
+
+  if(result==='heads'){heads++;headsEl.textContent=heads;log.innerHTML=`H → +1<br>`+log.innerHTML;}
+  else{tails++;tailsEl.textContent=tails;log.innerHTML=`T → +1<br>`+log.innerHTML;}
+
+  flips++;
+  progressText.textContent=`${flips} / ${TOTAL_FLIPS} flips`;
+  const pctH=((heads/flips)*100).toFixed(1);
+  const pctT=((tails/flips)*100).toFixed(1);
+  percentText.textContent=`Heads: ${pctH}% • Tails: ${pctT}%`;
+}
+
+async function flipUntil100(){
+  flipBtn.disabled=true;resetBtn.disabled=true;
+  while(flips<TOTAL_FLIPS){
+    await flipOnce();
+    await new Promise(r=>setTimeout(r,150));
   }
+  flipBtn.disabled=false;resetBtn.disabled=false;
+  showProbabilityPanel();
+}
 
-  async function flipOnce() {
-    const result = riggedFlip();
-    const spins = Math.floor(Math.random() * 8) + 3; // 3–10 spins
-    const extra = result === 'heads' ? 0 : 180;
-    const duration = (Math.random() * 0.7 + 0.8).toFixed(2); // 0.8–1.5s
-    coin.style.transition = `transform ${duration}s cubic-bezier(.45,1.8,.45,.95)`;
-    coin.style.transform = `rotateY(${360 * spins + extra}deg)`;
-    await new Promise(r => setTimeout(r, duration * 1000));
+// ===== Binomial Calculator =====
+function factorial(n){return n<=1?1:n*factorial(n-1);}
+function binom(n,k){return factorial(n)/(factorial(k)*factorial(n-k));}
+function binomProb(n,k,p){return binom(n,k)*Math.pow(p,k)*Math.pow(1-p,n-k);}
+function pGreaterEqual(n,k,p){
+  let sum=0;
+  for(let i=k;i<=n;i++){sum+=binomProb(n,i,p);}
+  return sum;
+}
 
-    total++;
-    if (result === 'heads') {
-      house++; houseEl.textContent = house;
-      log.innerHTML = `${total}. H → House +1<br>` + log.innerHTML;
-    } else {
-      player++; playerEl.textContent = player;
-      log.innerHTML = `${total}. T → Player +1<br>` + log.innerHTML;
-    }
-    progressText.textContent = `${total} / 100 Flips`;
+// ===== Results =====
+function showProbabilityPanel(){
+  obsHeadsEl.textContent=heads;
+  const p = pGreaterEqual(100, heads, 0.5);
+  const rounded = p < 0.0001 ? p.toExponential(2) : p.toFixed(5);
+  calcResultEl.innerHTML=`P(X ≥ ${heads}) = <strong>${rounded}</strong>`;
+  resultsPanel.style.display='block';
+}
 
-    const housePct = ((house/total)*100).toFixed(1);
-    const playerPct = ((player/total)*100).toFixed(1);
-    progressText.textContent = `${total} / 100 Flips — H: ${housePct}% • T: ${playerPct}%`;
-  }
+// ===== Reset =====
+resetBtn.onclick=()=>{
+  heads=tails=flips=0;
+  headsEl.textContent=tailsEl.textContent=0;
+  log.innerHTML='';percentText.textContent='';
+  progressText.textContent='0 / 100 flips';
+  resultsPanel.style.display='none';
+  coin.style.transition='none';coin.style.transform='rotateY(0deg)';
+};
 
-  async function flipUntil100() {
-    flip100Btn.disabled = true;
-    resetBtn.disabled = true;
-    while (total < 100) {
-      await flipOnce();
-      await new Promise(r => setTimeout(r, 200));
-    }
-    flip100Btn.disabled = false;
-    resetBtn.disabled = false;
-  }
-
-  document.getElementById('flip100Btn').onclick = () => flipUntil100();
-  document.getElementById('resetBtn').onclick = () => {
-    house = player = total = 0;
-    houseEl.textContent = playerEl.textContent = 0;
-    progressText.textContent = "0 / 100 Flips";
-    log.innerHTML = '';
-    coin.style.transition = 'none';
-    coin.style.transform = 'rotateY(0deg)';
-  };
-  </script>
+flipBtn.onclick=()=>flipUntil100();
+</script>
 </body>
 </html>
