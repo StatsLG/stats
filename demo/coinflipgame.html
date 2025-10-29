@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rigged Coin Flip — StatsLG</title>
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+  <style>
+    /* Demo-specific styles (keeps bctc style overall) */
+    .wrap { display:grid; grid-template-columns: 320px 1fr; gap:1rem; min-height:100vh; }
+    aside.sidebar { /* left column loaded by partial */ }
+    main { padding: 2rem; }
+    .demo-card { background: white; border-radius:8px; padding:1.25rem; box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+    .coin-stage { display:flex; align-items:center; gap:2rem; justify-content:center; margin:18px 0; }
+    .coin {
+      width:150px; height:150px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:48px; backface-visibility:hidden;
+      position:relative; transform-style:preserve-3d;
+      transition: transform 1s cubic-bezier(.2,.9,.3,1);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      cursor: pointer;
+      user-select:none;
+    }
+    .coin .side { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border-radius:50%; }
+    .coin .heads { transform: rotateY(0deg) translateZ(1px); }
+    .coin .tails { transform: rotateY(180deg) translateZ(1px); background: linear-gradient(180deg,#fff,#eee); }
+    /* 3D wrapper so we can spin */
+    .coin-wrapper { perspective:1000px; }
+    .spinning { animation: spinFlip 800ms steps(1) forwards; }
+    @keyframes spinFlip {
+      0% { transform: rotateX(0) rotateZ(0) rotateY(0deg) translateY(0) scale(1); }
+      20% { transform: rotateX(360deg) rotateZ(20deg) rotateY(360deg) translateY(-20px) scale(1.03); }
+      50% { transform: rotateX(720deg) rotateZ(-20deg) rotateY(720deg) translateY(10px) scale(1.02); }
+      100% { transform: rotateX(1080deg) rotateZ(0) rotateY(1080deg) translateY(0) scale(1); }
+    }
+    .controls { display:flex; gap:.5rem; align-items:center; justify-content:center; margin-top:8px; }
+    .btn { padding:.5rem .9rem; border-radius:6px; border:1px solid rgba(0,0,0,.08); background:#f3f3f3; cursor:pointer; }
+    .btn:active { transform: translateY(1px); }
+    .scoreboard { display:flex; gap:1rem; justify-content:center; margin-top:12px; }
+    .score { padding:.6rem 1rem; border-radius:8px; text-align:center; min-width:120px; }
+    .score h3 { margin:.1rem 0; font-size:14px; color:#666; }
+    .score p { margin:0; font-size:28px; font-weight:700; }
+    .history { margin-top:16px; max-height:160px; overflow:auto; border-top:1px dashed #eee; padding-top:10px; font-family:monospace; font-size:13px; }
+    .muted { color:#666; font-size:13px; text-align:center; margin-top:10px; }
+    /* small-screen friendly */
+    @media (max-width:700px) {
+      .wrap { grid-template-columns: 1fr; }
+      .coin { width:120px; height:120px; font-size:40px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
+
+    <main>
+      <div class="demo-card">
+        <header>
+          <h1>Rigged Coin Flip</h1>
+          <p class="muted">Flip the coin. Heads = house (you get 1 point on tails). This demo is secretly biased toward heads.</p>
+        </header>
+
+        <div class="coin-stage">
+          <div class="coin-wrapper" title="Click to flip">
+            <div id="coin" class="coin" aria-live="polite">
+              <div class="side heads">★</div>
+              <div class="side tails">●</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="flipBtn" class="btn">Flip Once</button>
+          <button id="flip10" class="btn">Flip 10</button>
+          <button id="resetBtn" class="btn">Reset</button>
+        </div>
+
+        <div class="scoreboard" role="status" aria-label="Scoreboard">
+          <div class="score" id="houseScoreBox">
+            <h3>House (Heads)</h3>
+            <p id="houseScore">0</p>
+          </div>
+          <div class="score" id="playerScoreBox">
+            <h3>Player (Tails)</h3>
+            <p id="playerScore">0</p>
+          </div>
+        </div>
+
+        <div class="history" id="historyLog" aria-live="polite"></div>
+        <p class="muted">Tip: Click the coin or press <kbd>Space</kbd> to flip.</p>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ===== CONFIG (hidden bias) =====
+    // Rigged bias: probability of HEADS (house). Keep the number here; UI doesn't display it.
+    const _RIGGED_HEADS_PROBABILITY = 0.75;
+
+    // ===== State =====
+    let houseScore = 0;
+    let playerScore = 0;
+
+    // DOM refs
+    const coin = document.getElementById('coin');
+    const flipBtn = document.getElementById('flipBtn');
+    const flip10Btn = document.getElementById('flip10');
+    const resetBtn = document.getElementById('resetBtn');
+    const houseScoreEl = document.getElementById('houseScore');
+    const playerScoreEl = document.getElementById('playerScore');
+    const historyLog = document.getElementById('historyLog');
+
+    // Utility: determine flip result using rigged probability
+    function riggedFlip() {
+      // Math.random() < p => HEADS
+      return Math.random() < _RIGGED_HEADS_PROBABILITY ? 'heads' : 'tails';
+    }
+
+    // Animate and resolve one flip; returns a Promise resolved with 'heads' or 'tails'
+    function animateFlipOnce() {
+      return new Promise(resolve => {
+        // add spinning class to play animation
+        coin.classList.add('spinning');
+
+        // visual randomization during the spin: briefly toggle front/back to make it feel real
+        // After timeout, compute true result and set final rotation to show correct side.
+        setTimeout(() => {
+          const result = riggedFlip();
+          // Set final transform to either 0deg or 180deg rotationY so the correct "side" shows.
+          // But we don't directly set a "face"; we let the animation end and then apply transform
+          // to show final orientation. We'll remove animation class and set rotated state.
+          coin.classList.remove('spinning');
+
+          // Apply quick flip to show final face (we rotate Y by a multiple of 180 to keep animation smooth)
+          // Use a small rotation to land correctly:
+          if (result === 'heads') {
+            coin.style.transform = 'rotateY(0deg)';
+          } else {
+            coin.style.transform = 'rotateY(180deg)';
+          }
+
+          // small timeout to let visual update then resolve
+          setTimeout(() => resolve(result), 120);
+        }, 900); // should match animation length (see CSS: ~800ms) + small buffer
+      });
+    }
+
+    // update UI scores/history
+    function recordResult(result) {
+      const now = new Date().toLocaleTimeString();
+      if (result === 'heads') {
+        houseScore++;
+        houseScoreEl.textContent = houseScore;
+        historyLog.insertAdjacentHTML('afterbegin', `<div>[${now}] Heads — House +1</div>`);
+      } else {
+        playerScore++;
+        playerScoreEl.textContent = playerScore;
+        historyLog.insertAdjacentHTML('afterbegin', `<div>[${now}] Tails — Player +1</div>`);
+      }
+    }
+
+    // handle a single flip sequence (disable UI briefly)
+    let flipping = false;
+    async function doFlip() {
+      if (flipping) return;
+      flipping = true;
+      flipBtn.disabled = true;
+      flip10Btn.disabled = true;
+      resetBtn.disabled = true;
+      coin.style.transform = ''; // reset any manual transform
+      const result = await animateFlipOnce();
+      // small "pop" feedback
+      recordResult(result);
+      // re-enable
+      flipBtn.disabled = false;
+      flip10Btn.disabled = false;
+      resetBtn.disabled = false;
+      flipping = false;
+    }
+
+    // batch flips (flip n times quickly)
+    async function doBatch(n) {
+      flipBtn.disabled = true;
+      flip10Btn.disabled = true;
+      resetBtn.disabled = true;
+      for (let i=0;i<n;i++){
+        await doFlip();
+        // short pause between flips (keep it snappy)
+        await new Promise(r => setTimeout(r, 160));
+      }
+      flipBtn.disabled = false;
+      flip10Btn.disabled = false;
+      resetBtn.disabled = false;
+    }
+
+    // Event wiring
+    flipBtn.addEventListener('click', () => doFlip());
+    coin.addEventListener('click', () => doFlip());
+    flip10Btn.addEventListener('click', () => doBatch(10));
+    resetBtn.addEventListener('click', () => {
+      houseScore = 0; playerScore = 0;
+      houseScoreEl.textContent = '0';
+      playerScoreEl.textContent = '0';
+      historyLog.textContent = '';
+      coin.style.transform = '';
+    });
+    // keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') { e.preventDefault(); doFlip(); }
+      // Hidden reveal: Shift+R logs the real probability to console (for teacher debug)
+      if (e.shiftKey && (e.code === 'KeyR')) {
+        console.info('DEBUG: rigged heads probability =', _RIGGED_HEADS_PROBABILITY);
+        alert('Debug: bias printed to console');
+      }
+    });
+
+    // Accessibility: announce initial state
+    historyLog.insertAdjacentHTML('afterbegin', `<div>[${new Date().toLocaleTimeString()}] Game ready. Click coin or press Space to flip.</div>`);
+  </script>
+</body>
+</html>
