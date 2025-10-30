@@ -40,16 +40,6 @@
     text-align: left; font-size: 14px; color: #333;
   }
   .progress { margin-top:1rem; font-size:15px; color:#555; }
-  #resultsPanel {
-    margin-top: 1.5rem; padding:1rem; border-radius:8px;
-    background:#f9f9f9; box-shadow:0 4px 12px rgba(0,0,0,0.08);
-    display:none; text-align:left;
-  }
-  #resultsPanel h2 { color:#00467f; margin-top:0; }
-  .mathbox {
-    background:white; padding:.6rem 1rem; border-left:4px solid #00467f;
-    margin:.7rem 0; font-family:monospace; font-size:15px;
-  }
   @media (max-width:700px){ .wrap{grid-template-columns:1fr;} }
 </style>
 </head>
@@ -62,7 +52,7 @@
   <main>
     <div class="card">
       <h1>Coin Flip Experiment</h1>
-      <p style="color:#666">Flip a coin 100 times and explore the probability results.</p>
+      <p style="color:#666">Flip a coin 100 times and track the results.</p>
 
       <div class="scene">
         <div class="coin" id="coin">
@@ -79,29 +69,12 @@
       <div class="progress" id="progressText">0 / 100 flips</div>
 
       <div class="scoreboard">
-        <div class="score"><h3>Heads</h3><p id="houseScore">0</p></div>
-        <div class="score"><h3>Tails</h3><p id="playerScore">0</p></div>
+        <div class="score"><h3>Heads</h3><p id="headsScore">0</p></div>
+        <div class="score"><h3>Tails</h3><p id="tailsScore">0</p></div>
       </div>
 
       <p style="font-size:14px;margin-top:8px;color:#444" id="percentText"></p>
       <div class="history" id="log"></div>
-
-      <!-- === RESULTS PANEL === -->
-      <div id="resultsPanel">
-        <h2>Probability of This Outcome</h2>
-        <p>
-          After <strong>100 flips</strong>, you observed <strong><span id="obsHeads"></span></strong> heads.
-          Assuming a <em>fair coin</em> (p = 0.5), we can calculate:
-        </p>
-        <div class="mathbox">
-          P(X ≥ observed heads) where X ~ Binomial(n=100, p=0.5)
-        </div>
-        <p id="calcResult"></p>
-        <p style="font-size:14px;color:#444;">
-          This represents the probability of getting this many or more heads
-          if the coin were truly fair.
-        </p>
-      </div>
     </div>
   </main>
 </div>
@@ -115,22 +88,19 @@ document.querySelectorAll('[data-include]').forEach(el=>{
     .catch(()=>el.innerHTML="<p>Sidebar failed to load.</p>");
 });
 
-// ====== Hidden probability bias (not shown to students) ======
-const HEADS_PROB = 0.75; // secretly biased
+// ====== Coin Flip Logic ======
+const HEADS_PROB = 0.75; // secret bias (not visible to students)
 const TOTAL_FLIPS = 100;
 let heads=0, tails=0, flips=0;
 
 const coin=document.getElementById('coin');
 const log=document.getElementById('log');
-const headsEl=document.getElementById('houseScore');
-const tailsEl=document.getElementById('playerScore');
+const headsEl=document.getElementById('headsScore');
+const tailsEl=document.getElementById('tailsScore');
 const progressText=document.getElementById('progressText');
 const percentText=document.getElementById('percentText');
 const flipBtn=document.getElementById('flipBtn');
 const resetBtn=document.getElementById('resetBtn');
-const resultsPanel=document.getElementById('resultsPanel');
-const obsHeadsEl=document.getElementById('obsHeads');
-const calcResultEl=document.getElementById('calcResult');
 
 function riggedFlip(){return Math.random()<HEADS_PROB?'heads':'tails';}
 
@@ -160,35 +130,13 @@ async function flipUntil100(){
     await new Promise(r=>setTimeout(r,150));
   }
   flipBtn.disabled=false;resetBtn.disabled=false;
-  showProbabilityPanel();
 }
 
-// ===== Binomial Calculator =====
-function factorial(n){return n<=1?1:n*factorial(n-1);}
-function binom(n,k){return factorial(n)/(factorial(k)*factorial(n-k));}
-function binomProb(n,k,p){return binom(n,k)*Math.pow(p,k)*Math.pow(1-p,n-k);}
-function pGreaterEqual(n,k,p){
-  let sum=0;
-  for(let i=k;i<=n;i++){sum+=binomProb(n,i,p);}
-  return sum;
-}
-
-// ===== Results =====
-function showProbabilityPanel(){
-  obsHeadsEl.textContent=heads;
-  const p = pGreaterEqual(100, heads, 0.5);
-  const rounded = p < 0.0001 ? p.toExponential(2) : p.toFixed(5);
-  calcResultEl.innerHTML=`P(X ≥ ${heads}) = <strong>${rounded}</strong>`;
-  resultsPanel.style.display='block';
-}
-
-// ===== Reset =====
 resetBtn.onclick=()=>{
   heads=tails=flips=0;
   headsEl.textContent=tailsEl.textContent=0;
   log.innerHTML='';percentText.textContent='';
   progressText.textContent='0 / 100 flips';
-  resultsPanel.style.display='none';
   coin.style.transition='none';coin.style.transform='rotateY(0deg)';
 };
 
