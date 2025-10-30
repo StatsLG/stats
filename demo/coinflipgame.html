@@ -6,38 +6,39 @@
 <title>Coin Flip Experiment — StatsLG</title>
 <link rel="stylesheet" href="/style/bctcstyle.css">
 <style>
-  .wrap { display: grid; grid-template-columns: 320px 1fr; min-height: 100vh; }
-  main { padding: 2rem; display: flex; justify-content: center; align-items: center; }
+  .wrap { display:grid; grid-template-columns:320px 1fr; min-height:100vh; }
+  main { padding:2rem; display:flex; justify-content:center; align-items:center; }
   .card {
-    background: white; padding: 2rem; border-radius: 10px;
-    box-shadow: 0 6px 16px rgba(0,0,0,.15); text-align: center;
-    max-width: 520px; width: 100%;
+    background:white; padding:2rem; border-radius:10px;
+    box-shadow:0 6px 16px rgba(0,0,0,.15); text-align:center;
+    max-width:520px; width:100%;
   }
-  .scene { perspective: 1000px; margin: 1.5rem auto; }
+  .scene { perspective:1000px; margin:1.5rem auto; }
   .coin {
-    width: 150px; height: 150px; margin: auto; position: relative;
-    transform-style: preserve-3d; transition: transform 1s ease-in-out;
+    width:150px; height:150px; margin:auto; position:relative;
+    transform-style:preserve-3d; transition:transform 1s ease-in-out;
   }
   .side {
-    position: absolute; width: 100%; height: 100%; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 64px; font-weight: bold; backface-visibility: hidden;
-    background: radial-gradient(circle at 30% 30%, #fdfdfd, #ccc);
-    box-shadow: 0 6px 12px rgba(0,0,0,.3);
+    position:absolute; width:100%; height:100%; border-radius:50%;
+    overflow:hidden; backface-visibility:hidden;
+    box-shadow:0 6px 12px rgba(0,0,0,.3);
   }
-  .tails { transform: rotateY(180deg); background: radial-gradient(circle at 70% 30%, #fff, #bbb); }
+  .side img {
+    width:100%; height:100%; object-fit:cover; border-radius:50%;
+  }
+  .tails { transform:rotateY(180deg); }
   button {
-    margin: .3rem; padding: .5rem 1rem; font-size: 16px;
-    border: none; border-radius: 6px; background: #00467f; color: #fff; cursor: pointer;
+    margin:.3rem; padding:.5rem 1rem; font-size:16px;
+    border:none; border-radius:6px; background:#00467f; color:#fff; cursor:pointer;
   }
-  button:hover { background: #005da8; }
-  .scoreboard { display: flex; justify-content: center; gap: 2rem; margin-top: 1rem; }
-  .score h3 { margin: .2rem; font-size: 15px; color: #555; }
-  .score p { font-size: 30px; font-weight: bold; margin: 0; }
+  button:hover { background:#005da8; }
+  .scoreboard { display:flex; justify-content:center; gap:2rem; margin-top:1rem; }
+  .score h3 { margin:.2rem; font-size:15px; color:#555; }
+  .score p { font-size:30px; font-weight:bold; margin:0; }
   .history {
-    margin-top: 1rem; font-family: monospace; max-height: 150px;
-    overflow: auto; border-top: 1px dashed #ccc; padding-top: .5rem;
-    text-align: left; font-size: 14px; color: #333;
+    margin-top:1rem; font-family:monospace; max-height:150px;
+    overflow:auto; border-top:1px dashed #ccc; padding-top:.5rem;
+    text-align:left; font-size:14px; color:#333;
   }
   .progress { margin-top:1rem; font-size:15px; color:#555; }
   @media (max-width:700px){ .wrap{grid-template-columns:1fr;} }
@@ -56,8 +57,8 @@
 
       <div class="scene">
         <div class="coin" id="coin">
-          <div class="side heads">H</div>
-          <div class="side tails">T</div>
+          <div class="side heads"><img src="heads.png" alt="Heads"></div>
+          <div class="side tails"><img src="tails.png" alt="Tails"></div>
         </div>
       </div>
 
@@ -89,7 +90,7 @@ document.querySelectorAll('[data-include]').forEach(el=>{
 });
 
 // ====== Coin Flip Logic ======
-const HEADS_PROB = 0.75; // secret bias (not visible to students)
+const HEADS_PROB = 0.75; // hidden bias
 const TOTAL_FLIPS = 100;
 let heads=0, tails=0, flips=0;
 
@@ -113,8 +114,8 @@ async function flipOnce(){
   coin.style.transform=`rotateY(${360*spins+extra}deg)`;
   await new Promise(r=>setTimeout(r,duration*1000));
 
-  if(result==='heads'){heads++;headsEl.textContent=heads;log.innerHTML=`H → +1<br>`+log.innerHTML;}
-  else{tails++;tailsEl.textContent=tails;log.innerHTML=`T → +1<br>`+log.innerHTML;}
+  if(result==='heads'){heads++;headsEl.textContent=heads;log.innerHTML=`Heads<br>`+log.innerHTML;}
+  else{tails++;tailsEl.textContent=tails;log.innerHTML=`Tails<br>`+log.innerHTML;}
 
   flips++;
   progressText.textContent=`${flips} / ${TOTAL_FLIPS} flips`;
