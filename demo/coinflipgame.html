@@ -23,9 +23,7 @@
     overflow:hidden; backface-visibility:hidden;
     box-shadow:0 6px 12px rgba(0,0,0,.3);
   }
-  .side img {
-    width:100%; height:100%; object-fit:cover; border-radius:50%;
-  }
+  .side img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
   .tails { transform:rotateY(180deg); }
   button {
     margin:.3rem; padding:.5rem 1rem; font-size:16px;
@@ -41,6 +39,11 @@
     text-align:left; font-size:14px; color:#333;
   }
   .progress { margin-top:1rem; font-size:15px; color:#555; }
+  #resultBox {
+    display:none; margin-top:1.5rem; padding:1rem;
+    background:#f9f9f9; border-left:4px solid #00467f; border-radius:8px;
+    font-family:monospace; text-align:left; word-break:break-all;
+  }
   @media (max-width:700px){ .wrap{grid-template-columns:1fr;} }
 </style>
 </head>
@@ -76,12 +79,14 @@
 
       <p style="font-size:14px;margin-top:8px;color:#444" id="percentText"></p>
       <div class="history" id="log"></div>
+
+      <div id="resultBox"></div>
     </div>
   </main>
 </div>
 
 <script>
-// ====== Sidebar include loader ======
+// ===== Sidebar include loader =====
 document.querySelectorAll('[data-include]').forEach(el=>{
   fetch(el.getAttribute('data-include'))
     .then(r=>r.text())
@@ -89,7 +94,7 @@ document.querySelectorAll('[data-include]').forEach(el=>{
     .catch(()=>el.innerHTML="<p>Sidebar failed to load.</p>");
 });
 
-// ====== Coin Flip Logic ======
+// ===== Experiment Variables =====
 const HEADS_PROB = 0.75; // hidden bias
 const TOTAL_FLIPS = 100;
 let heads=0, tails=0, flips=0;
@@ -102,6 +107,7 @@ const progressText=document.getElementById('progressText');
 const percentText=document.getElementById('percentText');
 const flipBtn=document.getElementById('flipBtn');
 const resetBtn=document.getElementById('resetBtn');
+const resultBox=document.getElementById('resultBox');
 
 function riggedFlip(){return Math.random()<HEADS_PROB?'heads':'tails';}
 
@@ -124,21 +130,51 @@ async function flipOnce(){
   percentText.textContent=`Heads: ${pctH}% • Tails: ${pctT}%`;
 }
 
+// ===== Run Experiment =====
 async function flipUntil100(){
-  flipBtn.disabled=true;resetBtn.disabled=true;
+  flipBtn.disabled=true;resetBtn.disabled=true;resultBox.style.display='none';
   while(flips<TOTAL_FLIPS){
     await flipOnce();
     await new Promise(r=>setTimeout(r,150));
   }
+  showProbability();
   flipBtn.disabled=false;resetBtn.disabled=false;
 }
 
+// ===== Exact Binomial Probability =====
+function logFactorial(n){
+  if(n<=1) return 0;
+  let s=0; for(let i=2;i<=n;i++) s+=Math.log(i);
+  return s;
+}
+function logChoose(n,k){return logFactorial(n)-logFactorial(k)-logFactorial(n-k);}
+function binomProb(n,k,p){
+  return Math.exp(logChoose(n,k) + k*Math.log(p) + (n-k)*Math.log(1-p));
+}
+function pGreaterEqual(n,k,p){
+  let sum=0;
+  for(let i=k;i<=n;i++) sum+=binomProb(n,i,p);
+  return sum;
+}
+
+function showProbability(){
+  const pval=pGreaterEqual(TOTAL_FLIPS,heads,0.5);
+  const formatted=pval.toPrecision(15);
+  resultBox.style.display='block';
+  resultBox.innerHTML=
+    `<strong>After 100 flips:</strong> ${heads} heads<br>`+
+    `If the coin were fair (p=0.5):<br>`+
+    `<code>P(X ≥ ${heads}) = ${formatted}</code>`;
+}
+
+// ===== Reset =====
 resetBtn.onclick=()=>{
   heads=tails=flips=0;
   headsEl.textContent=tailsEl.textContent=0;
   log.innerHTML='';percentText.textContent='';
   progressText.textContent='0 / 100 flips';
   coin.style.transition='none';coin.style.transform='rotateY(0deg)';
+  resultBox.style.display='none';
 };
 
 flipBtn.onclick=()=>flipUntil100();
