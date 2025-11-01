@@ -141,7 +141,7 @@ async function flipUntil100(){
   flipBtn.disabled=false;resetBtn.disabled=false;
 }
 
-// ===== Exact Binomial Probability =====
+// ===== Exact Binomial Probability (in full decimal) =====
 function logFactorial(n){
   if(n<=1) return 0;
   let s=0; for(let i=2;i<=n;i++) s+=Math.log(i);
@@ -156,10 +156,16 @@ function pGreaterEqual(n,k,p){
   for(let i=k;i<=n;i++) sum+=binomProb(n,i,p);
   return sum;
 }
+function toFullDecimal(x){
+  // Show up to 50 digits, no scientific notation
+  let s = x.toFixed(50);
+  // trim trailing zeros but leave at least one
+  return s.replace(/(\.\d*?[1-9])0+$/,'$1').replace(/\.$/,'');
+}
 
 function showProbability(){
   const pval=pGreaterEqual(TOTAL_FLIPS,heads,0.5);
-  const formatted=pval.toPrecision(15);
+  const formatted=toFullDecimal(pval);
   resultBox.style.display='block';
   resultBox.innerHTML=
     `<strong>After 100 flips:</strong> ${heads} heads<br>`+
