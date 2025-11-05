@@ -56,9 +56,9 @@ document.querySelectorAll("[data-include]").forEach(async el=>{
   if(r.ok) el.innerHTML = await r.text();
 });
 
-// ===== GAME CONSTANTS =====
-const ROWS = 5, COLS = 9, CELL = 90, MX = 45, MY = 60;
-const W = MX*2 + COLS*CELL, H = MY + ROWS*CELL + 40;
+// ==== GAME CONSTANTS ====
+const ROWS=5, COLS=9, CELL=90, MX=45, MY=60;
+const W=MX*2+COLS*CELL, H=MY+ROWS*CELL+40;
 
 let dp = 50;
 const COST_MEAN = 40, COST_FLOWER = 60;
@@ -68,42 +68,41 @@ class Game extends Phaser.Scene {
   create(){
     this.updateDP();
 
-    // Grid
-    const g=this.add.graphics();
-    g.lineStyle(2,0xdde5ee);
-    g.strokeRoundedRect(MX-6,MY-6,COLS*CELL+12,ROWS*CELL+12,12);
-
-    const lanes=this.add.graphics();
+    // Background grid
+    const lane=this.add.graphics();
     for(let r=0;r<ROWS;r++){
-      lanes.fillStyle(r%2?0xf6fbff:0xfafcff);
-      lanes.fillRect(MX,MY+r*CELL,COLS*CELL,CELL);
+      lane.fillStyle(r%2?0xf6fbff:0xfafcff);
+      lane.fillRect(MX,MY+r*CELL,COLS*CELL,CELL);
     }
+    const grid=this.add.graphics();
+    grid.lineStyle(2,0xdde5ee);
+    grid.strokeRoundedRect(MX-6,MY-6,COLS*CELL+12,ROWS*CELL+12,12);
 
     this.defenders=this.add.group();
     this.zombies=this.add.group();
     this.bullets=this.add.group();
     this.occupied=Array.from({length:ROWS},()=>Array(COLS).fill(null));
 
-    // Place units
+    // Placement
     this.input.on('pointerdown',p=>{
-      const cell=this.xyToCell(p.x,p.y); if(!cell) return;
+      const cell=this.xyToCell(p.x,p.y);
+      if(!cell) return;
       if(this.occupied[cell.r][cell.c]) return;
 
       if(selected==="mean"){
-        if(dp < COST_MEAN) return this.noDP();
-        dp -= COST_MEAN; this.updateDP();
+        if(dp<COST_MEAN) return this.noDP();
+        dp-=COST_MEAN; this.updateDP();
         this.placeMean(cell.r,cell.c);
       }
-
-      if(selected==="flower"){
-        if(dp < COST_FLOWER) return this.noDP();
-        dp -= COST_FLOWER; this.updateDP();
+      else if(selected==="flower"){
+        if(dp<COST_FLOWER) return this.noDP();
+        dp-=COST_FLOWER; this.updateDP();
         this.placeFlower(cell.r,cell.c);
       }
     });
 
-    // Bullet/Zombie collision **now checks row**
-    this.physics.add.overlap(this.bullets,this.zombies,(b,z)=>{
+    // Bullet-Zombie collision (now works!)
+    this.physics.add.overlap(this.bullets, this.zombies, (b,z)=>{
       if(b.getData("row") !== z.getData("row")) return;
       z.setData("hp",z.getData("hp") - b.getData("dmg"));
       b.destroy();
@@ -112,24 +111,24 @@ class Game extends Phaser.Scene {
       this.time.delayedCall(80,()=>z.setFillStyle(0xffc8c8));
 
       if(z.getData("hp") <= 0){
-        dp += 5; this.updateDP();
+        dp+=5; this.updateDP();
         z.destroy();
       }
     });
 
-    // Spawns slower now
+    // Spawn zombies slower
     this.time.addEvent({delay:4500,loop:true,callback:()=>this.spawnZombie()});
-    // DP trickle
+    // Data trickle
     this.time.addEvent({delay:4000,loop:true,callback:()=>{dp+=15;this.updateDP();}});
 
     this.gameOverText=this.add.text(W/2,H/2,"Game Over",{fontSize:"48px",color:"#b21e27"}).setOrigin(.5).setAlpha(0);
   }
 
   update(_,dt){
+    // Zombie movement & eating
     this.zombies.getChildren().forEach(z=>{
-      if(!z.getData("eating")){
+      if(!z.getData("eating"))
         z.x += z.getData("vx")*(dt/1000);
-      }
 
       const r=z.getData("row");
       const c=Math.floor((z.x-MX)/CELL);
@@ -137,19 +136,17 @@ class Game extends Phaser.Scene {
         const u=this.occupied[r][c];
         if(u){
           const dist = u.x - z.x;
-          if(dist < 35){
+          if(dist < 35){ // eating threshold
             if(!z.getData("eating")){
               z.setData("eating",true); z.setData("vx",0);
               z.chomp=this.time.addEvent({
                 delay:500,loop:true,callback:()=>{
                   if(!u.scene){z.chomp.remove(false);return;}
                   u.setData("hp",u.getData("hp")-10);
-
-                  const base = u.gen ? 0xfff3c4 : 0xbde4ff;
+                  const base = u.gen?0xfff3c4:0xbde4ff;
                   u.setFillStyle(0xaad1f5);
                   this.time.delayedCall(90,()=>u.setFillStyle(base));
-
-                  if(u.getData("hp") <= 0){
+                  if(u.getData("hp")<=0){
                     if(u.fire) u.fire.remove(false);
                     if(u.gen) u.gen.remove(false);
                     this.occupied[r][c]=null;
@@ -166,10 +163,10 @@ class Game extends Phaser.Scene {
       if(z.x<5) this.endGame();
     });
 
-    this.bullets.getChildren().forEach(b=>{ if(b.x>W-5) b.destroy(); });
+    this.bullets.getChildren().forEach(b=>{ if(b.x>W) b.destroy(); });
   }
 
-  // === PLACE UNITS ===
+  // UNITS
   placeMean(r,c){
     const {x,y}=this.center(c,r);
     const u=this.add.rectangle(x,y,CELL-20,CELL-20,0xbde4ff).setStrokeStyle(4,0x00467f).setData({hp:60});
@@ -177,13 +174,13 @@ class Game extends Phaser.Scene {
 
     u.fire=this.time.addEvent({
       delay:900,loop:true,callback:()=>{
-        const hasZombie = this.zombies.getChildren().some(z=>z.getData("row")==r);
-        if(!hasZombie) return;
+        const rowHas=this.zombies.getChildren().some(z=>z.getData("row")==r);
+        if(!rowHas) return;
         const b=this.add.circle(u.x+30,u.y,6,0x00467f);
         this.bullets.add(b); this.physics.add.existing(b);
         b.body.setVelocityX(260);
         b.setData("dmg",10);
-        b.setData("row",r);  // ✅ bullet row tagging
+        b.setData("row",r); // ✅ lane tag
         this.time.delayedCall(3000,()=>b.destroy());
       }
     });
@@ -205,12 +202,19 @@ class Game extends Phaser.Scene {
   spawnZombie(){
     const r=Phaser.Math.Between(0,ROWS-1);
     const {y}=this.center(0,r);
-    const z=this.add.rectangle(W-40,y,CELL-24,CELL-28,0xffc8c8).setStrokeStyle(4,0xb21e27).setData({row:r,hp:60,vx:-30,eating:false});
+    const z=this.add.rectangle(W-40,y,CELL-24,CELL-28,0xffc8c8)
+      .setStrokeStyle(4,0xb21e27)
+      .setData({row:r,hp:60,vx:-30,eating:false});
+
     this.zombies.add(z);
+
+    // ✅ give zombie a physics body so bullets can hit it
+    this.physics.add.existing(z);
+    z.body.setImmovable(true);
   }
 
   // Helpers
-  center(c,r){ return {x:MX+c*CELL+CELL/2,y:MY+r*CELL+CELL/2}; }
+  center(c,r){return{x:MX+c*CELL+CELL/2,y:MY+r*CELL+CELL/2};}
   xyToCell(x,y){
     if(x<MX||y<MY) return null;
     const c=Math.floor((x-MX)/CELL), r=Math.floor((y-MY)/CELL);
@@ -218,32 +222,28 @@ class Game extends Phaser.Scene {
   }
   updateDP(){ document.getElementById("dp").textContent=`Data Points: ${dp}`; }
   noDP(){
-    const e=document.getElementById("dp"); const old=e.textContent;
-    e.classList.add("danger"); e.textContent=`Not enough Data Points!`;
+    const e=document.getElementById("dp"),old=e.textContent;
+    e.classList.add("danger"); e.textContent="Not enough Data Points!";
     setTimeout(()=>{e.classList.remove("danger");e.textContent=old;},900);
   }
   endGame(){
-    this.time.getAllEvents().forEach(ev=>ev.remove(false));
+    this.time.getAllEvents().forEach(e=>e.remove(false));
     this.tweens.add({targets:this.gameOverText,alpha:1,duration:400});
     this.zombies.getChildren().forEach(z=>z.setData("vx",0));
   }
 }
 
 // Start
-new Phaser.Game({ type:Phaser.AUTO,width:W,height:H,parent:'game-container',
-  backgroundColor:'#f8fafc', physics:{default:'arcade'}, scene:[Game] });
+new Phaser.Game({type:Phaser.AUTO,width:W,height:H,parent:'game-container',
+  backgroundColor:'#f8fafc',physics:{default:'arcade'},scene:[Game]});
 
-// UI toggles
-document.getElementById("card-mean").onclick=()=>{
-  selected="mean";
-  card-mean.classList.add("active");
-  card-flower.classList.remove("active");
-};
-document.getElementById("card-flower").onclick=()=>{
-  selected="flower";
-  card-flower.classList.add("active");
-  card-mean.classList.remove("active");
-};
+// UI
+const cardMean=document.getElementById("card-mean");
+const cardFlower=document.getElementById("card-flower");
+
+cardMean.onclick=()=>{selected="mean";cardMean.classList.add("active");cardFlower.classList.remove("active");};
+cardFlower.onclick=()=>{selected="flower";cardFlower.classList.add("active");cardMean.classList.remove("active");};
 </script>
+
 </body>
 </html>
