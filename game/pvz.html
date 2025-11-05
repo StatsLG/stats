@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Stats vs. Bad Arguments — Prototype</title>
+  <meta name="description" content="Tower defense prototype themed for statistics class (Phaser 3)."/>
+  <link rel="icon" href="/favicon.ico"/>
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+  <style>
+    /* Minimal helpers; main styling comes from bctcstyle.css */
+    .hud {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+      padding: .5rem .75rem; border-radius: 10px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.08);
+      margin-bottom: .75rem;
+    }
+    .badge { padding: .25rem .6rem; border-radius: 999px; background: #00467f; color:#fff; font-weight:600; }
+    .card {
+      display:inline-flex; align-items:center; gap:.5rem; padding:.4rem .6rem; border:2px solid #e7e7e7;
+      border-radius: 10px; background:#fafafa; cursor:pointer; user-select:none;
+    }
+    .card.active { border-color:#00467f; box-shadow: inset 0 0 0 2px #00467f22; }
+    .legend-swatch { width:18px; height:18px; border-radius:6px; background:#bde4ff; border:2px solid #00467f; }
+    .pill { padding:.25rem .6rem; border-radius:999px; background:#f1f5f9; font-size:.9rem; }
+    .danger { color:#b21e27; font-weight:700; }
+    #game-container { width: 100%; max-width: 960px; }
+    canvas { border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
+
+    <!-- ===== MAIN ===== -->
+    <main>
+      <header>
+        <h1>Stats vs. Bad Arguments — Prototype</h1>
+        <p class="muted">Simple-shapes tower defense in Phaser. Place <strong>Mean Machine</strong> units to stop the <em>Anecdote Zombies</em>.</p>
+      </header>
+
+      <div class="hud" id="hud">
+        <span class="badge" id="dp">Data Points: 0</span>
+        <div class="card active" id="card-mean" title="Mean Machine (cost 50)">
+          <div class="legend-swatch" style="background:#bde4ff; border-color:#00467f;"></div>
+          <strong>Mean Machine</strong>
+          <span class="pill">Cost 50</span>
+        </div>
+        <span class="pill">Grid: 5×9</span>
+        <span class="pill">Zombies spawn every few seconds</span>
+        <span class="pill">Goal: Don’t let them reach the left!</span>
+      </div>
+
+      <div id="game-container"></div>
+      <p><small>Tip: Click a grid cell to place a Mean Machine (if you have enough Data Points). Units auto-fire along their row.</small></p>
+    </main>
+  </div>
+
+  <script>
+    // ===== Include helper to load sidebar.html (same pattern as your site) =====
+    (function includePartials(){
+      document.querySelectorAll("[data-include]").forEach(async (el)=>{
+        try {
+          const url = el.getAttribute("data-include");
+          const res = await fetch(url);
+          if (res.ok) el.innerHTML = await res.text();
+        } catch(e) { /* ignore */ }
+      });
+    })();
+
+    // ===== GAME CONFIG =====
+    const GRID_ROWS = 5;
+    const GRID_COLS = 9;
+    const CELL_W = 90;
+    const CELL_H = 90;
+    const GRID_MARGIN_X = 45;   // left/right padding
+    const GRID_MARGIN_Y = 60;   // top padding
+    const CANVAS_W = GRID_MARGIN_X*2 + GRID_COLS*CELL_W; // 45*2 + 9*90 = 900
+    const CANVAS_H = GRID_MARGIN_Y + GRID_ROWS*CELL_H + 40; // ~ 550
+
+    // Resources
+    let dataPoints = 50;
+    const meanMachineCost = 50;
+
+    // UI state
+    let selectedCard = 'mean'; // only one for now
+
+    // ===== PHASER SCENE =====
+    class MainScene extends Phaser.Scene {
+      constructor(){ super('MainScene'); }
+
+      preload(){ /* no assets; using shapes */ }
+
+      create(){
+        this.updateDP();
+
+        // Background grid lines
+        const g = this.add.graphics();
+        g.lineStyle(2, 0xdde5ee, 1);
+        // grid border
+        g.strokeRoundedRect(GRID_MARGIN_X-6, GRID_MARGIN_Y-6, GRID_COLS*CELL_W+12, GRID_ROWS*CELL_H+12, 12);
+        // vertical lines
+        for (let c=1;c<GRID_COLS;c++){
+          const x = GRID_MARGIN_X + c*CELL_W;
+          g.lineBetween(x, GRID_MARGIN_Y, x, GRID_MARGIN_Y + GRID_ROWS*CELL_H);
+        }
+        // horizontal lines
+        for (let r=1;r<GRID_ROWS;r++){
+          const y = GRID_MARGIN_Y + r*CELL_H;
+          g.lineBetween(GRID_MARGIN_X, y, GRID_MARGIN_X + GRID_COLS*CELL_W, y);
+        }
+
+        // Lane shading
+        const laneBg = this.add.graphics();
+        for (let r=0;r<GRID_ROWS;r++){
+          laneBg.fillStyle( (r%2?0xf6fbff:0xfafcff), 1);
+          laneBg.fillRect(GRID_MARGIN_X, GRID_MARGIN_Y + r*CELL_H, GRID_COLS*CELL_W, CELL_H);
+        }
+
+        // Groups
+        this.defenders = this.add.group(); // Mean Machines
+        this.zombies = this.add.group();
+        this.bullets = this.add.group();
+
+        // Occupancy map
+        this.occupied = Array.from({length: GRID_ROWS}, ()=>Array(GRID_COLS).fill(null));
+
+        // Input: place Mean Machine
+        this.input.on('pointerdown', (pointer)=>{
+          const {row, col} = this.xyToCell(pointer.x, pointer.y) || {};
+          if (row==null) return;
+          if (this.occupied[row][col]) return;           // already a unit
+          if (selectedCard !== 'mean') return;           // (future: other units)
+          if (dataPoints < meanMachineCost) { this.flashNoDP(); return; }
+
+          dataPoints -= meanMachineCost;
+          this.updateDP();
+
+          const {cx, cy} = this.cellCenter(col, row);
+          const unit = this.add.rectangle(cx, cy, CELL_W-20, CELL_H-20, 0xbde4ff)
+            .setStrokeStyle(4, 0x00467f)
+            .setData({row, col, hp: 60, fireCooldown: 0});
+          this.defenders.add(unit);
+          this.occupied[row][col] = unit;
+
+          // Unit fires periodically
+          unit.fireTimer = this.time.addEvent({
+            delay: 900,
+            loop: true,
+            callback: ()=>{
+              // Only fire if a zombie exists in this row
+              const zombieInRow = this.zombies.getChildren().some(z => z.getData('row')===row);
+              if (!zombieInRow) return;
+
+              const bullet = this.add.circle(unit.x + (CELL_W/2 - 20), unit.y, 6, 0x00467f);
+              this.bullets.add(bullet);
+              this.physics.add.existing(bullet);
+              bullet.body.setVelocityX(260);
+              bullet.setData('row', row);
+              bullet.setData('dmg', 10);
+
+              // Bullet lifetime
+              this.time.delayedCall(4000, ()=> bullet.destroy());
+            }
+          });
+        });
+
+        // Physics for bullets & zombies
+        this.physics.world.setBounds(0,0,CANVAS_W,CANVAS_H);
+        this.physics.add.overlap(this.bullets, this.zombies, (bullet, zombie)=>{
+          zombie.setData('hp', zombie.getData('hp') - bullet.getData('dmg'));
+          bullet.destroy();
+          // small hit flash
+          zombie.setFillStyle(0xffe3e3);
+          this.time.delayedCall(80, ()=> zombie.setFillStyle(0xffc8c8));
+        });
+
+        // Spawn zombies
+        this.time.addEvent({
+          delay: 2200,
+          loop: true,
+          callback: ()=> this.spawnZombie()
+        });
+
+        // Resource trickle (+10 every 5s)
+        this.time.addEvent({
+          delay: 5000,
+          loop: true,
+          callback: ()=> { dataPoints += 10; this.updateDP(); }
+        });
+
+        // Game over banner (hidden)
+        this.gameOverText = this.add.text(CANVAS_W/2, CANVAS_H/2, 'Game Over',
+          {fontFamily:'system-ui, -apple-system, Segoe UI, Roboto', fontSize:'48px', color:'#b21e27', fontStyle:'bold'})
+          .setOrigin(.5).setAlpha(0);
+      }
+
+      update(time, delta){
+        // Move zombies
+        this.zombies.getChildren().forEach(z=>{
+          if (z.getData('eating')) return;
+          z.x += z.getData('vx') * (delta/1000);
+
+          // Check collision with unit in front
+          const row = z.getData('row');
+          const col = Math.floor((z.x - GRID_MARGIN_X)/CELL_W);
+          if (col >= 0 && col < GRID_COLS){
+            const unit = this.occupied[row][col];
+            if (unit && Math.abs(unit.y - z.y) < CELL_H*0.4 && (z.x - unit.x) < (CELL_W*0.35)){
+              // Start eating
+              z.setData('eating', true);
+              z.setData('vx', 0);
+              // chomp damage over time
+              z.chompTimer = this.time.addEvent({
+                delay: 500,
+                loop: true,
+                callback: ()=>{
+                  if (!unit.scene) { z.chompTimer.remove(false); return; }
+                  unit.setData('hp', unit.getData('hp') - 10);
+                  // unit damage flash
+                  unit.setFillStyle(0xaad1f5);
+                  this.time.delayedCall(90, ()=> unit.setFillStyle(0xbde4ff));
+                  if (unit.getData('hp') <= 0){
+                    // remove unit and free cell
+                    if (unit.fireTimer) unit.fireTimer.remove(false);
+                    this.occupied[row][col] = null;
+                    unit.destroy();
+                    // resume zombie walk
+                    z.setData('eating', false);
+                    z.setData('vx', -30);
+                  }
+                }
+              });
+            }
+          }
+
+          // Left edge = lose
+          if (z.x < 5){
+            this.endGame();
+          }
+        });
+
+        // Cleanup dead zombies
+        this.zombies.getChildren().forEach(z=>{
+          if (z.getData('hp') <= 0){
+            // small bonus DP for kill
+            dataPoints += 5; this.updateDP();
+            z.destroy();
+          }
+        });
+
+        // Remove bullets off-screen
+        this.bullets.getChildren().forEach(b=>{
+          if (b.x > CANVAS_W - 5) b.destroy();
+        });
+      }
+
+      // ===== Helpers =====
+      updateDP(){ document.getElementById('dp').textContent = `Data Points: ${dataPoints}`; }
+      flashNoDP(){
+        const dpEl = document.getElementById('dp');
+        const old = dpEl.textContent;
+        dpEl.textContent = `Data Points: ${dataPoints} — need more!`;
+        dpEl.classList.add('danger');
+        setTimeout(()=>{ dpEl.textContent = old; dpEl.classList.remove('danger'); }, 900);
+      }
+
+      spawnZombie(){
+        if (this.gameEnded) return;
+        const row = Phaser.Math.Between(0, GRID_ROWS-1);
+        const {cx, cy} = this.cellCenter(GRID_COLS-0.5, row); // start slightly inside right edge
+        const z = this.add.rectangle(CANVAS_W - 40, cy, CELL_W-24, CELL_H-28, 0xffc8c8)
+          .setStrokeStyle(4, 0xb21e27)
+          .setData({row, hp: 60, vx: -30, eating: false});
+        this.zombies.add(z);
+      }
+
+      xyToCell(x,y){
+        if (x < GRID_MARGIN_X || y < GRID_MARGIN_Y) return null;
+        const col = Math.floor((x - GRID_MARGIN_X) / CELL_W);
+        const row = Math.floor((y - GRID_MARGIN_Y) / CELL_H);
+        if (col<0 || col>=GRID_COLS || row<0 || row>=GRID_ROWS) return null;
+        return {row, col};
+      }
+      cellCenter(col,row){
+        // accepts col as integer or float (for convenience)
+        const cx = GRID_MARGIN_X + col*CELL_W + CELL_W/2;
+        const cy = GRID_MARGIN_Y + row*CELL_H + CELL_H/2;
+        return {cx, cy};
+      }
+
+      endGame(){
+        if (this.gameEnded) return;
+        this.gameEnded = true;
+        // Stop timers
+        this.time.getAllEvents().forEach(ev=>ev.remove(false));
+        // Fade banner
+        this.tweens.add({ targets: this.gameOverText, alpha: 1, duration: 400 });
+        // Dim screen
+        const shade = this.add.rectangle(CANVAS_W/2, CANVAS_H/2, CANVAS_W, CANVAS_H, 0x000000, 0.25);
+        // Freeze everything
+        this.zombies.getChildren().forEach(z=> z.setData('vx', 0));
+      }
+    }
+
+    // ===== PHASER GAME INIT =====
+    const config = {
+      type: Phaser.AUTO,
+      width: CANVAS_W,
+      height: CANVAS_H,
+      parent: 'game-container',
+      backgroundColor: '#f8fafc',
+      physics: { default: 'arcade', arcade: { debug: false } },
+      scene: [MainScene]
+    };
+    const game = new Phaser.Game(config);
+
+    // Card UI selection (future-proofed for more units)
+    const cardMean = document.getElementById('card-mean');
+    cardMean.addEventListener('click', ()=>{
+      selectedCard = 'mean';
+      cardMean.classList.add('active');
+    });
+  </script>
+</body>
+</html>
