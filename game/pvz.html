@@ -21,8 +21,8 @@
     #game-container { max-width:960px; }
     canvas { border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,.08); }
   </style>
-
 </head>
+
 <body>
 <div class="wrap">
 
@@ -47,42 +47,42 @@
 
     <div id="game-container"></div>
   </main>
-
 </div>
 
 <script>
-// Sidebar loader
+// Load sidebar
 document.querySelectorAll("[data-include]").forEach(async el=>{
-  const r=await fetch(el.getAttribute("data-include")); if(r.ok) el.innerHTML=await r.text();
+  const r = await fetch(el.getAttribute("data-include"));
+  if(r.ok) el.innerHTML = await r.text();
 });
 
 // ===== GAME CONSTANTS =====
-const ROWS=5, COLS=9, CELL=90, MARGIN_X=45, MARGIN_Y=60;
-const W = MARGIN_X*2 + COLS*CELL, H = MARGIN_Y + ROWS*CELL + 40;
+const ROWS = 5, COLS = 9, CELL = 90, MX = 45, MY = 60;
+const W = MX*2 + COLS*CELL, H = MY + ROWS*CELL + 40;
 
-let dp=50;
-const COST_MEAN=40, COST_FLOWER=60;
-let selected="mean";
+let dp = 50;
+const COST_MEAN = 40, COST_FLOWER = 60;
+let selected = "mean";
 
 class Game extends Phaser.Scene {
   create(){
     this.updateDP();
 
-    // Draw grid
+    // Grid
     const g=this.add.graphics();
     g.lineStyle(2,0xdde5ee);
-    g.strokeRoundedRect(MARGIN_X-6,MARGIN_Y-6,COLS*CELL+12,ROWS*CELL+12,12);
+    g.strokeRoundedRect(MX-6,MY-6,COLS*CELL+12,ROWS*CELL+12,12);
 
     const lanes=this.add.graphics();
     for(let r=0;r<ROWS;r++){
       lanes.fillStyle(r%2?0xf6fbff:0xfafcff);
-      lanes.fillRect(MARGIN_X,MARGIN_Y+r*CELL,COLS*CELL,CELL);
+      lanes.fillRect(MX,MY+r*CELL,COLS*CELL,CELL);
     }
 
     this.defenders=this.add.group();
     this.zombies=this.add.group();
     this.bullets=this.add.group();
-    this.occupied = Array.from({length:ROWS},()=>Array(COLS).fill(null));
+    this.occupied=Array.from({length:ROWS},()=>Array(COLS).fill(null));
 
     // Place units
     this.input.on('pointerdown',p=>{
@@ -90,51 +90,54 @@ class Game extends Phaser.Scene {
       if(this.occupied[cell.r][cell.c]) return;
 
       if(selected==="mean"){
-        if(dp<COST_MEAN) return this.noDP();
-        dp-=COST_MEAN; this.updateDP();
+        if(dp < COST_MEAN) return this.noDP();
+        dp -= COST_MEAN; this.updateDP();
         this.placeMean(cell.r,cell.c);
-        return;
       }
 
       if(selected==="flower"){
-        if(dp<COST_FLOWER) return this.noDP();
-        dp-=COST_FLOWER; this.updateDP();
+        if(dp < COST_FLOWER) return this.noDP();
+        dp -= COST_FLOWER; this.updateDP();
         this.placeFlower(cell.r,cell.c);
-        return;
       }
     });
 
-    // Bullets damage zombies
+    // Bullet/Zombie collision **now checks row**
     this.physics.add.overlap(this.bullets,this.zombies,(b,z)=>{
-      z.setData("hp",z.getData("hp")-b.getData("dmg"));
+      if(b.getData("row") !== z.getData("row")) return;
+      z.setData("hp",z.getData("hp") - b.getData("dmg"));
       b.destroy();
+
       z.setFillStyle(0xffe3e3);
       this.time.delayedCall(80,()=>z.setFillStyle(0xffc8c8));
+
+      if(z.getData("hp") <= 0){
+        dp += 5; this.updateDP();
+        z.destroy();
+      }
     });
 
-    // Spawn zombies slower
+    // Spawns slower now
     this.time.addEvent({delay:4500,loop:true,callback:()=>this.spawnZombie()});
-
-    // Resource trickle
+    // DP trickle
     this.time.addEvent({delay:4000,loop:true,callback:()=>{dp+=15;this.updateDP();}});
 
     this.gameOverText=this.add.text(W/2,H/2,"Game Over",{fontSize:"48px",color:"#b21e27"}).setOrigin(.5).setAlpha(0);
   }
 
   update(_,dt){
-    // Move zombies & check combat
     this.zombies.getChildren().forEach(z=>{
       if(!z.getData("eating")){
         z.x += z.getData("vx")*(dt/1000);
       }
 
       const r=z.getData("row");
-      const c=Math.floor((z.x-MARGIN_X)/CELL);
+      const c=Math.floor((z.x-MX)/CELL);
       if(r>=0&&r<ROWS&&c>=0&&c<COLS){
         const u=this.occupied[r][c];
         if(u){
           const dist = u.x - z.x;
-          if(dist < 35){ // <-- FIXED, reliable eating detection
+          if(dist < 35){
             if(!z.getData("eating")){
               z.setData("eating",true); z.setData("vx",0);
               z.chomp=this.time.addEvent({
@@ -142,12 +145,11 @@ class Game extends Phaser.Scene {
                   if(!u.scene){z.chomp.remove(false);return;}
                   u.setData("hp",u.getData("hp")-10);
 
-                  // Flash when hit
-                  const base=u.gen?0xfff3c4:0xbde4ff;
+                  const base = u.gen ? 0xfff3c4 : 0xbde4ff;
                   u.setFillStyle(0xaad1f5);
                   this.time.delayedCall(90,()=>u.setFillStyle(base));
 
-                  if(u.getData("hp")<=0){
+                  if(u.getData("hp") <= 0){
                     if(u.fire) u.fire.remove(false);
                     if(u.gen) u.gen.remove(false);
                     this.occupied[r][c]=null;
@@ -161,26 +163,27 @@ class Game extends Phaser.Scene {
           }
         }
       }
-
       if(z.x<5) this.endGame();
     });
 
-    this.zombies.getChildren().forEach(z=>{ if(z.getData("hp")<=0){dp+=5;this.updateDP();z.destroy();} });
     this.bullets.getChildren().forEach(b=>{ if(b.x>W-5) b.destroy(); });
   }
 
-  // === UNIT PLACEMENT ===
+  // === PLACE UNITS ===
   placeMean(r,c){
     const {x,y}=this.center(c,r);
     const u=this.add.rectangle(x,y,CELL-20,CELL-20,0xbde4ff).setStrokeStyle(4,0x00467f).setData({hp:60});
     this.defenders.add(u); this.occupied[r][c]=u;
+
     u.fire=this.time.addEvent({
       delay:900,loop:true,callback:()=>{
-        const rowHas = this.zombies.getChildren().some(z=>z.getData("row")===r);
-        if(!rowHas) return;
+        const hasZombie = this.zombies.getChildren().some(z=>z.getData("row")==r);
+        if(!hasZombie) return;
         const b=this.add.circle(u.x+30,u.y,6,0x00467f);
         this.bullets.add(b); this.physics.add.existing(b);
-        b.body.setVelocityX(260); b.setData("dmg",10);
+        b.body.setVelocityX(260);
+        b.setData("dmg",10);
+        b.setData("row",r);  // ✅ bullet row tagging
         this.time.delayedCall(3000,()=>b.destroy());
       }
     });
@@ -199,7 +202,6 @@ class Game extends Phaser.Scene {
     });
   }
 
-  // === ZOMBIES ===
   spawnZombie(){
     const r=Phaser.Math.Between(0,ROWS-1);
     const {y}=this.center(0,r);
@@ -208,10 +210,10 @@ class Game extends Phaser.Scene {
   }
 
   // Helpers
-  center(c,r){ return {x:MARGIN_X+c*CELL+CELL/2,y:MARGIN_Y+r*CELL+CELL/2}; }
+  center(c,r){ return {x:MX+c*CELL+CELL/2,y:MY+r*CELL+CELL/2}; }
   xyToCell(x,y){
-    if(x<MARGIN_X||y<MARGIN_Y) return null;
-    const c=Math.floor((x-MARGIN_X)/CELL), r=Math.floor((y-MARGIN_Y)/CELL);
+    if(x<MX||y<MY) return null;
+    const c=Math.floor((x-MX)/CELL), r=Math.floor((y-MY)/CELL);
     return (r>=0&&r<ROWS&&c>=0&&c<COLS)?{r,c}:null;
   }
   updateDP(){ document.getElementById("dp").textContent=`Data Points: ${dp}`; }
@@ -227,11 +229,21 @@ class Game extends Phaser.Scene {
   }
 }
 
-new Phaser.Game({ type:Phaser.AUTO, width:W, height:H, parent:'game-container',
+// Start
+new Phaser.Game({ type:Phaser.AUTO,width:W,height:H,parent:'game-container',
   backgroundColor:'#f8fafc', physics:{default:'arcade'}, scene:[Game] });
 
-document.getElementById("card-mean").onclick=()=>{selected="mean";card-mean.classList.add("active");card-flower.classList.remove("active");}
-document.getElementById("card-flower").onclick=()=>{selected="flower";card-flower.classList.add("active");card-mean.classList.remove("active");}
+// UI toggles
+document.getElementById("card-mean").onclick=()=>{
+  selected="mean";
+  card-mean.classList.add("active");
+  card-flower.classList.remove("active");
+};
+document.getElementById("card-flower").onclick=()=>{
+  selected="flower";
+  card-flower.classList.add("active");
+  card-mean.classList.remove("active");
+};
 </script>
 </body>
 </html>
