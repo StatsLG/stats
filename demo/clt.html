@@ -4,215 +4,207 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Central Limit Theorem Demo — StatsLG</title>
-  <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css" />
+  <link rel="icon" href="/favicon.ico" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 
   <style>
-    .wrap-grid {
-      display: flex;
-      gap: 1rem;
-      align-items: flex-start;
+    .wrap-grid{display:flex;gap:1rem;align-items:flex-start}
+    .controls-panel{width:300px;background:var(--panel);border:1px solid var(--rule);border-radius:.75rem;padding:1rem}
+    .chart-panel{flex-grow:1;background:var(--panel);border:1px solid var(--rule);border-radius:.75rem;padding:1rem;position:relative}
+    canvas{max-height:420px}
+    table{margin-top:1rem;width:100%;border-collapse:collapse;text-align:center}
+    table td,table th{border:1px solid var(--rule);padding:.4rem}
+    button{margin-top:.4rem;width:100%}
+    .dot{
+      width:10px;height:10px;border-radius:50%;background:#d9534f;
+      position:absolute;pointer-events:none;z-index:50;
+      transition:transform 0.6s linear;
     }
-    .controls-panel {
-      width: 300px;
-      background: var(--panel);
-      border: 1px solid var(--rule);
-      border-radius: .75rem;
-      padding: 1rem;
-    }
-    .chart-panel {
-      flex-grow: 1;
-      background: var(--panel);
-      border: 1px solid var(--rule);
-      border-radius: .75rem;
-      padding: 1rem;
-    }
-    canvas { max-height: 420px; }
-    table {
-      margin-top: 1rem;
-      width: 100%;
-      border-collapse: collapse;
-      text-align: center;
-    }
-    table td, table th {
-      border: 1px solid var(--rule);
-      padding: .4rem;
-    }
-    button { margin-top: .4rem; width: 100%; }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <aside class="sidebar" aria-label="Sidebar" data-include="/partials/sidebar.html"></aside>
+<div class="wrap">
+  <aside class="sidebar" data-include="/partials/sidebar.html"></aside>
 
-    <main>
-      <header>
-        <h1>Central Limit Theorem</h1>
-        <p class="subtitle">Pick a population shape, draw samples, and watch the sampling distribution form.</p>
-      </header>
+  <main>
+    <header>
+      <h1>Central Limit Theorem</h1>
+      <p class="subtitle">Choose a population shape, draw samples, and watch the sampling distribution form.</p>
+    </header>
 
-      <section class="card-compact">
-        <div class="wrap-grid">
+    <section class="card-compact">
+      <div class="wrap-grid">
 
-          <!-- LEFT PANEL -->
-          <div class="controls-panel">
-            <h2>Controls</h2>
+        <!-- LEFT PANEL -->
+        <div class="controls-panel">
+          <h2>Controls</h2>
 
-            <label><strong>Population Distribution:</strong></label><br>
-            <select id="distSelect">
-              <option value="uniform">Uniform (0,1)</option>
-              <option value="normal">Normal (μ=0, σ=1)</option>
-              <option value="skewed">Right-Skewed (Exponential-like)</option>
-              <option value="bimodal">Bimodal (Two Peaks)</option>
-              <option value="crazy">Crazy (Sin + noise)</option>
-            </select>
+          <label><strong>Population Distribution:</strong></label><br>
+          <select id="distSelect">
+            <option value="uniform">Uniform (0,1)</option>
+            <option value="normal">Normal (μ=0, σ=1)</option>
+            <option value="skewed">Right-Skewed (Exponential-like)</option>
+            <option value="bimodal">Bimodal (Two Peaks)</option>
+            <option value="crazy">Crazy (Sin + noise)</option>
+          </select>
 
-            <br><br>
+          <br><br>
 
-            <label><strong>Sample Size (n):</strong></label><br>
-            <input type="number" id="sampleSize" value="30" min="1" max="500">
+          <label><strong>Sample Size (n):</strong></label><br>
+          <input type="number" id="sampleSize" value="30" min="1" max="500">
 
-            <br><br>
+          <br><br>
 
-            <button id="takeSampleBtn">Take ONE Sample Mean</button>
-            <button id="take50Btn">Take 50 Samples (Animated)</button>
-            <button id="resetBtn">Reset Sampling Distribution</button>
+          <button id="takeSampleBtn">Take ONE Sample Mean</button>
+          <button id="take50Btn">Take 50 Samples (Animated)</button>
+          <button id="take1000Btn">Add 1000 Samples (Instant)</button>
+          <button id="resetBtn">Reset Sampling Distribution</button>
 
-            <hr>
+          <hr>
 
-            <p><strong>Population Mean (μ):</strong> <span id="popMean"></span></p>
-            <p><strong>Population SD (σ):</strong> <span id="popSD"></span></p>
-            <p><strong># of Sample Means:</strong> <span id="countSamples">0</span></p>
-          </div>
-
-          <!-- RIGHT PANEL -->
-          <div class="chart-panel">
-            <h3>Population Distribution</h3>
-            <canvas id="populationChart"></canvas>
-
-            <h3>Sampling Distribution of Sample Means</h3>
-            <canvas id="samplingChart"></canvas>
-
-            <h3>Sampling Distribution Summary</h3>
-            <table>
-              <tr><th>Statistic</th><th>Value</th></tr>
-              <tr><td>Mean of Sample Means</td><td id="meanSampleMeans">--</td></tr>
-              <tr><td>SD of Sample Means</td><td id="sdSampleMeans">--</td></tr>
-              <tr><td>Theoretical SD (σ / √n)</td><td id="theoreticalSD">--</td></tr>
-            </table>
-          </div>
-
+          <p><strong>Population Mean (μ):</strong> <span id="popMean"></span></p>
+          <p><strong>Population SD (σ):</strong> <span id="popSD"></span></p>
+          <p><strong># of Sample Means:</strong> <span id="countSamples">0</span></p>
         </div>
-      </section>
-    </main>
-  </div>
 
-  <script>
-    // Load Sidebar
-    document.querySelectorAll('[data-include]').forEach(el =>
-      fetch(el.getAttribute('data-include'))
-        .then(r => r.text())
-        .then(html => el.innerHTML = html)
-    );
+        <!-- RIGHT PANEL -->
+        <div class="chart-panel">
+          <h3>Population Distribution</h3>
+          <canvas id="populationChart"></canvas>
 
-    // Globals
-    const POP_SIZE = 20000;
-    let population = [];
-    let sampleMeans = [];
-    let popChart, sampChart, samplingInterval = null;
+          <h3>Sampling Distribution of Sample Means</h3>
+          <canvas id="samplingChart"></canvas>
 
-    const popCtx = document.getElementById("populationChart");
-    const sampCtx = document.getElementById("samplingChart");
+          <h3>Sampling Distribution Summary</h3>
+          <table>
+            <tr><th>Statistic</th><th>Value</th></tr>
+            <tr><td>Mean of Sample Means</td><td id="meanSampleMeans">--</td></tr>
+            <tr><td>SD of Sample Means</td><td id="sdSampleMeans">--</td></tr>
+            <tr><td>Theoretical SD (σ / √n)</td><td id="theoreticalSD">--</td></tr>
+          </table>
 
-    function mean(arr){ return arr.reduce((a,b)=>a+b,0)/arr.length; }
-    function sd(arr){ let m=mean(arr); return Math.sqrt(arr.map(v=>(v-m)**2).reduce((a,b)=>a+b)/arr.length); }
+          <h3>Frequency Table (Sampling Distribution)</h3>
+          <table id="freqTable"><tr><th>Bin Range</th><th>Count</th></tr></table>
+        </div>
 
-    function histogram(values, bins=40){
-      const min=Math.min(...values), max=Math.max(...values);
-      const width=(max-min)/bins;
-      let counts=new Array(bins).fill(0);
-      values.forEach(v=>counts[Math.min(bins-1,Math.floor((v-min)/width))]++);
-      return { x:counts.map((_,i)=>(min+i*width).toFixed(2)), y:counts };
-    }
+      </div>
+    </section>
+  </main>
+</div>
 
-    function generatePopulation(type){
-      if(type==="uniform") return Array.from({length:POP_SIZE},()=>Math.random());
-      if(type==="normal") return Array.from({length:POP_SIZE},()=> (Math.random()*1));
-      if(type==="skewed") return Array.from({length:POP_SIZE},()=> Math.random()*-Math.log(Math.random()));
-      if(type==="bimodal") return Array.from({length:POP_SIZE},()=> Math.random()<0.5?Math.random()*0.5:Math.random()*0.5+1.5);
-      if(type==="crazy") return Array.from({length:POP_SIZE},()=> Math.sin(Math.random()*10)+Math.random()*0.5);
-    }
+<script>
+document.querySelectorAll('[data-include]').forEach(el=>
+  fetch(el.getAttribute('data-include')).then(r=>r.text()).then(html=>el.innerHTML=html)
+);
 
-    function drawPopulation(){
-      population = generatePopulation(document.getElementById("distSelect").value);
-      document.getElementById("popMean").textContent = mean(population).toFixed(4);
-      document.getElementById("popSD").textContent = sd(population).toFixed(4);
+const POP_SIZE = 20000;
+let population = [], sampleMeans = [];
+let popChart, sampChart, samplingInterval = null;
 
-      let hist=histogram(population);
-      if(popChart) popChart.destroy();
-      popChart=new Chart(popCtx,{
-        type:"bar",
-        data:{labels:hist.x,datasets:[{data:hist.y}]},
-        options:{
-          animation:false,
-          plugins:{legend:{display:false}},
-          scales:{y:{beginAtZero:true}}
-        }
-      });
-    }
+// DOM
+const popCtx = document.getElementById("populationChart");
+const sampCtx = document.getElementById("samplingChart");
+const freqTable = document.getElementById("freqTable");
 
-    function drawSampling(){
-      let hist = histogram(sampleMeans);
-      if(sampChart) sampChart.destroy();
-      sampChart=new Chart(sampCtx,{
-        type:"bar",
-        data:{labels:hist.x,datasets:[{data:hist.y}]},
-        options:{
-          animation:false,
-          plugins:{legend:{display:false}},
-          scales:{y:{beginAtZero:true}}
-        }
-      });
+// Helpers
+function mean(a){return a.reduce((x,y)=>x+y,0)/a.length}
+function sd(a){let m=mean(a);return Math.sqrt(a.map(v=>(v-m)**2).reduce((x,y)=>x+y)/a.length)}
+function histogram(arr,bins=40){
+  const min=Math.min(...arr), max=Math.max(...arr), width=(max-min)/bins;
+  let c=new Array(bins).fill(0);
+  arr.forEach(v=>c[Math.min(bins-1,Math.floor((v-min)/width))]++);
+  return {counts:c,bins:[...Array(bins)].map((_,i)=>[min+i*width,min+(i+1)*width])};
+}
 
-      if(sampleMeans.length){
-        document.getElementById("meanSampleMeans").textContent = mean(sampleMeans).toFixed(4);
-        document.getElementById("sdSampleMeans").textContent = sd(sampleMeans).toFixed(4);
-      }
-      document.getElementById("theoreticalSD").textContent =
-        (sd(population)/Math.sqrt(parseInt(document.getElementById("sampleSize").value))).toFixed(4);
-    }
+// Population
+function generatePopulation(type){
+  if(type==="uniform") return Array.from({length:POP_SIZE},()=>Math.random());
+  if(type==="normal") return Array.from({length:POP_SIZE},()=>Math.random()*1);
+  if(type==="skewed") return Array.from({length:POP_SIZE},()=>Math.random()*-Math.log(Math.random()));
+  if(type==="bimodal") return Array.from({length:POP_SIZE},()=>Math.random()<0.5?Math.random()*0.5:Math.random()*0.5+1.5);
+  if(type==="crazy") return Array.from({length:POP_SIZE},()=>Math.sin(Math.random()*10)+Math.random()*0.5);
+}
 
-    function takeSample(){
-      let n=parseInt(document.getElementById("sampleSize").value);
-      sampleMeans.push(mean(Array.from({length:n},()=>population[Math.floor(Math.random()*POP_SIZE)])));
-      document.getElementById("countSamples").textContent = sampleMeans.length;
-      drawSampling();
-    }
+function drawPopulation(){
+  population = generatePopulation(document.getElementById("distSelect").value);
+  popMean.textContent = mean(population).toFixed(4);
+  popSD.textContent = sd(population).toFixed(4);
+  let h=histogram(population);
+  if(popChart) popChart.destroy();
+  popChart=new Chart(popCtx,{type:"bar",data:{labels:h.bins.map(b=>b[0].toFixed(2)),datasets:[{data:h.counts}]},options:{animation:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+}
 
-    document.getElementById("takeSampleBtn").onclick = takeSample;
+// Falling Dot Animation
+function dropDot(sampleMean){
+  const meta = sampChart.scales;
+  const x = meta.x.getPixelForValue(sampleMean);
+  const yTop = meta.y.getPixelForValue(sampleMeans.length);
+  const rect = sampCtx.getBoundingClientRect();
+  const dot = document.createElement("div");
+  dot.className="dot";
+  dot.style.left = (x + rect.left - 5) + "px";
+  dot.style.top = (rect.top - 30) + "px";
+  document.body.appendChild(dot);
+  requestAnimationFrame(()=>dot.style.transform = `translateY(${(rect.top + rect.height - 40) - (rect.top - 30)}px)`);
+  setTimeout(()=>dot.remove(),650);
+}
 
-    document.getElementById("take50Btn").onclick = ()=>{
-      if(samplingInterval) return;
-      let count=0;
-      samplingInterval=setInterval(()=>{
-        takeSample();
-        if(++count>=50){ clearInterval(samplingInterval); samplingInterval=null; }
-      },120);
-    };
+// Sampling Histogram + Table Update
+function drawSampling(drop=null){
+  let h=histogram(sampleMeans);
+  if(sampChart) sampChart.destroy();
+  sampChart=new Chart(sampCtx,{type:"bar",data:{labels:h.bins.map(b=>((b[0]).toFixed(2))),datasets:[{data:h.counts}]},options:{animation:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+  // Stats
+  if(sampleMeans.length){
+    meanSampleMeans.textContent = mean(sampleMeans).toFixed(4);
+    sdSampleMeans.textContent = sd(sampleMeans).toFixed(4);
+  }
+  theoreticalSD.textContent=(sd(population)/Math.sqrt(parseInt(sampleSize.value))).toFixed(4);
+  countSamples.textContent = sampleMeans.length;
 
-    document.getElementById("resetBtn").onclick = ()=>{
-      sampleMeans=[];
-      document.getElementById("countSamples").textContent = 0;
-      drawSampling();
-    };
+  // Frequency table
+  freqTable.innerHTML = "<tr><th>Bin Range</th><th>Count</th></tr>";
+  h.bins.forEach((b,i)=>freqTable.innerHTML += `<tr><td>${b[0].toFixed(2)} to ${b[1].toFixed(2)}</td><td>${h.counts[i]}</td></tr>`);
 
-    document.getElementById("distSelect").onchange = drawPopulation;
+  if(drop!==null) dropDot(drop);
+}
 
-    drawPopulation();
-    drawSampling();
-  </script>
+// Buttons
+function takeSample(){
+  let n=parseInt(sampleSize.value);
+  let samp = mean(Array.from({length:n},()=>population[Math.floor(Math.random()*POP_SIZE)]));
+  sampleMeans.push(samp);
+  drawSampling(samp);
+}
+
+takeSampleBtn.onclick = takeSample;
+
+take50Btn.onclick = ()=>{
+  if(samplingInterval) return;
+  let count=0;
+  samplingInterval=setInterval(()=>{
+    takeSample();
+    if(++count>=50){ clearInterval(samplingInterval); samplingInterval=null; }
+  },120);
+};
+
+take1000Btn.onclick = ()=>{
+  for(let i=0;i<1000;i++) takeSample();
+};
+
+resetBtn.onclick = ()=>{
+  sampleMeans=[];
+  countSamples.textContent=0;
+  drawSampling();
+};
+
+distSelect.onchange = drawPopulation;
+
+drawPopulation();
+drawSampling();
+</script>
 
 </body>
 </html>
