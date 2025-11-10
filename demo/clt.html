@@ -1,205 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Central Limit Theorem Demo — StatsLG</title>
-  <link rel="stylesheet" href="/style/bctcstyle.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/style/bctcstyle.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 
   <style>
-    #main-content {
-      margin-left: 260px; /* matches sidebar width */
-      padding: 20px;
-    }
-
-    .flexrow {
-      display: flex;
-      gap: 20px;
-    }
-
-    .controls {
-      width: 260px;
-      padding-right: 10px;
-    }
-
-    .chartbox {
-      flex: 1;
-      min-width: 400px;
-      min-height: 300px;
-    }
-
-    canvas {
-      width: 100% !important;
-      height: 300px !important;
-    }
+    .controls-grid{display:grid;grid-template-columns:1fr;gap:1rem;margin-bottom:1rem}
+    input[type=range]{width:100%}
+    .charts-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:1.5rem;margin-top:1rem}
+    canvas{max-height:450px;min-height:350px}
+    .card-compact{padding:1rem;border:1px solid var(--rule);border-radius:.75rem;background:var(--card)}
   </style>
 </head>
 
 <body>
+<div class="wrap">
+  <aside class="sidebar" data-include="/partials/sidebar.html"></aside>
 
-<!-- SIDEBAR -->
-<div id="sidebar-container"></div>
-<script>
-fetch("/partials/sidebar.html").then(r=>r.text()).then(html=>{
-  document.getElementById("sidebar-container").innerHTML = html;
-});
-</script>
+  <main>
+    <header>
+      <h1>Central Limit Theorem</h1>
+      <p class="subtitle">Compare the population distribution (right) to the sampling distribution (left). Notice how the sampling distribution becomes Normal as sample size increases.</p>
+    </header>
 
-<!-- MAIN CONTENT -->
-<div id="main-content">
+    <section class="card-compact">
+      <div class="controls-grid">
 
-<h2>Central Limit Theorem Demonstration</h2>
-<p>Compare the population distribution (right) and the sampling distribution (left).</p>
+        <div>
+          <label><b>Statistic Type</b></label>
+          <select id="statType">
+            <option value="mean">Sample Mean (x̄)</option>
+            <option value="prop">Sample Proportion (p̂)</option>
+          </select>
+        </div>
 
-<div class="flexrow">
+        <div>
+          <label><b>Population Distribution</b></label>
+          <select id="popType">
+            <option value="normal">Normal(50,10)</option>
+            <option value="uniform">Uniform(0–100)</option>
+            <option value="skew">Right-Skewed</option>
+            <option value="bern">Bernoulli(p)</option>
+          </select>
+        </div>
 
-  <!-- CONTROLS -->
-  <div class="controls">
-    <label><b>Statistic Type</b></label><br>
-    <select id="statType">
-      <option value="mean">Sample Mean (x̄)</option>
-      <option value="prop">Sample Proportion (p̂)</option>
-    </select><br><br>
+        <div id="pRow" style="display:none;">
+          <label><b>p (for Bernoulli)</b></label>
+          <input id="pSlider" type="range" min="0" max="1" step="0.01" value="0.5"/>
+          <span id="pVal">0.50</span>
+        </div>
 
-    <label><b>Population Distribution</b></label><br>
-    <select id="popType">
-      <option value="normal">Normal</option>
-      <option value="uniform">Uniform (0–100)</option>
-      <option value="skew">Right-Skewed</option>
-      <option value="bern">Bernoulli (Two Outcomes)</option>
-    </select><br><br>
+        <div>
+          <label><b>Sample Size (n)</b></label>
+          <input id="nSlider" type="range" min="2" max="100" value="30"/>
+          <span id="nVal">30</span>
+        </div>
 
-    <label id="pLabel" style="display:none;"><b>p</b></label><br>
-    <input id="pSlider" type="range" min="0" max="1" step="0.01" value="0.5" style="display:none;">
-    <span id="pVal" style="display:none;">0.50</span><br><br>
+        <button id="draw1">Draw 1 Sample</button>
+        <button id="draw100">Draw 100 Samples</button>
+        <button id="reset">Reset</button>
 
-    <label><b>Sample Size (n)</b></label><br>
-    <input id="nSlider" type="range" min="2" max="100" value="30">
-    <span id="nVal">30</span><br><br>
+      </div>
+    </section>
 
-    <button id="draw1">Draw 1 Sample</button><br><br>
-    <button id="draw100">Draw 100 Samples</button><br><br>
-    <button id="reset">Reset</button>
-  </div>
+    <section class="charts-wrap">
+      <div class="card-compact">
+        <h3>Sampling Distribution</h3>
+        <canvas id="histCanvas"></canvas>
+      </div>
 
-  <!-- GRAPHS -->
-  <div class="chartbox">
-    <h3>Sampling Distribution</h3>
-    <canvas id="histCanvas"></canvas>
-  </div>
+      <div class="card-compact">
+        <h3>Population Distribution</h3>
+        <canvas id="popCanvas"></canvas>
+      </div>
+    </section>
 
-  <div class="chartbox">
-    <h3>Population Distribution</h3>
-    <canvas id="popCanvas"></canvas>
-  </div>
-
+  </main>
 </div>
 
-</div> <!-- end main-content -->
-
 <script>
-window.onload = function() {
+// ---------- Random Generators ----------
+function rNorm(mu=50,sd=10){let u1=Math.random(),u2=Math.random();return mu+sd*Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);}
+function rUnif(){return Math.random()*100;}
+function rSkew(){return Math.abs(rNorm(0,1))*20;}
+function rBern(p){return Math.random()<p?1:0;}
 
-function randNormal(mu=50, sigma=10){
-  let u1=Math.random(), u2=Math.random();
-  return mu + sigma * Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
-}
-function randUniform(){ return Math.random()*100; }
-function randSkew(){ return Math.abs(randNormal(0,1))*20; }
-function randBern(p){ return Math.random() < p ? 1 : 0; }
+// ---------- DOM ----------
+const statType=document.getElementById("statType");
+const popType=document.getElementById("popType");
+const nSlider=document.getElementById("nSlider");
+const nVal=document.getElementById("nVal");
+const pSlider=document.getElementById("pSlider");
+const pVal=document.getElementById("pVal");
+const pRow=document.getElementById("pRow");
+nSlider.oninput=()=>nVal.textContent=nSlider.value;
+pSlider.oninput=()=>pVal.textContent=parseFloat(pSlider.value).toFixed(2);
+popType.onchange=()=>{pRow.style.display=popType.value==="bern"?"block":"none";updatePop();};
 
-const statType = document.getElementById("statType");
-const popType = document.getElementById("popType");
-const nSlider = document.getElementById("nSlider");
-const nVal = document.getElementById("nVal");
-const pSlider = document.getElementById("pSlider");
-const pVal = document.getElementById("pVal");
-const pLabel = document.getElementById("pLabel");
-
-nSlider.oninput = ()=>nVal.textContent=nSlider.value;
-pSlider.oninput = ()=>pVal.textContent=parseFloat(pSlider.value).toFixed(2);
-
-function toggleBern(){
-  let show = popType.value==="bern";
-  pSlider.style.display = pVal.style.display = pLabel.style.display = show?"inline":"none";
-}
-popType.onchange = ()=>{ toggleBern(); updatePop(); };
-toggleBern();
-
-const popChart = new Chart(document.getElementById("popCanvas"), {
+// ---------- Population Chart ----------
+const popChart=new Chart(popCanvas,{
   type:"line",
-  data:{labels:[],datasets:[{data:[],borderWidth:2,fill:false}]},
-  options:{animation:false,scales:{x:{display:false},y:{display:false}}}
+  data:{labels:[],datasets:[{data:[],borderWidth:2,pointRadius:0}]},
+  options:{responsive:true,animation:false,scales:{x:{display:false},y:{display:false}},plugins:{legend:{display:false}}}
 });
 
 function updatePop(){
-  let xs=[], ys=[];
-  let p=parseFloat(pSlider.value);
-
-  if(popType.value==="bern"){
-    xs=[0,1]; ys=[1-p,p];
-  } else {
-    for(let i=0;i<200;i++){
-      let x=i/2;
-      xs.push(x);
-      if(popType.value==="normal") ys.push(1/(10*Math.sqrt(2*Math.PI))*Math.exp(-(x-50)**2/(200)));
-      else if(popType.value==="uniform") ys.push(1/100);
-      else ys.push(1/(x+10));
-    }
-  }
-  popChart.data.labels=xs;
-  popChart.data.datasets[0].data=ys;
-  popChart.update();
+  let xs=[],ys=[],p=parseFloat(pSlider.value);
+  if(popType.value==="bern"){xs=[0,1];ys=[1-p,p];}
+  else{for(let i=0;i<200;i++){let x=i/200*100;xs.push(x);
+    ys.push(popType.value==="normal"?Math.exp(-(x-50)**2/200)/(10*Math.sqrt(2*Math.PI)):popType.value==="uniform"?1/100:1/(x+10));}}
+  popChart.data.labels=xs;popChart.data.datasets[0].data=ys;popChart.update();
 }
-
 updatePop();
 
+// ---------- Histogram Chart ----------
 let results=[];
-const histChart = new Chart(document.getElementById("histCanvas"), {
+const histChart=new Chart(histCanvas,{
   type:"bar",
   data:{labels:[],datasets:[{data:[]}]},
   options:{
-    animation:false,
-    scales:{x:{grid:{display:false}}, y:{beginAtZero:true}},
-    datasets:{bar:{barPercentage:1.0, categoryPercentage:1.0}}
+    responsive:true,animation:false,
+    scales:{x:{grid:{display:false}},y:{beginAtZero:true}},
+    datasets:{bar:{barPercentage:1.0,categoryPercentage:1.0}},
+    plugins:{legend:{display:false}}
   }
 });
 
 function drawSample(){
-  let n=parseInt(nSlider.value), p=parseFloat(pSlider.value);
-  let sample=[];
+  let n=+nSlider.value,p=+pSlider.value,sample=[];
   for(let i=0;i<n;i++){
-    if(popType.value==="normal") sample.push(randNormal());
-    else if(popType.value==="uniform") sample.push(randUniform());
-    else if(popType.value==="skew") sample.push(randSkew());
-    else sample.push(randBern(p));
+    sample.push(popType.value==="normal"?rNorm():popType.value==="uniform"?rUnif():popType.value==="skew"?rSkew():rBern(p));
   }
-  let stat = statType.value==="mean"
-    ? sample.reduce((a,b)=>a+b)/n
-    : sample.filter(x=>x===1).length/n;
-
-  results.push(stat);
+  results.push(statType.value==="mean"?sample.reduce((a,b)=>a+b)/n:sample.filter(x=>x===1).length/n);
   updateHist();
 }
 
 function updateHist(){
-  if(results.length<2) return;
-  let bins=20, min=Math.min(...results), max=Math.max(...results);
-  let step=(max-min)/bins, counts=new Array(bins).fill(0);
+  if(results.length<2)return;
+  let min=Math.min(...results),max=Math.max(...results),bins=20,step=(max-min)/bins,counts=new Array(bins).fill(0);
   results.forEach(v=>counts[Math.min(bins-1,Math.floor((v-min)/step))]++);
-  histChart.data.labels = counts.map((_,i)=>(min+i*step).toFixed(2));
-  histChart.data.datasets[0].data = counts;
+  histChart.data.labels=counts.map((_,i)=>(min+i*step).toFixed(2));
+  histChart.data.datasets[0].data=counts;
   histChart.update();
 }
 
-document.getElementById("draw1").onclick = drawSample;
-document.getElementById("draw100").onclick = function(){
-  let i=0; (function loop(){ if(i<100){ drawSample(); i++; setTimeout(loop,15);} })();
-};
-document.getElementById("reset").onclick = function(){ results=[]; updateHist(); };
+draw1.onclick=drawSample;
+draw100.onclick=()=>{let i=0;(function loop(){if(i<100){drawSample();i++;setTimeout(loop,15);}})();};
+reset.onclick=()=>{results=[];updateHist();};
 
-};
 </script>
-
 </body>
 </html>
