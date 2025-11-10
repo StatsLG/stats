@@ -33,7 +33,7 @@
   <main>
 
     <h1>Central Limit Theorem Demo</h1>
-    <p class="subtitle">Switch between Sample Means and Sample Proportions. Watch the sampling distribution form, one sample at a time.</p>
+    <p class="subtitle">Switch between Sample Means and Sample Proportions. Watch the sampling distribution form.</p>
 
     <div class="tabs">
       <button class="tab active" id="tabMeans">Sample Means</button>
@@ -112,8 +112,9 @@ document.querySelectorAll('[data-include]').forEach(el=>fetch(el.dataset.include
 
 let mode="means";
 let sampleStats=[];
-const bins=40;
+let bins=60;
 let domain=[-5,5];
+let population=[];
 
 const ctx = document.getElementById("hist").getContext("2d");
 const dotCtx = document.getElementById("dotCanvas").getContext("2d");
@@ -123,7 +124,7 @@ function sd(a){let m=mean(a),s=0;for(let v of a)s+=(v-m)**2;return Math.sqrt(s/(
 
 function genPop(){
   if(mode==="props") return;
-  let N=60000,p=[];
+  let N=80000,p=[];
   let shape=document.getElementById("shape").value;
   for(let i=0;i<N;i++){
     if(shape==="uniform") p.push(Math.random());
@@ -132,24 +133,7 @@ function genPop(){
     else if(shape==="bimodal") p.push(Math.random()<.5?Math.random()*0.5:Math.random()*0.5+1.5);
     else p.push((Math.random()<.7?(Math.random()*-Math.log(Math.random())):((Math.random()*0.3)-2)));
   }
-  window.population=p;
-  let mu=mean(p), s=sd(p);
-  domain=[mu-4*s,mu+4*s];
-}
-
-function updateStats(){
-  let μ, σ;
-  if(mode==="props"){
-    let p=parseFloat(trueP.value);
-    μ=p; σ=Math.sqrt(p*(1-p));
-    sampSD.textContent=(σ/Math.sqrt(nProps.value)).toFixed(4);
-  } else {
-    μ=mean(population);
-    σ=sd(population);
-    sampSD.textContent=(σ/Math.sqrt(nMeans.value)).toFixed(4);
-  }
-  popMean.textContent=μ.toFixed(4);
-  popSD.textContent=σ.toFixed(4);
+  population=p;
 }
 
 let chart=new Chart(ctx,{
@@ -158,54 +142,67 @@ let chart=new Chart(ctx,{
   options:{
     animation:false,
     maintainAspectRatio:false,
-    scales:{x:{type:"linear",min:-5,max:5},y:{beginAtZero:true}}
+    scales:{x:{type:"linear"},y:{beginAtZero:true}}
   }
 });
 
 function refresh(){
-  let lo=domain[0], hi=domain[1];
+  let center=(sampleStats.length>0)?mean(sampleStats):(mode==="props"?parseFloat(trueP.value):mean(population));
+  let spread=(mode==="props"
+    ? Math.sqrt((parseFloat(trueP.value)*(1-parseFloat(trueP.value))))/Math.sqrt(nProps.value)
+    : sd(population)/Math.sqrt(nMeans.value)
+  );
+
+  let lo=center-4*spread, hi=center+4*spread;
+  domain=[lo,hi];
   let w=(hi-lo)/bins;
   let edges=Array.from({length:bins+1},(_,i)=>lo+i*w);
   let counts=Array(bins).fill(0);
   for(let v of sampleStats){
     if(v>=lo && v<=hi){
-      let i=Math.floor((v-lo)/w); if(i>=bins) i=bins-1;
+      let i=Math.floor((v-lo)/w); if(i>=bins)i=bins-1;
       counts[i]++;
     }
   }
+
   chart.data.labels=edges.slice(0,-1);
-  chart.data.datasets[0].data=counts.map((c,i)=>({x:(edges[i]+edges[i+1])/2,y:c}));
+  chart.data.datasets[0].data=counts;
   chart.options.scales.x.min=lo;
   chart.options.scales.x.max=hi;
+  chart.options.scales.y.max=Math.max(5,...counts)*1.2;
   chart.update("none");
-  countSamples.textContent=sampleStats.length;
 
-  freq.innerHTML=`<table><tr><th>Range</th><th>Count</th></tr>`+
+  freq.innerHTML="<table><tr><th>Range</th><th>Count</th></tr>"+
     counts.map((c,i)=>`<tr><td>${edges[i].toFixed(3)} to ${edges[i+1].toFixed(3)}</td><td>${c}</td></tr>`).join("")+
-    `</table>`;
+    "</table>";
+  popMean.textContent=(mode==="props"?parseFloat(trueP.value):mean(population)).toFixed(4);
+  popSD.textContent=(mode==="props"
+    ?Math.sqrt(parseFloat(trueP.value)*(1-parseFloat(trueP.value)))
+    :sd(population)).toFixed(4);
+  sampSD.textContent=(spread).toFixed(6);
+  countSamples.textContent=sampleStats.length;
 }
 
 function dot(value){
   let xs=chart.scales.x, ys=chart.scales.y;
   let x=xs.getPixelForValue(value), y=ys.getPixelForValue(0);
-  let start=0, end=y-8, t0=performance.now();
+  let start=0,end=y-6,t0=performance.now();
   function f(t){
-    let p=Math.min(1,(t-t0)/300);
-    let yy=start+(end-start)*(1-(1-p)**3);
+    let p=Math.min(1,(t-t0)/300),e=1-(1-p)**3;
     dotCtx.clearRect(0,0,dotCanvas.width,dotCanvas.height);
-    dotCtx.beginPath(); dotCtx.arc(x,yy,5,0,7); dotCtx.fillStyle="#d9534f"; dotCtx.fill();
-    if(p<1) requestAnimationFrame(f);
+    dotCtx.beginPath(); dotCtx.arc(x,start+(end-start)*e,5,0,7); dotCtx.fillStyle="#d9534f"; dotCtx.fill();
+    if(p<1)requestAnimationFrame(f);
   }
   requestAnimationFrame(f);
 }
 
 function drawSample(){
   if(mode==="props"){
-    let p=parseFloat(trueP.value), n=parseInt(nProps.value), s=0;
+    let p=parseFloat(trueP.value),n=parseInt(nProps.value),s=0;
     for(let i=0;i<n;i++) s+=(Math.random()<p?1:0);
     return s/n;
   } else {
-    let n=parseInt(nMeans.value), s=0;
+    let n=parseInt(nMeans.value),s=0;
     for(let i=0;i<n;i++) s+=population[(Math.random()*population.length)|0];
     return s/n;
   }
@@ -220,25 +217,19 @@ function add(k,animate){
   if(!animate) refresh();
 }
 
-function resetAll(){
-  sampleStats=[]; countSamples.textContent=0; dotCtx.clearRect(0,0,9000,9000); refresh();
-}
-
-tabMeans.onclick=()=>{mode="means"; tabMeans.classList.add("active"); tabProps.classList.remove("active"); meansControls.style.display=""; propsControls.style.display="none"; genPop(); updateStats(); resetAll();}
-tabProps.onclick=()=>{mode="props"; tabProps.classList.add("active"); tabMeans.classList.remove("active"); meansControls.style.display="none"; propsControls.style.display=""; updateStats(); resetAll();}
-
-shape.onchange=()=>{genPop(); updateStats(); resetAll();}
-nMeans.oninput=()=>{nMeansVal.textContent=nMeans.value; updateStats();}
-nProps.oninput=()=>{nPropsVal.textContent=nProps.value; updateStats();}
-trueP.oninput=()=>{truePVal.textContent=trueP.value; updateStats();}
-
 add1.onclick=()=>add(1,true);
-add50.onclick=()=>{let c=0; let I=setInterval(()=>{add(1,true); if(++c>=50)clearInterval(I)},120);}
+add50.onclick=()=>{let c=0;let I=setInterval(()=>{add(1,true);if(++c>=50)clearInterval(I)},120);}
 add1000.onclick=()=>add(1000,false);
-reset.onclick=resetAll;
+reset.onclick=()=>{sampleStats=[];refresh();dotCtx.clearRect(0,0,9999,9999)};
 
-// Initialize
-genPop(); updateStats(); refresh();
+tabMeans.onclick=()=>{mode="means";tabMeans.classList.add("active");tabProps.classList.remove("active");meansControls.style.display="";propsControls.style.display="none";genPop();sampleStats=[];refresh();}
+tabProps.onclick=()=>{mode="props";tabProps.classList.add("active");tabMeans.classList.remove("active");meansControls.style.display="none";propsControls.style.display="";sampleStats=[];refresh();}
+shape.onchange=()=>{genPop();sampleStats=[];refresh();}
+nMeans.oninput=()=>{nMeansVal.textContent=nMeans.value;refresh();}
+nProps.oninput=()=>{nPropsVal.textContent=nProps.value;refresh();}
+trueP.oninput=()=>{truePVal.textContent=trueP.value;refresh();}
+
+genPop(); refresh();
 </script>
 </body>
 </html>
