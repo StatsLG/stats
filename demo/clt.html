@@ -17,7 +17,7 @@
     .clt label.inline{display:flex;align-items:center;gap:.4rem}
     .clt .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
     .clt .small{font-size:.9rem}
-    .clt .btn{padding:.5rem .8rem;border:1px solid var(--rule);background:var(--panel);border-radius:.5rem;cursor:pointer}
+    $1; color: var(--ink); }
     .clt .btn:disabled{opacity:.6;cursor:not-allowed}
     .clt .tabs{display:flex;gap:.5rem;margin:.5rem 0}
     .clt .tab{padding:.35rem .8rem;border:1px solid var(--rule);border-bottom:none;border-radius:.5rem .5rem 0 0;background:var(--panel);cursor:pointer}
@@ -456,11 +456,41 @@
     }
 
     function refreshHistogram(){
+      // Compute an adaptive x-domain so the bell shape is visible
+      let center;
+      if(sampleStats.length>0){ center = mean(sampleStats); }
+      else if(mode==='props'){ center = parseFloat($('#trueP').value); }
+      else { center = estimateMuSigmaForShape().mu; }
+
+      let spread; // theoretical sampling sd
+      if(mode==='props'){
+        const p=parseFloat($('#trueP').value); const n=parseInt($('#nProps').value);
+        spread = Math.sqrt(p*(1-p))/Math.sqrt(n);
+      } else {
+        const popSigma = estimateMuSigmaForShape().sigma; const n=parseInt($('#nMeans').value);
+        spread = popSigma/Math.sqrt(n);
+      }
+
+      // Choose width: at least ±2*popSigma (means) or 0..1 (props), and at least ±4*spread
+      if(mode==='props'){
+        const w = Math.max(0.25, 8*spread); // minimum width so bins are meaningful
+        let lo = Math.max(0, center - w/2), hi = Math.min(1, center + w/2);
+        // ensure a minimum domain size
+        if(hi-lo < 0.2){ const mid=(lo+hi)/2; lo=Math.max(0, mid-0.1); hi=Math.min(1, mid+0.1); }
+        domain=[lo,hi];
+      } else {
+        const popSigma = estimateMuSigmaForShape().sigma;
+        const minWidth = 2*popSigma; // show a few pop SDs
+        const tight = 8*spread;      // show ±4 sampling SDs
+        const width = Math.max(minWidth, tight);
+        domain=[center - width/2, center + width/2];
+      }
+
       const {edges, centers, counts} = getBins();
       histChart.data.labels = centers;
       histChart.data.datasets[0].data = counts.map((c,i)=>({x:centers[i], y:c}));
-      histChart.options.scales.x.min = (mode==='props') ? 0 : domain[0];
-      histChart.options.scales.x.max = (mode==='props') ? 1 : domain[1];
+      histChart.options.scales.x.min = (mode==='props') ? domain[0] : domain[0];
+      histChart.options.scales.x.max = (mode==='props') ? domain[1] : domain[1];
       const maxY = Math.max(10, ...counts);
       histChart.options.scales.y.max = Math.ceil(maxY*1.12);
       histChart.update('none');
