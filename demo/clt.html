@@ -7,26 +7,44 @@
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
   <style>
-    .wrap-grid{display:grid; grid-template-columns:320px 1fr; gap:15px; padding:10px;}
-    .panel{background:white; padding:15px; border-radius:8px;}
-    input[type="number"]{width:80px;}
+    .wrap-grid {
+      margin-left: 260px; /* make space for sidebar */
+      display: flex;
+      gap: 15px;
+      padding: 15px;
+    }
+    .panel {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    .panel:first-child {
+      width: 320px;
+      flex-shrink: 0; /* Keep left panel fixed size */
+    }
+    input[type="number"] {
+      width: 80px;
+    }
+    table { margin-top: 10px; }
   </style>
 </head>
 
 <body>
+
   <div class="wrap-grid">
     <!-- LEFT PANEL -->
     <div class="panel">
       <h2>Central Limit Theorem Demo</h2>
 
-      <label for="distSelect"><strong>Population Distribution:</strong></label><br>
+      <label><strong>Population Distribution:</strong></label><br>
       <select id="distSelect">
         <option value="uniform">Uniform (0,1)</option>
         <option value="normal">Normal (μ=0, σ=1)</option>
-        <option value="skewed">Right-Skewed (Exp)</option>
-        <option value="bimodal">Bimodal</option>
-        <option value="crazy">Crazy (Sinusoidal)</option>
+        <option value="skewed">Right-Skewed (Exponential-ish)</option>
+        <option value="bimodal">Bimodal (Two peaks)</option>
+        <option value="crazy">Crazy (Sin + noise)</option>
       </select>
 
       <br><br>
@@ -36,110 +54,127 @@
 
       <br><br>
 
-      <button id="takeSampleBtn">Take ONE Sample</button><br><br>
-      <button id="take50Btn">Take 50 Samples</button><br><br>
-      <button id="resetBtn">Reset</button>
+      <button id="takeSampleBtn">Take ONE Sample Mean</button><br><br>
+      <button id="take50Btn">Take 50 Samples (animated)</button><br><br>
+      <button id="resetBtn">Reset Sampling Distribution</button>
 
       <hr>
+
       <p><strong>Population Mean (μ):</strong> <span id="popMean"></span></p>
       <p><strong>Population SD (σ):</strong> <span id="popSD"></span></p>
       <p><strong># of Sample Means Collected:</strong> <span id="countSamples">0</span></p>
     </div>
 
     <!-- RIGHT PANEL -->
-    <div class="panel">
+    <div class="panel" style="flex-grow:1;">
       <h3>Population Distribution</h3>
       <canvas id="populationChart"></canvas>
 
       <h3>Sampling Distribution of Sample Means</h3>
       <canvas id="samplingChart"></canvas>
+
+      <h3>Sampling Distribution Summary</h3>
+      <table id="summaryTable" border="1" style="border-collapse:collapse; width:100%; text-align:center;">
+        <tr><th>Statistic</th><th>Value</th></tr>
+        <tr><td>Mean of sample means</td><td id="meanSampleMeans">--</td></tr>
+        <tr><td>SD of sample means</td><td id="sdSampleMeans">--</td></tr>
+        <tr><td>Theoretical SD (σ / √n)</td><td id="theoreticalSD">--</td></tr>
+      </table>
     </div>
   </div>
 
-  <!-- Sidebar Injection -->
+  <!-- Insert Sidebar -->
   <script>
     fetch("/partials/sidebar.html")
       .then(r => r.text())
-      .then(html => { document.body.insertAdjacentHTML("afterbegin", html); });
+      .then(html => document.body.insertAdjacentHTML("afterbegin", html));
   </script>
 
   <script>
-    // GLOBALS
+    // Globals
+    const POP_SIZE = 20000;
     let population = [];
     let sampleMeans = [];
-    const POP_SIZE = 20000;
+    let popChart, sampChart, samplingInterval = null;
 
-    // CHARTS
     const popCtx = document.getElementById("populationChart");
     const sampCtx = document.getElementById("samplingChart");
 
-    function makeChart(ctx, data, label) {
-      return new Chart(ctx, {
-        type: "bar",
-        data: { labels: data.x, datasets: [{ data: data.y }] },
-        options: {
-          scales:{ y:{ beginAtZero:true }},
-          plugins:{ legend:{ display:false }},
-        }
-      });
-    }
-
     function histogram(values, bins=40){
       const min = Math.min(...values), max = Math.max(...values);
-      const width=(max-min)/bins;
-      let counts=new Array(bins).fill(0);
-      values.forEach(v=>{ counts[Math.min(bins-1, Math.floor((v-min)/width))]++; });
-      return {x:counts.map((_,i)=> (min+i*width).toFixed(2)), y:counts};
+      const width = (max-min)/bins;
+      let counts = new Array(bins).fill(0);
+      values.forEach(v => counts[Math.min(bins-1, Math.floor((v-min)/width))]++);
+      return {x: counts.map((_,i)=> (min+i*width).toFixed(2)), y:counts};
+    }
+
+    function mean(arr){ return arr.reduce((a,b)=>a+b,0)/arr.length; }
+    function sd(arr){
+      let m = mean(arr);
+      return Math.sqrt(mean(arr.map(v => (v-m)**2)));
     }
 
     function generatePopulation(dist){
       if(dist==="uniform") return Array.from({length:POP_SIZE},()=>Math.random());
-      if(dist==="normal") return Array.from({length:POP_SIZE},()=>Math.random()*1+0);
-      if(dist==="skewed") return Array.from({length:POP_SIZE},()=>Math.random()*-Math.log(Math.random()));
-      if(dist==="bimodal") return Array.from({length:POP_SIZE},()=>Math.random()<0.5?Math.random()*0.5:Math.random()*0.5+1.5);
+      if(dist==="normal") return Array.from({length:POP_SIZE},()=> (Math.random()*1) );
+      if(dist==="skewed") return Array.from({length:POP_SIZE},()=> Math.random()*-Math.log(Math.random()));
+      if(dist==="bimodal") return Array.from({length:POP_SIZE},()=> Math.random()<0.5?Math.random()*0.5:Math.random()*0.5+1.5);
       if(dist==="crazy") return Array.from({length:POP_SIZE},()=>Math.sin(Math.random()*10)+Math.random()*0.5);
     }
 
-    function mean(arr){return arr.reduce((a,b)=>a+b,0)/arr.length;}
-    function sd(arr){
-      let m=mean(arr);
-      return Math.sqrt(mean(arr.map(v=>(v-m)**2)));
-    }
-
-    let popChart, sampChart;
-
     function refreshPopulation(){
-      const dist=document.getElementById("distSelect").value;
-      population=generatePopulation(dist);
+      population = generatePopulation(document.getElementById("distSelect").value);
       document.getElementById("popMean").textContent = mean(population).toFixed(4);
       document.getElementById("popSD").textContent = sd(population).toFixed(4);
-
-      const hist=histogram(population);
+      let hist = histogram(population);
       if(popChart) popChart.destroy();
-      popChart = makeChart(popCtx, hist, "Population");
+      popChart = new Chart(popCtx,{type:"bar",data:{labels:hist.x,datasets:[{data:hist.y}]},options:{plugins:{legend:{display:false}}}});
     }
 
     function takeSample(){
-      let n=parseInt(document.getElementById("sampleSize").value);
-      let sample=[];
-      for(let i=0;i<n;i++){
-        sample.push(population[Math.floor(Math.random()*POP_SIZE)]);
-      }
+      let n = parseInt(document.getElementById("sampleSize").value);
+      let sample = Array.from({length:n}, ()=> population[Math.floor(Math.random()*POP_SIZE)]);
       sampleMeans.push(mean(sample));
-      document.getElementById("countSamples").textContent=sampleMeans.length;
+      document.getElementById("countSamples").textContent = sampleMeans.length;
       updateSamplingChart();
     }
 
     function updateSamplingChart(){
-      const hist=histogram(sampleMeans);
+      let hist = histogram(sampleMeans);
       if(sampChart) sampChart.destroy();
-      sampChart = makeChart(sampCtx, hist, "Sampling Distribution");
+      sampChart = new Chart(sampCtx,{type:"bar",data:{labels:hist.x,datasets:[{data:hist.y}]},options:{plugins:{legend:{display:false}}}});
+
+      if(sampleMeans.length > 0){
+        document.getElementById("meanSampleMeans").textContent = mean(sampleMeans).toFixed(4);
+        document.getElementById("sdSampleMeans").textContent = sd(sampleMeans).toFixed(4);
+      }
+
+      let n = parseInt(document.getElementById("sampleSize").value);
+      document.getElementById("theoreticalSD").textContent = (sd(population)/Math.sqrt(n)).toFixed(4);
     }
 
-    document.getElementById("takeSampleBtn").onclick=takeSample;
-    document.getElementById("take50Btn").onclick=()=>{for(let i=0;i<50;i++)takeSample();};
-    document.getElementById("resetBtn").onclick=()=>{sampleMeans=[]; document.getElementById("countSamples").textContent=0; updateSamplingChart();};
-    document.getElementById("distSelect").onchange=refreshPopulation;
+    document.getElementById("takeSampleBtn").onclick = takeSample;
+
+    // Animated sampling
+    document.getElementById("take50Btn").onclick = () => {
+      if(samplingInterval) return;
+      let count = 0;
+      samplingInterval = setInterval(()=>{
+        takeSample();
+        if(++count>=50){
+          clearInterval(samplingInterval);
+          samplingInterval = null;
+        }
+      },120);
+    };
+
+    document.getElementById("resetBtn").onclick = ()=>{
+      sampleMeans=[];
+      document.getElementById("countSamples").textContent = 0;
+      updateSamplingChart();
+    };
+
+    document.getElementById("distSelect").onchange = refreshPopulation;
 
     refreshPopulation();
     updateSamplingChart();
