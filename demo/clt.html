@@ -10,87 +10,113 @@
 
   <style>
     .wrap-grid {
-      margin-left: 260px; /* make space for sidebar */
       display: flex;
-      gap: 15px;
-      padding: 15px;
+      gap: 1rem;
+      align-items: flex-start;
     }
-    .panel {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
+    .controls-panel {
+      width: 300px;
+      background: var(--panel);
+      border: 1px solid var(--rule);
+      border-radius: .75rem;
+      padding: 1rem;
     }
-    .panel:first-child {
-      width: 320px;
-      flex-shrink: 0; /* Keep left panel fixed size */
+    .chart-panel {
+      flex-grow: 1;
+      background: var(--panel);
+      border: 1px solid var(--rule);
+      border-radius: .75rem;
+      padding: 1rem;
     }
-    input[type="number"] {
-      width: 80px;
+    canvas { max-height: 420px; }
+    table {
+      margin-top: 1rem;
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
     }
-    table { margin-top: 10px; }
+    table td, table th {
+      border: 1px solid var(--rule);
+      padding: .4rem;
+    }
+    button { margin-top: .4rem; width: 100%; }
   </style>
 </head>
 
 <body>
+  <div class="wrap">
+    <aside class="sidebar" aria-label="Sidebar" data-include="/partials/sidebar.html"></aside>
 
-  <div class="wrap-grid">
-    <!-- LEFT PANEL -->
-    <div class="panel">
-      <h2>Central Limit Theorem Demo</h2>
+    <main>
+      <header>
+        <h1>Central Limit Theorem</h1>
+        <p class="subtitle">Pick a population shape, draw samples, and watch the sampling distribution form.</p>
+      </header>
 
-      <label><strong>Population Distribution:</strong></label><br>
-      <select id="distSelect">
-        <option value="uniform">Uniform (0,1)</option>
-        <option value="normal">Normal (μ=0, σ=1)</option>
-        <option value="skewed">Right-Skewed (Exponential-ish)</option>
-        <option value="bimodal">Bimodal (Two peaks)</option>
-        <option value="crazy">Crazy (Sin + noise)</option>
-      </select>
+      <section class="card-compact">
+        <div class="wrap-grid">
 
-      <br><br>
+          <!-- LEFT PANEL -->
+          <div class="controls-panel">
+            <h2>Controls</h2>
 
-      <label><strong>Sample Size (n):</strong></label><br>
-      <input type="number" id="sampleSize" value="30" min="1" max="500">
+            <label><strong>Population Distribution:</strong></label><br>
+            <select id="distSelect">
+              <option value="uniform">Uniform (0,1)</option>
+              <option value="normal">Normal (μ=0, σ=1)</option>
+              <option value="skewed">Right-Skewed (Exponential-like)</option>
+              <option value="bimodal">Bimodal (Two Peaks)</option>
+              <option value="crazy">Crazy (Sin + noise)</option>
+            </select>
 
-      <br><br>
+            <br><br>
 
-      <button id="takeSampleBtn">Take ONE Sample Mean</button><br><br>
-      <button id="take50Btn">Take 50 Samples (animated)</button><br><br>
-      <button id="resetBtn">Reset Sampling Distribution</button>
+            <label><strong>Sample Size (n):</strong></label><br>
+            <input type="number" id="sampleSize" value="30" min="1" max="500">
 
-      <hr>
+            <br><br>
 
-      <p><strong>Population Mean (μ):</strong> <span id="popMean"></span></p>
-      <p><strong>Population SD (σ):</strong> <span id="popSD"></span></p>
-      <p><strong># of Sample Means Collected:</strong> <span id="countSamples">0</span></p>
-    </div>
+            <button id="takeSampleBtn">Take ONE Sample Mean</button>
+            <button id="take50Btn">Take 50 Samples (Animated)</button>
+            <button id="resetBtn">Reset Sampling Distribution</button>
 
-    <!-- RIGHT PANEL -->
-    <div class="panel" style="flex-grow:1;">
-      <h3>Population Distribution</h3>
-      <canvas id="populationChart"></canvas>
+            <hr>
 
-      <h3>Sampling Distribution of Sample Means</h3>
-      <canvas id="samplingChart"></canvas>
+            <p><strong>Population Mean (μ):</strong> <span id="popMean"></span></p>
+            <p><strong>Population SD (σ):</strong> <span id="popSD"></span></p>
+            <p><strong># of Sample Means:</strong> <span id="countSamples">0</span></p>
+          </div>
 
-      <h3>Sampling Distribution Summary</h3>
-      <table id="summaryTable" border="1" style="border-collapse:collapse; width:100%; text-align:center;">
-        <tr><th>Statistic</th><th>Value</th></tr>
-        <tr><td>Mean of sample means</td><td id="meanSampleMeans">--</td></tr>
-        <tr><td>SD of sample means</td><td id="sdSampleMeans">--</td></tr>
-        <tr><td>Theoretical SD (σ / √n)</td><td id="theoreticalSD">--</td></tr>
-      </table>
-    </div>
+          <!-- RIGHT PANEL -->
+          <div class="chart-panel">
+            <h3>Population Distribution</h3>
+            <canvas id="populationChart"></canvas>
+
+            <h3>Sampling Distribution of Sample Means</h3>
+            <canvas id="samplingChart"></canvas>
+
+            <h3>Sampling Distribution Summary</h3>
+            <table>
+              <tr><th>Statistic</th><th>Value</th></tr>
+              <tr><td>Mean of Sample Means</td><td id="meanSampleMeans">--</td></tr>
+              <tr><td>SD of Sample Means</td><td id="sdSampleMeans">--</td></tr>
+              <tr><td>Theoretical SD (σ / √n)</td><td id="theoreticalSD">--</td></tr>
+            </table>
+          </div>
+
+        </div>
+      </section>
+    </main>
   </div>
 
-  <!-- Insert Sidebar -->
   <script>
-    fetch("/partials/sidebar.html")
-      .then(r => r.text())
-      .then(html => document.body.insertAdjacentHTML("afterbegin", html));
-  </script>
+    // Load Sidebar
+    document.querySelectorAll('[data-include]').forEach(el =>
+      fetch(el.getAttribute('data-include'))
+        .then(r => r.text())
+        .then(html => el.innerHTML = html)
+    );
 
-  <script>
     // Globals
     const POP_SIZE = 20000;
     let population = [];
@@ -100,84 +126,93 @@
     const popCtx = document.getElementById("populationChart");
     const sampCtx = document.getElementById("samplingChart");
 
-    function histogram(values, bins=40){
-      const min = Math.min(...values), max = Math.max(...values);
-      const width = (max-min)/bins;
-      let counts = new Array(bins).fill(0);
-      values.forEach(v => counts[Math.min(bins-1, Math.floor((v-min)/width))]++);
-      return {x: counts.map((_,i)=> (min+i*width).toFixed(2)), y:counts};
-    }
-
     function mean(arr){ return arr.reduce((a,b)=>a+b,0)/arr.length; }
-    function sd(arr){
-      let m = mean(arr);
-      return Math.sqrt(mean(arr.map(v => (v-m)**2)));
+    function sd(arr){ let m=mean(arr); return Math.sqrt(arr.map(v=>(v-m)**2).reduce((a,b)=>a+b)/arr.length); }
+
+    function histogram(values, bins=40){
+      const min=Math.min(...values), max=Math.max(...values);
+      const width=(max-min)/bins;
+      let counts=new Array(bins).fill(0);
+      values.forEach(v=>counts[Math.min(bins-1,Math.floor((v-min)/width))]++);
+      return { x:counts.map((_,i)=>(min+i*width).toFixed(2)), y:counts };
     }
 
-    function generatePopulation(dist){
-      if(dist==="uniform") return Array.from({length:POP_SIZE},()=>Math.random());
-      if(dist==="normal") return Array.from({length:POP_SIZE},()=> (Math.random()*1) );
-      if(dist==="skewed") return Array.from({length:POP_SIZE},()=> Math.random()*-Math.log(Math.random()));
-      if(dist==="bimodal") return Array.from({length:POP_SIZE},()=> Math.random()<0.5?Math.random()*0.5:Math.random()*0.5+1.5);
-      if(dist==="crazy") return Array.from({length:POP_SIZE},()=>Math.sin(Math.random()*10)+Math.random()*0.5);
+    function generatePopulation(type){
+      if(type==="uniform") return Array.from({length:POP_SIZE},()=>Math.random());
+      if(type==="normal") return Array.from({length:POP_SIZE},()=> (Math.random()*1));
+      if(type==="skewed") return Array.from({length:POP_SIZE},()=> Math.random()*-Math.log(Math.random()));
+      if(type==="bimodal") return Array.from({length:POP_SIZE},()=> Math.random()<0.5?Math.random()*0.5:Math.random()*0.5+1.5);
+      if(type==="crazy") return Array.from({length:POP_SIZE},()=> Math.sin(Math.random()*10)+Math.random()*0.5);
     }
 
-    function refreshPopulation(){
+    function drawPopulation(){
       population = generatePopulation(document.getElementById("distSelect").value);
       document.getElementById("popMean").textContent = mean(population).toFixed(4);
       document.getElementById("popSD").textContent = sd(population).toFixed(4);
-      let hist = histogram(population);
+
+      let hist=histogram(population);
       if(popChart) popChart.destroy();
-      popChart = new Chart(popCtx,{type:"bar",data:{labels:hist.x,datasets:[{data:hist.y}]},options:{plugins:{legend:{display:false}}}});
+      popChart=new Chart(popCtx,{
+        type:"bar",
+        data:{labels:hist.x,datasets:[{data:hist.y}]},
+        options:{
+          animation:false,
+          plugins:{legend:{display:false}},
+          scales:{y:{beginAtZero:true}}
+        }
+      });
     }
 
-    function takeSample(){
-      let n = parseInt(document.getElementById("sampleSize").value);
-      let sample = Array.from({length:n}, ()=> population[Math.floor(Math.random()*POP_SIZE)]);
-      sampleMeans.push(mean(sample));
-      document.getElementById("countSamples").textContent = sampleMeans.length;
-      updateSamplingChart();
-    }
-
-    function updateSamplingChart(){
+    function drawSampling(){
       let hist = histogram(sampleMeans);
       if(sampChart) sampChart.destroy();
-      sampChart = new Chart(sampCtx,{type:"bar",data:{labels:hist.x,datasets:[{data:hist.y}]},options:{plugins:{legend:{display:false}}}});
+      sampChart=new Chart(sampCtx,{
+        type:"bar",
+        data:{labels:hist.x,datasets:[{data:hist.y}]},
+        options:{
+          animation:false,
+          plugins:{legend:{display:false}},
+          scales:{y:{beginAtZero:true}}
+        }
+      });
 
-      if(sampleMeans.length > 0){
+      if(sampleMeans.length){
         document.getElementById("meanSampleMeans").textContent = mean(sampleMeans).toFixed(4);
         document.getElementById("sdSampleMeans").textContent = sd(sampleMeans).toFixed(4);
       }
+      document.getElementById("theoreticalSD").textContent =
+        (sd(population)/Math.sqrt(parseInt(document.getElementById("sampleSize").value))).toFixed(4);
+    }
 
-      let n = parseInt(document.getElementById("sampleSize").value);
-      document.getElementById("theoreticalSD").textContent = (sd(population)/Math.sqrt(n)).toFixed(4);
+    function takeSample(){
+      let n=parseInt(document.getElementById("sampleSize").value);
+      sampleMeans.push(mean(Array.from({length:n},()=>population[Math.floor(Math.random()*POP_SIZE)])));
+      document.getElementById("countSamples").textContent = sampleMeans.length;
+      drawSampling();
     }
 
     document.getElementById("takeSampleBtn").onclick = takeSample;
 
-    // Animated sampling
-    document.getElementById("take50Btn").onclick = () => {
+    document.getElementById("take50Btn").onclick = ()=>{
       if(samplingInterval) return;
-      let count = 0;
-      samplingInterval = setInterval(()=>{
+      let count=0;
+      samplingInterval=setInterval(()=>{
         takeSample();
-        if(++count>=50){
-          clearInterval(samplingInterval);
-          samplingInterval = null;
-        }
+        if(++count>=50){ clearInterval(samplingInterval); samplingInterval=null; }
       },120);
     };
 
     document.getElementById("resetBtn").onclick = ()=>{
       sampleMeans=[];
       document.getElementById("countSamples").textContent = 0;
-      updateSamplingChart();
+      drawSampling();
     };
 
-    document.getElementById("distSelect").onchange = refreshPopulation;
+    document.getElementById("distSelect").onchange = drawPopulation;
 
-    refreshPopulation();
-    updateSamplingChart();
+    drawPopulation();
+    drawSampling();
   </script>
+
 </body>
 </html>
