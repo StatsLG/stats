@@ -33,7 +33,7 @@
   <main>
 
     <h1>Central Limit Theorem Demo</h1>
-    <p class="subtitle">Switch between Sample Means and Sample Proportions. Watch the sampling distribution form.</p>
+    <p class="subtitle">Compare the <b>Population</b> distribution (ghost curve) to the <b>Sampling Distribution</b> forming below.</p>
 
     <div class="tabs">
       <button class="tab active" id="tabMeans">Sample Means</button>
@@ -46,7 +46,6 @@
         <!-- LEFT CONTROL PANEL -->
         <div class="panel controls">
 
-          <!-- Means Controls -->
           <div id="meansControls">
             <label><b>Population Shape</b></label><br>
             <select id="shape">
@@ -63,7 +62,6 @@
             <div>n = <span id="nMeansVal">30</span></div>
           </div>
 
-          <!-- Proportions Controls -->
           <div id="propsControls" style="display:none;">
             <label>True proportion p</label>
             <input type="range" id="trueP" class="sl" min="0" max="1" step="0.01" value="0.35">
@@ -122,6 +120,7 @@ const dotCtx = document.getElementById("dotCanvas").getContext("2d");
 function mean(a){return a.reduce((x,y)=>x+y,0)/a.length;}
 function sd(a){let m=mean(a),s=0;for(let v of a)s+=(v-m)**2;return Math.sqrt(s/(a.length-1));}
 
+// Generate population dataset
 function genPop(){
   if(mode==="props") return;
   let N=80000,p=[];
@@ -136,9 +135,22 @@ function genPop(){
   population=p;
 }
 
+// KDE for population ghost curve
+function kde(values, xs){
+  let s=sd(values), bw=s*0.4, k=t=>Math.exp(-0.5*t*t)/Math.sqrt(2*Math.PI);
+  return xs.map(x=>mean(values.map(v=>k((x-v)/bw)))/bw);
+}
+
+// Chart with two datasets
 let chart=new Chart(ctx,{
   type:"bar",
-  data:{labels:[],datasets:[{data:[],backgroundColor:"#00467f"}]},
+  data:{
+    labels:[],
+    datasets:[
+      { data:[], backgroundColor:"#00467f" },
+      { data:[], type:"line", borderColor:"rgba(0,70,127,0.60)", borderWidth:2, tension:0.4, pointRadius:0, fill:false }
+    ]
+  },
   options:{
     animation:false,
     maintainAspectRatio:false,
@@ -146,6 +158,7 @@ let chart=new Chart(ctx,{
   }
 });
 
+// Refresh sampling histogram & ghost curve
 function refresh(){
   let center=(sampleStats.length>0)?mean(sampleStats):(mode==="props"?parseFloat(trueP.value):mean(population));
   let spread=(mode==="props"
@@ -155,9 +168,11 @@ function refresh(){
 
   let lo=center-4*spread, hi=center+4*spread;
   domain=[lo,hi];
+
   let w=(hi-lo)/bins;
   let edges=Array.from({length:bins+1},(_,i)=>lo+i*w);
   let counts=Array(bins).fill(0);
+
   for(let v of sampleStats){
     if(v>=lo && v<=hi){
       let i=Math.floor((v-lo)/w); if(i>=bins)i=bins-1;
@@ -167,6 +182,19 @@ function refresh(){
 
   chart.data.labels=edges.slice(0,-1);
   chart.data.datasets[0].data=counts;
+
+  // Population ghost curve
+  if(mode==="means"){
+    let xs = edges;
+    let density = kde(population, xs);
+    let maxCount = Math.max(...counts,1);
+    let maxD = Math.max(...density,1);
+    let scaled = density.map(d=> d/maxD * maxCount);
+    chart.data.datasets[1].data = xs.map((x,i)=>({x, y: scaled[i]||0}));
+  } else {
+    chart.data.datasets[1].data = [];
+  }
+
   chart.options.scales.x.min=lo;
   chart.options.scales.x.max=hi;
   chart.options.scales.y.max=Math.max(5,...counts)*1.2;
@@ -176,13 +204,12 @@ function refresh(){
     counts.map((c,i)=>`<tr><td>${edges[i].toFixed(3)} to ${edges[i+1].toFixed(3)}</td><td>${c}</td></tr>`).join("")+
     "</table>";
   popMean.textContent=(mode==="props"?parseFloat(trueP.value):mean(population)).toFixed(4);
-  popSD.textContent=(mode==="props"
-    ?Math.sqrt(parseFloat(trueP.value)*(1-parseFloat(trueP.value)))
-    :sd(population)).toFixed(4);
+  popSD.textContent=(mode==="props"?Math.sqrt(parseFloat(trueP.value)*(1-parseFloat(trueP.value))):sd(population)).toFixed(4);
   sampSD.textContent=(spread).toFixed(6);
   countSamples.textContent=sampleStats.length;
 }
 
+// Falling dot animation
 function dot(value){
   let xs=chart.scales.x, ys=chart.scales.y;
   let x=xs.getPixelForValue(value), y=ys.getPixelForValue(0);
