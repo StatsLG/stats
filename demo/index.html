@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>StatsLG — Demos</title>
+  <title>StatsLG — Online Class Demos</title>
   <meta name="description" content="Interactive demos created by StatsLG." />
   <link rel="icon" href="/favicon.ico" />
   <!-- Root-relative first; script below rewrites to ../ if needed -->
@@ -20,28 +20,6 @@
         <p class="text-muted">Quick links to interactive classroom demos and prototypes.</p>
       </header>
 
-      <!-- Filter controls -->
-      <section class="section">
-        <div class="row">
-          <div>
-            <label for="demoSearch">Filter demos</label>
-            <input id="demoSearch" type="search" placeholder="Type to filter (e.g., confidence, sampling, game)" />
-          </div>
-          <div>
-            <label for="demoTag">Tag</label>
-            <select id="demoTag">
-              <option value="">All</option>
-              <option value="stats">Stats</option>
-              <option value="visualization">Visualization</option>
-              <option value="classroom">Classroom</option>
-              <option value="inference">Inference</option>
-              <option value="sampling">Sampling</option>
-              <option value="modeling">Modeling</option>
-              <option value="game">Game</option>
-            </select>
-          </div>
-        </div>
-      </section>
 
       <section class="section">
         <h2>Featured</h2>
@@ -120,9 +98,9 @@
 
           <article class="card" data-tags="stats visualization classroom inference">
             <h3>Riemann Sums Visualization</h3>
-            <p>Flip A Fair Coin 100 Times</p>
+            <p>Left, Right, and Midpoint.</p>
             <div class="btns">
-              <a class="btn" href="./coinflipgame.html">Open</a>
+              <a class="btn" href="./riemann.html">Open</a>
             </div>
           </article>
 
@@ -130,7 +108,15 @@
             <h3>Emperical Rules for a Normal Distribution</h3>
             <p>Shows the 68%-95%-99% rule for normal distributions. Shows the effect of different means, standard deviations.</p>
             <div class="btns">
-              <a class="btn" href="./coinflipgame.html">Open</a>
+              <a class="btn" href="./emprule.html">Open</a>
+            </div>
+          </article>
+
+          <article class="card" data-tags="stats visualization classroom inference">
+            <h3>Central Limit Theorem</h3>
+            <p>Pick a population distribution, sample size, and how many samples to take!</p>
+            <div class="btns">
+              <a class="btn" href="./clt.html">Open</a>
             </div>
           </article>
 
