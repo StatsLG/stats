@@ -406,20 +406,3 @@ body .card input[type="color"]{
 .clt .btn:hover {
   background: var(--card);
 }
-
-.card.featured {
-  border: 3px solid var(--kctcs-blue) !important;
-  background: linear-gradient(180deg, #fff, #f2f6ff) !important;
-  box-shadow: 
-    0 0 0 3px var(--kctcs-gold),
-    0 10px 30px rgba(0,70,127,.22) !important;
-  transform: scale(1.02) !important;
-}
-
-
-.card.featured:hover {
-  transform: scale(1.03);
-  box-shadow:
-    0 0 0 3px var(--kctcs-gold),
-    0 12px 34px rgba(0,70,127,.28);
-}
