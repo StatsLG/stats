@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="/style/bctcstyle.css">
 <style>
   .wrap { display:grid; grid-template-columns:320px 1fr; min-height:100vh; }
-  main { padding:2rem; display:flex; justify-content:center; align-items:center; }
+  main { padding:2rem; display:flex; justify-content:center; }
   .card {
     background:white; padding:2rem; border-radius:10px;
     box-shadow:0 6px 16px rgba(0,0,0,.15); text-align:center;
@@ -95,7 +95,7 @@ document.querySelectorAll('[data-include]').forEach(el=>{
 });
 
 // ===== Experiment Variables =====
-const HEADS_PROB = 0.75; // hidden bias
+const HEADS_PROB = 0.75;
 const TOTAL_FLIPS = 100;
 let heads=0, tails=0, flips=0;
 
