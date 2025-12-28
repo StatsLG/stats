@@ -1,0 +1,3472 @@
+{
+  "generated_at": "2025-12-28T14:22:46",
+  "count": 26,
+  "albums": [
+    {
+      "id": 29,
+      "barcode": null,
+      "title": "Animal Crossing - Hours",
+      "artist": "",
+      "release_date": "",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": null,
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Animal Crossing - Hours",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": null,
+          "title": "BGM_24Hour_00_Sunny",
+          "length_ms": 159791,
+          "length_str": "2:39"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_01_Sunny",
+          "length_ms": 189518,
+          "length_str": "3:09"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_02_Sunny",
+          "length_ms": 221779,
+          "length_str": "3:41"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_03_Sunny",
+          "length_ms": 121495,
+          "length_str": "2:01"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_04_Sunny",
+          "length_ms": 136907,
+          "length_str": "2:16"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_05_Sunny",
+          "length_ms": 226037,
+          "length_str": "3:46"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_06_Sunny",
+          "length_ms": 147853,
+          "length_str": "2:27"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_07_Sunny",
+          "length_ms": 168594,
+          "length_str": "2:48"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_08_Sunny",
+          "length_ms": 160026,
+          "length_str": "2:40"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_09_Sunny",
+          "length_ms": 130089,
+          "length_str": "2:10"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_10_Sunny",
+          "length_ms": 161358,
+          "length_str": "2:41"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_11_Sunny",
+          "length_ms": 178964,
+          "length_str": "2:58"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_12_Sunny",
+          "length_ms": 148323,
+          "length_str": "2:28"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_13_Sunny",
+          "length_ms": 136150,
+          "length_str": "2:16"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_14_Sunny",
+          "length_ms": 185861,
+          "length_str": "3:05"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_15_Sunny",
+          "length_ms": 132989,
+          "length_str": "2:12"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_16_Sunny",
+          "length_ms": 136751,
+          "length_str": "2:16"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_17_Sunny",
+          "length_ms": 218801,
+          "length_str": "3:38"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_18_Sunny",
+          "length_ms": 132466,
+          "length_str": "2:12"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_19_Sunny",
+          "length_ms": 230582,
+          "length_str": "3:50"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_20_Sunny",
+          "length_ms": 125126,
+          "length_str": "2:05"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_21_Sunny",
+          "length_ms": 134504,
+          "length_str": "2:14"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_22_Sunny",
+          "length_ms": 146886,
+          "length_str": "2:26"
+        },
+        {
+          "position": null,
+          "title": "BGM_24Hour_23_Sunny",
+          "length_ms": 164257,
+          "length_str": "2:44"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "barcode": null,
+      "title": "Animal Crossing - KK Slider",
+      "artist": "",
+      "release_date": "",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": null,
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Animal Crossing - KK Slider",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": null,
+          "title": "BGM_Audio_001_Sanbika_Hifi",
+          "length_ms": 79490,
+          "length_str": "1:19"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_002_March_Hifi",
+          "length_ms": 50991,
+          "length_str": "0:50"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_003_Waltz_Hifi",
+          "length_ms": 77270,
+          "length_str": "1:17"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_004_Swing_Hifi",
+          "length_ms": 75598,
+          "length_str": "1:15"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_005_Jazz_Hifi",
+          "length_ms": 116715,
+          "length_str": "1:56"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_006_Fusion_Hifi",
+          "length_ms": 154488,
+          "length_str": "2:34"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_007_Etude_Hifi",
+          "length_ms": 86386,
+          "length_str": "1:26"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_008_Lullaby_Hifi",
+          "length_ms": 202919,
+          "length_str": "3:22"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_009_Maria_Hifi",
+          "length_ms": 138710,
+          "length_str": "2:18"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_010_Samba_Hifi",
+          "length_ms": 115173,
+          "length_str": "1:55"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_011_Bossa_Hifi",
+          "length_ms": 81293,
+          "length_str": "1:21"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_012_Caripso_Hifi",
+          "length_ms": 65645,
+          "length_str": "1:05"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_013_Salsa_Hifi",
+          "length_ms": 125048,
+          "length_str": "2:05"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_014_Mambo_Hifi",
+          "length_ms": 89626,
+          "length_str": "1:29"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_015_Reggae_Hifi",
+          "length_ms": 77479,
+          "length_str": "1:17"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_016_Ska_Hifi",
+          "length_ms": 62615,
+          "length_str": "1:02"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_017_Tango_Hifi",
+          "length_ms": 48587,
+          "length_str": "0:48"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_018_Haisai_Hifi",
+          "length_ms": 68649,
+          "length_str": "1:08"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_019_Aloha_Hifi",
+          "length_ms": 131004,
+          "length_str": "2:11"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_020_Irish_Hifi",
+          "length_ms": 113397,
+          "length_str": "1:53"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_021_Peru_Hifi",
+          "length_ms": 92107,
+          "length_str": "1:32"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_022_Cossack_Hifi",
+          "length_ms": 119457,
+          "length_str": "1:59"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_023_China_Hifi",
+          "length_ms": 78236,
+          "length_str": "1:18"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_024_Turkey_Hifi",
+          "length_ms": 121155,
+          "length_str": "2:01"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_025_Afro_Hifi",
+          "length_ms": 127164,
+          "length_str": "2:07"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_026_Minyo_Hifi",
+          "length_ms": 92029,
+          "length_str": "1:32"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_027_Rock_Hifi",
+          "length_ms": 61622,
+          "length_str": "1:01"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_028_Rocknroll_Hifi",
+          "length_ms": 75728,
+          "length_str": "1:15"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_029_Ragtime_Hifi",
+          "length_ms": 64496,
+          "length_str": "1:04"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_030_Neworleans_Hifi",
+          "length_ms": 74866,
+          "length_str": "1:14"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_031_Funk_Hifi",
+          "length_ms": 84924,
+          "length_str": "1:24"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_032_Blues_Hifi",
+          "length_ms": 69433,
+          "length_str": "1:09"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_033_Gospel_Hifi",
+          "length_ms": 140930,
+          "length_str": "2:20"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_034_Soul_Hifi",
+          "length_ms": 134844,
+          "length_str": "2:14"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_035_Urban_Hifi",
+          "length_ms": 112901,
+          "length_str": "1:52"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_036_Lovesong_Hifi",
+          "length_ms": 138292,
+          "length_str": "2:18"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_037_Drumnbass_Hifi",
+          "length_ms": 117786,
+          "length_str": "1:57"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_038_Technobeat_Hifi",
+          "length_ms": 108146,
+          "length_str": "1:48"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_039_Eurobeat_Hifi",
+          "length_ms": 84375,
+          "length_str": "1:24"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_040_Onlyme_Hifi",
+          "length_ms": 98690,
+          "length_str": "1:38"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_041_Country_Hifi",
+          "length_ms": 81528,
+          "length_str": "1:21"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_042_Eleki_Hifi",
+          "length_ms": 53106,
+          "length_str": "0:53"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_043_Ballad_Hifi",
+          "length_ms": 76042,
+          "length_str": "1:16"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_044_Showakayo_Hifi",
+          "length_ms": 57991,
+          "length_str": "0:57"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_045_Enka_Hifi",
+          "length_ms": 90775,
+          "length_str": "1:30"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_046_Kekerider_Hifi",
+          "length_ms": 79229,
+          "length_str": "1:19"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_047_Kowaiuta_Hifi",
+          "length_ms": 142001,
+          "length_str": "2:22"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_048_Western_Hifi",
+          "length_ms": 79751,
+          "length_str": "1:19"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_049_Sensei_Hifi",
+          "length_ms": 101929,
+          "length_str": "1:41"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_050_Paris_Hifi",
+          "length_ms": 144300,
+          "length_str": "2:24"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_051_Parade_Hifi",
+          "length_ms": 103000,
+          "length_str": "1:43"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_052_Senor_Hifi",
+          "length_ms": 85446,
+          "length_str": "1:25"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_053_Kekesong_Hifi",
+          "length_ms": 42919,
+          "length_str": "0:42"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_054_Daisuki_Hifi",
+          "length_ms": 111020,
+          "length_str": "1:51"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_055_Ototoi_Hifi",
+          "length_ms": 125962,
+          "length_str": "2:05"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_056_Bokunobasho_Hifi",
+          "length_ms": 82364,
+          "length_str": "1:22"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_057_Morinoseikatsu_Hifi",
+          "length_ms": 58044,
+          "length_str": "0:58"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_058_Naminami_Hifi",
+          "length_ms": 125231,
+          "length_str": "2:05"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_059_Kangaechu_Hifi",
+          "length_ms": 94040,
+          "length_str": "1:34"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_060_Dixie_Hifi",
+          "length_ms": 53603,
+          "length_str": "0:53"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_061_Gamelan_Hifi",
+          "length_ms": 82964,
+          "length_str": "1:22"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_062_Daimyo_Hifi",
+          "length_ms": 116924,
+          "length_str": "1:56"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_063_Alpine_Hifi",
+          "length_ms": 63268,
+          "length_str": "1:03"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_064_Hunauta2001_Hifi",
+          "length_ms": 444995,
+          "length_str": "7:24"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_065_Napolitan_Hifi",
+          "length_ms": 101799,
+          "length_str": "1:41"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_066_Nidanzaka_Hifi",
+          "length_ms": 140643,
+          "length_str": "2:20"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_067_Kekebily_Hifi",
+          "length_ms": 89626,
+          "length_str": "1:29"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_068_Keiji_Hifi",
+          "length_ms": 98037,
+          "length_str": "1:38"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_069_Ondo_Hifi",
+          "length_ms": 95477,
+          "length_str": "1:35"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_070_Metal_Hifi",
+          "length_ms": 64104,
+          "length_str": "1:04"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_071_Blueonigiri_Hifi",
+          "length_ms": 136045,
+          "length_str": "2:16"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_071_Blueonigiri_Hifi",
+          "length_ms": 136045,
+          "length_str": "2:16"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_072_Harunokomorebi_Hifi",
+          "length_ms": 79124,
+          "length_str": "1:19"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_072_Harunokomorebi_Hifi",
+          "length_ms": 79124,
+          "length_str": "1:19"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_073_Horo_Hifi",
+          "length_ms": 68101,
+          "length_str": "1:08"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_074_House_Hifi",
+          "length_ms": 102530,
+          "length_str": "1:42"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_075_Sonata_Hifi",
+          "length_ms": 125779,
+          "length_str": "2:05"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_076_Utatanenoyume_Hifi",
+          "length_ms": 145841,
+          "length_str": "2:25"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_077_Osanpo_Hifi",
+          "length_ms": 115800,
+          "length_str": "1:55"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_078_Doubutsunoshima_Hifi",
+          "length_ms": 77400,
+          "length_str": "1:17"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_079_Minimal_Hifi",
+          "length_ms": 97280,
+          "length_str": "1:37"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_080_Hollywood_Hifi",
+          "length_ms": 49711,
+          "length_str": "0:49"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_081_Maharaja_Hifi",
+          "length_ms": 92368,
+          "length_str": "1:32"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_082_Roma_Hifi",
+          "length_ms": 105325,
+          "length_str": "1:45"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_083_Milonga_Hifi",
+          "length_ms": 97880,
+          "length_str": "1:37"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_084_Raregroove_Hifi",
+          "length_ms": 103235,
+          "length_str": "1:43"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_085_Jongara_Hifi",
+          "length_ms": 54987,
+          "length_str": "0:54"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_086_Flamenco_Hifi",
+          "length_ms": 53629,
+          "length_str": "0:53"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_087_Bolero_Hifi",
+          "length_ms": 149342,
+          "length_str": "2:29"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_088_Idol_Hifi",
+          "length_ms": 101590,
+          "length_str": "1:41"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_089_Electronica_Hifi",
+          "length_ms": 142262,
+          "length_str": "2:22"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_090_Disco_Hifi",
+          "length_ms": 92160,
+          "length_str": "1:32"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_091_Birthdaysong_Hifi",
+          "length_ms": 144457,
+          "length_str": "2:24"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_092_Town_Hifi",
+          "length_ms": 102034,
+          "length_str": "1:42"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_093_Drive_Hifi",
+          "length_ms": 137195,
+          "length_str": "2:17"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_094_Sayonara_Hifi",
+          "length_ms": 170031,
+          "length_str": "2:50"
+        },
+        {
+          "position": null,
+          "title": "BGM_Audio_095_Minnaatsumare_Hifi",
+          "length_ms": 150804,
+          "length_str": "2:30"
+        },
+        {
+          "position": null,
+          "title": "BGM_Title",
+          "length_ms": 61988,
+          "length_str": "1:01"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "barcode": null,
+      "title": "Middleneck",
+      "artist": "",
+      "release_date": "",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": null,
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Middleneck",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": null,
+          "title": "Blossomvanillux Pavilion",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Bouncy",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Chorusy",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Groovy",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Key Lead",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Tap E Send",
+          "length_ms": null,
+          "length_str": ""
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "barcode": null,
+      "title": "Volume 1 - Wintergatan Original Music - Complete Collection",
+      "artist": "",
+      "release_date": "",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": null,
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Volume 1 - Wintergatan Original Music - Complete Collection",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": null,
+          "title": "Wintergatan - Single - Marble Machine",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan - Single - Marble Machine Piano Version",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan - Single - Tornado",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan - Wintergatan - 01 Sommarfågel",
+          "length_ms": 232642,
+          "length_str": "3:52"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan - Wintergatan - 02 The Rocket",
+          "length_ms": 211490,
+          "length_str": "3:31"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan - Wintergatan - 03 Valentine",
+          "length_ms": 238537,
+          "length_str": "3:58"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan - Wintergatan - 04 Slottskogen Disc Golf Club",
+          "length_ms": 212650,
+          "length_str": "3:32"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan - Wintergatan - 05 Biking Is Better",
+          "length_ms": 208269,
+          "length_str": "3:28"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan - Wintergatan - 06 Västanberg",
+          "length_ms": 265692,
+          "length_str": "4:25"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan - Wintergatan - 07 Starmachine2000",
+          "length_ms": 243138,
+          "length_str": "4:03"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan - Wintergatan - 08 All Was Well",
+          "length_ms": 183223,
+          "length_str": "3:03"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan - Wintergatan - 09 Paradis",
+          "length_ms": 850599,
+          "length_str": "14:10"
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "barcode": null,
+      "title": "Volume 2 - Wintergatan Build Tracks V1_1",
+      "artist": "",
+      "release_date": "",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Volume_2_-_Wintergatan_Build_Tracks_V1_1_178925408759059340.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Volume 2 - Wintergatan Build Tracks V1_1",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - All Was Well - Music Box & Modulin Version",
+          "length_ms": 316291,
+          "length_str": "5:16"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - Brännö",
+          "length_ms": 207492,
+          "length_str": "3:27"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - Emerson",
+          "length_ms": 205666,
+          "length_str": "3:25"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - It's been a journey but we're now on our Way",
+          "length_ms": 373240,
+          "length_str": "6:13"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - Local Cluster",
+          "length_ms": 233766,
+          "length_str": "3:53"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - Moon And Star",
+          "length_ms": 200142,
+          "length_str": "3:20"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - Multiverse",
+          "length_ms": 287250,
+          "length_str": "4:47"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - Music Box, Harp & Hammered Dulcimer",
+          "length_ms": 160676,
+          "length_str": "2:40"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - Music Machine Mondays Theme Song",
+          "length_ms": 350307,
+          "length_str": "5:50"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - Olivier",
+          "length_ms": 201276,
+          "length_str": "3:21"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - Prototype",
+          "length_ms": 201265,
+          "length_str": "3:21"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - Provence (No Intro )",
+          "length_ms": 142812,
+          "length_str": "2:22"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - Provence (With Intro)",
+          "length_ms": 216000,
+          "length_str": "3:36"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - Sandviken Stradivarius",
+          "length_ms": 350226,
+          "length_str": "5:50"
+        },
+        {
+          "position": null,
+          "title": "Wintergatan Build Track - Welding The Steel Frame",
+          "length_ms": 266000,
+          "length_str": "4:26"
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "barcode": null,
+      "title": "Volume 3 - 21 Mechanical Instruments From Speelklok Museum",
+      "artist": "",
+      "release_date": "",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": null,
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Volume 3 - 21 Mechanical Instruments From Speelklok Museum",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 01 Hupfeld Phonolizt Violina Orchestrion - Pasadena",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 02 Carillion - -Improvisation-",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 03 Polyphon Disc Changing Music Box - -Washington Post-",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 04 Schuyt Dance Organ - -Marble Machine-",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 05 Philipps Paganini Orchestrion - -Slavonic Dance Nr 6-",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 06 Bruder Barrel Automata Organ",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 07 Perlee Demonstration Organ",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 08 Grandiola Pedaled Player Piano",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 09 Dom Toren Clock Tower - -Marble Machine-",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 10 Steinway Duo-Art Self Playing Piano -",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 11 Drie Pruiken Street Organ - -Adiós Nonino-",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 12 Kalliope Panorama Disc Music Box",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 13 Andersson Pianoharp - Swedish Table",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 14 Miniature Music Box In A Snuff Box",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 15 Porter Music Box - -Radetzkymars-",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 16 Allin Walker Musical Clock - -Allemande-",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 17 Aalster Gaviola Dance Organ - -Sous Le Ciel de Paris-",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 18 Haydn Niemcz Organ",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 19 Carillion - -Aria from die Zauberflöte-",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 20 Cylinder Music Box - -Two Per Turn-",
+          "length_ms": null,
+          "length_str": ""
+        },
+        {
+          "position": null,
+          "title": "Wintergatan at Speelklok - 21 Tivoli Organ",
+          "length_ms": null,
+          "length_str": ""
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "barcode": null,
+      "title": "Sing the Sorrow",
+      "artist": "AFI",
+      "release_date": "2003",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/AFI_Sing_the_Sorrow_5919994924319489818.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Unknown artist\\AFI - Sing the Sorrow",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "Miseria Cantare: The Beginning",
+          "length_ms": 176882,
+          "length_str": "2:56"
+        },
+        {
+          "position": 2,
+          "title": "The Leaving Song, Part II",
+          "length_ms": 210865,
+          "length_str": "3:30"
+        },
+        {
+          "position": 3,
+          "title": "Bleed Black",
+          "length_ms": 255443,
+          "length_str": "4:15"
+        },
+        {
+          "position": 4,
+          "title": "Silver and Cold",
+          "length_ms": 251581,
+          "length_str": "4:11"
+        },
+        {
+          "position": 5,
+          "title": "Dancing Through Sunday",
+          "length_ms": 146763,
+          "length_str": "2:26"
+        },
+        {
+          "position": 6,
+          "title": "Girl’s Not Grey",
+          "length_ms": 190559,
+          "length_str": "3:10"
+        },
+        {
+          "position": 7,
+          "title": "Death of Seasons",
+          "length_ms": 238948,
+          "length_str": "3:58"
+        },
+        {
+          "position": 8,
+          "title": "The Great Disappointment",
+          "length_ms": 327166,
+          "length_str": "5:27"
+        },
+        {
+          "position": 9,
+          "title": "Paper Airplanes (makeshift wings)",
+          "length_ms": 237669,
+          "length_str": "3:57"
+        },
+        {
+          "position": 10,
+          "title": "This Celluloid Dream",
+          "length_ms": 251581,
+          "length_str": "4:11"
+        },
+        {
+          "position": 11,
+          "title": "The Leaving Song",
+          "length_ms": 164302,
+          "length_str": "2:44"
+        },
+        {
+          "position": 12,
+          "title": "…but home is nowhere / [The Spoken Word] / This Time Imperfect",
+          "length_ms": 907813,
+          "length_str": "15:07"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "barcode": null,
+      "title": "The Rise and Fall of a Midwest Princess",
+      "artist": "Chappell Roan",
+      "release_date": "2023",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Chappell_Roan_The_Rise_and_Fall_of_a_Midwest_Princess_1077262322875625422.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Chappell Roan - The Rise and Fall of a Midwest Princess",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "Femininomenon",
+          "length_ms": 219504,
+          "length_str": "3:39"
+        },
+        {
+          "position": 2,
+          "title": "Red Wine Supernova",
+          "length_ms": 192542,
+          "length_str": "3:12"
+        },
+        {
+          "position": 3,
+          "title": "After Midnight",
+          "length_ms": 204679,
+          "length_str": "3:24"
+        },
+        {
+          "position": 4,
+          "title": "Coffee",
+          "length_ms": 205331,
+          "length_str": "3:25"
+        },
+        {
+          "position": 5,
+          "title": "Casual",
+          "length_ms": 232580,
+          "length_str": "3:52"
+        },
+        {
+          "position": 6,
+          "title": "Super Graphic Ultra Modern Girl",
+          "length_ms": 183721,
+          "length_str": "3:03"
+        },
+        {
+          "position": 7,
+          "title": "HOT TO GO!",
+          "length_ms": 184660,
+          "length_str": "3:04"
+        },
+        {
+          "position": 8,
+          "title": "My Kink Is Karma",
+          "length_ms": 222375,
+          "length_str": "3:42"
+        },
+        {
+          "position": 9,
+          "title": "Picture You",
+          "length_ms": 186957,
+          "length_str": "3:06"
+        },
+        {
+          "position": 10,
+          "title": "Kaleidoscope",
+          "length_ms": 222453,
+          "length_str": "3:42"
+        },
+        {
+          "position": 11,
+          "title": "Pink Pony Club",
+          "length_ms": 257792,
+          "length_str": "4:17"
+        },
+        {
+          "position": 12,
+          "title": "Naked in Manhattan",
+          "length_ms": 210865,
+          "length_str": "3:30"
+        },
+        {
+          "position": 13,
+          "title": "California",
+          "length_ms": 197919,
+          "length_str": "3:17"
+        },
+        {
+          "position": 14,
+          "title": "Guilty Pleasure",
+          "length_ms": 224411,
+          "length_str": "3:44"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "barcode": null,
+      "title": "Chronicle",
+      "artist": "Creedence Clearwater Revival",
+      "release_date": "1991",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Creedence_Clearwater_Revival_Chronicle_4053098814499406170.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Creedence Clearwater Revival - Chronicle",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "Susie Q",
+          "length_ms": 275384,
+          "length_str": "4:35"
+        },
+        {
+          "position": 2,
+          "title": "I Put a Spell on You",
+          "length_ms": 271782,
+          "length_str": "4:31"
+        },
+        {
+          "position": 3,
+          "title": "Proud Mary",
+          "length_ms": 188810,
+          "length_str": "3:08"
+        },
+        {
+          "position": 4,
+          "title": "Bad Moon Rising",
+          "length_ms": 139925,
+          "length_str": "2:19"
+        },
+        {
+          "position": 5,
+          "title": "Lodi",
+          "length_ms": 191185,
+          "length_str": "3:11"
+        },
+        {
+          "position": 6,
+          "title": "Green River",
+          "length_ms": 153967,
+          "length_str": "2:33"
+        },
+        {
+          "position": 7,
+          "title": "Commotion",
+          "length_ms": 162710,
+          "length_str": "2:42"
+        },
+        {
+          "position": 8,
+          "title": "Down on the Corner",
+          "length_ms": 164615,
+          "length_str": "2:44"
+        },
+        {
+          "position": 9,
+          "title": "Fortunate Son",
+          "length_ms": 140108,
+          "length_str": "2:20"
+        },
+        {
+          "position": 10,
+          "title": "Travelin' Band",
+          "length_ms": 129172,
+          "length_str": "2:09"
+        },
+        {
+          "position": 11,
+          "title": "Who'll Stop the Rain",
+          "length_ms": 149060,
+          "length_str": "2:29"
+        },
+        {
+          "position": 12,
+          "title": "Up Around the Bend",
+          "length_ms": 162423,
+          "length_str": "2:42"
+        },
+        {
+          "position": 13,
+          "title": "Run Through the Jungle",
+          "length_ms": 185913,
+          "length_str": "3:05"
+        },
+        {
+          "position": 14,
+          "title": "Lookin' out My Back Door",
+          "length_ms": 152505,
+          "length_str": "2:32"
+        },
+        {
+          "position": 15,
+          "title": "Long as I Can See the Light",
+          "length_ms": 214101,
+          "length_str": "3:34"
+        },
+        {
+          "position": 16,
+          "title": "I Heard It Through the Grapevine",
+          "length_ms": 665892,
+          "length_str": "11:05"
+        },
+        {
+          "position": 17,
+          "title": "Have You Ever Seen the Rain?",
+          "length_ms": 159813,
+          "length_str": "2:39"
+        },
+        {
+          "position": 18,
+          "title": "Hey Tonight",
+          "length_ms": 162606,
+          "length_str": "2:42"
+        },
+        {
+          "position": 19,
+          "title": "Sweet Hitch‐Hiker",
+          "length_ms": 175551,
+          "length_str": "2:55"
+        },
+        {
+          "position": 20,
+          "title": "Someday Never Comes",
+          "length_ms": 241376,
+          "length_str": "4:01"
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "barcode": null,
+      "title": "Crash",
+      "artist": "Dave Matthews Band",
+      "release_date": "1996",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Dave_Matthews_Band_Crash_1894754918200534839.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Unknown artist\\Dave Matthews Band - Crash",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "So Much to Say",
+          "length_ms": 246335,
+          "length_str": "4:06"
+        },
+        {
+          "position": 2,
+          "title": "Two Step",
+          "length_ms": 386935,
+          "length_str": "6:26"
+        },
+        {
+          "position": 3,
+          "title": "Crash Into Me",
+          "length_ms": 316152,
+          "length_str": "5:16"
+        },
+        {
+          "position": 4,
+          "title": "Too Much",
+          "length_ms": 261420,
+          "length_str": "4:21"
+        },
+        {
+          "position": 5,
+          "title": "#41",
+          "length_ms": 399646,
+          "length_str": "6:39"
+        },
+        {
+          "position": 6,
+          "title": "Say Goodbye",
+          "length_ms": 370466,
+          "length_str": "6:10"
+        },
+        {
+          "position": 7,
+          "title": "Drive In Drive Out",
+          "length_ms": 354284,
+          "length_str": "5:54"
+        },
+        {
+          "position": 8,
+          "title": "Let You Down",
+          "length_ms": 247326,
+          "length_str": "4:07"
+        },
+        {
+          "position": 9,
+          "title": "Lie in Our Graves",
+          "length_ms": 341808,
+          "length_str": "5:41"
+        },
+        {
+          "position": 10,
+          "title": "Cry Freedom",
+          "length_ms": 353318,
+          "length_str": "5:53"
+        },
+        {
+          "position": 11,
+          "title": "Tripping Billies",
+          "length_ms": 300048,
+          "length_str": "5:00"
+        },
+        {
+          "position": 12,
+          "title": "Proudest Monkey",
+          "length_ms": 550112,
+          "length_str": "9:10"
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "barcode": null,
+      "title": "Everyday",
+      "artist": "Dave Matthews Band",
+      "release_date": "2001",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Dave_Matthews_Band_Everyday_7905071952919241912.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Unknown artist\\Dave Matthews Band - Everyday",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "I Did It",
+          "length_ms": 216085,
+          "length_str": "3:36"
+        },
+        {
+          "position": 2,
+          "title": "When the World Ends",
+          "length_ms": 212039,
+          "length_str": "3:32"
+        },
+        {
+          "position": 3,
+          "title": "The Space Between",
+          "length_ms": 243542,
+          "length_str": "4:03"
+        },
+        {
+          "position": 4,
+          "title": "Dreams of Our Fathers",
+          "length_ms": 281517,
+          "length_str": "4:41"
+        },
+        {
+          "position": 5,
+          "title": "So Right",
+          "length_ms": 281100,
+          "length_str": "4:41"
+        },
+        {
+          "position": 6,
+          "title": "If I Had It All",
+          "length_ms": 242837,
+          "length_str": "4:02"
+        },
+        {
+          "position": 7,
+          "title": "What You Are",
+          "length_ms": 272826,
+          "length_str": "4:32"
+        },
+        {
+          "position": 8,
+          "title": "Angel",
+          "length_ms": 236651,
+          "length_str": "3:56"
+        },
+        {
+          "position": 9,
+          "title": "Fool to Think",
+          "length_ms": 253877,
+          "length_str": "4:13"
+        },
+        {
+          "position": 10,
+          "title": "Sleep to Dream Her",
+          "length_ms": 265309,
+          "length_str": "4:25"
+        },
+        {
+          "position": 11,
+          "title": "Mother Father",
+          "length_ms": 264631,
+          "length_str": "4:24"
+        },
+        {
+          "position": 12,
+          "title": "Everyday",
+          "length_ms": 283658,
+          "length_str": "4:43"
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "barcode": null,
+      "title": "Elton John's Greatest Hits, Volume II",
+      "artist": "Elton John",
+      "release_date": "1992",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Elton_John_Elton_Johns_Greatest_Hits_Volume_II_4992607045233915869.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Elton John - Elton John's Greatest Hits, Volume II",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "The Bitch Is Back",
+          "length_ms": 217990,
+          "length_str": "3:37"
+        },
+        {
+          "position": 2,
+          "title": "Lucy in the Sky With Diamonds",
+          "length_ms": 357312,
+          "length_str": "5:57"
+        },
+        {
+          "position": 3,
+          "title": "Tiny Dancer",
+          "length_ms": 375738,
+          "length_str": "6:15"
+        },
+        {
+          "position": 4,
+          "title": "I Feel Like a Bullet (in the Gun of Robert Ford)",
+          "length_ms": 328680,
+          "length_str": "5:28"
+        },
+        {
+          "position": 5,
+          "title": "Someone Saved My Life Tonight",
+          "length_ms": 404605,
+          "length_str": "6:44"
+        },
+        {
+          "position": 6,
+          "title": "Philadelphia Freedom",
+          "length_ms": 323016,
+          "length_str": "5:23"
+        },
+        {
+          "position": 7,
+          "title": "Island Girl",
+          "length_ms": 223340,
+          "length_str": "3:43"
+        },
+        {
+          "position": 8,
+          "title": "Grow Some Funk of Your Own",
+          "length_ms": 258367,
+          "length_str": "4:18"
+        },
+        {
+          "position": 9,
+          "title": "Levon",
+          "length_ms": 321711,
+          "length_str": "5:21"
+        },
+        {
+          "position": 10,
+          "title": "Pinball Wizard",
+          "length_ms": 310775,
+          "length_str": "5:10"
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "barcode": null,
+      "title": "A Boy Named Goo",
+      "artist": "Goo Goo Dolls",
+      "release_date": "1995",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Goo_Goo_Dolls_A_Boy_Named_Goo_1418365466402782935.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Unknown artist\\Goo Goo Dolls - A Boy Named Goo",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "Long Way Down",
+          "length_ms": 208307,
+          "length_str": "3:28"
+        },
+        {
+          "position": 2,
+          "title": "Burnin’ Up",
+          "length_ms": 148877,
+          "length_str": "2:28"
+        },
+        {
+          "position": 3,
+          "title": "Naked",
+          "length_ms": 223732,
+          "length_str": "3:43"
+        },
+        {
+          "position": 4,
+          "title": "Flat Top",
+          "length_ms": 269955,
+          "length_str": "4:29"
+        },
+        {
+          "position": 5,
+          "title": "Impersonality",
+          "length_ms": 161196,
+          "length_str": "2:41"
+        },
+        {
+          "position": 6,
+          "title": "Name",
+          "length_ms": 269877,
+          "length_str": "4:29"
+        },
+        {
+          "position": 7,
+          "title": "Only One",
+          "length_ms": 197815,
+          "length_str": "3:17"
+        },
+        {
+          "position": 8,
+          "title": "Somethin’ Bad",
+          "length_ms": 150756,
+          "length_str": "2:30"
+        },
+        {
+          "position": 9,
+          "title": "Ain’t That Unusual",
+          "length_ms": 199616,
+          "length_str": "3:19"
+        },
+        {
+          "position": 10,
+          "title": "So Long",
+          "length_ms": 153262,
+          "length_str": "2:33"
+        },
+        {
+          "position": 11,
+          "title": "Eyes Wide Open",
+          "length_ms": 235895,
+          "length_str": "3:55"
+        },
+        {
+          "position": 12,
+          "title": "Disconnected",
+          "length_ms": 180249,
+          "length_str": "3:00"
+        },
+        {
+          "position": 13,
+          "title": "Slave Girl",
+          "length_ms": 137628,
+          "length_str": "2:17"
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "barcode": null,
+      "title": "Before The Night",
+      "artist": "HOME",
+      "release_date": "2014",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/HOME_Before_The_Night_3488134559307163076.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\HOME - Before The Night",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "We're Finally Landing",
+          "length_ms": 272000,
+          "length_str": "4:32"
+        },
+        {
+          "position": 2,
+          "title": "Synchronize",
+          "length_ms": 240000,
+          "length_str": "4:00"
+        },
+        {
+          "position": 3,
+          "title": "Overflow",
+          "length_ms": 322025,
+          "length_str": "5:22"
+        },
+        {
+          "position": 4,
+          "title": "Without A Sound",
+          "length_ms": 213750,
+          "length_str": "3:33"
+        },
+        {
+          "position": 5,
+          "title": "Above All",
+          "length_ms": 226909,
+          "length_str": "3:46"
+        },
+        {
+          "position": 6,
+          "title": "Pyxis",
+          "length_ms": 217036,
+          "length_str": "3:37"
+        },
+        {
+          "position": 7,
+          "title": "Before The Night",
+          "length_ms": 233207,
+          "length_str": "3:53"
+        },
+        {
+          "position": 8,
+          "title": "If I'm Wrong",
+          "length_ms": 175083,
+          "length_str": "2:55"
+        },
+        {
+          "position": 9,
+          "title": "Nosebleed",
+          "length_ms": 234000,
+          "length_str": "3:54"
+        },
+        {
+          "position": 10,
+          "title": "Sun",
+          "length_ms": 156631,
+          "length_str": "2:36"
+        },
+        {
+          "position": 11,
+          "title": "Sleep",
+          "length_ms": 274500,
+          "length_str": "4:34"
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "barcode": null,
+      "title": "Falling Into Place",
+      "artist": "HOME",
+      "release_date": "2016",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/HOME_Falling_Into_Place_6537336065963788336.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\HOME - Falling Into Place",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "Head First",
+          "length_ms": 213089,
+          "length_str": "3:33"
+        },
+        {
+          "position": 2,
+          "title": "Night Swim",
+          "length_ms": 202956,
+          "length_str": "3:22"
+        },
+        {
+          "position": 3,
+          "title": "Blackout",
+          "length_ms": 181145,
+          "length_str": "3:01"
+        },
+        {
+          "position": 4,
+          "title": "Flashlight",
+          "length_ms": 165863,
+          "length_str": "2:45"
+        },
+        {
+          "position": 5,
+          "title": "Burning",
+          "length_ms": 185806,
+          "length_str": "3:05"
+        },
+        {
+          "position": 6,
+          "title": "This Will Pass",
+          "length_ms": 201738,
+          "length_str": "3:21"
+        },
+        {
+          "position": 7,
+          "title": "I See You",
+          "length_ms": 163018,
+          "length_str": "2:43"
+        },
+        {
+          "position": 8,
+          "title": "Fata Morgana (Interlude)",
+          "length_ms": 77837,
+          "length_str": "1:17"
+        },
+        {
+          "position": 9,
+          "title": "Warmth",
+          "length_ms": 177777,
+          "length_str": "2:57"
+        },
+        {
+          "position": 10,
+          "title": "Billiards",
+          "length_ms": 176640,
+          "length_str": "2:56"
+        },
+        {
+          "position": 11,
+          "title": "Bright Lights In Silent Rooms",
+          "length_ms": 193396,
+          "length_str": "3:13"
+        },
+        {
+          "position": 12,
+          "title": "Hold Your Breath",
+          "length_ms": 107368,
+          "length_str": "1:47"
+        },
+        {
+          "position": 13,
+          "title": "Puzzle",
+          "length_ms": 176727,
+          "length_str": "2:56"
+        },
+        {
+          "position": 14,
+          "title": "Climbing Out",
+          "length_ms": 181561,
+          "length_str": "3:01"
+        },
+        {
+          "position": 15,
+          "title": "Falling Into Place",
+          "length_ms": 226253,
+          "length_str": "3:46"
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "barcode": null,
+      "title": "Odyssey",
+      "artist": "HOME",
+      "release_date": "2014",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/HOME_Odyssey_7246564511824236855.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\HOME - Odyssey",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "Intro",
+          "length_ms": 189144,
+          "length_str": "3:09"
+        },
+        {
+          "position": 2,
+          "title": "Native",
+          "length_ms": 242400,
+          "length_str": "4:02"
+        },
+        {
+          "position": 3,
+          "title": "Decay",
+          "length_ms": 251000,
+          "length_str": "4:11"
+        },
+        {
+          "position": 4,
+          "title": "Oort Cloud",
+          "length_ms": 205850,
+          "length_str": "3:25"
+        },
+        {
+          "position": 5,
+          "title": "Tides",
+          "length_ms": 237176,
+          "length_str": "3:57"
+        },
+        {
+          "position": 6,
+          "title": "Nights (I Wish I Could Be There)",
+          "length_ms": 185791,
+          "length_str": "3:05"
+        },
+        {
+          "position": 7,
+          "title": "Odyssey",
+          "length_ms": 369505,
+          "length_str": "6:09"
+        },
+        {
+          "position": 8,
+          "title": "New Machines",
+          "length_ms": 177373,
+          "length_str": "2:57"
+        },
+        {
+          "position": 9,
+          "title": "Resonance",
+          "length_ms": 212881,
+          "length_str": "3:32"
+        },
+        {
+          "position": 10,
+          "title": "Come Back Down",
+          "length_ms": 293052,
+          "length_str": "4:53"
+        },
+        {
+          "position": 11,
+          "title": "Half Moon",
+          "length_ms": 260951,
+          "length_str": "4:20"
+        },
+        {
+          "position": 12,
+          "title": "On The Way Out",
+          "length_ms": 241889,
+          "length_str": "4:01"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "barcode": null,
+      "title": "Resting State",
+      "artist": "HOME",
+      "release_date": "2017",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/HOME_Resting_State_7825479248536190855.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\HOME - Resting State",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "1",
+          "length_ms": 81533,
+          "length_str": "1:21"
+        },
+        {
+          "position": 2,
+          "title": "2",
+          "length_ms": 106794,
+          "length_str": "1:46"
+        },
+        {
+          "position": 3,
+          "title": "3",
+          "length_ms": 56350,
+          "length_str": "0:56"
+        },
+        {
+          "position": 4,
+          "title": "4",
+          "length_ms": 81277,
+          "length_str": "1:21"
+        },
+        {
+          "position": 5,
+          "title": "5",
+          "length_ms": 77058,
+          "length_str": "1:17"
+        },
+        {
+          "position": 6,
+          "title": "6",
+          "length_ms": 82285,
+          "length_str": "1:22"
+        },
+        {
+          "position": 7,
+          "title": "7",
+          "length_ms": 86405,
+          "length_str": "1:26"
+        },
+        {
+          "position": 8,
+          "title": "8",
+          "length_ms": 197146,
+          "length_str": "3:17"
+        },
+        {
+          "position": 9,
+          "title": "9",
+          "length_ms": 175174,
+          "length_str": "2:55"
+        },
+        {
+          "position": 10,
+          "title": "10",
+          "length_ms": 83478,
+          "length_str": "1:23"
+        },
+        {
+          "position": 11,
+          "title": "11",
+          "length_ms": 97254,
+          "length_str": "1:37"
+        },
+        {
+          "position": 12,
+          "title": "12",
+          "length_ms": 137528,
+          "length_str": "2:17"
+        },
+        {
+          "position": 13,
+          "title": "13",
+          "length_ms": 72935,
+          "length_str": "1:12"
+        },
+        {
+          "position": 14,
+          "title": "14",
+          "length_ms": 80913,
+          "length_str": "1:20"
+        },
+        {
+          "position": 15,
+          "title": "15",
+          "length_ms": 98526,
+          "length_str": "1:38"
+        },
+        {
+          "position": 16,
+          "title": "16",
+          "length_ms": 32000,
+          "length_str": "0:32"
+        },
+        {
+          "position": 17,
+          "title": "17",
+          "length_ms": 90566,
+          "length_str": "1:30"
+        },
+        {
+          "position": 18,
+          "title": "18",
+          "length_ms": 93030,
+          "length_str": "1:33"
+        },
+        {
+          "position": 19,
+          "title": "19",
+          "length_ms": 84874,
+          "length_str": "1:24"
+        },
+        {
+          "position": 20,
+          "title": "20",
+          "length_ms": 92897,
+          "length_str": "1:32"
+        },
+        {
+          "position": 21,
+          "title": "21",
+          "length_ms": 131417,
+          "length_str": "2:11"
+        },
+        {
+          "position": 22,
+          "title": "22",
+          "length_ms": 85405,
+          "length_str": "1:25"
+        },
+        {
+          "position": 23,
+          "title": "23",
+          "length_ms": 112941,
+          "length_str": "1:52"
+        },
+        {
+          "position": 24,
+          "title": "24",
+          "length_ms": 93405,
+          "length_str": "1:33"
+        },
+        {
+          "position": 25,
+          "title": "25",
+          "length_ms": 54000,
+          "length_str": "0:54"
+        },
+        {
+          "position": 26,
+          "title": "26",
+          "length_ms": 58038,
+          "length_str": "0:58"
+        },
+        {
+          "position": 27,
+          "title": "27",
+          "length_ms": 56230,
+          "length_str": "0:56"
+        },
+        {
+          "position": 28,
+          "title": "28",
+          "length_ms": 26696,
+          "length_str": "0:26"
+        },
+        {
+          "position": 29,
+          "title": "29",
+          "length_ms": 97066,
+          "length_str": "1:37"
+        },
+        {
+          "position": 30,
+          "title": "30",
+          "length_ms": 104571,
+          "length_str": "1:44"
+        },
+        {
+          "position": 31,
+          "title": "31",
+          "length_ms": 50890,
+          "length_str": "0:50"
+        },
+        {
+          "position": 32,
+          "title": "32",
+          "length_ms": 111551,
+          "length_str": "1:51"
+        },
+        {
+          "position": 33,
+          "title": "33",
+          "length_ms": 111818,
+          "length_str": "1:51"
+        },
+        {
+          "position": 34,
+          "title": "34",
+          "length_ms": 97959,
+          "length_str": "1:37"
+        },
+        {
+          "position": 35,
+          "title": "35",
+          "length_ms": 129695,
+          "length_str": "2:09"
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "barcode": null,
+      "title": "The Holiday: Original Motion Picture Soundtrack",
+      "artist": "Hans Zimmer",
+      "release_date": "2007",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Hans_Zimmer_The_Holiday_Original_Motion_Picture_Soundtrack_4810307243590958789.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Unknown artist\\Hans Zimmer - The Holiday",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "Maestro",
+          "length_ms": 233493,
+          "length_str": "3:53"
+        },
+        {
+          "position": 2,
+          "title": "Iris and Jasper",
+          "length_ms": 204026,
+          "length_str": "3:24"
+        },
+        {
+          "position": 3,
+          "title": "Kayak for One",
+          "length_ms": 90648,
+          "length_str": "1:30"
+        },
+        {
+          "position": 4,
+          "title": "Zero",
+          "length_ms": 164302,
+          "length_str": "2:44"
+        },
+        {
+          "position": 5,
+          "title": "Dream Kitchen",
+          "length_ms": 95738,
+          "length_str": "1:35"
+        },
+        {
+          "position": 6,
+          "title": "Separate Vacations",
+          "length_ms": 107796,
+          "length_str": "1:47"
+        },
+        {
+          "position": 7,
+          "title": "Anything Can Happen",
+          "length_ms": 48575,
+          "length_str": "0:48"
+        },
+        {
+          "position": 8,
+          "title": "Light My Fire",
+          "length_ms": 74048,
+          "length_str": "1:14"
+        },
+        {
+          "position": 9,
+          "title": "Definitely Unexpected",
+          "length_ms": 214597,
+          "length_str": "3:34"
+        },
+        {
+          "position": 10,
+          "title": "If I Wanted to Call You",
+          "length_ms": 110693,
+          "length_str": "1:50"
+        },
+        {
+          "position": 11,
+          "title": "Roadside Rhapsody",
+          "length_ms": 99131,
+          "length_str": "1:39"
+        },
+        {
+          "position": 12,
+          "title": "Busy Guy",
+          "length_ms": 87960,
+          "length_str": "1:27"
+        },
+        {
+          "position": 13,
+          "title": "For Nancy",
+          "length_ms": 87673,
+          "length_str": "1:27"
+        },
+        {
+          "position": 14,
+          "title": "It’s Complicated",
+          "length_ms": 59981,
+          "length_str": "0:59"
+        },
+        {
+          "position": 15,
+          "title": "Kiss Goodbye",
+          "length_ms": 153314,
+          "length_str": "2:33"
+        },
+        {
+          "position": 16,
+          "title": "Verso e prosa",
+          "length_ms": 118940,
+          "length_str": "1:58"
+        },
+        {
+          "position": 17,
+          "title": "Meu passado",
+          "length_ms": 85350,
+          "length_str": "1:25"
+        },
+        {
+          "position": 18,
+          "title": "The ‘Cowch’",
+          "length_ms": 162449,
+          "length_str": "2:42"
+        },
+        {
+          "position": 19,
+          "title": "Three Musketeers",
+          "length_ms": 164668,
+          "length_str": "2:44"
+        },
+        {
+          "position": 20,
+          "title": "Christmas Surprise",
+          "length_ms": 152531,
+          "length_str": "2:32"
+        },
+        {
+          "position": 21,
+          "title": "Gumption",
+          "length_ms": 225246,
+          "length_str": "3:45"
+        },
+        {
+          "position": 22,
+          "title": "Cry",
+          "length_ms": 159630,
+          "length_str": "2:39"
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "barcode": null,
+      "title": "Deeper Well",
+      "artist": "Kacey Musgraves",
+      "release_date": "2024",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Kacey_Musgraves_Deeper_Well_7123422124844267763.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Kacey Musgraves - Deeper Well",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "Cardinal",
+          "length_ms": 191237,
+          "length_str": "3:11"
+        },
+        {
+          "position": 2,
+          "title": "Deeper Well",
+          "length_ms": 231927,
+          "length_str": "3:51"
+        },
+        {
+          "position": 3,
+          "title": "Too Good to Be True",
+          "length_ms": 159917,
+          "length_str": "2:39"
+        },
+        {
+          "position": 4,
+          "title": "Moving Out",
+          "length_ms": 189645,
+          "length_str": "3:09"
+        },
+        {
+          "position": 5,
+          "title": "Giver / Taker",
+          "length_ms": 190794,
+          "length_str": "3:10"
+        },
+        {
+          "position": 6,
+          "title": "Sway",
+          "length_ms": 191237,
+          "length_str": "3:11"
+        },
+        {
+          "position": 7,
+          "title": "Dinner With Friends",
+          "length_ms": 177561,
+          "length_str": "2:57"
+        },
+        {
+          "position": 8,
+          "title": "Heart of the Woods",
+          "length_ms": 136688,
+          "length_str": "2:16"
+        },
+        {
+          "position": 9,
+          "title": "Jade Green",
+          "length_ms": 178292,
+          "length_str": "2:58"
+        },
+        {
+          "position": 10,
+          "title": "The Architect",
+          "length_ms": 177143,
+          "length_str": "2:57"
+        },
+        {
+          "position": 11,
+          "title": "Lonely Millionaire",
+          "length_ms": 185835,
+          "length_str": "3:05"
+        },
+        {
+          "position": 12,
+          "title": "Heaven Is",
+          "length_ms": 163885,
+          "length_str": "2:43"
+        },
+        {
+          "position": 13,
+          "title": "Anime Eyes",
+          "length_ms": 197841,
+          "length_str": "3:17"
+        },
+        {
+          "position": 14,
+          "title": "Nothing to Be Scared Of",
+          "length_ms": 153366,
+          "length_str": "2:33"
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "barcode": null,
+      "title": "Super Mario 64 (Soundtrack)",
+      "artist": "Koji Kondo",
+      "release_date": "1996",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Koji_Kondo_Super_Mario_64_Soundtrack_2705139277194801873.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Super Mario 64",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "\"It's A Me, Mario!\"",
+          "length_ms": 4048,
+          "length_str": "0:04"
+        },
+        {
+          "position": 2,
+          "title": "Title Theme",
+          "length_ms": 211200,
+          "length_str": "3:31"
+        },
+        {
+          "position": 3,
+          "title": "Peach's Message",
+          "length_ms": 8881,
+          "length_str": "0:08"
+        },
+        {
+          "position": 4,
+          "title": "Opening",
+          "length_ms": 34768,
+          "length_str": "0:34"
+        },
+        {
+          "position": 5,
+          "title": "Super Mario 64 Main Theme",
+          "length_ms": 142341,
+          "length_str": "2:22"
+        },
+        {
+          "position": 6,
+          "title": "Slider",
+          "length_ms": 169560,
+          "length_str": "2:49"
+        },
+        {
+          "position": 7,
+          "title": "Inside The Castle Walls",
+          "length_ms": 120032,
+          "length_str": "2:00"
+        },
+        {
+          "position": 8,
+          "title": "Looping Steps",
+          "length_ms": 27768,
+          "length_str": "0:27"
+        },
+        {
+          "position": 9,
+          "title": "Dire, Dire Docks",
+          "length_ms": 186226,
+          "length_str": "3:06"
+        },
+        {
+          "position": 10,
+          "title": "Lethal Lava Land",
+          "length_ms": 163866,
+          "length_str": "2:43"
+        },
+        {
+          "position": 11,
+          "title": "Snow Mountain",
+          "length_ms": 178468,
+          "length_str": "2:58"
+        },
+        {
+          "position": 12,
+          "title": "Haunted House",
+          "length_ms": 186279,
+          "length_str": "3:06"
+        },
+        {
+          "position": 13,
+          "title": "Merry-Go-Round",
+          "length_ms": 61335,
+          "length_str": "1:01"
+        },
+        {
+          "position": 14,
+          "title": "Cave Dungeon",
+          "length_ms": 225933,
+          "length_str": "3:45"
+        },
+        {
+          "position": 15,
+          "title": "Piranha Plant's Lullaby",
+          "length_ms": 139180,
+          "length_str": "2:19"
+        },
+        {
+          "position": 16,
+          "title": "Powerful Mario",
+          "length_ms": 54778,
+          "length_str": "0:54"
+        },
+        {
+          "position": 17,
+          "title": "Metallic Mario",
+          "length_ms": 54674,
+          "length_str": "0:54"
+        },
+        {
+          "position": 18,
+          "title": "File Select",
+          "length_ms": 44303,
+          "length_str": "0:44"
+        },
+        {
+          "position": 19,
+          "title": "Correct Solution",
+          "length_ms": 5616,
+          "length_str": "0:05"
+        },
+        {
+          "position": 20,
+          "title": "Toad's Message",
+          "length_ms": 5929,
+          "length_str": "0:05"
+        },
+        {
+          "position": 21,
+          "title": "Power Star",
+          "length_ms": 8542,
+          "length_str": "0:08"
+        },
+        {
+          "position": 22,
+          "title": "Race Fanfare",
+          "length_ms": 5929,
+          "length_str": "0:05"
+        },
+        {
+          "position": 23,
+          "title": "Star Catch Fanfare",
+          "length_ms": 5381,
+          "length_str": "0:05"
+        },
+        {
+          "position": 24,
+          "title": "Game Start",
+          "length_ms": 4911,
+          "length_str": "0:04"
+        },
+        {
+          "position": 25,
+          "title": "Course Clear",
+          "length_ms": 6765,
+          "length_str": "0:06"
+        },
+        {
+          "position": 26,
+          "title": "Game Over",
+          "length_ms": 17214,
+          "length_str": "0:17"
+        },
+        {
+          "position": 27,
+          "title": "Stage Boss",
+          "length_ms": 81345,
+          "length_str": "1:21"
+        },
+        {
+          "position": 28,
+          "title": "Koopa's Message",
+          "length_ms": 5877,
+          "length_str": "0:05"
+        },
+        {
+          "position": 29,
+          "title": "Koopa's Road",
+          "length_ms": 131160,
+          "length_str": "2:11"
+        },
+        {
+          "position": 30,
+          "title": "Koopa's Theme",
+          "length_ms": 149968,
+          "length_str": "2:29"
+        },
+        {
+          "position": 31,
+          "title": "Koopa Clear",
+          "length_ms": 5929,
+          "length_str": "0:05"
+        },
+        {
+          "position": 32,
+          "title": "Ultimate Koopa",
+          "length_ms": 171493,
+          "length_str": "2:51"
+        },
+        {
+          "position": 33,
+          "title": "Ultimate Koopa Clear",
+          "length_ms": 28447,
+          "length_str": "0:28"
+        },
+        {
+          "position": 34,
+          "title": "Ending Demo",
+          "length_ms": 76773,
+          "length_str": "1:16"
+        },
+        {
+          "position": 35,
+          "title": "Staff Roll",
+          "length_ms": 207046,
+          "length_str": "3:27"
+        },
+        {
+          "position": 36,
+          "title": "Piranha Plant's Lullaby-Piano",
+          "length_ms": 143072,
+          "length_str": "2:23"
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "barcode": null,
+      "title": "More Than You Think You Are",
+      "artist": "Matchbox Twenty",
+      "release_date": "2012",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Matchbox_Twenty_More_Than_You_Think_You_Are_441231376301619616.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Unknown artist\\Matchbox Twenty - More Than You Think You Are",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "Feel",
+          "length_ms": 199746,
+          "length_str": "3:19"
+        },
+        {
+          "position": 2,
+          "title": "Disease",
+          "length_ms": 219478,
+          "length_str": "3:39"
+        },
+        {
+          "position": 3,
+          "title": "Bright Lights",
+          "length_ms": 234224,
+          "length_str": "3:54"
+        },
+        {
+          "position": 4,
+          "title": "Unwell",
+          "length_ms": 228508,
+          "length_str": "3:48"
+        },
+        {
+          "position": 5,
+          "title": "Cold",
+          "length_ms": 195544,
+          "length_str": "3:15"
+        },
+        {
+          "position": 6,
+          "title": "All I Need",
+          "length_ms": 220991,
+          "length_str": "3:40"
+        },
+        {
+          "position": 7,
+          "title": "Hand Me Down",
+          "length_ms": 302554,
+          "length_str": "5:02"
+        },
+        {
+          "position": 8,
+          "title": "Could I Be You",
+          "length_ms": 223001,
+          "length_str": "3:43"
+        },
+        {
+          "position": 9,
+          "title": "Downfall",
+          "length_ms": 246961,
+          "length_str": "4:06"
+        },
+        {
+          "position": 10,
+          "title": "Soul",
+          "length_ms": 274053,
+          "length_str": "4:34"
+        },
+        {
+          "position": 11,
+          "title": "You’re so Real",
+          "length_ms": 181137,
+          "length_str": "3:01"
+        },
+        {
+          "position": 12,
+          "title": "The Difference",
+          "length_ms": 480164,
+          "length_str": "8:00"
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "barcode": null,
+      "title": "Thriller",
+      "artist": "Michael Jackson",
+      "release_date": "1991",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Michael_Jackson_Thriller_6363254521142238358.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Michael Jackson - Thriller",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "Wanna Be Startin’ Somethin’",
+          "length_ms": 363941,
+          "length_str": "6:03"
+        },
+        {
+          "position": 2,
+          "title": "Baby Be Mine",
+          "length_ms": 260611,
+          "length_str": "4:20"
+        },
+        {
+          "position": 3,
+          "title": "The Girl Is Mine",
+          "length_ms": 222270,
+          "length_str": "3:42"
+        },
+        {
+          "position": 4,
+          "title": "Thriller",
+          "length_ms": 359113,
+          "length_str": "5:59"
+        },
+        {
+          "position": 5,
+          "title": "Beat It",
+          "length_ms": 258628,
+          "length_str": "4:18"
+        },
+        {
+          "position": 6,
+          "title": "Billie Jean",
+          "length_ms": 294150,
+          "length_str": "4:54"
+        },
+        {
+          "position": 7,
+          "title": "Human Nature",
+          "length_ms": 246100,
+          "length_str": "4:06"
+        },
+        {
+          "position": 8,
+          "title": "P.Y.T. (Pretty Young Thing)",
+          "length_ms": 239053,
+          "length_str": "3:59"
+        },
+        {
+          "position": 9,
+          "title": "The Lady in My Life",
+          "length_ms": 299370,
+          "length_str": "4:59"
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "barcode": null,
+      "title": "Meet Miley Cyrus",
+      "artist": "Miley Cyrus",
+      "release_date": "2021",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Miley_Cyrus_Meet_Miley_Cyrus_1242174749468464649.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Unknown artist\\Miley Cyrus - Meet Miley Cyrus",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "See You Again",
+          "length_ms": 190272,
+          "length_str": "3:10"
+        },
+        {
+          "position": 2,
+          "title": "East Northumberland High",
+          "length_ms": 204105,
+          "length_str": "3:24"
+        },
+        {
+          "position": 3,
+          "title": "Let’s Dance",
+          "length_ms": 182390,
+          "length_str": "3:02"
+        },
+        {
+          "position": 4,
+          "title": "G.N.O. - Girl’s Night Out",
+          "length_ms": 217859,
+          "length_str": "3:37"
+        },
+        {
+          "position": 5,
+          "title": "Right Here",
+          "length_ms": 164668,
+          "length_str": "2:44"
+        },
+        {
+          "position": 6,
+          "title": "As I Am",
+          "length_ms": 225428,
+          "length_str": "3:45"
+        },
+        {
+          "position": 7,
+          "title": "Start All Over",
+          "length_ms": 206976,
+          "length_str": "3:26"
+        },
+        {
+          "position": 8,
+          "title": "Clear",
+          "length_ms": 183016,
+          "length_str": "3:03"
+        },
+        {
+          "position": 9,
+          "title": "Good and Broken",
+          "length_ms": 176230,
+          "length_str": "2:56"
+        },
+        {
+          "position": 10,
+          "title": "I Miss You",
+          "length_ms": 239836,
+          "length_str": "3:59"
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "barcode": null,
+      "title": "Short n’ Sweet",
+      "artist": "Sabrina Carpenter",
+      "release_date": "2024",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Sabrina_Carpenter_Short_n_Sweet_3984287569815490615.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Unknown artist\\Sabrina Carpenter - Short n’ Sweet",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "Taste",
+          "length_ms": 157125,
+          "length_str": "2:37"
+        },
+        {
+          "position": 2,
+          "title": "Please Please Please",
+          "length_ms": 186200,
+          "length_str": "3:06"
+        },
+        {
+          "position": 3,
+          "title": "Good Graces",
+          "length_ms": 185104,
+          "length_str": "3:05"
+        },
+        {
+          "position": 4,
+          "title": "Sharpest Tool",
+          "length_ms": 218094,
+          "length_str": "3:38"
+        },
+        {
+          "position": 5,
+          "title": "Coincidence",
+          "length_ms": 164041,
+          "length_str": "2:44"
+        },
+        {
+          "position": 6,
+          "title": "Bed Chem",
+          "length_ms": 171715,
+          "length_str": "2:51"
+        },
+        {
+          "position": 7,
+          "title": "Espresso",
+          "length_ms": 175290,
+          "length_str": "2:55"
+        },
+        {
+          "position": 8,
+          "title": "Dumb & Poetic",
+          "length_ms": 133348,
+          "length_str": "2:13"
+        },
+        {
+          "position": 9,
+          "title": "Slim Pickins",
+          "length_ms": 152061,
+          "length_str": "2:32"
+        },
+        {
+          "position": 10,
+          "title": "Juno",
+          "length_ms": 222975,
+          "length_str": "3:42"
+        },
+        {
+          "position": 11,
+          "title": "Lie to Girls",
+          "length_ms": 201808,
+          "length_str": "3:21"
+        },
+        {
+          "position": 12,
+          "title": "Don't Smile",
+          "length_ms": 206141,
+          "length_str": "3:26"
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "barcode": null,
+      "title": "Wicked",
+      "artist": "Stephen Schwartz",
+      "release_date": "2003",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Stephen_Schwartz_Wicked_7148023425510200787.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Unknown artist\\Various Artists - Wicked",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "No One Mourns The Wicked",
+          "length_ms": 400899,
+          "length_str": "6:40"
+        },
+        {
+          "position": 2,
+          "title": "Dear Old Shiz",
+          "length_ms": 87594,
+          "length_str": "1:27"
+        },
+        {
+          "position": 3,
+          "title": "The Wizard And I",
+          "length_ms": 311063,
+          "length_str": "5:11"
+        },
+        {
+          "position": 4,
+          "title": "What Is This Feeling?",
+          "length_ms": 213683,
+          "length_str": "3:33"
+        },
+        {
+          "position": 5,
+          "title": "Something Bad",
+          "length_ms": 100436,
+          "length_str": "1:40"
+        },
+        {
+          "position": 6,
+          "title": "Dancing Through Life",
+          "length_ms": 457249,
+          "length_str": "7:37"
+        },
+        {
+          "position": 7,
+          "title": "Popular",
+          "length_ms": 225402,
+          "length_str": "3:45"
+        },
+        {
+          "position": 8,
+          "title": "I'm Not That Girl",
+          "length_ms": 181424,
+          "length_str": "3:01"
+        },
+        {
+          "position": 9,
+          "title": "One Short Day",
+          "length_ms": 184817,
+          "length_str": "3:04"
+        },
+        {
+          "position": 10,
+          "title": "A Sentimental Man",
+          "length_ms": 77285,
+          "length_str": "1:17"
+        },
+        {
+          "position": 11,
+          "title": "Defying Gravity",
+          "length_ms": 356685,
+          "length_str": "5:56"
+        },
+        {
+          "position": 12,
+          "title": "Thank Goodness",
+          "length_ms": 383177,
+          "length_str": "6:23"
+        },
+        {
+          "position": 13,
+          "title": "Wonderful",
+          "length_ms": 298091,
+          "length_str": "4:58"
+        },
+        {
+          "position": 14,
+          "title": "I'm Not That Girl (Reprise)",
+          "length_ms": 50115,
+          "length_str": "0:50"
+        },
+        {
+          "position": 15,
+          "title": "As Long As You're Mine",
+          "length_ms": 227386,
+          "length_str": "3:47"
+        },
+        {
+          "position": 16,
+          "title": "No Good Deed",
+          "length_ms": 212405,
+          "length_str": "3:32"
+        },
+        {
+          "position": 17,
+          "title": "March Of The Witch Hunters",
+          "length_ms": 92736,
+          "length_str": "1:32"
+        },
+        {
+          "position": 18,
+          "title": "For Good",
+          "length_ms": 309366,
+          "length_str": "5:09"
+        },
+        {
+          "position": 19,
+          "title": "Finale \"Wicked\"",
+          "length_ms": 101584,
+          "length_str": "1:41"
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "barcode": null,
+      "title": "Unreal Tournament",
+      "artist": "Straylight Productions",
+      "release_date": "1999",
+      "country": null,
+      "label": null,
+      "catalog_number": null,
+      "musicbrainz_release_id": null,
+      "cover_path": "covers/Straylight_Productions_Unreal_Tournament_7862356435717692475.jpg",
+      "source": "folder",
+      "source_id": "C:\\Users\\gcxcl\\Music\\Unreal Tournament - GOTY Soundtrack",
+      "created_at": "2025-12-28T14:22:40",
+      "tracks": [
+        {
+          "position": 1,
+          "title": "Unreal Tournament Title",
+          "length_ms": 86778,
+          "length_str": "1:26"
+        },
+        {
+          "position": 2,
+          "title": "Unreal Tournament Menu",
+          "length_ms": 119849,
+          "length_str": "1:59"
+        },
+        {
+          "position": 3,
+          "title": "The Course",
+          "length_ms": 268094,
+          "length_str": "4:28"
+        },
+        {
+          "position": 4,
+          "title": "Nether Animal",
+          "length_ms": 300773,
+          "length_str": "5:00"
+        },
+        {
+          "position": 5,
+          "title": "Into the Darkness",
+          "length_ms": 172225,
+          "length_str": "2:52"
+        },
+        {
+          "position": 6,
+          "title": "Mechanism Eight",
+          "length_ms": 387526,
+          "length_str": "6:27"
+        },
+        {
+          "position": 7,
+          "title": "Run",
+          "length_ms": 273110,
+          "length_str": "4:33"
+        },
+        {
+          "position": 8,
+          "title": "Mission Landing",
+          "length_ms": 252865,
+          "length_str": "4:12"
+        },
+        {
+          "position": 9,
+          "title": "Firebreath",
+          "length_ms": 195265,
+          "length_str": "3:15"
+        },
+        {
+          "position": 10,
+          "title": "Lock",
+          "length_ms": 163866,
+          "length_str": "2:43"
+        },
+        {
+          "position": 11,
+          "title": "Foregone Destruction",
+          "length_ms": 251193,
+          "length_str": "4:11"
+        },
+        {
+          "position": 12,
+          "title": "BotMCA #10",
+          "length_ms": 252682,
+          "length_str": "4:12"
+        },
+        {
+          "position": 13,
+          "title": "Razorback",
+          "length_ms": 282958,
+          "length_str": "4:42"
+        },
+        {
+          "position": 14,
+          "title": "Cannonade",
+          "length_ms": 129880,
+          "length_str": "2:09"
+        },
+        {
+          "position": 15,
+          "title": "Enigma",
+          "length_ms": 204747,
+          "length_str": "3:24"
+        },
+        {
+          "position": 16,
+          "title": "Save Me",
+          "length_ms": 111673,
+          "length_str": "1:51"
+        },
+        {
+          "position": 17,
+          "title": "Underworld 2",
+          "length_ms": 199915,
+          "length_str": "3:19"
+        },
+        {
+          "position": 18,
+          "title": "Seeker",
+          "length_ms": 205662,
+          "length_str": "3:25"
+        },
+        {
+          "position": 19,
+          "title": "Skyward Fire",
+          "length_ms": 296150,
+          "length_str": "4:56"
+        },
+        {
+          "position": 20,
+          "title": "Colossus",
+          "length_ms": 257488,
+          "length_str": "4:17"
+        },
+        {
+          "position": 21,
+          "title": "BotPack #9",
+          "length_ms": 297064,
+          "length_str": "4:57"
+        },
+        {
+          "position": 22,
+          "title": "Go Down",
+          "length_ms": 189884,
+          "length_str": "3:09"
+        },
+        {
+          "position": 23,
+          "title": "Three Wheels Turning",
+          "length_ms": 144561,
+          "length_str": "2:24"
+        },
+        {
+          "position": 24,
+          "title": "Superfist",
+          "length_ms": 126902,
+          "length_str": "2:06"
+        },
+        {
+          "position": 25,
+          "title": "Phantom",
+          "length_ms": 361142,
+          "length_str": "6:01"
+        },
+        {
+          "position": 26,
+          "title": "Organic",
+          "length_ms": 193959,
+          "length_str": "3:13"
+        },
+        {
+          "position": 27,
+          "title": "Room of Champions",
+          "length_ms": 134713,
+          "length_str": "2:14"
+        },
+        {
+          "position": 28,
+          "title": "Ending",
+          "length_ms": 107781,
+          "length_str": "1:47"
+        }
+      ]
+    }
+  ]
+}
