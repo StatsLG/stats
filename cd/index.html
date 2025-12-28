@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>CD Catalog</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --card:#ffffff;
+      --ink:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --soft:#f3f4f6;
+      --accent:#2563eb;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    .wrap{max-width:1200px;margin:0 auto;padding:18px}
+    header{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+    h1{margin:0;font-size:28px;letter-spacing:-0.02em}
+    .sub{color:var(--muted);margin:4px 0 0 0;font-size:14px}
+    .toolbar{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .search{
+      flex:1;min-width:260px;
+      display:flex;gap:10px;align-items:center;
+      background:var(--card);border:1px solid var(--line);
+      padding:10px 12px;border-radius:12px;
+      box-shadow:0 1px 0 rgba(0,0,0,0.02);
+    }
+    .search input{
+      width:100%;border:0;outline:none;font-size:16px;background:transparent;color:var(--ink)
+    }
+    .btn{
+      border:1px solid var(--line);
+      background:var(--card);
+      padding:10px 12px;border-radius:12px;
+      cursor:pointer;font-size:14px;
+    }
+    .btn:hover{border-color:#cbd5e1}
+    .pill{
+      font-size:12px;color:var(--muted);
+      background:var(--soft);border:1px solid var(--line);
+      padding:6px 10px;border-radius:999px;
+    }
+
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: 1.35fr 0.65fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .panel{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow:0 1px 0 rgba(0,0,0,0.02);
+    }
+    .panel .head{
+      padding:12px 14px;
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(#fff, #fbfbfb);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+    }
+    .panel .head strong{font-size:14px}
+    .panel .body{padding:12px 14px}
+
+    table{width:100%;border-collapse:collapse}
+    thead th{
+      text-align:left;font-size:12px;color:var(--muted);
+      padding:10px 12px;border-bottom:1px solid var(--line);
+      background:#fafafa;
+      position:sticky;top:0;z-index:1;
+    }
+    tbody td{
+      padding:10px 12px;border-bottom:1px solid var(--line);
+      vertical-align:top;
+    }
+    tbody tr{cursor:pointer}
+    tbody tr:hover{background:#fafafa}
+    .cover{
+      width:44px;height:44px;border-radius:10px;
+      background:var(--soft);
+      border:1px solid var(--line);
+      object-fit:cover;
+      display:block;
+    }
+    .title{font-weight:600;line-height:1.15}
+    .meta{color:var(--muted);font-size:13px;margin-top:3px}
+    .tag{
+      display:inline-block;
+      margin-top:6px;
+      font-size:11px;
+      color:var(--muted);
+      background:var(--soft);
+      border:1px solid var(--line);
+      padding:3px 8px;border-radius:999px;
+    }
+
+    .detail-top{display:flex;gap:12px;align-items:flex-start}
+    .detail-cover{
+      width:92px;height:92px;border-radius:16px;
+      background:var(--soft);
+      border:1px solid var(--line);
+      object-fit:cover;
+      flex:0 0 auto;
+    }
+    .detail-title{margin:0;font-size:18px;letter-spacing:-0.01em}
+    .kv{margin-top:8px;display:grid;grid-template-columns:120px 1fr;gap:6px 10px;font-size:13px}
+    .kv .k{color:var(--muted)}
+    .kv .v{color:var(--ink);word-break:break-word}
+    .tracks{margin-top:12px}
+    .tracks h3{margin:0 0 8px 0;font-size:14px}
+    .track{
+      display:grid;
+      grid-template-columns: 40px 1fr 60px;
+      gap:10px;
+      padding:8px 0;
+      border-bottom:1px dashed var(--line);
+      font-size:13px;
+    }
+    .track .n{color:var(--muted)}
+    .track .t{color:var(--ink)}
+    .track .l{color:var(--muted);text-align:right}
+    .empty{color:var(--muted);font-size:14px}
+
+    .hint{color:var(--muted);font-size:13px}
+    .link{
+      color:var(--accent);
+      text-decoration:none;
+    }
+    .link:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>CD Catalog</h1>
+        <p class="sub">Search your collection. Click an album to view details & tracks.</p>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <div class="search" role="search">
+        <span class="hint">🔎</span>
+        <input id="q" type="text" placeholder="Search title, artist, label, barcode, year…" autocomplete="off" />
+      </div>
+      <button class="btn" id="clearBtn">Clear</button>
+      <span class="pill" id="statusPill">Loading…</span>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: results -->
+      <div class="panel">
+        <div class="head">
+          <strong>Albums</strong>
+          <span class="hint" id="countText"></span>
+        </div>
+        <div class="body" style="padding:0">
+          <div style="max-height:70vh; overflow:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:66px">Cover</th>
+                  <th>Title</th>
+                  <th style="width:220px">Artist</th>
+                  <th style="width:90px">Year</th>
+                  <th style="width:220px">Label</th>
+                  <th style="width:160px">Barcode</th>
+                </tr>
+              </thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: details -->
+      <div class="panel">
+        <div class="head">
+          <strong>Album details</strong>
+          <span class="hint" id="detailHint">Select an album</span>
+        </div>
+        <div class="body" id="detailBody">
+          <p class="empty">Click an album on the left to see its tracks.</p>
+          <p class="hint" style="margin-top:10px">
+            Tip: if you’re testing locally, use a local server:
+            <code>python -m http.server</code>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  let ALL = [];
+  let FILTERED = [];
+  let SELECTED_ID = null;
+
+  const elQ = document.getElementById("q");
+  const elRows = document.getElementById("rows");
+  const elStatus = document.getElementById("statusPill");
+  const elCount = document.getElementById("countText");
+  const elDetail = document.getElementById("detailBody");
+  const elDetailHint = document.getElementById("detailHint");
+
+  function escapeHtml(s){
+    return String(s ?? "").replace(/[&<>"']/g, c => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[c]));
+  }
+
+  function yearFromDate(d){
+    if(!d) return "";
+    return String(d).slice(0,4);
+  }
+
+  function asText(a){
+    return [
+      a.title, a.artist, a.label, a.country, a.catalog_number,
+      a.release_date, a.barcode, a.source
+    ].join(" ").toLowerCase();
+  }
+
+  function coverImg(cover_path){
+    if(!cover_path) return null;
+    return cover_path; // expected like "covers/xxxxx.jpg"
+  }
+
+  function renderTable(list){
+    elRows.innerHTML = "";
+    for(const a of list){
+      const tr = document.createElement("tr");
+      tr.dataset.id = a.id;
+      tr.addEventListener("click", () => selectAlbum(a.id));
+
+      const cover = coverImg(a.cover_path);
+
+      const tdCover = document.createElement("td");
+      tdCover.innerHTML = cover
+        ? `<img class="cover" src="${escapeHtml(cover)}" alt="cover">`
+        : `<div class="cover" title="No cover"></div>`;
+
+      const tdTitle = document.createElement("td");
+      const title = a.title || "(unknown title)";
+      const extra = [];
+      if (a.source) extra.push(a.source === "cd" ? "CD scan" : "Folder import");
+      if (a.tracks && a.tracks.length) extra.push(`${a.tracks.length} tracks`);
+      tdTitle.innerHTML = `
+        <div class="title">${escapeHtml(title)}</div>
+        <div class="meta">${escapeHtml(a.country || "")}</div>
+        ${extra.length ? `<span class="tag">${escapeHtml(extra.join(" • "))}</span>` : ""}
+      `;
+
+      const tdArtist = document.createElement("td");
+      tdArtist.textContent = a.artist || "";
+
+      const tdYear = document.createElement("td");
+      tdYear.textContent = yearFromDate(a.release_date);
+
+      const tdLabel = document.createElement("td");
+      tdLabel.textContent = a.label || "";
+
+      const tdBarcode = document.createElement("td");
+      tdBarcode.innerHTML = a.barcode ? `<span class="hint">${escapeHtml(a.barcode)}</span>` : `<span class="hint">—</span>`;
+
+      tr.appendChild(tdCover);
+      tr.appendChild(tdTitle);
+      tr.appendChild(tdArtist);
+      tr.appendChild(tdYear);
+      tr.appendChild(tdLabel);
+      tr.appendChild(tdBarcode);
+
+      elRows.appendChild(tr);
+    }
+
+    elCount.textContent = `${list.length} shown`;
+  }
+
+  function renderDetail(a){
+    if(!a){
+      elDetailHint.textContent = "Select an album";
+      elDetail.innerHTML = `<p class="empty">Click an album on the left to see its tracks.</p>`;
+      return;
+    }
+
+    elDetailHint.textContent = "";
+
+    const cover = coverImg(a.cover_path);
+    const mb = a.musicbrainz_release_id;
+
+    const mbLink = mb
+      ? `<a class="link" target="_blank" rel="noreferrer" href="https://musicbrainz.org/release/${encodeURIComponent(mb)}">MusicBrainz</a>`
+      : "";
+
+    const tracks = (a.tracks || []);
+    const trackHtml = tracks.length
+      ? tracks.map(t => `
+          <div class="track">
+            <div class="n">${escapeHtml(t.position ?? "")}</div>
+            <div class="t">${escapeHtml(t.title ?? "")}</div>
+            <div class="l">${escapeHtml(t.length_str ?? "")}</div>
+          </div>
+        `).join("")
+      : `<p class="empty">No tracks stored for this album.</p>`;
+
+    elDetail.innerHTML = `
+      <div class="detail-top">
+        ${cover ? `<img class="detail-cover" src="${escapeHtml(cover)}" alt="cover">`
+                : `<div class="detail-cover"></div>`}
+        <div>
+          <h2 class="detail-title">${escapeHtml(a.title || "(unknown title)")}</h2>
+          <div class="meta">${escapeHtml(a.artist || "")}</div>
+          <div class="meta">${escapeHtml(a.label || "")}</div>
+          ${mbLink ? `<div class="meta">${mbLink}</div>` : ""}
+        </div>
+      </div>
+
+      <div class="kv">
+        <div class="k">Year</div><div class="v">${escapeHtml(yearFromDate(a.release_date))}</div>
+        <div class="k">Country</div><div class="v">${escapeHtml(a.country || "")}</div>
+        <div class="k">Barcode</div><div class="v">${escapeHtml(a.barcode || "—")}</div>
+        <div class="k">Catalog #</div><div class="v">${escapeHtml(a.catalog_number || "")}</div>
+        <div class="k">Source</div><div class="v">${escapeHtml(a.source || "")}</div>
+      </div>
+
+      <div class="tracks">
+        <h3>Tracks</h3>
+        ${trackHtml}
+      </div>
+    `;
+  }
+
+  function selectAlbum(id){
+    SELECTED_ID = id;
+    const a = ALL.find(x => String(x.id) === String(id));
+    renderDetail(a);
+  }
+
+  function applyFilter(){
+    const q = (elQ.value || "").trim().toLowerCase();
+    if(!q){
+      FILTERED = ALL;
+    } else {
+      FILTERED = ALL.filter(a => asText(a).includes(q));
+    }
+
+    renderTable(FILTERED);
+
+    // keep selection if still visible
+    if(SELECTED_ID){
+      const still = FILTERED.find(x => String(x.id) === String(SELECTED_ID));
+      renderDetail(still || null);
+    }
+    elStatus.textContent = `Loaded ${ALL.length} • Showing ${FILTERED.length}`;
+  }
+
+  async function init(){
+    try{
+      elStatus.textContent = "Loading albums.json…";
+      const res = await fetch("./albums.json", { cache: "no-store" });
+      if(!res.ok) throw new Error(`HTTP ${res.status} loading albums.json`);
+      const data = await res.json();
+      ALL = (data.albums || []);
+      // ensure numeric-ish id for sorting/display consistency
+      ALL.sort((a,b) => (a.artist||"").localeCompare(b.artist||"") || (a.title||"").localeCompare(b.title||""));
+      elStatus.textContent = `Loaded ${ALL.length} albums`;
+      applyFilter();
+      if (ALL.length) selectAlbum(ALL[0].id);
+    } catch(err){
+      console.error(err);
+      elStatus.textContent = "Failed to load albums.json";
+      elDetail.innerHTML = `
+        <p class="empty">Could not load <code>albums.json</code>.</p>
+        <p class="hint">
+          If you opened this page by double-clicking the file, your browser may block fetch().
+          Try running a local server in the <code>site</code> folder:
+          <code>python -m http.server 8000</code>
+          then open <code>http://127.0.0.1:8000/</code>.
+        </p>
+      `;
+    }
+  }
+
+  // events
+  elQ.addEventListener("input", () => applyFilter());
+  document.getElementById("clearBtn").addEventListener("click", () => {
+    elQ.value = "";
+    applyFilter();
+    elQ.focus();
+  });
+
+  init();
+</script>
+</body>
+</html>
