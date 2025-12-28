@@ -3,523 +3,521 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Central Limit Theorem Demo | StatsLG</title>
-  <meta name="description" content="Interactive CLT demo: choose a population distribution, sample repeatedly, and visualize the sampling distribution of the mean.">
+  <title>Central Limit Theorem Demo — StatsLG</title>
+  <meta name="description" content="Interactive CLT demo with population choices." />
   <link rel="icon" href="/favicon.ico" />
-  <!-- Your brand stylesheet -->
-  <link rel="stylesheet" href="/style/bctcstyle.css">
-
-  <!-- Chart.js 4 -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <!-- Chart.js plugin for annotation (optional for vertical lines) -->
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-
+  <link rel="stylesheet" href="/style/bctcstyle.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
-    /* Small local tweaks that play nice with bctcstyle.css */
-    .controls { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-    .card { background: var(--card, #ffffff); border: 1px solid var(--rule, #e5e7eb); border-radius: 14px; padding: 1rem; }
-    .row { display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; }
-    .row > .card { min-height: 420px; }
-    .kv{ display:flex; align-items:center; justify-content:space-between; gap:.75rem; }
-    .kv input[type="number"], .kv input[type="range"], .kv select { width: 100%; }
-    .statgrid { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap:.5rem; }
-    .pill { background: var(--panel, #f5f7fb); border:1px solid var(--rule,#e5e7eb); border-radius: 999px; padding:.4rem .75rem; font-size:.95rem; }
-    .btnrow { display:flex; flex-wrap:wrap; gap:.5rem; }
-    .muted { color: var(--muted,#6b7280); }
-    .subtitle { margin-top:.25rem; }
-    canvas { max-height: 340px; }
-    .footnote { font-size: .9rem; }
-    .warn { color: var(--warn,#f59e0b); }
+    /* Scoped styles so we don't touch your global layout */
+    .clt .card{padding:1rem;border:1px solid var(--rule);border-radius:.75rem;background:var(--card)}
+    .clt .controls-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;align-items:start}
+    .clt .full-span{grid-column:1/-1}
+    .clt .row{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+    .clt label.inline{display:flex;align-items:center;gap:.4rem}
+    .clt .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+    .clt .small{font-size:.9rem}
+    $1; color: var(--ink); }
+    .clt .btn:disabled{opacity:.6;cursor:not-allowed}
+    .clt .tabs{display:flex;gap:.5rem;margin:.5rem 0}
+    .clt .tab{padding:.35rem .8rem;border:1px solid var(--rule);border-bottom:none;border-radius:.5rem .5rem 0 0;background:var(--panel);cursor:pointer}
+    .clt .tab.active{background:var(--card);font-weight:600}
+    .clt .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.5rem}
+    .clt .stats .box{background:var(--panel);border:1px solid var(--rule);padding:.5rem .75rem;border-radius:.5rem}
+    .clt .stack{display:grid;grid-template-rows:auto auto;gap:1rem}
+    .clt .canvas-wrap{position:relative; height:420px;}
+    .clt #histCanvas{position:relative; width:100%; height:100%}
+    .clt #dotCanvas{position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none}
+    .clt table{width:100%; border-collapse:collapse}
+    .clt th, .clt td{border:1px solid var(--rule); padding:.4rem; text-align:right}
+    .clt th{background:var(--panel); text-align:center}
+    .clt .sl{width:240px}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <!-- ===== SIDEBAR ===== -->
+    <!-- Sidebar kept exactly like your other demos so it stays on the LEFT -->
     <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
-
-    <!-- ===== MAIN ===== -->
     <main>
-      <header>
-        <h1>Central Limit Theorem Demo</h1>
-        <p class="subtitle muted">Pick a population distribution, draw many samples of size <em>n</em>, and watch the sampling distribution of the mean trend toward normality.</p>
-      </header>
+      <div class="clt">
+        <header>
+          <h1>Central Limit Theorem — Means & Proportions</h1>
+          <p class="subtitle">Population shown <b>on top</b>. Sampling distribution (histogram) below with falling-dot animation for the newest statistic. No grow-from-axis chart animation. Adjustable bins.</p>
+        </header>
 
-      <!-- Controls -->
-      <section class="card">
-        <div class="controls">
-          <div class="kv">
-            <label for="dist">Population</label>
-            <select id="dist">
-              <option value="normal" selected>Normal(μ, σ)</option>
-              <option value="uniform">Uniform(a, b)</option>
-              <option value="exponential">Exponential(λ)</option>
-              <option value="chisq">Chi-Square(k)</option>
-              <option value="bernoulli">Bernoulli(p)</option>
-              <option value="bimodal">Bimodal: w·N(μ₁,σ₁) + (1−w)·N(μ₂,σ₂)</option>
-            </select>
-          </div>
-
-          <!-- Parameter blocks (show/hide depending on dist) -->
-          <div class="kv dist normal">
-            <label>μ</label><input id="p_mu" type="number" step="0.1" value="0">
-          </div>
-          <div class="kv dist normal">
-            <label>σ</label><input id="p_sigma" type="number" step="0.1" value="3">
-          </div>
-
-          <div class="kv dist uniform" style="display:none">
-            <label>a</label><input id="p_a" type="number" step="0.1" value="-5">
-          </div>
-          <div class="kv dist uniform" style="display:none">
-            <label>b</label><input id="p_b" type="number" step="0.1" value="7">
-          </div>
-
-          <div class="kv dist exponential" style="display:none">
-            <label>λ (rate)</label><input id="p_lambda" type="number" step="0.1" value="0.5">
-          </div>
-
-          <div class="kv dist chisq" style="display:none">
-            <label>k (df)</label><input id="p_k" type="number" step="1" min="1" value="4">
-          </div>
-
-          <div class="kv dist bernoulli" style="display:none">
-            <label>p</label><input id="p_p" type="number" step="0.01" min="0" max="1" value="0.3">
-          </div>
-
-          <div class="kv dist bimodal" style="display:none">
-            <label>w</label><input id="p_w" type="number" step="0.05" min="0" max="1" value="0.5">
-          </div>
-          <div class="kv dist bimodal" style="display:none">
-            <label>μ₁</label><input id="p_mu1" type="number" step="0.1" value="-3">
-          </div>
-          <div class="kv dist bimodal" style="display:none">
-            <label>σ₁</label><input id="p_sigma1" type="number" step="0.1" value="1.2">
-          </div>
-          <div class="kv dist bimodal" style="display:none">
-            <label>μ₂</label><input id="p_mu2" type="number" step="0.1" value="3">
-          </div>
-          <div class="kv dist bimodal" style="display:none">
-            <label>σ₂</label><input id="p_sigma2" type="number" step="0.1" value="1.2">
-          </div>
-
-          <div class="kv">
-            <label>Sample size (n): <span id="nval" class="muted"></span></label>
-          </div>
-          <div class="kv">
-            <input id="n" type="range" min="1" max="200" value="30">
-          </div>
-
-          <div class="kv">
-            <label>Samples per click: <span id="mval" class="muted"></span></label>
-          </div>
-          <div class="kv">
-            <input id="m" type="range" min="1" max="2000" value="200">
-          </div>
-
-          <div class="kv">
-            <label>Histogram bins</label>
-            <input id="bins" type="number" min="5" max="80" value="30">
-          </div>
-
-          <div class="kv">
-            <label><input id="overlayNormal" type="checkbox" checked> Overlay Normal(μ, σ/√n)</label>
-          </div>
-
-          <div class="btnrow">
-            <button id="drawBtn" class="btn">Add Samples</button>
-            <button id="autorunBtn" class="btn">Start Auto-Run</button>
-            <button id="resetBtn" class="btn secondary">Reset</button>
-          </div>
+        <!-- Tabs for statistic type -->
+        <div class="tabs" role="tablist" aria-label="Statistic Type">
+          <button id="tabMeans" class="tab active" role="tab" aria-selected="true">Sample Means</button>
+          <button id="tabProps" class="tab" role="tab" aria-selected="false">Sample Proportions</button>
         </div>
 
-        <div class="statgrid" style="margin-top: .75rem;">
-          <div class="pill">Population μ: <span id="mu_pop">—</span></div>
-          <div class="pill">Population σ: <span id="sd_pop">—</span></div>
-          <div class="pill">Theoretical SE = σ/√n: <span id="se_theory">—</span></div>
-          <div class="pill">Sampling Mean (emp): <span id="mean_emp">—</span></div>
-          <div class="pill">Sampling SD (emp): <span id="sd_emp">—</span></div>
-          <div class="pill">Total Samples: <span id="count_emp">0</span></div>
-        </div>
-      </section>
+        <section class="card">
+          <div class="controls-grid">
+            <!-- Means controls -->
+            <div id="meansControls" class="full-span">
+              <div class="row">
+                <label class="inline">Population Shape
+                  <select id="popShape">
+                    <option value="uniform">Uniform [a,b]</option>
+                    <option value="normal" selected>Normal (μ, σ)</option>
+                    <option value="lognormal">Skewed</option>
+                    <option value="bimodal">Bimodal</option>
+                    <option value="crazy">Crazy</option>
+                  </select>
+                </label>
+                <label class="inline">Sample Size n
+                  <input id="nMeans" type="range" min="2" max="500" step="1" value="30" class="sl"/>
+                </label>
+                <span class="mono small">n = <span id="nMeansVal">30</span></span>
+                <label class="inline">Histogram bins
+                  <input id="binSlider" type="range" min="10" max="120" step="1" value="40" class="sl"/>
+                </label>
+                <span class="mono small">bins = <span id="binVal">40</span></span>
+              </div>
+              <div id="paramsUniform" class="row" style="display:none">
+                <label class="inline">a <input id="uA" type="number" step="0.1" value="0"></label>
+                <label class="inline">b <input id="uB" type="number" step="0.1" value="1"></label>
+              </div>
+              <div id="paramsNormal" class="row">
+                <label class="inline">μ <input id="nMu" type="number" step="0.1" value="0"></label>
+                <label class="inline">σ <input id="nSd" type="number" step="0.1" value="1"></label>
+              </div>
+              <div id="paramsLognormal" class="row" style="display:none">
+                <label class="inline">log μ <input id="lnMu" type="number" step="0.1" value="0"></label>
+                <label class="inline">log σ <input id="lnSd" type="number" step="0.1" value="1"></label>
+              </div>
+              <div id="paramsBimodal" class="row" style="display:none">
+                <label class="inline">μ₁ <input id="bMu1" type="number" step="0.1" value="-2"></label>
+                <label class="inline">σ₁ <input id="bSd1" type="number" step="0.1" value="1"></label>
+                <label class="inline">μ₂ <input id="bMu2" type="number" step="0.1" value="2"></label>
+                <label class="inline">σ₂ <input id="bSd2" type="number" step="0.1" value="1"></label>
+                <label class="inline">mix w (μ₁) <input id="bW" type="number" step="0.05" value="0.5"></label>
+              </div>
+              <div id="paramsCrazy" class="row" style="display:none">
+                <span class="small">Crazy mix = 0.7·Exponential(λ=1) + 0.3·Normal(−2, 0.3)</span>
+              </div>
+            </div>
 
-      <!-- Charts -->
-      <section class="row" style="margin-top: 1rem;">
-        <div class="card">
-          <h3>Population Preview</h3>
-          <p class="muted">A quick look at draws from your chosen population (not the sampling distribution).</p>
-          <canvas id="popChart" aria-label="Population Histogram"></canvas>
-        </div>
-        <div class="card">
-          <h3>Sampling Distribution of the Mean</h3>
-          <p class="muted">Histogram of sample means from many samples of size <span id="nlabel">n</span>. CLT predicts approximate Normal with mean μ and SD σ/√n (overlay optional).</p>
-          <canvas id="sampChart" aria-label="Sampling Distribution Histogram"></canvas>
-        </div>
-      </section>
+            <!-- Proportions controls -->
+            <div id="propsControls" class="full-span" style="display:none">
+              <div class="row">
+                <label class="inline">True proportion p
+                  <input id="trueP" type="range" min="0" max="1" step="0.01" value="0.35" class="sl"/>
+                </label>
+                <span class="mono small">p = <span id="truePVal">0.35</span></span>
+                <label class="inline">Sample Size n
+                  <input id="nProps" type="range" min="2" max="1000" step="1" value="40" class="sl"/>
+                </label>
+                <span class="mono small">n = <span id="nPropsVal">40</span></span>
+                <label class="inline">Histogram bins
+                  <input id="binSliderP" type="range" min="10" max="120" step="1" value="40" class="sl"/>
+                </label>
+                <span class="mono small">bins = <span id="binValP">40</span></span>
+              </div>
+            </div>
 
-      <p class="footnote muted" style="margin-top:1rem;">
-        Notes: CLT tends to kick in faster for light-tailed, symmetric populations. For heavy skew (e.g., Exponential, small df Chi-Square) and discrete Bernoulli, larger <em>n</em> is often needed. Bimodal populations can take longer to “look normal” without large <em>n</em>.
-      </p>
+            <!-- Stat summary -->
+            <div class="stats full-span">
+              <div class="box">Population Mean (μ): <b class="mono" id="popMean">—</b></div>
+              <div class="box">Population SD (σ): <b class="mono" id="popSd">—</b></div>
+              <div class="box">Sampling SD (σ/√n): <b class="mono" id="sampSd">—</b></div>
+              <div class="box">Samples Collected: <b class="mono" id="sampleCount">0</b></div>
+            </div>
+
+            <!-- Actions -->
+            <div class="row full-span">
+              <button class="btn" id="btnAdd1">Add 1 (animated)</button>
+              <button class="btn" id="btnAdd10">Add 10 (fast)</button>
+              <button class="btn" id="btnAdd100">Add 100 (fast)</button>
+              <button class="btn" id="btnAdd1000">Add 1000 (no animation)</button>
+              <button class="btn" id="btnReset">Reset</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- STACK: Population on top, Sampling distribution below -->
+        <section class="stack">
+          <section class="card" aria-label="Population distribution (top)">
+            <div style="height:340px">
+              <canvas id="popChart"></canvas>
+            </div>
+          </section>
+
+          <section class="card" aria-label="Sampling distribution (bottom)">
+            <div class="canvas-wrap">
+              <canvas id="histCanvas" aria-label="Sampling distribution histogram"></canvas>
+              <canvas id="dotCanvas"></canvas>
+            </div>
+          </section>
+        </section>
+
+        <section class="card">
+          <h3>Frequency Table (Sampling Distribution)</h3>
+          <div class="small">Bin ranges and counts used to draw the histogram.</div>
+          <div id="freqTableWrap" style="overflow:auto; max-height:340px; margin-top:.5rem;"></div>
+        </section>
+      </div>
     </main>
   </div>
 
-  <!-- Simple include loader for sidebar -->
   <script>
-    (async function includePartials(){
-      const els = document.querySelectorAll('[data-include]');
-      for (const el of els) {
-        const url = el.getAttribute('data-include');
-        try { const resp = await fetch(url); el.innerHTML = await resp.text(); }
-        catch(e){ el.innerHTML = '<div class="warn">Could not load sidebar.</div>'; }
-      }
-    })();
-  </script>
-
-  <script>
-    // ---------- Utilities ----------
-    const randn = (() => {
-      // Box-Muller
-      let spare = null;
-      return function() {
-        if (spare !== null) { const v = spare; spare = null; return v; }
-        let u=0, v=0, s=0;
-        while (s===0 || s>=1) { u = Math.random()*2-1; v = Math.random()*2-1; s = u*u+v*v; }
-        const mul = Math.sqrt(-2.0*Math.log(s)/s);
-        spare = v * mul;
-        return u * mul;
-      }
+    // Ensure sidebar include (if your global include script hasn't already populated it)
+    (function maybeInclude(){
+      const el = document.querySelector('[data-include]');
+      if(!el || el.children.length) return;
+      const url = el.getAttribute('data-include');
+      if(url){ fetch(url).then(r=>r.text()).then(html=>{ el.innerHTML = html; }).catch(()=>{}); }
     })();
 
-    function normalSample(mu, sigma){ return mu + sigma*randn(); }
-    function uniformSample(a,b){ return a + (b-a)*Math.random(); }
-    function exponentialSample(lambda){ return -Math.log(1-Math.random())/lambda; } // rate λ
-    // Chi-square via sum of squared N(0,1)
-    function chisqSample(k){ let s=0; for(let i=0;i<k;i++) s += randn()**2; return s; }
-    function bernoulliSample(p){ return Math.random()<p ? 1 : 0; }
-
-    // Bimodal mixture of two normals
-    function bimodalSample(w, mu1, s1, mu2, s2){
-      return (Math.random()<w) ? normalSample(mu1, s1) : normalSample(mu2, s2);
-    }
-
-    // Theoretical mean and variance by population
-    function populationMoments(dist, P){
-      switch(dist){
-        case 'normal': {
-          const mu = P.mu, v = P.sigma**2;
-          return {mu, var:v};
-        }
-        case 'uniform': {
-          const a=P.a, b=P.b;
-          const mu=(a+b)/2, v=((b-a)**2)/12;
-          return {mu, var:v};
-        }
-        case 'exponential': {
-          const lambda=P.lambda;
-          const mu=1/lambda, v=1/(lambda**2);
-          return {mu, var:v};
-        }
-        case 'chisq': {
-          const k=P.k;
-          const mu=k, v=2*k;
-          return {mu, var:v};
-        }
-        case 'bernoulli': {
-          const p=P.p;
-          const mu=p, v=p*(1-p);
-          return {mu, var:v};
-        }
-        case 'bimodal': {
-          const w=P.w, mu1=P.mu1, s1=P.sigma1, mu2=P.mu2, s2=P.sigma2;
-          const mu = w*mu1 + (1-w)*mu2;
-          // Var = w(s1^2 + mu1^2) + (1-w)(s2^2 + mu2^2) - mu^2
-          const second = w*(s1**2 + mu1**2) + (1-w)*(s2**2 + mu2**2);
-          const v = second - mu**2;
-          return {mu, var:v};
-        }
-      }
-    }
-
-    // Draw one value from chosen population
-    function popDraw(dist, P){
-      switch(dist){
-        case 'normal':    return normalSample(P.mu, P.sigma);
-        case 'uniform':   return uniformSample(P.a, P.b);
-        case 'exponential': return exponentialSample(P.lambda);
-        case 'chisq':     return chisqSample(P.k);
-        case 'bernoulli': return bernoulliSample(P.p);
-        case 'bimodal':   return bimodalSample(P.w, P.mu1, P.sigma1, P.mu2, P.sigma2);
-      }
-    }
-
-    // Sample mean of n draws
-    function sampleMean(dist, P, n){
-      let s=0;
-      for(let i=0;i<n;i++) s += popDraw(dist,P);
-      return s/n;
-    }
-
-    // Compute histogram bins
-    function histogram(data, bins){
-      if (data.length===0) return {edges:[], counts:[]};
-      const min = Math.min(...data), max = Math.max(...data);
-      const pad = (max-min)*0.04 || 1e-6;
-      const lo = min - pad, hi = max + pad;
-      const w = (hi-lo)/bins;
-      const edges = Array.from({length: bins+1}, (_,i)=>lo+i*w);
-      const counts = new Array(bins).fill(0);
-      for (const x of data){
-        let idx = Math.floor((x-lo)/w);
-        if (idx<0) idx=0;
-        if (idx>=bins) idx=bins-1;
-        counts[idx]++;
-      }
-      return {edges, counts};
-    }
-
-    function linspace(a,b,k){
-      if (k<=1) return [a];
-      const step = (b-a)/(k-1);
-      return Array.from({length:k}, (_,i)=>a+i*step);
-    }
-
-    function gaussianPdf(x, mu, sd){
-      const z = (x-mu)/sd;
-      return Math.exp(-0.5*z*z) / (sd*Math.sqrt(2*Math.PI));
-    }
-
-    // ---------- State ----------
-    const distSel = document.getElementById('dist');
-    const nSlider = document.getElementById('n');
-    const mSlider = document.getElementById('m');
-    const binsInput = document.getElementById('bins');
-    const overlayChk = document.getElementById('overlayNormal');
-
-    const nLabel = document.getElementById('nlabel');
-    const nVal = document.getElementById('nval');
-    const mVal = document.getElementById('mval');
-
-    const muPopEl = document.getElementById('mu_pop');
-    const sdPopEl = document.getElementById('sd_pop');
-    const seTheoryEl = document.getElementById('se_theory');
-    const meanEmpEl = document.getElementById('mean_emp');
-    const sdEmpEl = document.getElementById('sd_emp');
-    const countEmpEl = document.getElementById('count_emp');
-
-    const params = {
-      mu: document.getElementById('p_mu'),
-      sigma: document.getElementById('p_sigma'),
-      a: document.getElementById('p_a'),
-      b: document.getElementById('p_b'),
-      lambda: document.getElementById('p_lambda'),
-      k: document.getElementById('p_k'),
-      p: document.getElementById('p_p'),
-      w: document.getElementById('p_w'),
-      mu1: document.getElementById('p_mu1'),
-      sigma1: document.getElementById('p_sigma1'),
-      mu2: document.getElementById('p_mu2'),
-      sigma2: document.getElementById('p_sigma2'),
+    // --- RNG helpers ---
+    const RNG = {
+      uniform(a=0,b=1){return a + (b-a)*Math.random();},
+      normal(mu=0, sd=1){ let u=0,v=0; while(u===0) u=Math.random(); while(v===0) v=Math.random(); const z=Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); return mu + sd*z; },
+      lognormal(lmu=0, lsd=1){ return Math.exp(RNG.normal(lmu, lsd)); },
+      exponential(lambda=1){ let u=0; while(u===0) u=Math.random(); return -Math.log(u)/lambda; },
+      bernoulli(p){ return Math.random() < p ? 1 : 0; }
     };
 
-    let sampleMeans = [];
-    let autorun = false;
-    let autorunHandle = null;
+    // --- State ---
+    let mode='means';
+    let sampleStats=[]; // sample means or proportions
+    let population = null; // only used in means mode (big synthetic bank)
+    let binsMeans = 40, binsProps = 40;
+    let domain=[-5,5];
 
-    function currentDist(){ return distSel.value; }
-    function currentParams(){
-      switch(currentDist()){
-        case 'normal': return {mu: +params.mu.value, sigma: Math.max(0.0001, +params.sigma.value)};
-        case 'uniform': {
-          let a=+params.a.value, b=+params.b.value;
-          if (b<a){ const t=a; a=b; b=t; }
-          return {a, b};
+    // Elements
+    const $ = s=>document.querySelector(s);
+    const popCtx = $('#popChart').getContext('2d');
+    const histCanvas = $('#histCanvas');
+    const dotCanvas = $('#dotCanvas');
+    const dotCtx = dotCanvas.getContext('2d');
+
+    let popChart, histChart;
+
+    // Size overlay canvas to match histogram canvas
+    function resizeDotCanvas(){
+      const r = histCanvas.getBoundingClientRect();
+      dotCanvas.width = r.width * devicePixelRatio;
+      dotCanvas.height = r.height * devicePixelRatio;
+      dotCanvas.style.width = r.width + 'px';
+      dotCanvas.style.height = r.height + 'px';
+      dotCtx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    }
+    new ResizeObserver(resizeDotCanvas).observe($('.canvas-wrap'));
+
+    // UI wiring
+    $('#tabMeans').addEventListener('click', ()=> switchMode('means'));
+    $('#tabProps').addEventListener('click', ()=> switchMode('props'));
+
+    $('#popShape').addEventListener('change', ()=>{ toggleParamRows(); recomputePopulation(); resetSampling(true); });
+    ['uA','uB','nMu','nSd','lnMu','lnSd','bMu1','bSd1','bMu2','bSd2','bW'].forEach(id=>{
+      const el = document.getElementById(id); if(el) el.addEventListener('input', ()=>{ recomputePopulation(); resetSampling(true); });
+    });
+
+    $('#nMeans').addEventListener('input', e=>{ $('#nMeansVal').textContent=e.target.value; updateSamplingSd(); });
+    $('#nMeans').addEventListener('change', ()=> resetSampling(true));
+
+    $('#trueP').addEventListener('input', e=>{ $('#truePVal').textContent=Number(e.target.value).toFixed(2); updateAllStats(); });
+    $('#nProps').addEventListener('input', e=>{ $('#nPropsVal').textContent=e.target.value; updateSamplingSd(); });
+
+    $('#binSlider').addEventListener('input', e=>{ binsMeans = +e.target.value; $('#binVal').textContent=binsMeans; refreshHistogram(); renderTable(); });
+    $('#binSliderP').addEventListener('input', e=>{ binsProps = +e.target.value; $('#binValP').textContent=binsProps; refreshHistogram(); renderTable(); });
+
+    $('#btnAdd1').addEventListener('click', ()=> addSamples(1, true));
+    $('#btnAdd10').addEventListener('click', ()=> addSamples(10, false));
+    $('#btnAdd100').addEventListener('click', ()=> addSamples(100, false));
+    $('#btnAdd1000').addEventListener('click', ()=> addSamples(1000, false));
+    $('#btnReset').addEventListener('click', ()=> resetSampling());
+
+    // Init
+    toggleParamRows();
+    setupCharts();
+    recomputePopulation();
+    updateAllStats();
+
+    function switchMode(m){
+      if(mode===m) return;
+      mode=m;
+      $('#tabMeans').classList.toggle('active', m==='means');
+      $('#tabProps').classList.toggle('active', m==='props');
+      $('#meansControls').style.display = m==='means' ? '' : 'none';
+      $('#propsControls').style.display = m==='props' ? '' : 'none';
+      recomputePopulation();
+      resetSampling(true);
+    }
+
+    function toggleParamRows(){
+      const v = $('#popShape').value;
+      $('#paramsUniform').style.display = v==='uniform' ? '' : 'none';
+      $('#paramsNormal').style.display = v==='normal' ? '' : 'none';
+      $('#paramsLognormal').style.display = v==='lognormal' ? '' : 'none';
+      $('#paramsBimodal').style.display = v==='bimodal' ? '' : 'none';
+      $('#paramsCrazy').style.display = v==='crazy' ? '' : 'none';
+    }
+
+    // --- Population PDF (top chart) ---
+    function pdfForShape(x){
+      const shape = $('#popShape').value;
+      const a = parseFloat($('#uA').value), b = parseFloat($('#uB').value);
+      const mu = parseFloat($('#nMu').value), sd = Math.max(1e-6, parseFloat($('#nSd').value));
+      const lmu = parseFloat($('#lnMu').value), lsd = Math.max(1e-6, parseFloat($('#lnSd').value));
+      const m1 = parseFloat($('#bMu1').value), s1 = Math.max(1e-6, parseFloat($('#bSd1').value));
+      const m2 = parseFloat($('#bMu2').value), s2 = Math.max(1e-6, parseFloat($('#bSd2').value));
+      const w = Math.min(0.999, Math.max(0.001, parseFloat($('#bW').value)));
+      const norm = (x,m,s)=> Math.exp(-0.5*Math.pow((x-m)/s,2))/(s*Math.sqrt(2*Math.PI));
+      if(shape==='uniform') return (x>=a && x<=b) ? 1/(b-a) : 0;
+      if(shape==='normal') return norm(x,mu,sd);
+      if(shape==='lognormal') return (x>0) ? (Math.exp(-Math.pow(Math.log(x)-lmu,2)/(2*lsd*lsd)) / (x*lsd*Math.sqrt(2*Math.PI))) : 0;
+      if(shape==='bimodal') return w*norm(x,m1,s1) + (1-w)*norm(x,m2,s2);
+      // crazy: 0.7*Exp(1) (x>=0) + 0.3*N(-2,0.3)
+      const exp = x>=0 ? Math.exp(-x) : 0;
+      return 0.7*exp + 0.3*norm(x,-2,0.3);
+    }
+
+    function setupCharts(){
+      popChart = new Chart(popCtx, {
+        type:'line',
+        data:{ labels:[], datasets:[{ label:'Population density', data:[], pointRadius:0, borderWidth:2, borderColor:'#131D45' }]},
+        options:{ responsive:true, maintainAspectRatio:false, animation:false, transitions:{active:{animation:{duration:0}}},
+          scales:{ x:{ type:'linear', title:{display:true, text:'x'} }, y:{ beginAtZero:true, title:{display:true, text:'density f(x)'} } },
+          plugins:{ legend:{ display:false } }
         }
-        case 'exponential': return {lambda: Math.max(0.0001, +params.lambda.value)};
-        case 'chisq': return {k: Math.max(1, Math.floor(+params.k.value))};
-        case 'bernoulli': return {p: Math.min(1, Math.max(0, +params.p.value))};
-        case 'bimodal': return {
-          w: Math.min(1, Math.max(0, +params.w.value)),
-          mu1: +params.mu1.value, sigma1: Math.max(0.0001, +params.sigma1.value),
-          mu2: +params.mu2.value, sigma2: Math.max(0.0001, +params.sigma2.value),
-        };
-      }
-    }
-    function currentN(){ return Math.max(1, Math.floor(+nSlider.value)); }
-    function currentM(){ return Math.max(1, Math.floor(+mSlider.value)); }
-    function currentBins(){ return Math.max(5, Math.min(80, Math.floor(+binsInput.value))); }
+      });
 
-    // ---------- Charts ----------
-    const popCtx = document.getElementById('popChart').getContext('2d');
-    const sampCtx = document.getElementById('sampChart').getContext('2d');
-
-    let popChart = new Chart(popCtx, {
-      type: 'bar',
-      data: { labels: [], datasets: [{ label: 'Population draws', data: [], borderWidth:1 }]},
-      options: {
-        animation: false,
-        scales: { x: { title: {display:true, text:'Value'}}, y: { title: {display:true, text:'Count'}, beginAtZero:true }},
-        plugins: { legend: {display:false} }
-      }
-    });
-
-    let sampChart = new Chart(sampCtx, {
-      type: 'bar',
-      data: { labels: [], datasets: [
-        { label: 'Sample means', data: [], borderWidth:1 },
-        { label: 'Normal overlay (scaled)', data: [], type:'line', yAxisID:'y2', borderWidth:2, borderDash:[6,4], hidden: !overlayChk.checked }
-      ]},
-      options: {
-        interaction: { mode:'nearest', intersect:false },
-        animation: false,
-        scales: {
-          x: { title: {display:true, text:'Sample mean'} },
-          y: { title: {display:true, text:'Count'}, beginAtZero:true, stacked:false },
-          y2: { display:false, beginAtZero:true } // used to plot scaled density
-        },
-        plugins: { legend: {labels: {filter: item => item.text !== undefined}} }
-      },
-      plugins: [Chart.registry.getPlugin('annotation')]
-    });
-
-    function updatePopulationPreview(){
-      // Draw many single observations to show population shape
-      const dist = currentDist();
-      const P = currentParams();
-      const draws = [];
-      const N = 5000; // for smooth hist preview
-      for (let i=0;i<N;i++) draws.push(popDraw(dist,P));
-      const {edges, counts} = histogram(draws, 40);
-      const mids = edges.slice(0,-1).map((e,i)=> (e+edges[i+1])/2);
-      popChart.data.labels = mids.map(v=>v.toFixed(2));
-      popChart.data.datasets[0].data = counts;
-      popChart.update();
-
-      // Update population stats & theoretical SE
-      const mom = populationMoments(dist,P);
-      const n = currentN();
-      muPopEl.textContent = mom.mu.toFixed(3);
-      sdPopEl.textContent = Math.sqrt(mom.var).toFixed(3);
-      seTheoryEl.textContent = (Math.sqrt(mom.var)/Math.sqrt(n)).toFixed(3);
+      const hctx = histCanvas.getContext('2d');
+      histChart = new Chart(hctx, {
+        type:'bar',
+        data:{ labels:[], datasets:[{ label:'Sampling Distribution', data:[], borderWidth:1 }]},
+        options:{ responsive:true, maintainAspectRatio:false, animation:false, transitions:{active:{animation:{duration:0}}, resize:{animation:{duration:0}}},
+          scales:{ x:{ type:'linear', title:{display:true, text:'Statistic value'} }, y:{ beginAtZero:true, title:{display:true, text:'Frequency'} } },
+          plugins:{ legend:{ display:false } }
+        }
+      });
     }
 
-    function updateSamplingChart(){
+    function recomputePopulation(){
+      if(mode==='props'){
+        population = null;
+        domain = [0,1];
+        updatePopPlotProps();
+        updateAllStats();
+        return;
+      }
+      // For means mode we draw analytic PDF on top chart and also generate a big bank for sampling
+      // Determine a domain around mean ± 5σ (or reasonable fallback)
+      const estimateMuSd = estimateMuSigmaForShape();
+      const mu = estimateMuSd.mu, sigma = estimateMuSd.sigma;
+      const w = Math.max(2, 5*sigma);
+      domain = [mu - w, mu + w];
+
+      // Build analytic PDF curve
+      const xs = grid(domain[0], domain[1], 801);
+      const ys = xs.map(pdfForShape);
+      popChart.data.labels = xs;
+      popChart.data.datasets[0].data = xs.map((x,i)=>({x, y: ys[i]}));
+      popChart.options.scales.x.min = domain[0];
+      popChart.options.scales.x.max = domain[1];
+      const yMax = Math.max(...ys, 0.1);
+      popChart.options.scales.y.max = yMax*1.1;
+      popChart.update('none');
+
+      // Pre-generate population bank for sampling
+      const N = 120000;
+      population = new Float64Array(N);
+      const shape = $('#popShape').value;
+      const a = parseFloat($('#uA').value), b = parseFloat($('#uB').value);
+      const nMu = parseFloat($('#nMu').value), nSd = Math.max(0.0001, parseFloat($('#nSd').value));
+      const lnMu = parseFloat($('#lnMu').value), lnSd = Math.max(0.0001, parseFloat($('#lnSd').value));
+      const bMu1 = parseFloat($('#bMu1').value), bSd1 = Math.max(0.0001, parseFloat($('#bSd1').value));
+      const bMu2 = parseFloat($('#bMu2').value), bSd2 = Math.max(0.0001, parseFloat($('#bSd2').value));
+      const bW = Math.min(0.999, Math.max(0.001, parseFloat($('#bW').value)));
+      for(let i=0;i<N;i++){
+        switch(shape){
+          case 'uniform': population[i] = RNG.uniform(a,b); break;
+          case 'normal': population[i] = RNG.normal(nMu,nSd); break;
+          case 'lognormal': population[i] = RNG.lognormal(lnMu,lnSd); break;
+          case 'bimodal': population[i] = (Math.random()<bW? RNG.normal(bMu1,bSd1): RNG.normal(bMu2,bSd2)); break;
+          default: population[i] = (Math.random()<0.7 ? RNG.exponential(1) : RNG.normal(-2,0.3));
+        }
+      }
+      updateAllStats();
+    }
+
+    function updatePopPlotProps(){
+      // Bernoulli bars at 0 and 1 (top chart)
+      const p = parseFloat($('#trueP').value);
+      popChart.data.labels = [0,1];
+      popChart.config.type = 'bar';
+      popChart.data.datasets[0] = {label:'Population (Bernoulli)', data:[{x:0,y:1-p},{x:1,y:p}]};
+      popChart.options.scales.x.min = -0.1; popChart.options.scales.x.max = 1.1;
+      popChart.options.scales.y.title.text='Probability';
+      popChart.options.scales.y.max = 1;
+      popChart.update('none');
+      // Switch back to line type automatically when returning to means
+      popChart.config.type = 'line';
+    }
+
+    function estimateMuSigmaForShape(){
+      const shape = $('#popShape').value;
+      const a = parseFloat($('#uA').value), b = parseFloat($('#uB').value);
+      const mu = parseFloat($('#nMu').value), sd = Math.max(1e-6, parseFloat($('#nSd').value));
+      const lmu = parseFloat($('#lnMu').value), lsd = Math.max(1e-6, parseFloat($('#lnSd').value));
+      const m1 = parseFloat($('#bMu1').value), s1 = Math.max(1e-6, parseFloat($('#bSd1').value));
+      const m2 = parseFloat($('#bMu2').value), s2 = Math.max(1e-6, parseFloat($('#bSd2').value));
+      const w = Math.min(0.999, Math.max(0.001, parseFloat($('#bW').value)));
+      if(shape==='uniform') return { mu:(a+b)/2, sigma:(b-a)/Math.sqrt(12) };
+      if(shape==='normal') return { mu, sigma: sd };
+      if(shape==='lognormal'){
+        const m = Math.exp(lmu + 0.5*lsd*lsd);
+        const v = (Math.exp(lsd*lsd) - 1) * Math.exp(2*lmu + lsd*lsd);
+        return { mu: m, sigma: Math.sqrt(v) };
+      }
+      if(shape==='bimodal'){
+        const muMix = w*m1 + (1-w)*m2;
+        const varMix = w*(s1*s1 + (m1-muMix)**2) + (1-w)*(s2*s2 + (m2-muMix)**2);
+        return { mu: muMix, sigma: Math.sqrt(varMix) };
+      }
+      // crazy: 0.7*Exp(1) + 0.3*N(-2,0.3)
+      const muMix = 0.7*1 + 0.3*(-2);
+      const varExp = 1; // Exp(1) variance
+      const varNorm = 0.3*0.3;
+      const meanNorm = -2;
+      const varMix = 0.7*(varExp + (1 - muMix)**2) + 0.3*(varNorm + (meanNorm - muMix)**2);
+      return { mu: muMix, sigma: Math.sqrt(varMix) };
+    }
+
+    function mean(arr){ let s=0; for(let i=0;i<arr.length;i++) s+=arr[i]; return s/arr.length; }
+    function sd(arr){ const m=mean(arr); let s=0; for(let i=0;i<arr.length;i++){ const d=arr[i]-m; s+=d*d; } return Math.sqrt(s/(arr.length-1)); }
+
+    function updatePopStats(){
+      let mu, sigma;
+      if(mode==='props'){
+        const p = parseFloat($('#trueP').value); mu=p; sigma=Math.sqrt(p*(1-p));
+      } else {
+        const es = estimateMuSigmaForShape(); mu = es.mu; sigma = es.sigma;
+      }
+      $('#popMean').textContent = fmt(mu);
+      $('#popSd').textContent = fmt(sigma);
+      // Domain already set in recomputePopulation(); for props fixed [0,1]
+    }
+
+    function updateSamplingSd(){
+      let sigma;
+      if(mode==='props'){
+        const p = parseFloat($('#trueP').value); const n = parseInt($('#nProps').value); sigma = Math.sqrt(p*(1-p))/Math.sqrt(n);
+      } else {
+        const sigmaPop = estimateMuSigmaForShape().sigma; const n = parseInt($('#nMeans').value); sigma = sigmaPop/Math.sqrt(n);
+      }
+      $('#sampSd').textContent = fmt(sigma,6);
+    }
+
+    function updateAllStats(){ updatePopStats(); updateSamplingSd(); $('#sampleCount').textContent = sampleStats.length; refreshHistogram(); renderTable(); }
+
+    function grid(lo, hi, n){ const step=(hi-lo)/(n-1); return Array.from({length:n},(_,i)=> lo + i*step); }
+
+    function sampleOnce(){
+      if(mode==='props'){
+        const p = parseFloat($('#trueP').value); const n = parseInt($('#nProps').value); let s=0; for(let i=0;i<n;i++) s+=RNG.bernoulli(p); return s/n;
+      } else {
+        const n = parseInt($('#nMeans').value); let s=0; for(let i=0;i<n;i++){ const idx = (Math.random()*population.length)|0; s += population[idx]; } return s/n;
+      }
+    }
+
+    async function addSamples(k, animate){
+      setButtons(false);
+      const delay = ms=> new Promise(r=>setTimeout(r,ms));
+      for(let i=0;i<k;i++){
+        const val = sampleOnce();
+        sampleStats.push(val);
+        $('#sampleCount').textContent = sampleStats.length;
+        if(animate && i===k-1){ refreshHistogram(); fallingDot(val); await delay(120); }
+        else if(k<=100){ refreshHistogram(); }
+      }
+      if(k>100) refreshHistogram();
+      renderTable();
+      setButtons(true);
+    }
+
+    function setButtons(on){ ['btnAdd1','btnAdd10','btnAdd100','btnAdd1000','btnReset'].forEach(id=>{ const b=document.getElementById(id); b.disabled=!on; }); }
+
+    function resetSampling(keepSettings){ sampleStats=[]; $('#sampleCount').textContent=0; refreshHistogram(); renderTable(); if(!keepSettings) updateAllStats(); clearDots(); }
+
+    function currentBins(){ return mode==='props' ? binsProps : binsMeans; }
+
+    function getBins(){
       const bins = currentBins();
-      const {edges, counts} = histogram(sampleMeans, bins);
-      const mids = edges.slice(0,-1).map((e,i)=> (e+edges[i+1])/2);
+      const [lo, hi] = (mode==='props') ? [0,1] : domain;
+      const width = (hi - lo)/bins;
+      const edges = Array.from({length: bins+1}, (_,i)=> lo + i*width);
+      const centers = Array.from({length: bins}, (_,i)=> (edges[i]+edges[i+1])/2);
+      const counts = new Array(bins).fill(0);
+      for(const v of sampleStats){ if(v<lo || v>hi) continue; const idx=Math.min(bins-1, Math.max(0, Math.floor((v-lo)/width))); counts[idx]++; }
+      return {edges, centers, counts};
+    }
 
-      sampChart.data.labels = mids.map(v=>v.toFixed(3));
-      sampChart.data.datasets[0].data = counts;
+    function refreshHistogram(){
+      // Compute an adaptive x-domain so the bell shape is visible
+      let center;
+      if(sampleStats.length>0){ center = mean(sampleStats); }
+      else if(mode==='props'){ center = parseFloat($('#trueP').value); }
+      else { center = estimateMuSigmaForShape().mu; }
 
-      // Normal overlay (scaled to histogram counts)
-      const showOverlay = overlayChk.checked && sampleMeans.length>0;
-      sampChart.data.datasets[1].hidden = !showOverlay;
-      if (showOverlay){
-        const dist = currentDist();
-        const P = currentParams();
-        const mom = populationMoments(dist,P);
-        const mu = mom.mu;
-        const sd = Math.sqrt(mom.var)/Math.sqrt(currentN());
-
-        // Convert density to approx counts per bin by multiplying by bin width and total samples
-        const width = edges[1]-edges[0];
-        const xs = mids;
-        const dens = xs.map(x => gaussianPdf(x, mu, sd));
-        const total = sampleMeans.length;
-        const scaled = dens.map(d => d * width * total);
-
-        sampChart.data.datasets[1].data = scaled;
-      }
-      sampChart.update();
-
-      // Empirical stats
-      if (sampleMeans.length>0){
-        const m = sampleMeans.reduce((a,b)=>a+b,0)/sampleMeans.length;
-        const v = sampleMeans.reduce((a,b)=>a+(b-m)*(b-m),0)/(sampleMeans.length-1 || 1);
-        meanEmpEl.textContent = m.toFixed(3);
-        sdEmpEl.textContent = Math.sqrt(v).toFixed(3);
+      let spread; // theoretical sampling sd
+      if(mode==='props'){
+        const p=parseFloat($('#trueP').value); const n=parseInt($('#nProps').value);
+        spread = Math.sqrt(p*(1-p))/Math.sqrt(n);
       } else {
-        meanEmpEl.textContent = '—';
-        sdEmpEl.textContent = '—';
+        const popSigma = estimateMuSigmaForShape().sigma; const n=parseInt($('#nMeans').value);
+        spread = popSigma/Math.sqrt(n);
       }
-      countEmpEl.textContent = sampleMeans.length.toString();
-    }
 
-    function addSamples(k){
-      const dist = currentDist();
-      const P = currentParams();
-      const n = currentN();
-      for (let i=0;i<k;i++){
-        sampleMeans.push(sampleMean(dist,P,n));
-      }
-      updateSamplingChart();
-    }
-
-    function resetAll(){
-      sampleMeans = [];
-      updatePopulationPreview();
-      updateSamplingChart();
-    }
-
-    // ---------- Wire up UI ----------
-    function showParamsFor(dist){
-      document.querySelectorAll('.dist').forEach(el => el.style.display='none');
-      document.querySelectorAll('.dist.'+dist).forEach(el => el.style.display='flex');
-      // Bimodal needs multiple rows; already handled.
-    }
-
-    distSel.addEventListener('change', () => {
-      showParamsFor(currentDist());
-      resetAll();
-    });
-
-    Object.values(params).forEach(inp => {
-      inp.addEventListener('change', ()=> { resetAll(); });
-      inp.addEventListener('input', ()=> { /* live feedback */ });
-    });
-
-    nSlider.addEventListener('input', ()=>{
-      nVal.textContent = currentN();
-      nLabel.textContent = currentN();
-      const mom = populationMoments(currentDist(), currentParams());
-      seTheoryEl.textContent = (Math.sqrt(mom.var)/Math.sqrt(currentN())).toFixed(3);
-    });
-    mSlider.addEventListener('input', ()=>{ mVal.textContent = currentM(); });
-    binsInput.addEventListener('change', ()=> updateSamplingChart());
-    overlayChk.addEventListener('change', ()=> updateSamplingChart());
-
-    document.getElementById('drawBtn').addEventListener('click', ()=>{
-      addSamples(currentM());
-    });
-
-    document.getElementById('resetBtn').addEventListener('click', ()=>{
-      resetAll();
-    });
-
-    document.getElementById('autorunBtn').addEventListener('click', (e)=>{
-      autorun = !autorun;
-      e.target.textContent = autorun ? 'Stop Auto-Run' : 'Start Auto-Run';
-      if (autorun){
-        const step = ()=> {
-          if (!autorun) return;
-          addSamples(currentM());
-          // modest throttle
-          autorunHandle = setTimeout(step, 200);
-        };
-        step();
+      // Choose width: at least ±2*popSigma (means) or 0..1 (props), and at least ±4*spread
+      if(mode==='props'){
+        const w = Math.max(0.25, 8*spread); // minimum width so bins are meaningful
+        let lo = Math.max(0, center - w/2), hi = Math.min(1, center + w/2);
+        // ensure a minimum domain size
+        if(hi-lo < 0.2){ const mid=(lo+hi)/2; lo=Math.max(0, mid-0.1); hi=Math.min(1, mid+0.1); }
+        domain=[lo,hi];
       } else {
-        if (autorunHandle) clearTimeout(autorunHandle);
+        const popSigma = estimateMuSigmaForShape().sigma;
+        const minWidth = 2*popSigma; // show a few pop SDs
+        const tight = 8*spread;      // show ±4 sampling SDs
+        const width = Math.max(minWidth, tight);
+        domain=[center - width/2, center + width/2];
       }
-    });
 
-    // ---------- Init ----------
-    function init(){
-      nVal.textContent = currentN();
-      nLabel.textContent = currentN();
-      mVal.textContent = currentM();
-      showParamsFor(currentDist());
-      updatePopulationPreview();
-      updateSamplingChart();
+      const {edges, centers, counts} = getBins();
+      histChart.data.labels = centers;
+      histChart.data.datasets[0].data = counts.map((c,i)=>({x:centers[i], y:c}));
+      histChart.options.scales.x.min = (mode==='props') ? domain[0] : domain[0];
+      histChart.options.scales.x.max = (mode==='props') ? domain[1] : domain[1];
+      const maxY = Math.max(10, ...counts);
+      histChart.options.scales.y.max = Math.ceil(maxY*1.12);
+      histChart.update('none');
     }
-    init();
+
+    function clearDots(){ dotCtx.clearRect(0,0,dotCanvas.width,dotCanvas.height); }
+
+    function fallingDot(value){
+      resizeDotCanvas();
+      const xScale = histChart.scales.x; const yScale = histChart.scales.y; if(!xScale||!yScale) return;
+      const x = xScale.getPixelForValue(value);
+      const yTop = 0, yBottom = yScale.getPixelForValue(0) - 6; // stops near axis
+      const radius=5, duration=350; const start=performance.now();
+      function step(t){ const p=Math.min(1,(t-start)/duration); const ease=1-Math.pow(1-p,3); clearDots(); dotCtx.beginPath(); dotCtx.arc(x, yTop + (yBottom-yTop)*ease, radius, 0, Math.PI*2); dotCtx.fillStyle='#00467f'; dotCtx.fill(); if(p<1) requestAnimationFrame(step); }
+      requestAnimationFrame(step);
+    }
+
+    function renderTable(){
+      const {edges, counts} = getBins();
+      const rows = counts.map((c,i)=>`<tr><td>[${fmt(edges[i])}, ${fmt(edges[i+1])})</td><td>${c}</td></tr>`).join('');
+      $('#freqTableWrap').innerHTML = `<table aria-label="Frequency table"><thead><tr><th>Bin range</th><th>Count</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+
+    function fmt(x, digits=4){ if(!isFinite(x)) return String(x); const ax=Math.abs(x); return (ax<1e6? x.toFixed(digits): x.toExponential(3)); }
+
+    // Initial sizing for dots
+    window.addEventListener('load', resizeDotCanvas);
   </script>
 </body>
 </html>

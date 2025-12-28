@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Coin Flip Experiment — StatsLG</title>
+<link rel="stylesheet" href="/style/bctcstyle.css">
+<style>
+  .wrap { display:grid; grid-template-columns:320px 1fr; min-height:100vh; }
+  main { padding:2rem; display:flex; justify-content:center; }
+  .card {
+    background:white; padding:2rem; border-radius:10px;
+    box-shadow:0 6px 16px rgba(0,0,0,.15); text-align:center;
+    max-width:520px; width:100%;
+  }
+  .scene { perspective:1000px; margin:1.5rem auto; }
+  .coin {
+    width:150px; height:150px; margin:auto; position:relative;
+    transform-style:preserve-3d; transition:transform 1s ease-in-out;
+  }
+  .side {
+    position:absolute; width:100%; height:100%; border-radius:50%;
+    overflow:hidden; backface-visibility:hidden;
+    box-shadow:0 6px 12px rgba(0,0,0,.3);
+  }
+  .side img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+  .tails { transform:rotateY(180deg); }
+  button {
+    margin:.3rem; padding:.5rem 1rem; font-size:16px;
+    border:none; border-radius:6px; background:#00467f; color:#fff; cursor:pointer;
+  }
+  button:hover { background:#005da8; }
+  .scoreboard { display:flex; justify-content:center; gap:2rem; margin-top:1rem; }
+  .score h3 { margin:.2rem; font-size:15px; color:#555; }
+  .score p { font-size:30px; font-weight:bold; margin:0; }
+  .history {
+    margin-top:1rem; font-family:monospace; max-height:150px;
+    overflow:auto; border-top:1px dashed #ccc; padding-top:.5rem;
+    text-align:left; font-size:14px; color:#333;
+  }
+  .progress { margin-top:1rem; font-size:15px; color:#555; }
+  #resultBox {
+    display:none; margin-top:1.5rem; padding:1rem;
+    background:#f9f9f9; border-left:4px solid #00467f; border-radius:8px;
+    font-family:monospace; text-align:left; word-break:break-all;
+  }
+  @media (max-width:700px){ .wrap{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- Sidebar -->
+  <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
+
+  <!-- Main -->
+  <main>
+    <div class="card">
+      <h1>Coin Flip Experiment</h1>
+      <p style="color:#666">Flip a coin 100 times and track the results.</p>
+
+      <div class="scene">
+        <div class="coin" id="coin">
+          <div class="side heads"><img src="heads.png" alt="Heads"></div>
+          <div class="side tails"><img src="tails.png" alt="Tails"></div>
+        </div>
+      </div>
+
+      <div>
+        <button id="flipBtn">Start 100 Flips</button>
+        <button id="resetBtn">Reset</button>
+      </div>
+
+      <div class="progress" id="progressText">0 / 100 flips</div>
+
+      <div class="scoreboard">
+        <div class="score"><h3>Heads</h3><p id="headsScore">0</p></div>
+        <div class="score"><h3>Tails</h3><p id="tailsScore">0</p></div>
+      </div>
+
+      <p style="font-size:14px;margin-top:8px;color:#444" id="percentText"></p>
+      <div class="history" id="log"></div>
+
+      <div id="resultBox"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ===== Sidebar include loader =====
+document.querySelectorAll('[data-include]').forEach(el=>{
+  fetch(el.getAttribute('data-include'))
+    .then(r=>r.text())
+    .then(t=>el.innerHTML=t)
+    .catch(()=>el.innerHTML="<p>Sidebar failed to load.</p>");
+});
+
+// ===== Experiment Variables =====
+const HEADS_PROB = 0.75;
+const TOTAL_FLIPS = 100;
+let heads=0, tails=0, flips=0;
+
+const coin=document.getElementById('coin');
+const log=document.getElementById('log');
+const headsEl=document.getElementById('headsScore');
+const tailsEl=document.getElementById('tailsScore');
+const progressText=document.getElementById('progressText');
+const percentText=document.getElementById('percentText');
+const flipBtn=document.getElementById('flipBtn');
+const resetBtn=document.getElementById('resetBtn');
+const resultBox=document.getElementById('resultBox');
+
+function riggedFlip(){return Math.random()<HEADS_PROB?'heads':'tails';}
+
+async function flipOnce(){
+  const result=riggedFlip();
+  const spins=Math.floor(Math.random()*8)+3;
+  const extra=result==='heads'?0:180;
+  const duration=(Math.random()*0.5+0.7).toFixed(2);
+  coin.style.transition=`transform ${duration}s cubic-bezier(.45,1.8,.45,.95)`;
+  coin.style.transform=`rotateY(${360*spins+extra}deg)`;
+  await new Promise(r=>setTimeout(r,duration*1000));
+
+  if(result==='heads'){heads++;headsEl.textContent=heads;log.innerHTML=`Heads<br>`+log.innerHTML;}
+  else{tails++;tailsEl.textContent=tails;log.innerHTML=`Tails<br>`+log.innerHTML;}
+
+  flips++;
+  progressText.textContent=`${flips} / ${TOTAL_FLIPS} flips`;
+  const pctH=((heads/flips)*100).toFixed(1);
+  const pctT=((tails/flips)*100).toFixed(1);
+  percentText.textContent=`Heads: ${pctH}% • Tails: ${pctT}%`;
+}
+
+// ===== Run Experiment =====
+async function flipUntil100(){
+  flipBtn.disabled=true;resetBtn.disabled=true;resultBox.style.display='none';
+  while(flips<TOTAL_FLIPS){
+    await flipOnce();
+    await new Promise(r=>setTimeout(r,150));
+  }
+  showProbability();
+  flipBtn.disabled=false;resetBtn.disabled=false;
+}
+
+// ===== Exact Binomial Probability (in full decimal) =====
+function logFactorial(n){
+  if(n<=1) return 0;
+  let s=0; for(let i=2;i<=n;i++) s+=Math.log(i);
+  return s;
+}
+function logChoose(n,k){return logFactorial(n)-logFactorial(k)-logFactorial(n-k);}
+function binomProb(n,k,p){
+  return Math.exp(logChoose(n,k) + k*Math.log(p) + (n-k)*Math.log(1-p));
+}
+function pGreaterEqual(n,k,p){
+  let sum=0;
+  for(let i=k;i<=n;i++) sum+=binomProb(n,i,p);
+  return sum;
+}
+function toFullDecimal(x){
+  // Show up to 50 digits, no scientific notation
+  let s = x.toFixed(50);
+  // trim trailing zeros but leave at least one
+  return s.replace(/(\.\d*?[1-9])0+$/,'$1').replace(/\.$/,'');
+}
+
+function showProbability(){
+  const pval=pGreaterEqual(TOTAL_FLIPS,heads,0.5);
+  const formatted=toFullDecimal(pval);
+  resultBox.style.display='block';
+  resultBox.innerHTML=
+    `<strong>After 100 flips:</strong> ${heads} heads<br>`+
+    `If the coin were fair (p=0.5):<br>`+
+    `<code>P(X ≥ ${heads}) = ${formatted}</code>`;
+}
+
+// ===== Reset =====
+resetBtn.onclick=()=>{
+  heads=tails=flips=0;
+  headsEl.textContent=tailsEl.textContent=0;
+  log.innerHTML='';percentText.textContent='';
+  progressText.textContent='0 / 100 flips';
+  coin.style.transition='none';coin.style.transform='rotateY(0deg)';
+  resultBox.style.display='none';
+};
+
+flipBtn.onclick=()=>flipUntil100();
+</script>
+</body>
+</html>

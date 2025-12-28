@@ -6,7 +6,7 @@
   <title>One Sample Test - Means</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
-<link rel="stylesheet" href="/style/bctcstyle.css">
+  <link rel="stylesheet" href="/style/bctcstyle.css">
 </head>
 <body>
   <div class="wrap">
@@ -20,9 +20,10 @@
       </div>
 
       <div class="card">
-        <strong>One‑Sample Test for a Mean</strong>
+        <strong>One-Sample Test for a Mean</strong>
         <label>Numeric Column</label>
         <select id="numCol"><option value="">—</option></select>
+
         <div class="grid2">
           <div>
             <label>Null Mean (μ₀)</label>
@@ -31,12 +32,13 @@
           <div>
             <label>Alternative</label>
             <select id="alt">
-              <option value="two.sided" selected>Two‑sided (μ ≠ μ₀)</option>
-              <option value="less">Left‑tailed (μ < μ₀)</option>
-              <option value="greater">Right‑tailed (μ > μ₀)</option>
+              <option value="two.sided" selected>Two-sided (μ ≠ μ₀)</option>
+              <option value="less">Left-tailed (μ < μ₀)</option>
+              <option value="greater">Right-tailed (μ > μ₀)</option>
             </select>
           </div>
         </div>
+
         <div class="grid2">
           <div>
             <label>Confidence Level (%)</label>
@@ -44,15 +46,17 @@
           </div>
           <div style="display:flex;align-items:center;gap:6px;margin-top:22px">
             <input id="knownSigma" type="checkbox" />
-            <label for="knownSigma" style="margin:0">Use z‑test (σ known)</label>
+            <label for="knownSigma" style="margin:0">Use z-test (σ known)</label>
           </div>
         </div>
+
         <div id="sigmaRow" class="grid2" style="display:none">
           <div>
             <label>Population σ</label>
             <input id="sigma" type="number" step="any" value="10" />
           </div>
         </div>
+
         <button class="btn" id="runBtn">Run Test</button>
         <button class="btn" id="downloadBtn">Download Results (CSV)</button>
       </div>
@@ -73,7 +77,7 @@
   </div>
 
 <script>
-let DATA=[]; let HEADERS=[]; let LAST_ROWS=[]; // for CSV
+let DATA=[]; let HEADERS=[]; let LAST_ROWS=[]; 
 
 function buildPreview(rows){
   if(!rows.length) return '<div>No data loaded</div>';
@@ -86,9 +90,21 @@ function buildPreview(rows){
 async function loadFile(file){
   try{
     const isExcel=(file.name||'').toLowerCase().endsWith('.xlsx');
-    if(isExcel){ const buf=await file.arrayBuffer(); const wb=XLSX.read(buf,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; setData(XLSX.utils.sheet_to_json(ws,{defval:''})); }
-    else { const text=await file.text(); const wb=XLSX.read(text,{type:'string'}); const ws=wb.Sheets[wb.SheetNames[0]]; setData(XLSX.utils.sheet_to_json(ws,{defval:''})); }
-  } catch(e){ console.error(e); document.getElementById('status').textContent='Failed to parse file. Use CSV or XLSX.'; }
+    if(isExcel){
+      const buf=await file.arrayBuffer();
+      const wb=XLSX.read(buf,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      setData(XLSX.utils.sheet_to_json(ws,{defval:''}));
+    } else {
+      const text=await file.text();
+      const wb=XLSX.read(text,{type:'string'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      setData(XLSX.utils.sheet_to_json(ws,{defval:''}));
+    }
+  } catch(e){
+    console.error(e);
+    document.getElementById('status').textContent='Failed to parse file. Use CSV or XLSX.';
+  }
 }
 
 function setData(rows){
@@ -101,21 +117,35 @@ function setData(rows){
 }
 
 function tSummary(vals){
-  const n=vals.length; const mean=jStat.mean(vals); const sd=jStat.stdev(vals,true); // sample sd
+  const n=vals.length; const mean=jStat.mean(vals); const sd=jStat.stdev(vals,true);
   return {n, mean, sd, se: sd/Math.sqrt(n)};
 }
 
-function formatNum(x){ if(x===undefined||x===null||Number.isNaN(x)) return ''; const a=Math.abs(x); if(a>=100) return x.toFixed(1); if(a>=10) return x.toFixed(2); if(a>=1) return x.toFixed(3); return x.toFixed(4); }
+function formatNum(x){
+  if(x===undefined||x===null||Number.isNaN(x)) return '';
+  const a=Math.abs(x);
+  if(a>=100) return x.toFixed(1);
+  if(a>=10) return x.toFixed(2);
+  if(a>=1) return x.toFixed(3);
+  return x.toFixed(4);
+}
 
 function runTest(){
-  const col=document.getElementById('numCol').value; if(!col) return alert('Pick a numeric column');
+  const col=document.getElementById('numCol').value;
+  if(!col) return alert('Pick a numeric column');
+
   const mu0=parseFloat(document.getElementById('mu0').value);
   const alt=document.getElementById('alt').value;
-  const conf=parseFloat(document.getElementById('conf').value)/100; const alpha=1-conf;
+  const conf=parseFloat(document.getElementById('conf').value)/100; 
+  const alpha=1-conf;
   const useZ=document.getElementById('knownSigma').checked;
   const sigma=parseFloat(document.getElementById('sigma').value);
 
-  const vals=[]; for(const r of DATA){ const v=parseFloat(r[col]); if(Number.isFinite(v)) vals.push(v); }
+  const vals=[];
+  for(const r of DATA){
+    const v=parseFloat(r[col]); 
+    if(Number.isFinite(v)) vals.push(v);
+  }
   if(vals.length<2) return alert('Need at least 2 numeric values.');
 
   const {n, mean, sd, se}=tSummary(vals);
@@ -124,28 +154,31 @@ function runTest(){
   if(useZ){
     if(!Number.isFinite(sigma) || sigma<=0) return alert('Enter a valid population σ');
     const seZ=sigma/Math.sqrt(n);
-    stat=(mean-mu0)/seZ; // z
+    stat=(mean-mu0)/seZ;
     if(alt==='two.sided') p = 2*(1-jStat.normal.cdf(Math.abs(stat),0,1));
     else if(alt==='less') p = jStat.normal.cdf(stat,0,1);
     else p = 1-jStat.normal.cdf(stat,0,1);
+
     const zcrit=jStat.normal.inv(1-alpha/2,0,1);
     ciLo=mean - zcrit*seZ; ciHi=mean + zcrit*seZ;
-    df = Infinity; method='One‑sample z‑test (σ known)';
+    df=Infinity; method='One-sample z-test (σ known)';
   } else {
-    stat=(mean-mu0)/se; // t
+    stat=(mean-mu0)/se;
     df=n-1;
+
     const tcdf=jStat.studentt.cdf(stat, df);
     if(alt==='two.sided') p = 2*(1-jStat.studentt.cdf(Math.abs(stat), df));
     else if(alt==='less') p = tcdf;
     else p = 1-tcdf;
+
     const tcrit=jStat.studentt.inv(1-alpha/2, df);
     ciLo=mean - tcrit*se; ciHi=mean + tcrit*se;
-    method='One‑sample t‑test (σ unknown)';
+
+    method='One-sample t-test (σ unknown)';
   }
 
-  const d=(mean-mu0)/sd; // Cohen's d
+  const d=(mean-mu0)/sd;
 
-  // Build results table
   const rows=[
     {Metric:'Method', Value:method},
     {Metric:'n', Value:n},
@@ -155,29 +188,27 @@ function runTest(){
     {Metric:'Null mean (μ₀)', Value:formatNum(mu0)},
     {Metric: useZ? 'z statistic':'t statistic', Value:formatNum(stat)},
     {Metric:'df', Value: (isFinite(df)? df : '∞')},
-    {Metric:'p‑value', Value:formatNum(p)},
+    {Metric:'p-value', Value:formatNum(p)},
     {Metric:`${(conf*100).toFixed(1)}% CI for μ`, Value:`[${formatNum(ciLo)}, ${formatNum(ciHi)}]`},
     {Metric:"Cohen's d", Value:formatNum(d)}
   ];
 
   LAST_ROWS = rows;
 
-  // Render meta and results
   document.getElementById('meta').innerHTML =
     `<span class="tag">Column: ${col}</span>`+
-    `<span class="tag">Alternative: ${alt.replace('two.sided','two‑sided')}</span>`+
+    `<span class="tag">Alternative: ${alt.replace('two.sided','two-sided')}</span>`+
     `<span class="tag">α = ${(alpha).toFixed(3)}</span>`;
 
-  // Simple decision sentence at α
-  let decision = p < alpha ? 'Reject H₀' : 'Fail to reject H₀';
-  const note = useZ ?
-   'Assumes population standard deviation σ is known and data are independent and approximately normal (or n is large by CLT).' :
-   'Assumes data are independent and approximately normal; uses sample SD and t distribution.';
-
-  const res = document.getElementById('result');
+  // NO DECISION — ONLY show test statistic + p-value
+  const res=document.getElementById('result');
   res.innerHTML = buildTable(rows) +
-    `<div class="hl">Conclusion at α = ${(alpha).toFixed(3)}: <strong>${decision}</strong>. `+
-    `Observed ${useZ?'z':'t'} = ${formatNum(stat)}, p = ${formatNum(p)}.</div>`;
+    `<div class="hl">Observed ${useZ?'z':'t'} = ${formatNum(stat)}, p = ${formatNum(p)}.</div>`;
+
+  const note = useZ ?
+    'Assumes population σ is known and data are independent and approximately normal (or n is large by CLT).' :
+    'Assumes data are independent and approximately normal; uses sample SD and t distribution.';
+
   document.getElementById('note').textContent = note;
 }
 
@@ -185,30 +216,45 @@ function buildTable(rows){
   if(!rows || rows.length===0) return '<div>No results</div>';
   let html='<table><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>';
   for(const r of rows){ html+=`<tr><td>${r.Metric}</td><td class="num">${r.Value}</td></tr>`; }
-  html+='</tbody></table>'; return html;
+  html+='</tbody></table>';
+  return html;
 }
 
 function downloadCSV(){
-  if(!LAST_ROWS || LAST_ROWS.length===0){ alert('Nothing to download yet. Run a test first.'); return; }
+  if(!LAST_ROWS || LAST_ROWS.length===0){
+    alert('Nothing to download yet. Run a test first.');
+    return;
+  }
   const headers=['Metric','Value'];
   const escape=(s)=> '"'+String(s).replaceAll('"','""')+'"';
   const lines=[headers.join(',')];
-  for(const r of LAST_ROWS){ lines.push(headers.map(h=> escape(r[h]!==undefined? r[h]: '') ).join(',')); }
+  for(const r of LAST_ROWS){
+    lines.push(headers.map(h=> escape(r[h]!==undefined? r[h]: '') ).join(','));
+  }
   const blob=new Blob([lines.join('\n')],{type:'text/csv'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='one_sample_mean_test.csv'; a.click(); URL.revokeObjectURL(a.href);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='one_sample_mean_test.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 const SAMPLE=[
-  {Score: 68},{Score:72},{Score:71},{Score:75},{Score:69},{Score:70},{Score:74},{Score:73},{Score:68},{Score:76},{Score:72},{Score:71}
+  {Score: 68},{Score:72},{Score:71},{Score:75},{Score:69},{Score:70},
+  {Score:74},{Score:73},{Score:68},{Score:76},{Score:72},{Score:71}
 ];
 
 window.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('loadBtn').onclick=()=>{ const f=document.getElementById('file').files[0]; if(f) loadFile(f); };
+  document.getElementById('loadBtn').onclick=()=>{
+    const f=document.getElementById('file').files[0];
+    if(f) loadFile(f);
+  };
   document.getElementById('sampleBtn').onclick=()=>{ setData(SAMPLE); };
   document.getElementById('runBtn').onclick=runTest;
   document.getElementById('downloadBtn').onclick=downloadCSV;
   document.getElementById('knownSigma').addEventListener('change',()=>{
-    document.getElementById('sigmaRow').style.display = document.getElementById('knownSigma').checked? 'grid':'none';
+    document.getElementById('sigmaRow').style.display = 
+      document.getElementById('knownSigma').checked? 'grid':'none';
   });
 });
 </script>

@@ -395,3 +395,14 @@ body .card input[type="color"]{
   border: 2px solid var(--field-border) !important;
   background: transparent !important;
 }
+
+.clt .btn {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--rule);
+  border-radius: .5rem;
+  padding: .5rem .8rem;
+}
+.clt .btn:hover {
+  background: var(--card);
+}

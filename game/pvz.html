@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Stats vs Bad Arguments — Prototype</title>
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+
+  <style>
+    .hud { display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+      padding:.5rem .75rem; border-radius:10px; background:#fff;
+      box-shadow:0 2px 10px rgba(0,0,0,.08); margin-bottom:.75rem; }
+    .badge { padding:.25rem .6rem; border-radius:999px; background:#00467f; color:#fff; font-weight:600; }
+    .card { display:inline-flex; align-items:center; gap:.5rem; padding:.4rem .6rem;
+      border:2px solid #e4e4e4; border-radius:10px; background:#fafafa; cursor:pointer; user-select:none; }
+    .card.active { border-color:#00467f; box-shadow: inset 0 0 0 2px #00467f22; }
+    .legend-swatch { width:18px; height:18px; border-radius:6px; border:2px solid currentColor; }
+    .pill { padding:.25rem .6rem; border-radius:999px; background:#f1f5f9; font-size:.9rem; }
+    .danger { color:#b21e27; font-weight:700; }
+    #game-container { max-width:960px; }
+    canvas { border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,.08); }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <aside class="sidebar" data-include="/partials/sidebar.html"></aside>
+
+  <main>
+    <h1>Stats vs Bad Arguments — Prototype</h1>
+
+    <div class="hud">
+      <span class="badge" id="dp">Data Points: 0</span>
+
+      <div class="card active" id="card-mean">
+        <div class="legend-swatch" style="background:#bde4ff; color:#00467f;"></div>
+        <strong>Mean Machine</strong><span class="pill">Cost 40</span>
+      </div>
+
+      <div class="card" id="card-flower">
+        <div class="legend-swatch" style="background:#fff3c4; color:#d5a10f;"></div>
+        <strong>Sample Size Flower</strong><span class="pill">Cost 60</span>
+      </div>
+    </div>
+
+    <div id="game-container"></div>
+  </main>
+</div>
+
+<script>
+// Load sidebar
+document.querySelectorAll("[data-include]").forEach(async el=>{
+  const r = await fetch(el.getAttribute("data-include"));
+  if(r.ok) el.innerHTML = await r.text();
+});
+
+// ==== GAME CONSTANTS ====
+const ROWS=5, COLS=9, CELL=90, MX=45, MY=60;
+const W=MX*2+COLS*CELL, H=MY+ROWS*CELL+40;
+
+let dp = 50;
+const COST_MEAN = 40, COST_FLOWER = 60;
+let selected = "mean";
+
+class Game extends Phaser.Scene {
+  create(){
+    this.updateDP();
+
+    // Background grid
+    const lane=this.add.graphics();
+    for(let r=0;r<ROWS;r++){
+      lane.fillStyle(r%2?0xf6fbff:0xfafcff);
+      lane.fillRect(MX,MY+r*CELL,COLS*CELL,CELL);
+    }
+    const grid=this.add.graphics();
+    grid.lineStyle(2,0xdde5ee);
+    grid.strokeRoundedRect(MX-6,MY-6,COLS*CELL+12,ROWS*CELL+12,12);
+
+    this.defenders=this.add.group();
+    this.zombies=this.add.group();
+    this.bullets=this.add.group();
+    this.occupied=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+
+    // Placement
+    this.input.on('pointerdown',p=>{
+      const cell=this.xyToCell(p.x,p.y);
+      if(!cell) return;
+      if(this.occupied[cell.r][cell.c]) return;
+
+      if(selected==="mean"){
+        if(dp<COST_MEAN) return this.noDP();
+        dp-=COST_MEAN; this.updateDP();
+        this.placeMean(cell.r,cell.c);
+      }
+      else if(selected==="flower"){
+        if(dp<COST_FLOWER) return this.noDP();
+        dp-=COST_FLOWER; this.updateDP();
+        this.placeFlower(cell.r,cell.c);
+      }
+    });
+
+    // Bullet-Zombie collision (now works!)
+    this.physics.add.overlap(this.bullets, this.zombies, (b,z)=>{
+      if(b.getData("row") !== z.getData("row")) return;
+      z.setData("hp",z.getData("hp") - b.getData("dmg"));
+      b.destroy();
+
+      z.setFillStyle(0xffe3e3);
+      this.time.delayedCall(80,()=>z.setFillStyle(0xffc8c8));
+
+      if(z.getData("hp") <= 0){
+        dp+=5; this.updateDP();
+        z.destroy();
+      }
+    });
+
+    // Spawn zombies slower
+    this.time.addEvent({delay:4500,loop:true,callback:()=>this.spawnZombie()});
+    // Data trickle
+    this.time.addEvent({delay:4000,loop:true,callback:()=>{dp+=15;this.updateDP();}});
+
+    this.gameOverText=this.add.text(W/2,H/2,"Game Over",{fontSize:"48px",color:"#b21e27"}).setOrigin(.5).setAlpha(0);
+  }
+
+  update(_,dt){
+    // Zombie movement & eating
+    this.zombies.getChildren().forEach(z=>{
+      if(!z.getData("eating"))
+        z.x += z.getData("vx")*(dt/1000);
+
+      const r=z.getData("row");
+      const c=Math.floor((z.x-MX)/CELL);
+      if(r>=0&&r<ROWS&&c>=0&&c<COLS){
+        const u=this.occupied[r][c];
+        if(u){
+          const dist = u.x - z.x;
+          if(dist < 35){ // eating threshold
+            if(!z.getData("eating")){
+              z.setData("eating",true); z.setData("vx",0);
+              z.chomp=this.time.addEvent({
+                delay:500,loop:true,callback:()=>{
+                  if(!u.scene){z.chomp.remove(false);return;}
+                  u.setData("hp",u.getData("hp")-10);
+                  const base = u.gen?0xfff3c4:0xbde4ff;
+                  u.setFillStyle(0xaad1f5);
+                  this.time.delayedCall(90,()=>u.setFillStyle(base));
+                  if(u.getData("hp")<=0){
+                    if(u.fire) u.fire.remove(false);
+                    if(u.gen) u.gen.remove(false);
+                    this.occupied[r][c]=null;
+                    u.destroy();
+                    z.setData("eating",false);
+                    z.setData("vx",-30);
+                  }
+                }
+              });
+            }
+          }
+        }
+      }
+      if(z.x<5) this.endGame();
+    });
+
+    this.bullets.getChildren().forEach(b=>{ if(b.x>W) b.destroy(); });
+  }
+
+  // UNITS
+  placeMean(r,c){
+    const {x,y}=this.center(c,r);
+    const u=this.add.rectangle(x,y,CELL-20,CELL-20,0xbde4ff).setStrokeStyle(4,0x00467f).setData({hp:60});
+    this.defenders.add(u); this.occupied[r][c]=u;
+
+    u.fire=this.time.addEvent({
+      delay:900,loop:true,callback:()=>{
+        const rowHas=this.zombies.getChildren().some(z=>z.getData("row")==r);
+        if(!rowHas) return;
+        const b=this.add.circle(u.x+30,u.y,6,0x00467f);
+        this.bullets.add(b); this.physics.add.existing(b);
+        b.body.setVelocityX(260);
+        b.setData("dmg",10);
+        b.setData("row",r); // ✅ lane tag
+        this.time.delayedCall(3000,()=>b.destroy());
+      }
+    });
+  }
+
+  placeFlower(r,c){
+    const {x,y}=this.center(c,r);
+    const u=this.add.rectangle(x,y,CELL-24,CELL-24,0xfff3c4).setStrokeStyle(4,0xd5a10f).setData({hp:55});
+    this.defenders.add(u); this.occupied[r][c]=u;
+    u.gen=this.time.addEvent({
+      delay:6000,loop:true,callback:()=>{
+        dp+=15; this.updateDP();
+        u.setFillStyle(0xfff8db);
+        this.time.delayedCall(120,()=>u.setFillStyle(0xfff3c4));
+      }
+    });
+  }
+
+  spawnZombie(){
+    const r=Phaser.Math.Between(0,ROWS-1);
+    const {y}=this.center(0,r);
+    const z=this.add.rectangle(W-40,y,CELL-24,CELL-28,0xffc8c8)
+      .setStrokeStyle(4,0xb21e27)
+      .setData({row:r,hp:60,vx:-30,eating:false});
+
+    this.zombies.add(z);
+
+    // ✅ give zombie a physics body so bullets can hit it
+    this.physics.add.existing(z);
+    z.body.setImmovable(true);
+  }
+
+  // Helpers
+  center(c,r){return{x:MX+c*CELL+CELL/2,y:MY+r*CELL+CELL/2};}
+  xyToCell(x,y){
+    if(x<MX||y<MY) return null;
+    const c=Math.floor((x-MX)/CELL), r=Math.floor((y-MY)/CELL);
+    return (r>=0&&r<ROWS&&c>=0&&c<COLS)?{r,c}:null;
+  }
+  updateDP(){ document.getElementById("dp").textContent=`Data Points: ${dp}`; }
+  noDP(){
+    const e=document.getElementById("dp"),old=e.textContent;
+    e.classList.add("danger"); e.textContent="Not enough Data Points!";
+    setTimeout(()=>{e.classList.remove("danger");e.textContent=old;},900);
+  }
+  endGame(){
+    this.time.getAllEvents().forEach(e=>e.remove(false));
+    this.tweens.add({targets:this.gameOverText,alpha:1,duration:400});
+    this.zombies.getChildren().forEach(z=>z.setData("vx",0));
+  }
+}
+
+// Start
+new Phaser.Game({type:Phaser.AUTO,width:W,height:H,parent:'game-container',
+  backgroundColor:'#f8fafc',physics:{default:'arcade'},scene:[Game]});
+
+// UI
+const cardMean=document.getElementById("card-mean");
+const cardFlower=document.getElementById("card-flower");
+
+cardMean.onclick=()=>{selected="mean";cardMean.classList.add("active");cardFlower.classList.remove("active");};
+cardFlower.onclick=()=>{selected="flower";cardFlower.classList.add("active");cardMean.classList.remove("active");};
+</script>
+
+</body>
+</html>
