@@ -38,27 +38,41 @@
     .grid2 { display:grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:12px }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     .mini { font-size: 12px; color: var(--muted); }
-    .scroll-mini { max-height: 220px; overflow:auto; background:#fff; border:1px solid var(--rule); border-radius:8px; }
+    .scroll-mini { max-height: 260px; overflow:auto; background:#fff; border:1px solid var(--rule); border-radius:8px; }
     .tight-table th, .tight-table td { font-size:12px; padding:4px 6px; }
 
-    /* ===== Population nearly full-screen ===== */
+    /* Layout: single column main content (no left card) */
     .stack { display:grid; gap:12px; }
+
+    /* Population nearly full-screen */
     .pop-card .viz{
       height: min(78vh, 900px);
       width: 100%;
     }
 
-    /* Options under population */
-    .pop-options{
+    /* Controls under population */
+    .pop-controls{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--rule);
+      align-items: end;
+    }
+    .pop-controls .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .pop-controls input[type="number"], .pop-controls select { width: 100%; }
+
+    .pop-toggles{
       display:flex;
       flex-wrap:wrap;
       gap:10px 14px;
-      margin-top:10px;
-      padding-top:10px;
-      border-top:1px solid var(--rule);
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--rule);
       align-items:center;
     }
-    .pop-options .checkline{ margin:0; }
+    .pop-toggles .checkline{ margin:0; }
   </style>
 </head>
 <body>
@@ -120,69 +134,12 @@
         </p>
       </header>
 
-      <section class="section wrap" style="grid-template-columns: 360px 1fr;">
-        <!-- ===== LEFT: Controls ===== -->
-        <div class="panel pad left">
-          <div class="grid2">
-            <div>
-              <label for="designSel">Sampling design</label>
-              <select id="designSel">
-                <option value="srs">Simple Random Sample (SRS)</option>
-                <option value="strat">Stratified Random Sample</option>
-                <option value="cluster">Cluster Sample (one-stage)</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="nInput">Sample size n <span class="muter">(SRS/Stratified)</span></label>
-              <input id="nInput" type="number" min="5" max="5000" value="400" />
-            </div>
-
-            <div id="strataBox">
-              <label># of strata (horizontal bands)</label>
-              <input id="SInput" type="number" min="2" max="20" value="4" />
-              <div class="checkline" style="margin-top:6px;">
-                <input type="radio" id="allocProp" name="alloc" value="prop" checked>
-                <label for="allocProp" style="margin:0;">Proportional allocation</label>
-              </div>
-              <div class="checkline">
-                <input type="radio" id="allocEqual" name="alloc" value="equal">
-                <label for="allocEqual" style="margin:0;">Equal \(n_h\)</label>
-              </div>
-            </div>
-
-            <div id="clusterBox">
-              <label>Cluster layout (rows × cols)</label>
-              <div class="row">
-                <input id="cRows" type="number" min="2" max="50" value="10" />
-                <input id="cCols" type="number" min="2" max="50" value="10" />
-              </div>
-              <label style="margin-top:6px;"># clusters to sample (K)</label>
-              <input id="KInput" type="number" min="1" max="2500" value="10" />
-              <p class="muter">Cluster sample size = K × (cluster size).</p>
-            </div>
-          </div>
-
-          <hr class="rule" style="margin:12px 0">
-          <div class="row">
-            <button class="btn" id="btnResample">Re-sample</button>
-            <button class="btn outline" id="btnShuffle">Shuffle population</button>
-            <button class="btn ghost" id="btnDefaults">Reset defaults</button>
-          </div>
-
-          <div class="card soft" style="margin-top:10px;">
-            <h3 style="margin:.2rem 0 .4rem;">Estimator notes</h3>
-            <ul class="muter">
-              <li><strong>SRS:</strong> \( \bar y = \frac{1}{n}\sum_{i=1}^{n} y_i \)</li>
-              <li><strong>Stratified:</strong> \( \displaystyle \bar y_{\text{str}}=\sum_{h=1}^{S} \frac{N_h}{N}\,\bar y_h \)</li>
-              <li><strong>Cluster (one-stage):</strong> mean of all units sampled across chosen clusters</li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- ===== RIGHT: Viz & Numbers ===== -->
+      <!-- Single-column layout (no left control panel) -->
+      <section class="section wrap" style="grid-template-columns: 1fr;">
         <div class="panel pad">
           <div class="stack">
+
+            <!-- ===== Population + ALL options underneath ===== -->
             <div class="card pop-card">
               <h3 style="margin-top:0;">Population</h3>
               <div class="muter">
@@ -193,8 +150,66 @@
               <div class="legend" id="legend" style="margin:8px 0;"></div>
               <svg id="viz" class="viz" viewBox="0 0 760 560" aria-label="Population grid visualization"></svg>
 
-              <!-- NEW: Options below population -->
-              <div class="pop-options" aria-label="Population display options">
+              <!-- Controls (sampling) under the population -->
+              <div class="pop-controls" aria-label="Sampling controls">
+
+                <div>
+                  <label for="designSel">Sampling design</label>
+                  <select id="designSel">
+                    <option value="srs">Simple Random Sample (SRS)</option>
+                    <option value="strat">Stratified Random Sample</option>
+                    <option value="cluster">Cluster Sample (one-stage)</option>
+                  </select>
+                </div>
+
+                <div id="nBox">
+                  <label for="nInput">Sample size n <span class="muter">(SRS/Stratified)</span></label>
+                  <input id="nInput" type="number" min="5" max="5000" value="400" />
+                </div>
+
+                <div id="strataBox">
+                  <label for="SInput"># of strata (horizontal bands)</label>
+                  <input id="SInput" type="number" min="2" max="20" value="4" />
+                  <div class="checkline" style="margin-top:6px;">
+                    <input type="radio" id="allocProp" name="alloc" value="prop" checked>
+                    <label for="allocProp" style="margin:0;">Proportional allocation</label>
+                  </div>
+                  <div class="checkline">
+                    <input type="radio" id="allocEqual" name="alloc" value="equal">
+                    <label for="allocEqual" style="margin:0;">Equal \(n_h\)</label>
+                  </div>
+                </div>
+
+                <div id="clusterBox">
+                  <label>Cluster layout (rows × cols)</label>
+                  <div class="row">
+                    <div style="flex:1; min-width:120px;">
+                      <input id="cRows" type="number" min="2" max="50" value="10" />
+                      <div class="mini">cluster rows</div>
+                    </div>
+                    <div style="flex:1; min-width:120px;">
+                      <input id="cCols" type="number" min="2" max="50" value="10" />
+                      <div class="mini">cluster cols</div>
+                    </div>
+                  </div>
+
+                  <label style="margin-top:6px;" for="KInput"># clusters to sample (K)</label>
+                  <input id="KInput" type="number" min="1" max="2500" value="10" />
+                  <p class="muter" style="margin:.4rem 0 0;">Cluster sample size = K × (cluster size).</p>
+                </div>
+
+                <div>
+                  <label>Actions</label>
+                  <div class="row">
+                    <button class="btn" id="btnResample">Re-sample</button>
+                    <button class="btn outline" id="btnShuffle">Shuffle population</button>
+                    <button class="btn ghost" id="btnDefaults">Reset defaults</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Display toggles under the controls -->
+              <div class="pop-toggles" aria-label="Population display toggles">
                 <div class="checkline">
                   <input type="checkbox" id="showGrid" checked>
                   <label for="showGrid" style="margin:0;">Show overlays (match current design)</label>
@@ -212,8 +227,10 @@
               </div>
             </div>
 
+            <!-- ===== Numbers ===== -->
             <div class="card">
               <h3 style="margin-top:0;">Numbers</h3>
+
               <div class="grid2">
                 <div>
                   <p>Population mean \( \mu \): <strong><span id="popMean"></span></strong></p>
@@ -513,8 +530,6 @@
             line.setAttribute('stroke-dasharray', '6 6');
             viz.appendChild(line);
           }
-        } else {
-          // SRS: no group overlay needed (keeps UI simple)
         }
       }
     }
@@ -549,15 +564,16 @@
 
     function syncVisibility(){
       const design = document.getElementById('designSel').value;
-      document.getElementById('strataBox').style.display = design==='strat' ? 'block' : 'none';
-      document.getElementById('clusterBox').style.display = design==='cluster' ? 'block' : 'none';
-      document.getElementById('nInput').parentElement.style.display = (design!=='cluster') ? 'block' : 'none';
 
-      // cluster overlay toggles only really matter in cluster mode
+      document.getElementById('strataBox').style.display = (design==='strat') ? 'block' : 'none';
+      document.getElementById('clusterBox').style.display = (design==='cluster') ? 'block' : 'none';
+      document.getElementById('nBox').style.display = (design!=='cluster') ? 'block' : 'none';
+
+      // cluster overlay toggles only relevant in cluster mode
       const cb = document.getElementById('clusterBorders');
       const hc = document.getElementById('highlightClusters');
-      if(cb) cb.disabled = (design!=='cluster');
-      if(hc) hc.disabled = (design!=='cluster');
+      cb.disabled = (design!=='cluster');
+      hc.disabled = (design!=='cluster');
     }
 
     function nearestDivisor(total, want){
@@ -602,7 +618,6 @@
     document.getElementById('cCols').addEventListener('input', rebuildPopulationAndResample);
     document.getElementById('KInput').addEventListener('input', resample);
 
-    // options under population
     document.getElementById('showGrid').addEventListener('change', draw);
     document.getElementById('clusterBorders').addEventListener('change', draw);
     document.getElementById('highlightClusters').addEventListener('change', draw);
@@ -614,6 +629,7 @@
       document.getElementById('nInput').value = 400;
       document.getElementById('SInput').value = 4;
       document.getElementById('allocProp').checked = true;
+
       document.getElementById('cRows').value = 10;
       document.getElementById('cCols').value = 10;
       document.getElementById('KInput').value = 10;
