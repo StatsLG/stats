@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Population Mystery Sampler — StatsLG</title>
-  <meta name="description" content="Students sample from 4 hidden populations and guess which distribution is which."/>
+  <title>Demographics Mystery Sampler — StatsLG</title>
+  <meta name="description" content="Students sample from 4 hidden demographic distributions and guess which is which."/>
   <link rel="icon" href="/favicon.ico"/>
   <link rel="stylesheet" href="/style/bctcstyle.css">
 
@@ -12,17 +12,13 @@
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 
   <style>
-    .wrap-grid{
-      display:grid; grid-template-columns: 1fr; gap: 18px; align-items:start;
-    }
-
+    .wrap-grid{ display:grid; grid-template-columns: 1fr; gap: 18px; align-items:start; }
     .panel{
       background: var(--panel, #f5f7fb);
       border: 1px solid var(--rule, #e5e7eb);
       border-radius: 12px;
       padding: 14px 16px;
     }
-
     .muted{color:var(--muted,#4b5563); font-size:0.95rem;}
     .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
     .row > *{ flex: 1 1 auto; }
@@ -40,15 +36,12 @@
     }
     .btn:disabled{ opacity:0.5; cursor:not-allowed; }
 
-    /* Card grid */
     .cards{
       display:grid;
       grid-template-columns: repeat(2, minmax(280px, 1fr));
       gap: 14px;
     }
-    @media (max-width: 900px){
-      .cards{ grid-template-columns: 1fr; }
-    }
+    @media (max-width: 900px){ .cards{ grid-template-columns: 1fr; } }
 
     .pop-card{
       background: #fff;
@@ -57,40 +50,29 @@
       padding: 14px;
       box-shadow: 0 1px 0 rgba(15,23,42,0.03);
     }
-
     .pop-head{
       display:flex; align-items:flex-start; justify-content:space-between; gap: 10px;
       margin-bottom: 8px;
     }
-    .pop-title{
-      font-size: 1.05rem; font-weight: 800; margin: 0;
-    }
+    .pop-title{ font-size: 1.05rem; font-weight: 800; margin: 0; }
     .badge{
       display:inline-block; padding: 2px 10px;
       border-radius: 999px; border: 1px solid var(--rule,#e5e7eb);
       font-variant-numeric: tabular-nums; background:#fff;
       font-weight:700;
     }
-    .pop-body{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
 
     .plot{
       width:100%;
-      height: 220px;
+      height: 230px;
       border-radius: 12px;
       border: 1px solid var(--rule,#e5e7eb);
       overflow:hidden;
       background:#fff;
     }
 
-    .controls{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-    }
-    .controls > *{ flex: 1 1 160px; }
-
+    .controls{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .controls > *{ flex: 1 1 170px; }
     select, input[type="number"]{
       width: 100%;
       padding: 10px 10px;
@@ -99,18 +81,22 @@
       background:#fff;
     }
 
-    .sample-box{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      font-size: 0.95rem;
-      padding: 10px;
-      border-radius: 12px;
-      border: 1px solid var(--rule,#e5e7eb);
+    table{
+      width:100%;
+      border-collapse: collapse;
       background:#fff;
-      max-height: 140px;
-      overflow:auto;
-      line-height: 1.35;
-      white-space: pre-wrap;
+      border:1px solid var(--rule,#e5e7eb);
+      border-radius: 12px;
+      overflow:hidden;
     }
+    th, td{
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--rule,#e5e7eb);
+      text-align:left;
+      font-variant-numeric: tabular-nums;
+    }
+    th{ background: #fafafa; font-weight:800; }
+    tr:last-child td{ border-bottom: none; }
 
     .divider{ height:1px; background: var(--rule,#e5e7eb); margin: 10px 0; }
     .status{
@@ -133,9 +119,10 @@
     <!-- ===== MAIN ===== -->
     <main>
       <header>
-        <h1>Population Mystery Sampler</h1>
+        <h1>Demographics Mystery Sampler</h1>
         <p class="subtitle">
-          Click <strong>Take sample</strong> on each card. Use the sample + mini-histogram to guess which population distribution each card represents.
+          Each card is a different <strong>hidden demographic distribution</strong>.
+          Take samples, inspect the category counts, and guess which profile each card matches.
         </p>
       </header>
 
@@ -145,14 +132,16 @@
           <div class="row">
             <div>
               <label for="n" style="display:block;font-weight:700;margin-bottom:6px;">Sample size (per draw)</label>
-              <input id="n" type="number" min="1" max="200" value="12" />
-              <div class="muted" style="margin-top:6px;">Tip: Start small (n=5–15). Then increase (n=30+) to see patterns stabilize.</div>
+              <input id="n" type="number" min="1" max="500" value="25" />
+              <div class="muted" style="margin-top:6px;">
+                Tip: Try n=10, then n=30, then n=100. Bigger samples stabilize proportions.
+              </div>
             </div>
 
             <div>
               <label for="seed" style="display:block;font-weight:700;margin-bottom:6px;">Random seed (optional)</label>
               <input id="seed" type="number" placeholder="Leave blank for random" />
-              <div class="muted" style="margin-top:6px;">Use a seed to make the same mystery mapping repeatable.</div>
+              <div class="muted" style="margin-top:6px;">Use a seed to replay the same shuffle for a section.</div>
             </div>
 
             <div style="align-self:end;">
@@ -169,13 +158,14 @@
           <div class="divider"></div>
 
           <div class="muted">
-            <strong>Teacher note:</strong> The identities are shuffled each round.
-            Students only see “Population A–D” until you click Reveal.
+            <strong>What they’re seeing:</strong> samples from a categorical distribution (multinomial sampling).
+            Each card accumulates samples as you click “Take sample”.
           </div>
         </section>
 
         <!-- Cards -->
         <section class="panel" aria-label="Populations">
+          <div id="dimensionTitle" class="muted" style="margin-bottom:10px;"></div>
           <div class="cards" id="cards"></div>
         </section>
       </div>
@@ -190,68 +180,67 @@
     });
 
     // ============================================================
-    // 1) Define your 4 population "true identities" here
-    //    You can edit names + generators.
+    // EDIT HERE: Choose your demographic dimension + categories,
+    // and define 4 profiles with different category proportions.
+    //
+    // Proportions can be any positive numbers; they will be normalized.
     // ============================================================
-    const POP_TYPES = [
-      {
-        key: "normal",
-        label: "Normal (bell-shaped)",
-        hint: "Symmetric, centered.",
-        gen: (rng) => {
-          // Box-Muller standard normal, then scale
-          const z = randn(rng);
-          return 50 + 10*z; // mean 50, sd 10
+
+    const DEMO = {
+      dimensionLabel: "Primary Work Status",
+      categories: [
+        "Not working",
+        "Part-time (1–20 hrs)",
+        "Part-time (21–30 hrs)",
+        "Full-time (31+ hrs)"
+      ],
+      profiles: [
+        {
+          key: "mostly-not-working",
+          label: "Profile 1: Mostly not working",
+          hint: "Large share in 'Not working'.",
+          weights: [55, 25, 12, 8]
+        },
+        {
+          key: "mostly-full-time",
+          label: "Profile 2: Mostly full-time work",
+          hint: "Large share in 'Full-time (31+ hrs)'.",
+          weights: [10, 18, 22, 50]
+        },
+        {
+          key: "mostly-part-time",
+          label: "Profile 3: Mostly part-time work",
+          hint: "Most students in part-time categories.",
+          weights: [15, 45, 30, 10]
+        },
+        {
+          key: "balanced",
+          label: "Profile 4: Balanced mix",
+          hint: "No category dominates.",
+          weights: [25, 25, 25, 25]
         }
-      },
-      {
-        key: "rightSkew",
-        label: "Right-skewed",
-        hint: "Many small/moderate values, few large ones.",
-        gen: (rng) => {
-          // Exponential-like then shift
-          const u = rng();
-          const x = -Math.log(1-u); // Exp(1)
-          return 30 + 12*x; // shift/scale
-        }
-      },
-      {
-        key: "bimodal",
-        label: "Bimodal",
-        hint: "Two clusters / two peaks.",
-        gen: (rng) => {
-          // Mixture of two normals
-          const choose = rng() < 0.5;
-          const z = randn(rng);
-          return choose ? (35 + 6*z) : (65 + 6*z);
-        }
-      },
-      {
-        key: "uniform",
-        label: "Uniform",
-        hint: "Roughly flat across a range.",
-        gen: (rng) => {
-          return 20 + 80*rng(); // Uniform(20,100)
-        }
-      }
-    ];
+      ]
+    };
 
     // ============================================================
-    // 2) UI/game state
+    // Game state / UI
     // ============================================================
     const cardLabels = ["A","B","C","D"];
     const cardsEl = document.getElementById('cards');
     const nInput = document.getElementById('n');
     const seedInput = document.getElementById('seed');
     const scoreBox = document.getElementById('scoreBox');
+    const dimensionTitle = document.getElementById('dimensionTitle');
 
     const btnNewRound = document.getElementById('newRound');
     const btnCheck = document.getElementById('check');
     const btnReveal = document.getElementById('reveal');
     const btnResetSamples = document.getElementById('resetSamples');
 
+    dimensionTitle.innerHTML = `<strong>Demographic variable:</strong> ${escapeHtml(DEMO.dimensionLabel)} (categories shown as counts).`;
+
     let rng = Math.random;
-    let round = null; // { mapping: [{card:'A', pop:POP_TYPES[i]}...], samplesByCard: {A:[], ...}, revealed:boolean }
+    let round = null; // { mapping, countsByCard, nByCard, guessByCard, revealed }
 
     // ============================================================
     // RNG with seed (Mulberry32)
@@ -266,14 +255,6 @@
       }
     }
 
-    // Standard normal using Box-Muller
-    function randn(rng){
-      let u = 0, v = 0;
-      while(u === 0) u = rng();
-      while(v === 0) v = rng();
-      return Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
-    }
-
     function shuffle(arr){
       const a = arr.slice();
       for(let i=a.length-1;i>0;i--){
@@ -283,14 +264,35 @@
       return a;
     }
 
-    function fmt(x){
-      const ax = Math.abs(x);
-      if (ax !== 0 && (ax < 1e-3 || ax > 1e6)) return x.toExponential(3);
-      return x.toFixed(2).replace(/\.00$/,'');
+    function escapeHtml(s){
+      return String(s)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+    }
+
+    // Normalize weights -> probabilities
+    function normalize(weights){
+      const sum = weights.reduce((a,b)=>a + Math.max(0,b), 0);
+      if(sum <= 0) return weights.map(_=>1/weights.length);
+      return weights.map(w => Math.max(0,w)/sum);
+    }
+
+    // Draw one categorical outcome using probabilities
+    function drawCategoryIndex(probs){
+      const u = rng();
+      let cum = 0;
+      for(let i=0;i<probs.length;i++){
+        cum += probs[i];
+        if(u <= cum) return i;
+      }
+      return probs.length - 1; // fallback for floating error
     }
 
     // ============================================================
-    // Build card DOM
+    // Build UI cards
     // ============================================================
     function buildCards(){
       cardsEl.innerHTML = "";
@@ -305,30 +307,39 @@
               <h3 class="pop-title">Population ${letter}</h3>
               <div class="muted" id="truth-${letter}" style="display:none;"></div>
             </div>
-            <span class="badge" id="count-${letter}">samples: 0</span>
+            <span class="badge" id="nBadge-${letter}">N = 0</span>
           </div>
 
-          <div class="pop-body">
-            <div class="plot" id="plot-${letter}" aria-label="Sample histogram"></div>
+          <div class="plot" id="plot-${letter}" aria-label="Bar chart of category counts"></div>
 
-            <div class="controls">
-              <button class="btn primary" data-action="sample" data-card="${letter}">Take sample</button>
+          <div class="controls" style="margin-top:10px;">
+            <button class="btn primary" data-action="sample" data-card="${letter}">Take sample</button>
 
-              <select data-action="guess" data-card="${letter}">
-                <option value="">Select your guess…</option>
-                ${POP_TYPES.map(p=>`<option value="${p.key}">${p.label}</option>`).join('')}
-              </select>
+            <select data-action="guess" data-card="${letter}">
+              <option value="">Select your guess…</option>
+              ${DEMO.profiles.map(p=>`<option value="${p.key}">${escapeHtml(p.label)}</option>`).join('')}
+            </select>
 
-              <button class="btn" data-action="clear" data-card="${letter}">Clear</button>
-            </div>
+            <button class="btn" data-action="clear" data-card="${letter}">Clear</button>
+          </div>
 
-            <div class="sample-box" id="box-${letter}" aria-label="Sample values">No samples yet.</div>
+          <div style="margin-top:10px;">
+            <table aria-label="Counts table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Count</th>
+                  <th>Percent</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-${letter}"></tbody>
+            </table>
           </div>
         `;
         cardsEl.appendChild(card);
       });
 
-      // Button handlers via event delegation
+      // Event delegation
       cardsEl.addEventListener('click', (e)=>{
         const btn = e.target.closest('button');
         if(!btn) return;
@@ -350,7 +361,7 @@
     }
 
     // ============================================================
-    // Round logic
+    // Round setup
     // ============================================================
     function newRound(){
       // set RNG
@@ -361,13 +372,26 @@
         rng = mulberry32(parseInt(seedVal,10) || 1);
       }
 
-      // shuffle POP_TYPES to cards A-D
-      const shuffled = shuffle(POP_TYPES);
-      const mapping = cardLabels.map((letter, i)=>({card: letter, pop: shuffled[i]}));
+      // assign profiles randomly to cards A-D
+      const shuffledProfiles = shuffle(DEMO.profiles);
+      const mapping = cardLabels.map((letter, i)=>({
+        card: letter,
+        profile: shuffledProfiles[i],
+        probs: normalize(shuffledProfiles[i].weights)
+      }));
+
+      // initialize counts
+      const countsByCard = {};
+      const nByCard = {};
+      cardLabels.forEach(letter=>{
+        countsByCard[letter] = new Array(DEMO.categories.length).fill(0);
+        nByCard[letter] = 0;
+      });
 
       round = {
         mapping,
-        samplesByCard: {A:[],B:[],C:[],D:[]},
+        countsByCard,
+        nByCard,
         guessByCard: {A:"",B:"",C:"",D:""},
         revealed: false
       };
@@ -375,79 +399,82 @@
       scoreBox.innerHTML = "";
       buildCards();
       cardLabels.forEach(letter=>{
-        drawHistogram(letter);
-        updateSampleBox(letter);
+        renderCard(letter);
         updateTruthLabel(letter);
       });
     }
 
     function resetSamples(){
       if(!round) return;
-      round.samplesByCard = {A:[],B:[],C:[],D:[]};
       cardLabels.forEach(letter=>{
-        drawHistogram(letter);
-        updateSampleBox(letter);
-        document.getElementById(`count-${letter}`).textContent = "samples: 0";
+        round.countsByCard[letter] = new Array(DEMO.categories.length).fill(0);
+        round.nByCard[letter] = 0;
+        renderCard(letter);
       });
-      scoreBox.innerHTML = `<span class="muted">Samples cleared.</span>`;
+      scoreBox.innerHTML = `<span class="muted">All samples cleared.</span>`;
     }
 
     function clearCard(letter){
-      round.samplesByCard[letter] = [];
-      drawHistogram(letter);
-      updateSampleBox(letter);
-      document.getElementById(`count-${letter}`).textContent = "samples: 0";
+      round.countsByCard[letter] = new Array(DEMO.categories.length).fill(0);
+      round.nByCard[letter] = 0;
+      renderCard(letter);
     }
 
     function takeSample(letter){
-      const n = Math.max(1, Math.min(200, parseInt(nInput.value,10) || 1));
-      const pop = round.mapping.find(m=>m.card===letter).pop;
-      const newVals = [];
+      const n = Math.max(1, Math.min(500, parseInt(nInput.value,10) || 1));
+      const m = round.mapping.find(x=>x.card===letter);
+      const probs = m.probs;
+
       for(let i=0;i<n;i++){
-        newVals.push(pop.gen(rng));
+        const idx = drawCategoryIndex(probs);
+        round.countsByCard[letter][idx] += 1;
+        round.nByCard[letter] += 1;
       }
-      round.samplesByCard[letter].push(...newVals);
-      document.getElementById(`count-${letter}`).textContent = `samples: ${round.samplesByCard[letter].length}`;
-      updateSampleBox(letter);
-      drawHistogram(letter);
-    }
-
-    function updateSampleBox(letter){
-      const box = document.getElementById(`box-${letter}`);
-      const arr = round.samplesByCard[letter];
-      if(arr.length === 0){
-        box.textContent = "No samples yet.";
-        return;
-      }
-      // Show last 30 values for readability
-      const last = arr.slice(-30).map(fmt);
-      const more = arr.length > 30 ? `\n… (${arr.length-30} earlier values hidden)` : "";
-      box.textContent = last.join(", ") + more;
+      renderCard(letter);
     }
 
     // ============================================================
-    // Plotly histogram per card
+    // Rendering per card (Plot + table)
     // ============================================================
-    function drawHistogram(letter){
+    function renderCard(letter){
+      const counts = round.countsByCard[letter];
+      const N = round.nByCard[letter];
+
+      document.getElementById(`nBadge-${letter}`).textContent = `N = ${N}`;
+
+      // Plotly bar chart of counts
       const div = document.getElementById(`plot-${letter}`);
-      const dataArr = round.samplesByCard[letter];
-
       const trace = {
-        type: 'histogram',
-        x: dataArr,
-        nbinsx: 12,
-        opacity: 0.75,
-        hovertemplate: "bin count=%{y}<extra></extra>"
+        type: 'bar',
+        x: DEMO.categories,
+        y: counts,
+        hovertemplate: "%{x}<br>count=%{y}<extra></extra>",
+        opacity: 0.85
       };
 
       const layout = {
-        margin: {t: 10, r: 10, b: 30, l: 40},
-        xaxis: {title: "value"},
-        yaxis: {title: "count"},
+        margin: {t: 10, r: 10, b: 70, l: 45},
+        xaxis: {tickangle: -20},
+        yaxis: {title: "count", rangemode: "tozero"},
         showlegend: false
       };
 
       Plotly.react(div, [trace], layout, {responsive:true});
+
+      // Table
+      const tbody = document.getElementById(`tbl-${letter}`);
+      tbody.innerHTML = "";
+      for(let i=0;i<DEMO.categories.length;i++){
+        const c = counts[i];
+        const pct = (N === 0) ? 0 : (100*c/N);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(DEMO.categories[i])}</td>
+          <td>${c}</td>
+          <td>${pct.toFixed(1)}%</td>
+        `;
+        tbody.appendChild(tr);
+      }
     }
 
     // ============================================================
@@ -455,8 +482,8 @@
     // ============================================================
     function updateTruthLabel(letter){
       const el = document.getElementById(`truth-${letter}`);
-      const pop = round.mapping.find(m=>m.card===letter).pop;
-      el.innerHTML = `<strong>Identity:</strong> ${pop.label} <span class="muted">(${pop.hint})</span>`;
+      const m = round.mapping.find(x=>x.card===letter);
+      el.innerHTML = `<strong>Identity:</strong> ${escapeHtml(m.profile.label)} <span class="muted">(${escapeHtml(m.profile.hint)})</span>`;
       el.style.display = round.revealed ? "" : "none";
     }
 
@@ -472,19 +499,18 @@
 
       cardLabels.forEach(letter=>{
         const guess = round.guessByCard[letter];
-        const truth = round.mapping.find(m=>m.card===letter).pop.key;
+        const truth = round.mapping.find(m=>m.card===letter).profile.key;
         const ok = (guess && guess === truth);
         if(ok) correct++;
         details.push({letter, ok, guess, truth});
       });
 
-      // Pretty output
       const total = cardLabels.length;
       const pct = Math.round((correct/total)*100);
+
+      const labelOf = (key) => DEMO.profiles.find(p=>p.key===key)?.label || "(no guess)";
       const lines = details.map(d=>{
-        const g = d.guess ? POP_TYPES.find(p=>p.key===d.guess)?.label : "(no guess)";
-        const t = POP_TYPES.find(p=>p.key===d.truth)?.label;
-        return `Population ${d.letter}: ${d.ok ? "✅" : "❌"}  guess: ${g}  |  truth: ${t}`;
+        return `Population ${d.letter}: ${d.ok ? "✅" : "❌"} &nbsp; guess: ${escapeHtml(labelOf(d.guess))} &nbsp; | &nbsp; truth: ${escapeHtml(labelOf(d.truth))}`;
       }).join("<br/>");
 
       scoreBox.innerHTML = `
@@ -507,6 +533,8 @@
 
     // Initial
     newRound();
+
+    // Resize
     window.addEventListener('resize', ()=>{
       cardLabels.forEach(letter=>{
         const div = document.getElementById(`plot-${letter}`);
