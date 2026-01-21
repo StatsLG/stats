@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Cats vs Dogs — Mystery Population Sampler (StatsLG)</title>
-  <meta name="description" content="Students sample from 4 hidden populations (cats vs dogs preferences) and guess which profile is which."/>
+  <title>Cats vs Dogs — City Mystery Sampler</title>
+  <meta name="description" content="Students sample from 4 hidden city populations (cats vs dogs preferences) and guess which city is which."/>
   <link rel="icon" href="/favicon.ico"/>
   <link rel="stylesheet" href="/style/bctcstyle.css">
 
@@ -12,16 +12,15 @@
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 
   <style>
-    .wrap-grid{ display:grid; grid-template-columns: 1fr; gap: 18px; align-items:start; }
     .panel{
       background: var(--panel, #f5f7fb);
       border: 1px solid var(--rule, #e5e7eb);
       border-radius: 12px;
       padding: 14px 16px;
+      margin-bottom: 14px;
     }
     .muted{color:var(--muted,#4b5563); font-size:0.95rem;}
     .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    .row > *{ flex: 1 1 auto; }
 
     .btn{
       display:inline-flex; align-items:center; justify-content:center;
@@ -34,7 +33,6 @@
       background: var(--kctcs-blue,#00467f);
       color:#fff; border-color: transparent;
     }
-    .btn:disabled{ opacity:0.5; cursor:not-allowed; }
 
     .cards{
       display:grid;
@@ -61,20 +59,18 @@
       font-variant-numeric: tabular-nums; background:#fff;
       font-weight:700;
     }
-
     .plot{
       width:100%;
-      height: 220px;
+      height: 200px;
       border-radius: 12px;
       border: 1px solid var(--rule,#e5e7eb);
       overflow:hidden;
       background:#fff;
     }
+    .controls{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+    .controls > *{ flex: 1 1 160px; }
 
-    .controls{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    .controls > *{ flex: 1 1 170px; }
     select, input[type="number"]{
-      width: 100%;
       padding: 10px 10px;
       border-radius: 10px;
       border: 1px solid var(--rule,#e5e7eb);
@@ -88,6 +84,7 @@
       border:1px solid var(--rule,#e5e7eb);
       border-radius: 12px;
       overflow:hidden;
+      margin-top:10px;
     }
     th, td{
       padding: 8px 10px;
@@ -98,13 +95,13 @@
     th{ background: #fafafa; font-weight:800; }
     tr:last-child td{ border-bottom: none; }
 
-    .divider{ height:1px; background: var(--rule,#e5e7eb); margin: 10px 0; }
     .status{
       padding: 10px 12px;
       border-radius: 12px;
       border: 1px solid var(--rule,#e5e7eb);
       background: #fff;
       font-weight: 700;
+      margin-top: 12px;
     }
     .status.good{ border-color: #86efac; }
     .status.bad{ border-color: #fca5a5; }
@@ -113,142 +110,80 @@
 
 <body>
   <div class="wrap">
-    <!-- ===== SIDEBAR ===== -->
+    <!-- Sidebar include (keeps your site consistent) -->
     <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
 
-    <!-- ===== MAIN ===== -->
     <main>
       <header>
-        <h1>Cats vs Dogs — Mystery Population Sampler</h1>
+        <h1>Cats vs Dogs — City Mystery Sampler</h1>
         <p class="subtitle">
-          Each card is a hidden population with a different <strong>Cats vs Dogs preference</strong>.
-          Take samples, inspect the counts, and guess which profile each population matches.
+          Each card is a <strong>hidden city</strong>. Sample residents and guess which city each card represents.
         </p>
       </header>
 
-      <div class="wrap-grid">
-        <!-- Global Controls -->
-        <section class="panel" aria-label="Game controls">
-          <div class="row">
-            <div>
-              <label for="n" style="display:block;font-weight:700;margin-bottom:6px;">Sample size (per draw)</label>
-              <input id="n" type="number" min="1" max="500" value="25" />
-              <div class="muted" style="margin-top:6px;">
-                Teaching tip: start with n=10–25, then jump to n=100 to see how 51/49 is hard to distinguish from 50/50.
-              </div>
-            </div>
-
-            <div>
-              <label for="seed" style="display:block;font-weight:700;margin-bottom:6px;">Random seed (optional)</label>
-              <input id="seed" type="number" placeholder="Leave blank for random" />
-              <div class="muted" style="margin-top:6px;">Use a seed to replay the same shuffle for a class section.</div>
-            </div>
-
-            <div style="align-self:end;">
-              <div class="row" style="gap:10px;">
-                <button class="btn" id="newRound">New round</button>
-                <button class="btn primary" id="check">Check answers</button>
-                <button class="btn" id="reveal">Reveal</button>
-                <button class="btn" id="resetSamples">Reset samples</button>
-              </div>
-              <div id="scoreBox" class="muted" style="margin-top:10px;"></div>
-            </div>
+      <!-- Simple top bar -->
+      <section class="panel" aria-label="Top controls">
+        <div class="row">
+          <div>
+            <label for="n" style="display:block;font-weight:800;margin-bottom:6px;">Sample size</label>
+            <input id="n" type="number" min="1" max="500" value="25" />
+            <div class="muted" style="margin-top:6px;">Try 10 → 25 → 100 to see how hard 51/49 is to detect.</div>
           </div>
+          <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+            <button class="btn" id="newRound">New round</button>
+            <button class="btn" id="reveal">Reveal</button>
+          </div>
+        </div>
 
-          <div class="divider"></div>
-          <div id="dimensionTitle" class="muted"></div>
-        </section>
+        <div id="revealNote" class="muted" style="margin-top:10px;"></div>
+      </section>
 
-        <!-- Cards -->
-        <section class="panel" aria-label="Populations">
-          <div class="cards" id="cards"></div>
-        </section>
-      </div>
+      <!-- Cards -->
+      <section class="panel" aria-label="City cards">
+        <div class="cards" id="cards"></div>
+
+        <div class="row" style="margin-top:12px;">
+          <button class="btn primary" id="check">Check answers</button>
+          <button class="btn" id="resetSamples">Reset samples</button>
+        </div>
+        <div id="scoreBox"></div>
+      </section>
     </main>
   </div>
 
   <script>
-    // --------- Sidebar include ----------
+    // Sidebar include
     document.querySelectorAll('[data-include]').forEach(el=>{
       fetch(el.getAttribute('data-include'))
         .then(r=>r.text()).then(html=>{ el.innerHTML = html; });
     });
 
     // ============================================================
-    // DEMO SETUP: Cats vs Dogs (4 hidden profiles)
+    // DEMO: Cats vs Dogs by City (hidden)
     // ============================================================
     const DEMO = {
-      dimensionLabel: "Preference: Cats vs Dogs",
+      dimensionLabel: "Preference: Cats vs Dogs (by City)",
       categories: ["Cats", "Dogs"],
       profiles: [
-        {
-          key: "fifty-fifty",
-          label: "Profile 1: 50% Cats / 50% Dogs",
-          hint: "Perfectly balanced.",
-          weights: [50, 50]
-        },
-        {
-          key: "eighty-twenty-cats",
-          label: "Profile 2: 80% Cats / 20% Dogs",
-          hint: "Strong Cats preference.",
-          weights: [80, 20]
-        },
-        {
-          key: "fiftyone-fortynine",
-          label: "Profile 3: 51% Cats / 49% Dogs",
-          hint: "Barely different from 50/50 (hard to detect in small samples).",
-          weights: [51, 49]
-        },
-        {
-          key: "twenty-eighty-cats",
-          label: "Profile 4: 20% Cats / 80% Dogs",
-          hint: "Strong Dogs preference.",
-          weights: [20, 80]
-        }
+        { key:"city-austin",     label:"Austin, TX",     hint:"Very strong Cats preference.",   weights:[80,20] },
+        { key:"city-chicago",    label:"Chicago, IL",    hint:"Balanced.",                      weights:[50,50] },
+        { key:"city-lexington",  label:"Lexington, KY",  hint:"Almost balanced, slightly Cats.",weights:[51,49] },
+        { key:"city-sanantonio", label:"San Antonio, TX",hint:"Very strong Dogs preference.",   weights:[20,80] }
       ]
     };
 
-    // ============================================================
-    // Game state / UI
-    // ============================================================
     const cardLabels = ["A","B","C","D"];
     const cardsEl = document.getElementById('cards');
     const nInput = document.getElementById('n');
-    const seedInput = document.getElementById('seed');
     const scoreBox = document.getElementById('scoreBox');
-    const dimensionTitle = document.getElementById('dimensionTitle');
+    const revealNote = document.getElementById('revealNote');
 
     const btnNewRound = document.getElementById('newRound');
-    const btnCheck = document.getElementById('check');
     const btnReveal = document.getElementById('reveal');
+    const btnCheck = document.getElementById('check');
     const btnResetSamples = document.getElementById('resetSamples');
 
-    dimensionTitle.innerHTML = `<strong>Variable:</strong> ${escapeHtml(DEMO.dimensionLabel)} (counts shown; percent updates as N grows).`;
-
-    let rng = Math.random;
-    let round = null; // { mapping, countsByCard, nByCard, guessByCard, revealed }
-
-    // ============================================================
-    // RNG with seed (Mulberry32)
-    // ============================================================
-    function mulberry32(seed){
-      let a = seed >>> 0;
-      return function(){
-        a |= 0; a = a + 0x6D2B79F5 | 0;
-        let t = Math.imul(a ^ a >>> 15, 1 | a);
-        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-        return ((t ^ t >>> 14) >>> 0) / 4294967296;
-      }
-    }
-
-    function shuffle(arr){
-      const a = arr.slice();
-      for(let i=a.length-1;i>0;i--){
-        const j = Math.floor(rng()*(i+1));
-        [a[i],a[j]] = [a[j],a[i]];
-      }
-      return a;
-    }
+    let round = null; // { mapping, probsByCard, countsByCard, nByCard, guessByCard, revealed }
 
     function escapeHtml(s){
       return String(s)
@@ -259,16 +194,23 @@
         .replace(/'/g,'&#039;');
     }
 
-    // Normalize weights -> probabilities
+    function shuffle(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
+
     function normalize(weights){
       const sum = weights.reduce((a,b)=>a + Math.max(0,b), 0);
       if(sum <= 0) return weights.map(_=>1/weights.length);
       return weights.map(w => Math.max(0,w)/sum);
     }
 
-    // Draw one categorical outcome using probabilities
     function drawCategoryIndex(probs){
-      const u = rng();
+      const u = Math.random();
       let cum = 0;
       for(let i=0;i<probs.length;i++){
         cum += probs[i];
@@ -277,9 +219,6 @@
       return probs.length - 1;
     }
 
-    // ============================================================
-    // Build UI cards
-    // ============================================================
     function buildCards(){
       cardsEl.innerHTML = "";
       cardLabels.forEach(letter=>{
@@ -290,7 +229,7 @@
         card.innerHTML = `
           <div class="pop-head">
             <div>
-              <h3 class="pop-title">Population ${letter}</h3>
+              <h3 class="pop-title">City ${letter}</h3>
               <div class="muted" id="truth-${letter}" style="display:none;"></div>
             </div>
             <span class="badge" id="nBadge-${letter}">N = 0</span>
@@ -298,34 +237,28 @@
 
           <div class="plot" id="plot-${letter}" aria-label="Bar chart of category counts"></div>
 
-          <div class="controls" style="margin-top:10px;">
+          <div class="controls">
             <button class="btn primary" data-action="sample" data-card="${letter}">Take sample</button>
 
             <select data-action="guess" data-card="${letter}">
-              <option value="">Select your guess…</option>
+              <option value="">Guess the city…</option>
               ${DEMO.profiles.map(p=>`<option value="${p.key}">${escapeHtml(p.label)}</option>`).join('')}
             </select>
 
             <button class="btn" data-action="clear" data-card="${letter}">Clear</button>
           </div>
 
-          <div style="margin-top:10px;">
-            <table aria-label="Counts table">
-              <thead>
-                <tr>
-                  <th>Category</th>
-                  <th>Count</th>
-                  <th>Percent</th>
-                </tr>
-              </thead>
-              <tbody id="tbl-${letter}"></tbody>
-            </table>
-          </div>
+          <table aria-label="Counts table">
+            <thead>
+              <tr><th>Preference</th><th>Count</th><th>Percent</th></tr>
+            </thead>
+            <tbody id="tbl-${letter}"></tbody>
+          </table>
         `;
         cardsEl.appendChild(card);
       });
 
-      // Event delegation
+      // Button clicks
       cardsEl.addEventListener('click', (e)=>{
         const btn = e.target.closest('button');
         if(!btn) return;
@@ -337,6 +270,7 @@
         if(action === "clear") clearCard(letter);
       });
 
+      // Guess dropdowns
       cardsEl.addEventListener('change', (e)=>{
         const sel = e.target.closest('select');
         if(!sel) return;
@@ -346,70 +280,38 @@
       });
     }
 
-    // ============================================================
-    // Round setup
-    // ============================================================
     function newRound(){
-      // set RNG
-      const seedVal = seedInput.value.trim();
-      if(seedVal === ""){
-        rng = Math.random;
-      }else{
-        rng = mulberry32(parseInt(seedVal,10) || 1);
-      }
+      const shuffled = shuffle(DEMO.profiles);
+      const mapping = cardLabels.map((letter, i)=>({ card: letter, profile: shuffled[i] }));
 
-      // assign profiles randomly to cards A-D
-      const shuffledProfiles = shuffle(DEMO.profiles);
-      const mapping = cardLabels.map((letter, i)=>({
-        card: letter,
-        profile: shuffledProfiles[i],
-        probs: normalize(shuffledProfiles[i].weights)
-      }));
-
-      // initialize counts
+      const probsByCard = {};
       const countsByCard = {};
       const nByCard = {};
       cardLabels.forEach(letter=>{
+        const prof = mapping.find(m=>m.card===letter).profile;
+        probsByCard[letter] = normalize(prof.weights);
         countsByCard[letter] = new Array(DEMO.categories.length).fill(0);
         nByCard[letter] = 0;
       });
 
       round = {
         mapping,
+        probsByCard,
         countsByCard,
         nByCard,
         guessByCard: {A:"",B:"",C:"",D:""},
         revealed: false
       };
 
+      revealNote.textContent = "";
       scoreBox.innerHTML = "";
       buildCards();
-      cardLabels.forEach(letter=>{
-        renderCard(letter);
-        updateTruthLabel(letter);
-      });
-    }
-
-    function resetSamples(){
-      if(!round) return;
-      cardLabels.forEach(letter=>{
-        round.countsByCard[letter] = new Array(DEMO.categories.length).fill(0);
-        round.nByCard[letter] = 0;
-        renderCard(letter);
-      });
-      scoreBox.innerHTML = `<span class="muted">All samples cleared.</span>`;
-    }
-
-    function clearCard(letter){
-      round.countsByCard[letter] = new Array(DEMO.categories.length).fill(0);
-      round.nByCard[letter] = 0;
-      renderCard(letter);
+      cardLabels.forEach(letter=>renderCard(letter));
     }
 
     function takeSample(letter){
       const n = Math.max(1, Math.min(500, parseInt(nInput.value,10) || 1));
-      const m = round.mapping.find(x=>x.card===letter);
-      const probs = m.probs;
+      const probs = round.probsByCard[letter];
 
       for(let i=0;i<n;i++){
         const idx = drawCategoryIndex(probs);
@@ -419,33 +321,37 @@
       renderCard(letter);
     }
 
-    // ============================================================
-    // Rendering per card (Plot + table)
-    // ============================================================
+    function clearCard(letter){
+      round.countsByCard[letter] = new Array(DEMO.categories.length).fill(0);
+      round.nByCard[letter] = 0;
+      renderCard(letter);
+    }
+
+    function resetSamples(){
+      cardLabels.forEach(clearCard);
+      scoreBox.innerHTML = "";
+    }
+
     function renderCard(letter){
       const counts = round.countsByCard[letter];
       const N = round.nByCard[letter];
 
       document.getElementById(`nBadge-${letter}`).textContent = `N = ${N}`;
 
-      // Plotly bar chart (Cats vs Dogs)
+      // Bar chart
       const div = document.getElementById(`plot-${letter}`);
-      const trace = {
+      Plotly.react(div, [{
         type: 'bar',
         x: DEMO.categories,
         y: counts,
-        hovertemplate: "%{x}<br>count=%{y}<extra></extra>",
-        opacity: 0.85
-      };
-
-      const layout = {
+        opacity: 0.85,
+        hovertemplate: "%{x}<br>count=%{y}<extra></extra>"
+      }], {
         margin: {t: 10, r: 10, b: 35, l: 45},
         xaxis: {tickangle: 0},
         yaxis: {title: "count", rangemode: "tozero"},
         showlegend: false
-      };
-
-      Plotly.react(div, [trace], layout, {responsive:true});
+      }, {responsive:true});
 
       // Table
       const tbody = document.getElementById(`tbl-${letter}`);
@@ -461,72 +367,47 @@
         `;
         tbody.appendChild(tr);
       }
-    }
 
-    // ============================================================
-    // Reveal + Check
-    // ============================================================
-    function updateTruthLabel(letter){
-      const el = document.getElementById(`truth-${letter}`);
-      const m = round.mapping.find(x=>x.card===letter);
-      el.innerHTML = `<strong>Identity:</strong> ${escapeHtml(m.profile.label)} <span class="muted">(${escapeHtml(m.profile.hint)})</span>`;
-      el.style.display = round.revealed ? "" : "none";
+      // Reveal label if needed
+      const truthEl = document.getElementById(`truth-${letter}`);
+      const prof = round.mapping.find(m=>m.card===letter).profile;
+      truthEl.innerHTML = `<strong>${escapeHtml(prof.label)}</strong> <span class="muted">(${escapeHtml(prof.hint)})</span>`;
+      truthEl.style.display = round.revealed ? "" : "none";
     }
 
     function reveal(){
       round.revealed = true;
-      cardLabels.forEach(updateTruthLabel);
-      scoreBox.innerHTML = `<span class="status">Revealed. Use “New round” to reshuffle.</span>`;
+      cardLabels.forEach(renderCard);
+      revealNote.innerHTML = `<strong>Revealed.</strong> Use “New round” to reshuffle the cities.`;
     }
 
     function checkAnswers(){
       let correct = 0;
-      const details = [];
+      const lines = [];
 
       cardLabels.forEach(letter=>{
         const guess = round.guessByCard[letter];
         const truth = round.mapping.find(m=>m.card===letter).profile.key;
         const ok = (guess && guess === truth);
         if(ok) correct++;
-        details.push({letter, ok, guess, truth});
+        const guessLabel = DEMO.profiles.find(p=>p.key===guess)?.label || "(no guess)";
+        const truthLabel = DEMO.profiles.find(p=>p.key===truth)?.label || "";
+        lines.push(`City ${letter}: ${ok ? "✅" : "❌"} guess: ${escapeHtml(guessLabel)} | truth: ${escapeHtml(truthLabel)}`);
       });
 
-      const total = cardLabels.length;
-      const pct = Math.round((correct/total)*100);
-
-      const labelOf = (key) => DEMO.profiles.find(p=>p.key===key)?.label || "(no guess)";
-      const lines = details.map(d=>{
-        return `Population ${d.letter}: ${d.ok ? "✅" : "❌"} &nbsp; guess: ${escapeHtml(labelOf(d.guess))} &nbsp; | &nbsp; truth: ${escapeHtml(labelOf(d.truth))}`;
-      }).join("<br/>");
-
+      const pct = Math.round((correct/4)*100);
       scoreBox.innerHTML = `
-        <div class="status ${correct===total ? "good" : "bad"}">
-          Score: ${correct} / ${total} (${pct}%)
-        </div>
-        <div class="muted" style="margin-top:8px;line-height:1.5">
-          ${lines}
-        </div>
+        <div class="status ${correct===4 ? "good" : "bad"}">Score: ${correct}/4 (${pct}%)</div>
+        <div class="muted" style="margin-top:8px;line-height:1.5">${lines.join("<br/>")}</div>
       `;
     }
 
-    // ============================================================
-    // Buttons
-    // ============================================================
     btnNewRound.addEventListener('click', newRound);
-    btnResetSamples.addEventListener('click', resetSamples);
     btnReveal.addEventListener('click', reveal);
     btnCheck.addEventListener('click', checkAnswers);
+    btnResetSamples.addEventListener('click', resetSamples);
 
-    // Initial
     newRound();
-
-    // Resize
-    window.addEventListener('resize', ()=>{
-      cardLabels.forEach(letter=>{
-        const div = document.getElementById(`plot-${letter}`);
-        if(div) Plotly.Plots.resize(div);
-      });
-    });
   </script>
 </body>
 </html>
