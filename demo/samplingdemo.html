@@ -41,10 +41,10 @@
     .scroll-mini { max-height: 220px; overflow:auto; background:#fff; border:1px solid var(--rule); border-radius:8px; }
     .tight-table th, .tight-table td { font-size:12px; padding:4px 6px; }
 
-    /* ===== NEW: make Population nearly full-screen ===== */
+    /* ===== Population nearly full-screen (from last step) ===== */
     .stack { display:grid; gap:12px; }
     .pop-card .viz{
-      height: min(78vh, 900px);  /* near full-screen but capped */
+      height: min(78vh, 900px);
       width: 100%;
     }
   </style>
@@ -156,6 +156,16 @@
             <label for="showGrid" style="margin:0;">Show overlays (match current design)</label>
           </div>
 
+          <!-- NEW: cluster overlay options -->
+          <div class="checkline" style="margin-top:8px;">
+            <input type="checkbox" id="clusterBorders" checked>
+            <label for="clusterBorders" style="margin:0;">Show cluster borders (in Cluster mode)</label>
+          </div>
+          <div class="checkline" style="margin-top:6px;">
+            <input type="checkbox" id="highlightClusters" checked>
+            <label for="highlightClusters" style="margin:0;">Highlight selected clusters</label>
+          </div>
+
           <div class="card soft" style="margin-top:10px;">
             <h3 style="margin:.2rem 0 .4rem;">Estimator notes</h3>
             <ul class="muter">
@@ -168,7 +178,6 @@
 
         <!-- ===== RIGHT: Viz & Numbers ===== -->
         <div class="panel pad">
-          <!-- ===== NEW: stacked layout so Population is full width ===== -->
           <div class="stack">
             <div class="card pop-card">
               <h3 style="margin-top:0;">Population</h3>
@@ -340,6 +349,15 @@
       return out;
     }
 
+    // Determine chosen clusters from current sampleSet
+    function chosenClustersFromSample(){
+      const set = new Set();
+      for(const u of units){
+        if(sampleSet.has(u.id)) set.add(u.clusterId);
+      }
+      return set;
+    }
+
     // ====== Group counts into Numbers card ======
     function updateGroupTable(){
       const design = document.getElementById('designSel').value;
@@ -388,38 +406,22 @@
 
       // legend
       legendEl.innerHTML = '';
-      if(design === 'cluster'){
-        legendLabel.textContent = 'clusters';
-        const clusters = Array.from(new Set(units.map(u=>u.clusterId))).slice(0,5);
-        clusters.forEach((cid,i)=>{
-          const div = document.createElement('div');
-          div.className = 'chip';
-          const sw = document.createElement('span');
-          sw.className = 'swatch';
-          sw.style.background = palette[i % palette.length];
-          div.appendChild(sw);
-          div.appendChild(document.createTextNode('Cluster ' + (cid+1)));
-          legendEl.appendChild(div);
-        });
-      } else {
-        legendLabel.textContent = 'strata';
-        for(let s=0;s<S;s++){
-          const div = document.createElement('div');
-          div.className = 'chip';
-          const sw = document.createElement('span');
-          sw.className = 'swatch';
-          sw.style.background = palette[s % palette.length];
-          div.appendChild(sw);
-          div.appendChild(document.createTextNode('Stratum ' + (s+1)));
-          legendEl.appendChild(div);
-        }
+      // Population stays the same: always show strata legend (even in cluster mode)
+      legendLabel.textContent = 'strata';
+      for(let s=0;s<S;s++){
+        const div = document.createElement('div');
+        div.className = 'chip';
+        const sw = document.createElement('span');
+        sw.className = 'swatch';
+        sw.style.background = palette[s % palette.length];
+        div.appendChild(sw);
+        div.appendChild(document.createTextNode('Stratum ' + (s+1)));
+        legendEl.appendChild(div);
       }
 
-      // cells (selected squares now BLACK outline)
+      // cells — ALWAYS colored by STRATUM so population "stays the same"
       for(const u of units){
-        const fill = (design==='cluster')
-          ? palette[u.clusterId % palette.length]
-          : palette[u.stratum % palette.length];
+        const fill = palette[u.stratum % palette.length];
 
         const x = pad + u.c * cellW;
         const y = pad + u.r * cellH;
@@ -441,35 +443,43 @@
         viz.appendChild(rect);
       }
 
-      // overlays that MATCH the current design (and in BLACK)
+      // overlays that MATCH the current design
       if(showGrid){
         if(design === 'cluster'){
-          // cluster grid
-          const blockH = R / clusterRows;
-          const blockW = C / clusterCols;
-          for(let rc=1; rc<clusterRows; rc++){
-            const y = pad + rc*blockH*cellH;
-            const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-            line.setAttribute('x1', pad);
-            line.setAttribute('x2', W-pad);
-            line.setAttribute('y1', y);
-            line.setAttribute('y2', y);
-            line.setAttribute('stroke', '#000');
-            line.setAttribute('stroke-width', '1.5');
-            line.setAttribute('stroke-dasharray', '6 6');
-            viz.appendChild(line);
-          }
-          for(let cc=1; cc<clusterCols; cc++){
-            const x = pad + cc*blockW*cellW;
-            const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-            line.setAttribute('y1', pad);
-            line.setAttribute('y2', H-pad);
-            line.setAttribute('x1', x);
-            line.setAttribute('x2', x);
-            line.setAttribute('stroke', '#000');
-            line.setAttribute('stroke-width', '1.5');
-            line.setAttribute('stroke-dasharray', '6 6');
-            viz.appendChild(line);
+          const showBorders = document.getElementById('clusterBorders')?.checked ?? true;
+          const highlight = document.getElementById('highlightClusters')?.checked ?? true;
+
+          if(showBorders){
+            const blockH = R / clusterRows;
+            const blockW = C / clusterCols;
+
+            const chosen = chosenClustersFromSample();
+
+            // Draw a rectangle border around each cluster; chosen clusters get thicker borders
+            for(let rc=0; rc<clusterRows; rc++){
+              for(let cc=0; cc<clusterCols; cc++){
+                const x = pad + cc*blockW*cellW;
+                const y = pad + rc*blockH*cellH;
+                const w = blockW*cellW;
+                const h = blockH*cellH;
+
+                const cid = rc*clusterCols + cc;
+                const isChosen = chosen.has(cid);
+
+                const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+                rect.setAttribute('x', x);
+                rect.setAttribute('y', y);
+                rect.setAttribute('width', w);
+                rect.setAttribute('height', h);
+                rect.setAttribute('fill', 'none');
+                rect.setAttribute('stroke', '#000');
+                rect.setAttribute('stroke-width', (isChosen && highlight) ? '3.2' : '1.4');
+                rect.setAttribute('opacity', (isChosen && highlight) ? '1' : '0.65');
+                rect.setAttribute('rx', 2);
+                rect.setAttribute('ry', 2);
+                viz.appendChild(rect);
+              }
+            }
           }
         } else {
           // stratified: horizontal band boundaries
@@ -566,6 +576,10 @@
     document.getElementById('KInput').addEventListener('input', resample);
     document.getElementById('showGrid').addEventListener('change', draw);
 
+    // NEW: cluster overlay toggles
+    document.getElementById('clusterBorders')?.addEventListener('change', draw);
+    document.getElementById('highlightClusters')?.addEventListener('change', draw);
+
     document.getElementById('btnResample').addEventListener('click', resample);
     document.getElementById('btnShuffle').addEventListener('click', ()=>{ buildPopulation(); resample(); });
     document.getElementById('btnDefaults').addEventListener('click', ()=>{
@@ -577,6 +591,8 @@
       document.getElementById('cCols').value = 5;
       document.getElementById('KInput').value = 4;
       document.getElementById('showGrid').checked = true;
+      document.getElementById('clusterBorders').checked = true;
+      document.getElementById('highlightClusters').checked = true;
       syncVisibility();
       rebuildPopulationAndResample();
     });
