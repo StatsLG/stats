@@ -40,6 +40,13 @@
     .mini { font-size: 12px; color: var(--muted); }
     .scroll-mini { max-height: 220px; overflow:auto; background:#fff; border:1px solid var(--rule); border-radius:8px; }
     .tight-table th, .tight-table td { font-size:12px; padding:4px 6px; }
+
+    /* ===== NEW: make Population nearly full-screen ===== */
+    .stack { display:grid; gap:12px; }
+    .pop-card .viz{
+      height: min(78vh, 900px);  /* near full-screen but capped */
+      width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -161,8 +168,9 @@
 
         <!-- ===== RIGHT: Viz & Numbers ===== -->
         <div class="panel pad">
-          <div class="grid2">
-            <div class="card">
+          <!-- ===== NEW: stacked layout so Population is full width ===== -->
+          <div class="stack">
+            <div class="card pop-card">
               <h3 style="margin-top:0;">Population</h3>
               <div class="muter">N=<span id="NLabel">400</span>; 20×20 grid. Colors show <span id="legendLabel">strata</span>.</div>
               <div class="legend" id="legend" style="margin:8px 0;"></div>
