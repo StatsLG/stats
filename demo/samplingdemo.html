@@ -126,11 +126,9 @@
     <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
     <main>
       <header>
-        <h1>Sampling Designs: SRS vs Stratified vs Cluster</h1>
+        <h1>Sampling Methods: SRS vs Stratified vs Cluster</h1>
         <p>
-          Population is a <strong>100×100 grid (N=10,000)</strong> with numeric outcome \(Y\).
-          Choose a design and compare the <strong>population mean</strong> to the <strong>sample mean</strong>.
-          Stratified uses horizontal bands; Cluster uses equal-sized blocks. Re-sample to see variability.
+          The population size is<strong>10,000</strong>, divided equally amoung the four groups.
         </p>
       </header>
 
@@ -144,7 +142,7 @@
               <h3 style="margin-top:0;">Population</h3>
               <div class="muter">
                 N=<span id="NLabel">—</span>; <span id="dimLabel">—</span>.
-                Colors show <span id="legendLabel">strata</span>.
+                Colors show <span id="legendLabel">Group</span>.
               </div>
 
               <div class="legend" id="legend" style="margin:8px 0;"></div>
@@ -154,11 +152,11 @@
               <div class="pop-controls" aria-label="Sampling controls">
 
                 <div>
-                  <label for="designSel">Sampling design</label>
+                  <label for="designSel">Sampling Method</label>
                   <select id="designSel">
                     <option value="srs">Simple Random Sample (SRS)</option>
                     <option value="strat">Stratified Random Sample</option>
-                    <option value="cluster">Cluster Sample (one-stage)</option>
+                    <option value="cluster">Cluster Sample</option>
                   </select>
                 </div>
 
