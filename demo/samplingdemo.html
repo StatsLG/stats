@@ -41,12 +41,24 @@
     .scroll-mini { max-height: 220px; overflow:auto; background:#fff; border:1px solid var(--rule); border-radius:8px; }
     .tight-table th, .tight-table td { font-size:12px; padding:4px 6px; }
 
-    /* ===== Population nearly full-screen (from last step) ===== */
+    /* ===== Population nearly full-screen ===== */
     .stack { display:grid; gap:12px; }
     .pop-card .viz{
       height: min(78vh, 900px);
       width: 100%;
     }
+
+    /* Options under population */
+    .pop-options{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px 14px;
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px solid var(--rule);
+      align-items:center;
+    }
+    .pop-options .checkline{ margin:0; }
   </style>
 </head>
 <body>
@@ -101,7 +113,11 @@
     <main>
       <header>
         <h1>Sampling Designs: SRS vs Stratified vs Cluster</h1>
-        <p>Population is a <strong>20×20 grid (N=400)</strong> with numeric outcome \(Y\). Choose a design and compare the <strong>population mean</strong> to the <strong>sample mean</strong>. Stratified uses horizontal bands; Cluster uses equal-sized blocks. Re-sample to see variability.</p>
+        <p>
+          Population is a <strong>100×100 grid (N=10,000)</strong> with numeric outcome \(Y\).
+          Choose a design and compare the <strong>population mean</strong> to the <strong>sample mean</strong>.
+          Stratified uses horizontal bands; Cluster uses equal-sized blocks. Re-sample to see variability.
+        </p>
       </header>
 
       <section class="section wrap" style="grid-template-columns: 360px 1fr;">
@@ -116,13 +132,15 @@
                 <option value="cluster">Cluster Sample (one-stage)</option>
               </select>
             </div>
+
             <div>
               <label for="nInput">Sample size n <span class="muter">(SRS/Stratified)</span></label>
-              <input id="nInput" type="number" min="5" max="200" value="40" />
+              <input id="nInput" type="number" min="5" max="5000" value="400" />
             </div>
+
             <div id="strataBox">
               <label># of strata (horizontal bands)</label>
-              <input id="SInput" type="number" min="2" max="10" value="4" />
+              <input id="SInput" type="number" min="2" max="20" value="4" />
               <div class="checkline" style="margin-top:6px;">
                 <input type="radio" id="allocProp" name="alloc" value="prop" checked>
                 <label for="allocProp" style="margin:0;">Proportional allocation</label>
@@ -132,14 +150,15 @@
                 <label for="allocEqual" style="margin:0;">Equal \(n_h\)</label>
               </div>
             </div>
+
             <div id="clusterBox">
               <label>Cluster layout (rows × cols)</label>
               <div class="row">
-                <input id="cRows" type="number" min="2" max="10" value="5" />
-                <input id="cCols" type="number" min="2" max="10" value="5" />
+                <input id="cRows" type="number" min="2" max="50" value="10" />
+                <input id="cCols" type="number" min="2" max="50" value="10" />
               </div>
               <label style="margin-top:6px;"># clusters to sample (K)</label>
-              <input id="KInput" type="number" min="1" max="25" value="4" />
+              <input id="KInput" type="number" min="1" max="2500" value="10" />
               <p class="muter">Cluster sample size = K × (cluster size).</p>
             </div>
           </div>
@@ -149,21 +168,6 @@
             <button class="btn" id="btnResample">Re-sample</button>
             <button class="btn outline" id="btnShuffle">Shuffle population</button>
             <button class="btn ghost" id="btnDefaults">Reset defaults</button>
-          </div>
-
-          <div class="checkline" style="margin-top:10px;">
-            <input type="checkbox" id="showGrid" checked>
-            <label for="showGrid" style="margin:0;">Show overlays (match current design)</label>
-          </div>
-
-          <!-- NEW: cluster overlay options -->
-          <div class="checkline" style="margin-top:8px;">
-            <input type="checkbox" id="clusterBorders" checked>
-            <label for="clusterBorders" style="margin:0;">Show cluster borders (in Cluster mode)</label>
-          </div>
-          <div class="checkline" style="margin-top:6px;">
-            <input type="checkbox" id="highlightClusters" checked>
-            <label for="highlightClusters" style="margin:0;">Highlight selected clusters</label>
           </div>
 
           <div class="card soft" style="margin-top:10px;">
@@ -181,9 +185,31 @@
           <div class="stack">
             <div class="card pop-card">
               <h3 style="margin-top:0;">Population</h3>
-              <div class="muter">N=<span id="NLabel">400</span>; 20×20 grid. Colors show <span id="legendLabel">strata</span>.</div>
+              <div class="muter">
+                N=<span id="NLabel">—</span>; <span id="dimLabel">—</span>.
+                Colors show <span id="legendLabel">strata</span>.
+              </div>
+
               <div class="legend" id="legend" style="margin:8px 0;"></div>
               <svg id="viz" class="viz" viewBox="0 0 760 560" aria-label="Population grid visualization"></svg>
+
+              <!-- NEW: Options below population -->
+              <div class="pop-options" aria-label="Population display options">
+                <div class="checkline">
+                  <input type="checkbox" id="showGrid" checked>
+                  <label for="showGrid" style="margin:0;">Show overlays (match current design)</label>
+                </div>
+
+                <div class="checkline">
+                  <input type="checkbox" id="clusterBorders" checked>
+                  <label for="clusterBorders" style="margin:0;">Show cluster borders (Cluster mode)</label>
+                </div>
+
+                <div class="checkline">
+                  <input type="checkbox" id="highlightClusters" checked>
+                  <label for="highlightClusters" style="margin:0;">Highlight selected clusters</label>
+                </div>
+              </div>
             </div>
 
             <div class="card">
@@ -201,13 +227,15 @@
               </div>
 
               <div style="margin-top:10px;">
-                <h4 style="margin:0 0 6px;">Sample composition by group <span class="mini">(matches current design)</span></h4>
+                <h4 style="margin:0 0 6px;">
+                  Sample composition by stratum <span class="mini">(population groups)</span>
+                </h4>
                 <div class="scroll-mini">
-                  <table class="table tight-table" id="groupTable" aria-label="Sample counts by group">
+                  <table class="table tight-table" id="groupTable" aria-label="Sample counts by stratum">
                     <thead>
                       <tr>
-                        <th>Group</th>
-                        <th>Population \(N_g\)</th>
+                        <th>Stratum</th>
+                        <th>Population \(N_h\)</th>
                         <th>Selected</th>
                       </tr>
                     </thead>
@@ -217,6 +245,7 @@
                 <p class="mini" id="groupTotals" style="margin-top:6px;"></p>
               </div>
             </div>
+
           </div>
         </div>
       </section>
@@ -233,8 +262,11 @@
     document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
 
     // ====== Parameters & helpers ======
-    const R = 20, C = 20;                 // grid size => N = 400
+    const R = 100, C = 100;               // grid size => N = 10,000
     const N = R*C;
+    document.getElementById('NLabel').textContent = String(N);
+    document.getElementById('dimLabel').textContent = `${R}×${C}`;
+
     const viz = document.getElementById('viz');
     const fmt = (x,d=3)=> Number.isFinite(x) ? x.toFixed(d) : '—';
     const sum = a => a.reduce((s,v)=>s+v,0);
@@ -261,14 +293,14 @@
 
     // ====== Build population ======
     let S = 4;                 // strata bands
-    let clusterRows = 5, clusterCols = 5;
+    let clusterRows = 10, clusterCols = 10;
     let units = [];            // [{id,r,c,y,stratum,clusterId}]
     let sampleSet = new Set(); // selected ids
 
     function buildPopulation(){
       units = [];
 
-      // stratum boundaries (horizontal) — we’ll ensure equal band sizes (R divisible by S)
+      // stratum boundaries (horizontal) — equal band sizes when possible
       const bandH = Math.floor(R / S);
       const boundaries = Array.from({length:S}, (_,s) => {
         const r0 = s*bandH;
@@ -276,11 +308,11 @@
         return {s, r0, r1};
       });
 
-      // stratum effects for Y (to make stratified helpful)
-      const effects = Array.from({length:S}, (_,i)=> (i - (S-1)/2) * 8); // e.g., [-12,-4,4,12] for S=4
+      // stratum effects for Y
+      const effects = Array.from({length:S}, (_,i)=> (i - (S-1)/2) * 8);
       const base = 50, noiseSD = 6;
 
-      // cluster block sizes — use exact integer sizes; we enforce divisibility
+      // cluster block sizes
       const blockH = R / clusterRows;
       const blockW = C / clusterCols;
 
@@ -291,7 +323,6 @@
         for(let c=0;c<C;c++){
           const id = r*C + c;
 
-          // exact cluster indices (no floor rounding issues now)
           const rc = Math.min(Math.floor(r / blockH), clusterRows-1);
           const cc = Math.min(Math.floor(c / blockW), clusterCols-1);
           const clusterId = rc*clusterCols + cc;
@@ -349,7 +380,6 @@
       return out;
     }
 
-    // Determine chosen clusters from current sampleSet
     function chosenClustersFromSample(){
       const set = new Set();
       for(const u of units){
@@ -358,20 +388,16 @@
       return set;
     }
 
-    // ====== Group counts into Numbers card ======
+    // ====== Group counts into Numbers card (ALWAYS strata totals) ======
     function updateGroupTable(){
-      const design = document.getElementById('designSel').value;
       const tbody = document.querySelector('#groupTable tbody');
       const totalsEl = document.getElementById('groupTotals');
 
-      const isCluster = (design === 'cluster');
-
-      // Build population & selected counts per group
-      const popCount = new Map();
-      const selCount = new Map();
+      const popCount = new Map(); // stratum -> Nh
+      const selCount = new Map(); // stratum -> selected
 
       for(const u of units){
-        const key = isCluster ? u.clusterId : u.stratum;
+        const key = u.stratum; // ALWAYS strata (population groups)
         popCount.set(key, (popCount.get(key)||0) + 1);
         if(sampleSet.has(u.id)){
           selCount.set(key, (selCount.get(key)||0) + 1);
@@ -382,7 +408,7 @@
 
       tbody.innerHTML = keys.map(k => `
         <tr>
-          <td>${isCluster ? ('Cluster ' + (k+1)) : ('Stratum ' + (k+1))}</td>
+          <td>Stratum ${k+1}</td>
           <td>${popCount.get(k)}</td>
           <td>${selCount.get(k) || 0}</td>
         </tr>
@@ -404,9 +430,8 @@
       const cellW = (W - 2*pad) / C;
       const cellH = (H - 2*pad) / R;
 
-      // legend
+      // legend — population stays the same: strata legend always
       legendEl.innerHTML = '';
-      // Population stays the same: always show strata legend (even in cluster mode)
       legendLabel.textContent = 'strata';
       for(let s=0;s<S;s++){
         const div = document.createElement('div');
@@ -430,16 +455,12 @@
         const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
         rect.setAttribute('x', x);
         rect.setAttribute('y', y);
-        rect.setAttribute('width', Math.max(1, cellW - 1));
-        rect.setAttribute('height', Math.max(1, cellH - 1));
+        rect.setAttribute('width', Math.max(0.25, cellW));
+        rect.setAttribute('height', Math.max(0.25, cellH));
         rect.setAttribute('fill', fill);
-        rect.setAttribute('stroke', selected ? '#000' : 'rgba(0,0,0,0.08)');
-        rect.setAttribute('stroke-width', selected ? 2.2 : 1);
-        rect.setAttribute('opacity', selected ? 1 : 0.9);
-        rect.setAttribute('rx', 2);
-        rect.setAttribute('ry', 2);
-        rect.setAttribute('aria-label', `r${u.r+1} c${u.c+1} Y=${u.y.toFixed(2)}`);
-        rect.setAttribute('title', `Y = ${u.y.toFixed(2)} (r${u.r+1}, c${u.c+1})`);
+        rect.setAttribute('stroke', selected ? '#000' : 'rgba(0,0,0,0.06)');
+        rect.setAttribute('stroke-width', selected ? 1.6 : 0.5);
+        rect.setAttribute('opacity', selected ? 1 : 0.92);
         viz.appendChild(rect);
       }
 
@@ -452,10 +473,8 @@
           if(showBorders){
             const blockH = R / clusterRows;
             const blockW = C / clusterCols;
-
             const chosen = chosenClustersFromSample();
 
-            // Draw a rectangle border around each cluster; chosen clusters get thicker borders
             for(let rc=0; rc<clusterRows; rc++){
               for(let cc=0; cc<clusterCols; cc++){
                 const x = pad + cc*blockW*cellW;
@@ -473,15 +492,13 @@
                 rect.setAttribute('height', h);
                 rect.setAttribute('fill', 'none');
                 rect.setAttribute('stroke', '#000');
-                rect.setAttribute('stroke-width', (isChosen && highlight) ? '3.2' : '1.4');
-                rect.setAttribute('opacity', (isChosen && highlight) ? '1' : '0.65');
-                rect.setAttribute('rx', 2);
-                rect.setAttribute('ry', 2);
+                rect.setAttribute('stroke-width', (isChosen && highlight) ? '2.8' : '1.2');
+                rect.setAttribute('opacity', (isChosen && highlight) ? '1' : '0.55');
                 viz.appendChild(rect);
               }
             }
           }
-        } else {
+        } else if(design === 'strat') {
           // stratified: horizontal band boundaries
           const bandH = Math.floor(R / S);
           for(let s=1; s<S; s++){
@@ -496,6 +513,8 @@
             line.setAttribute('stroke-dasharray', '6 6');
             viz.appendChild(line);
           }
+        } else {
+          // SRS: no group overlay needed (keeps UI simple)
         }
       }
     }
@@ -533,11 +552,18 @@
       document.getElementById('strataBox').style.display = design==='strat' ? 'block' : 'none';
       document.getElementById('clusterBox').style.display = design==='cluster' ? 'block' : 'none';
       document.getElementById('nInput').parentElement.style.display = (design!=='cluster') ? 'block' : 'none';
+
+      // cluster overlay toggles only really matter in cluster mode
+      const cb = document.getElementById('clusterBorders');
+      const hc = document.getElementById('highlightClusters');
+      if(cb) cb.disabled = (design!=='cluster');
+      if(hc) hc.disabled = (design!=='cluster');
     }
 
     function nearestDivisor(total, want){
       let best=2, bestDiff=1e9;
-      for(let k=2;k<=10;k++){
+      const maxTry = 50;
+      for(let k=2;k<=maxTry;k++){
         if(total % k === 0){
           const diff=Math.abs(k-want);
           if(diff<bestDiff){ best=k; bestDiff=diff; }
@@ -548,15 +574,16 @@
 
     function clampLayouts(){
       // ensure strata roughly equal-height; clusters tile exactly
-      S = Math.max(2, Math.min(10, +document.getElementById('SInput').value||4));
-      clusterRows = Math.max(2, Math.min(10, +document.getElementById('cRows').value||5));
-      clusterCols = Math.max(2, Math.min(10, +document.getElementById('cCols').value||5));
+      S = Math.max(2, Math.min(20, +document.getElementById('SInput').value||4));
+      clusterRows = Math.max(2, Math.min(50, +document.getElementById('cRows').value||10));
+      clusterCols = Math.max(2, Math.min(50, +document.getElementById('cCols').value||10));
 
       if(R % clusterRows !== 0) clusterRows = nearestDivisor(R, clusterRows);
       if(C % clusterCols !== 0) clusterCols = nearestDivisor(C, clusterCols);
 
       document.getElementById('cRows').value = clusterRows;
       document.getElementById('cCols').value = clusterCols;
+      document.getElementById('SInput').value = S;
     }
 
     function rebuildPopulationAndResample(){
@@ -574,25 +601,27 @@
     document.getElementById('cRows').addEventListener('input', rebuildPopulationAndResample);
     document.getElementById('cCols').addEventListener('input', rebuildPopulationAndResample);
     document.getElementById('KInput').addEventListener('input', resample);
-    document.getElementById('showGrid').addEventListener('change', draw);
 
-    // NEW: cluster overlay toggles
-    document.getElementById('clusterBorders')?.addEventListener('change', draw);
-    document.getElementById('highlightClusters')?.addEventListener('change', draw);
+    // options under population
+    document.getElementById('showGrid').addEventListener('change', draw);
+    document.getElementById('clusterBorders').addEventListener('change', draw);
+    document.getElementById('highlightClusters').addEventListener('change', draw);
 
     document.getElementById('btnResample').addEventListener('click', resample);
     document.getElementById('btnShuffle').addEventListener('click', ()=>{ buildPopulation(); resample(); });
     document.getElementById('btnDefaults').addEventListener('click', ()=>{
       document.getElementById('designSel').value = 'srs';
-      document.getElementById('nInput').value = 40;
+      document.getElementById('nInput').value = 400;
       document.getElementById('SInput').value = 4;
       document.getElementById('allocProp').checked = true;
-      document.getElementById('cRows').value = 5;
-      document.getElementById('cCols').value = 5;
-      document.getElementById('KInput').value = 4;
+      document.getElementById('cRows').value = 10;
+      document.getElementById('cCols').value = 10;
+      document.getElementById('KInput').value = 10;
+
       document.getElementById('showGrid').checked = true;
       document.getElementById('clusterBorders').checked = true;
       document.getElementById('highlightClusters').checked = true;
+
       syncVisibility();
       rebuildPopulationAndResample();
     });
