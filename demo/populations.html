@@ -61,7 +61,7 @@
     }
     .plot{
       width:100%;
-      height: 200px;
+      height: 190px;
       border-radius: 12px;
       border: 1px solid var(--rule,#e5e7eb);
       overflow:hidden;
@@ -75,6 +75,7 @@
       border-radius: 10px;
       border: 1px solid var(--rule,#e5e7eb);
       background:#fff;
+      width: 100%;
     }
 
     table{
@@ -91,6 +92,7 @@
       border-bottom: 1px solid var(--rule,#e5e7eb);
       text-align:left;
       font-variant-numeric: tabular-nums;
+      vertical-align: top;
     }
     th{ background: #fafafa; font-weight:800; }
     tr:last-child td{ border-bottom: none; }
@@ -105,6 +107,19 @@
     }
     .status.good{ border-color: #86efac; }
     .status.bad{ border-color: #fca5a5; }
+
+    .profile-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .profile-item{
+      background:#fff;
+      border:1px solid var(--rule,#e5e7eb);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .profile-item strong{ display:block; margin-bottom:4px; }
   </style>
 </head>
 
@@ -121,21 +136,29 @@
         </p>
       </header>
 
-      <!-- Simple top bar -->
+      <!-- Top controls -->
       <section class="panel" aria-label="Top controls">
         <div class="row">
-          <div>
+          <div style="min-width:220px;">
             <label for="n" style="display:block;font-weight:800;margin-bottom:6px;">Sample size</label>
             <input id="n" type="number" min="1" max="500" value="25" />
-            <div class="muted" style="margin-top:6px;">Try 10 → 25 → 100 to see how hard 51/49 is to detect.</div>
+            <div class="muted" style="margin-top:6px;">Try 10 → 25 → 100. Small differences need big samples.</div>
           </div>
           <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
             <button class="btn" id="newRound">New round</button>
             <button class="btn" id="reveal">Reveal</button>
           </div>
         </div>
-
         <div id="revealNote" class="muted" style="margin-top:10px;"></div>
+      </section>
+
+      <!-- City profiles (what students use to pick from dropdown) -->
+      <section class="panel" aria-label="City profiles">
+        <h2 style="margin:0 0 8px 0;">City Profiles</h2>
+        <p class="muted" style="margin-top:0;">
+          Use these descriptions to decide which city to select in each dropdown.
+        </p>
+        <div class="profile-grid" id="profiles"></div>
       </section>
 
       <!-- Cards -->
@@ -158,19 +181,58 @@
         .then(r=>r.text()).then(html=>{ el.innerHTML = html; });
     });
 
+    function escapeHtml(s){
+      return String(s)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+    }
+
     // ============================================================
     // DEMO: Cats vs Dogs by City (hidden)
+    // - "desc" is what you display to students for selecting cities
+    // - "weights" control the true cats/dogs rates used in sampling
     // ============================================================
     const DEMO = {
-      dimensionLabel: "Preference: Cats vs Dogs (by City)",
       categories: ["Cats", "Dogs"],
       profiles: [
-        { key:"city-austin",     label:"Austin, TX",     hint:"Very strong Cats preference.",   weights:[80,20] },
-        { key:"city-chicago",    label:"Chicago, IL",    hint:"Balanced.",                      weights:[50,50] },
-        { key:"city-lexington",  label:"Lexington, KY",  hint:"Almost balanced, slightly Cats.",weights:[51,49] },
-        { key:"city-sanantonio", label:"San Antonio, TX",hint:"Very strong Dogs preference.",   weights:[20,80] }
+        {
+          key:"city-austin",
+          label:"Austin, TX",
+          desc:"Trendy downtown apartments, lots of indoor living — people here strongly lean Cats.",
+          weights:[80,20]
+        },
+        {
+          key:"city-chicago",
+          label:"Chicago, IL",
+          desc:"Big mixed city vibes — overall preferences are very balanced (about 50/50).",
+          weights:[50,50]
+        },
+        {
+          key:"city-lexington",
+          label:"Lexington, KY",
+          desc:"Balanced town feel — extremely close to 50/50, just barely more Cats.",
+          weights:[51,49]
+        },
+        {
+          key:"city-sanantonio",
+          label:"San Antonio, TX",
+          desc:"More outdoor + family-oriented culture — people here strongly lean Dogs.",
+          weights:[20,80]
+        }
       ]
     };
+
+    // Render the profile descriptions panel
+    const profilesEl = document.getElementById('profiles');
+    profilesEl.innerHTML = DEMO.profiles.map(p=>`
+      <div class="profile-item">
+        <strong>${escapeHtml(p.label)}</strong>
+        <div class="muted">${escapeHtml(p.desc)}</div>
+      </div>
+    `).join("");
 
     const cardLabels = ["A","B","C","D"];
     const cardsEl = document.getElementById('cards');
@@ -184,15 +246,6 @@
     const btnResetSamples = document.getElementById('resetSamples');
 
     let round = null; // { mapping, probsByCard, countsByCard, nByCard, guessByCard, revealed }
-
-    function escapeHtml(s){
-      return String(s)
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;')
-        .replace(/'/g,'&#039;');
-    }
 
     function shuffle(arr){
       const a = arr.slice();
@@ -235,13 +288,13 @@
             <span class="badge" id="nBadge-${letter}">N = 0</span>
           </div>
 
-          <div class="plot" id="plot-${letter}" aria-label="Bar chart of category counts"></div>
+          <div class="plot" id="plot-${letter}" aria-label="Bar chart of cats vs dogs counts"></div>
 
           <div class="controls">
             <button class="btn primary" data-action="sample" data-card="${letter}">Take sample</button>
 
             <select data-action="guess" data-card="${letter}">
-              <option value="">Guess the city…</option>
+              <option value="">Select city…</option>
               ${DEMO.profiles.map(p=>`<option value="${p.key}">${escapeHtml(p.label)}</option>`).join('')}
             </select>
 
@@ -287,6 +340,7 @@
       const probsByCard = {};
       const countsByCard = {};
       const nByCard = {};
+
       cardLabels.forEach(letter=>{
         const prof = mapping.find(m=>m.card===letter).profile;
         probsByCard[letter] = normalize(prof.weights);
@@ -348,7 +402,6 @@
         hovertemplate: "%{x}<br>count=%{y}<extra></extra>"
       }], {
         margin: {t: 10, r: 10, b: 35, l: 45},
-        xaxis: {tickangle: 0},
         yaxis: {title: "count", rangemode: "tozero"},
         showlegend: false
       }, {responsive:true});
@@ -371,7 +424,7 @@
       // Reveal label if needed
       const truthEl = document.getElementById(`truth-${letter}`);
       const prof = round.mapping.find(m=>m.card===letter).profile;
-      truthEl.innerHTML = `<strong>${escapeHtml(prof.label)}</strong> <span class="muted">(${escapeHtml(prof.hint)})</span>`;
+      truthEl.innerHTML = `<strong>${escapeHtml(prof.label)}</strong> <span class="muted">(${escapeHtml(prof.desc)})</span>`;
       truthEl.style.display = round.revealed ? "" : "none";
     }
 
@@ -390,6 +443,7 @@
         const truth = round.mapping.find(m=>m.card===letter).profile.key;
         const ok = (guess && guess === truth);
         if(ok) correct++;
+
         const guessLabel = DEMO.profiles.find(p=>p.key===guess)?.label || "(no guess)";
         const truthLabel = DEMO.profiles.find(p=>p.key===truth)?.label || "";
         lines.push(`City ${letter}: ${ok ? "✅" : "❌"} guess: ${escapeHtml(guessLabel)} | truth: ${escapeHtml(truthLabel)}`);
