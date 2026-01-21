@@ -73,6 +73,39 @@
       align-items:center;
     }
     .pop-toggles .checkline{ margin:0; }
+
+    /* ============================================================
+       FIX: force real checkbox / radio boxes (override bctcstyle.css)
+       ============================================================ */
+    .pop-toggles input[type="checkbox"],
+    .pop-toggles input[type="radio"],
+    .pop-controls input[type="checkbox"],
+    .pop-controls input[type="radio"]{
+      appearance: auto !important;
+      -webkit-appearance: auto !important;
+      width: 16px !important;
+      height: 16px !important;
+      padding: 0 !important;
+      margin: 0 8px 0 0 !important;
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      display: inline-block !important;
+      vertical-align: middle !important;
+      flex: 0 0 auto !important;
+    }
+    .pop-toggles .checkline,
+    .pop-controls .checkline{
+      display:inline-flex !important;
+      align-items:center !important;
+    }
+    /* Optional: color */
+    .pop-toggles input[type="checkbox"],
+    .pop-toggles input[type="radio"],
+    .pop-controls input[type="checkbox"],
+    .pop-controls input[type="radio"]{
+      accent-color: var(--kctcs-blue);
+    }
   </style>
 </head>
 <body>
@@ -128,11 +161,10 @@
       <header>
         <h1>Sampling Methods: SRS vs Stratified vs Cluster</h1>
         <p>
-          The population size is<strong>10,000</strong>, divided equally amoung the four groups.
+          The population size is <strong>10,000</strong>, divided equally among the four groups.
         </p>
       </header>
 
-      <!-- Single-column layout (no left control panel) -->
       <section class="section wrap" style="grid-template-columns: 1fr;">
         <div class="panel pad">
           <div class="stack">
@@ -189,6 +221,11 @@
                       <input id="cCols" type="number" min="2" max="50" value="10" />
                       <div class="mini">cluster cols</div>
                     </div>
+                  </div>
+
+                  <div class="checkline" style="margin-top:8px;">
+                    <input type="checkbox" id="nonUniformClusters">
+                    <label for="nonUniformClusters" style="margin:0;">Non-uniform cluster sizes (random grid partitions)</label>
                   </div>
 
                   <label style="margin-top:6px;" for="KInput"># clusters to sample (K)</label>
@@ -312,6 +349,65 @@
     let units = [];            // [{id,r,c,y,stratum,clusterId}]
     let sampleSet = new Set(); // selected ids
 
+    // cluster partitions (sizes per row/col of clusters)
+    let clusterRowSizes = [];  // length clusterRows, sum to R
+    let clusterColSizes = [];  // length clusterCols, sum to C
+
+    function randPartition(total, parts){
+      // random positive integers summing to total
+      const cuts = [];
+      for(let i=0;i<parts-1;i++) cuts.push(Math.random());
+      cuts.sort((a,b)=>a-b);
+      const pts = [0, ...cuts, 1];
+      const raw = [];
+      for(let i=0;i<parts;i++){
+        raw.push(pts[i+1]-pts[i]);
+      }
+      // convert to integers, ensure >=1
+      let sizes = raw.map(x => Math.max(1, Math.floor(x * total)));
+      let cur = sizes.reduce((s,v)=>s+v,0);
+
+      // fix sum
+      while(cur < total){
+        const j = Math.floor(Math.random()*parts);
+        sizes[j] += 1; cur += 1;
+      }
+      while(cur > total){
+        const j = Math.floor(Math.random()*parts);
+        if(sizes[j] > 1){ sizes[j] -= 1; cur -= 1; }
+      }
+      return sizes;
+    }
+
+    function buildClusterPartitions(){
+      const nonUniform = document.getElementById('nonUniformClusters')?.checked ?? false;
+      if(nonUniform){
+        clusterRowSizes = randPartition(R, clusterRows);
+        clusterColSizes = randPartition(C, clusterCols);
+      } else {
+        // uniform sizes (assumes divisibility enforced)
+        clusterRowSizes = Array(clusterRows).fill(R/clusterRows);
+        clusterColSizes = Array(clusterCols).fill(C/clusterCols);
+      }
+    }
+
+    function indexFromSizes(i, sizes){
+      // given i in [0..total-1], return which bucket it falls into
+      let acc = 0;
+      for(let k=0;k<sizes.length;k++){
+        const next = acc + sizes[k];
+        if(i < next) return k;
+        acc = next;
+      }
+      return sizes.length - 1;
+    }
+
+    function prefixSums(sizes){
+      const out = [0];
+      for(const s of sizes) out.push(out[out.length-1] + s);
+      return out; // length = sizes.length + 1
+    }
+
     function buildPopulation(){
       units = [];
 
@@ -327,19 +423,18 @@
       const effects = Array.from({length:S}, (_,i)=> (i - (S-1)/2) * 8);
       const base = 50, noiseSD = 6;
 
-      // cluster block sizes
-      const blockH = R / clusterRows;
-      const blockW = C / clusterCols;
+      // build (possibly non-uniform) cluster partitions
+      buildClusterPartitions();
 
       for(let r=0;r<R;r++){
         const b = boundaries.find(b => r>=b.r0 && r<=b.r1);
         const sIdx = b ? b.s : 0;
 
+        const rc = indexFromSizes(r, clusterRowSizes);
+
         for(let c=0;c<C;c++){
           const id = r*C + c;
-
-          const rc = Math.min(Math.floor(r / blockH), clusterRows-1);
-          const cc = Math.min(Math.floor(c / blockW), clusterCols-1);
+          const cc = indexFromSizes(c, clusterColSizes);
           const clusterId = rc*clusterCols + cc;
 
           const y = base + effects[sIdx] + randn(0, noiseSD);
@@ -412,7 +507,7 @@
       const selCount = new Map(); // stratum -> selected
 
       for(const u of units){
-        const key = u.stratum; // ALWAYS strata (population groups)
+        const key = u.stratum;
         popCount.set(key, (popCount.get(key)||0) + 1);
         if(sampleSet.has(u.id)){
           selCount.set(key, (selCount.get(key)||0) + 1);
@@ -447,7 +542,7 @@
 
       // legend — population stays the same: strata legend always
       legendEl.innerHTML = '';
-      legendLabel.textContent = 'strata';
+      legendLabel.textContent = 'Group';
       for(let s=0;s<S;s++){
         const div = document.createElement('div');
         div.className = 'chip';
@@ -455,7 +550,7 @@
         sw.className = 'swatch';
         sw.style.background = palette[s % palette.length];
         div.appendChild(sw);
-        div.appendChild(document.createTextNode('Stratum ' + (s+1)));
+        div.appendChild(document.createTextNode('Group ' + (s+1)));
         legendEl.appendChild(div);
       }
 
@@ -486,16 +581,17 @@
           const highlight = document.getElementById('highlightClusters')?.checked ?? true;
 
           if(showBorders){
-            const blockH = R / clusterRows;
-            const blockW = C / clusterCols;
             const chosen = chosenClustersFromSample();
+
+            const rCuts = prefixSums(clusterRowSizes);
+            const cCuts = prefixSums(clusterColSizes);
 
             for(let rc=0; rc<clusterRows; rc++){
               for(let cc=0; cc<clusterCols; cc++){
-                const x = pad + cc*blockW*cellW;
-                const y = pad + rc*blockH*cellH;
-                const w = blockW*cellW;
-                const h = blockH*cellH;
+                const x = pad + cCuts[cc] * cellW;
+                const y = pad + rCuts[rc] * cellH;
+                const w = clusterColSizes[cc] * cellW;
+                const h = clusterRowSizes[rc] * cellH;
 
                 const cid = rc*clusterCols + cc;
                 const isChosen = chosen.has(cid);
@@ -587,13 +683,20 @@
     }
 
     function clampLayouts(){
-      // ensure strata roughly equal-height; clusters tile exactly
+      // strata: any S is okay
       S = Math.max(2, Math.min(20, +document.getElementById('SInput').value||4));
+
+      // clusters:
       clusterRows = Math.max(2, Math.min(50, +document.getElementById('cRows').value||10));
       clusterCols = Math.max(2, Math.min(50, +document.getElementById('cCols').value||10));
 
-      if(R % clusterRows !== 0) clusterRows = nearestDivisor(R, clusterRows);
-      if(C % clusterCols !== 0) clusterCols = nearestDivisor(C, clusterCols);
+      const nonUniform = document.getElementById('nonUniformClusters')?.checked ?? false;
+
+      // If UNIFORM clusters, enforce divisibility so borders align to cells cleanly.
+      if(!nonUniform){
+        if(R % clusterRows !== 0) clusterRows = nearestDivisor(R, clusterRows);
+        if(C % clusterCols !== 0) clusterCols = nearestDivisor(C, clusterCols);
+      }
 
       document.getElementById('cRows').value = clusterRows;
       document.getElementById('cCols').value = clusterCols;
@@ -612,8 +715,11 @@
     document.getElementById('SInput').addEventListener('input', rebuildPopulationAndResample);
     document.getElementById('allocProp').addEventListener('change', resample);
     document.getElementById('allocEqual').addEventListener('change', resample);
+
     document.getElementById('cRows').addEventListener('input', rebuildPopulationAndResample);
     document.getElementById('cCols').addEventListener('input', rebuildPopulationAndResample);
+    document.getElementById('nonUniformClusters').addEventListener('change', rebuildPopulationAndResample);
+
     document.getElementById('KInput').addEventListener('input', resample);
 
     document.getElementById('showGrid').addEventListener('change', draw);
@@ -630,6 +736,7 @@
 
       document.getElementById('cRows').value = 10;
       document.getElementById('cCols').value = 10;
+      document.getElementById('nonUniformClusters').checked = false;
       document.getElementById('KInput').value = 10;
 
       document.getElementById('showGrid').checked = true;
