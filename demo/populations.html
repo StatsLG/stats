@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Demographics Mystery Sampler — StatsLG</title>
-  <meta name="description" content="Students sample from 4 hidden demographic distributions and guess which is which."/>
+  <title>Cats vs Dogs — Mystery Population Sampler (StatsLG)</title>
+  <meta name="description" content="Students sample from 4 hidden populations (cats vs dogs preferences) and guess which profile is which."/>
   <link rel="icon" href="/favicon.ico"/>
   <link rel="stylesheet" href="/style/bctcstyle.css">
 
@@ -64,7 +64,7 @@
 
     .plot{
       width:100%;
-      height: 230px;
+      height: 220px;
       border-radius: 12px;
       border: 1px solid var(--rule,#e5e7eb);
       overflow:hidden;
@@ -119,10 +119,10 @@
     <!-- ===== MAIN ===== -->
     <main>
       <header>
-        <h1>Demographics Mystery Sampler</h1>
+        <h1>Cats vs Dogs — Mystery Population Sampler</h1>
         <p class="subtitle">
-          Each card is a different <strong>hidden demographic distribution</strong>.
-          Take samples, inspect the category counts, and guess which profile each card matches.
+          Each card is a hidden population with a different <strong>Cats vs Dogs preference</strong>.
+          Take samples, inspect the counts, and guess which profile each population matches.
         </p>
       </header>
 
@@ -134,14 +134,14 @@
               <label for="n" style="display:block;font-weight:700;margin-bottom:6px;">Sample size (per draw)</label>
               <input id="n" type="number" min="1" max="500" value="25" />
               <div class="muted" style="margin-top:6px;">
-                Tip: Try n=10, then n=30, then n=100. Bigger samples stabilize proportions.
+                Teaching tip: start with n=10–25, then jump to n=100 to see how 51/49 is hard to distinguish from 50/50.
               </div>
             </div>
 
             <div>
               <label for="seed" style="display:block;font-weight:700;margin-bottom:6px;">Random seed (optional)</label>
               <input id="seed" type="number" placeholder="Leave blank for random" />
-              <div class="muted" style="margin-top:6px;">Use a seed to replay the same shuffle for a section.</div>
+              <div class="muted" style="margin-top:6px;">Use a seed to replay the same shuffle for a class section.</div>
             </div>
 
             <div style="align-self:end;">
@@ -156,16 +156,11 @@
           </div>
 
           <div class="divider"></div>
-
-          <div class="muted">
-            <strong>What they’re seeing:</strong> samples from a categorical distribution (multinomial sampling).
-            Each card accumulates samples as you click “Take sample”.
-          </div>
+          <div id="dimensionTitle" class="muted"></div>
         </section>
 
         <!-- Cards -->
         <section class="panel" aria-label="Populations">
-          <div id="dimensionTitle" class="muted" style="margin-bottom:10px;"></div>
           <div class="cards" id="cards"></div>
         </section>
       </div>
@@ -180,44 +175,35 @@
     });
 
     // ============================================================
-    // EDIT HERE: Choose your demographic dimension + categories,
-    // and define 4 profiles with different category proportions.
-    //
-    // Proportions can be any positive numbers; they will be normalized.
+    // DEMO SETUP: Cats vs Dogs (4 hidden profiles)
     // ============================================================
-
     const DEMO = {
-      dimensionLabel: "Primary Work Status",
-      categories: [
-        "Not working",
-        "Part-time (1–20 hrs)",
-        "Part-time (21–30 hrs)",
-        "Full-time (31+ hrs)"
-      ],
+      dimensionLabel: "Preference: Cats vs Dogs",
+      categories: ["Cats", "Dogs"],
       profiles: [
         {
-          key: "mostly-not-working",
-          label: "Profile 1: Mostly not working",
-          hint: "Large share in 'Not working'.",
-          weights: [55, 25, 12, 8]
+          key: "fifty-fifty",
+          label: "Profile 1: 50% Cats / 50% Dogs",
+          hint: "Perfectly balanced.",
+          weights: [50, 50]
         },
         {
-          key: "mostly-full-time",
-          label: "Profile 2: Mostly full-time work",
-          hint: "Large share in 'Full-time (31+ hrs)'.",
-          weights: [10, 18, 22, 50]
+          key: "eighty-twenty-cats",
+          label: "Profile 2: 80% Cats / 20% Dogs",
+          hint: "Strong Cats preference.",
+          weights: [80, 20]
         },
         {
-          key: "mostly-part-time",
-          label: "Profile 3: Mostly part-time work",
-          hint: "Most students in part-time categories.",
-          weights: [15, 45, 30, 10]
+          key: "fiftyone-fortynine",
+          label: "Profile 3: 51% Cats / 49% Dogs",
+          hint: "Barely different from 50/50 (hard to detect in small samples).",
+          weights: [51, 49]
         },
         {
-          key: "balanced",
-          label: "Profile 4: Balanced mix",
-          hint: "No category dominates.",
-          weights: [25, 25, 25, 25]
+          key: "twenty-eighty-cats",
+          label: "Profile 4: 20% Cats / 80% Dogs",
+          hint: "Strong Dogs preference.",
+          weights: [20, 80]
         }
       ]
     };
@@ -237,7 +223,7 @@
     const btnReveal = document.getElementById('reveal');
     const btnResetSamples = document.getElementById('resetSamples');
 
-    dimensionTitle.innerHTML = `<strong>Demographic variable:</strong> ${escapeHtml(DEMO.dimensionLabel)} (categories shown as counts).`;
+    dimensionTitle.innerHTML = `<strong>Variable:</strong> ${escapeHtml(DEMO.dimensionLabel)} (counts shown; percent updates as N grows).`;
 
     let rng = Math.random;
     let round = null; // { mapping, countsByCard, nByCard, guessByCard, revealed }
@@ -288,7 +274,7 @@
         cum += probs[i];
         if(u <= cum) return i;
       }
-      return probs.length - 1; // fallback for floating error
+      return probs.length - 1;
     }
 
     // ============================================================
@@ -442,7 +428,7 @@
 
       document.getElementById(`nBadge-${letter}`).textContent = `N = ${N}`;
 
-      // Plotly bar chart of counts
+      // Plotly bar chart (Cats vs Dogs)
       const div = document.getElementById(`plot-${letter}`);
       const trace = {
         type: 'bar',
@@ -453,8 +439,8 @@
       };
 
       const layout = {
-        margin: {t: 10, r: 10, b: 70, l: 45},
-        xaxis: {tickangle: -20},
+        margin: {t: 10, r: 10, b: 35, l: 45},
+        xaxis: {tickangle: 0},
         yaxis: {title: "count", rangemode: "tozero"},
         showlegend: false
       };
