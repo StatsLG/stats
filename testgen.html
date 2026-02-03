@@ -455,8 +455,9 @@ function loadFromLocal(){
    Symbol palette
 ========================= */
 const SYMBOLS = [
-  {label:"x̄", insert:"x̄"},        // x + macron (may be combining depending on font)
-  {label:"ȳ", insert:"ȳ"},          // y with macron
+  // Core stats symbols
+  {label:"x̄", insert:"x̄"},
+  {label:"ȳ", insert:"ȳ"},
   {label:"Σ", insert:"Σ"},
   {label:"∑", insert:"∑"},
   {label:"σ", insert:"σ"},
@@ -468,15 +469,6 @@ const SYMBOLS = [
   {label:"≠", insert:"≠"},
   {label:"±", insert:"±"},
   {label:"∞", insert:"∞"},
-  {label:"∈", insert:"∈"},
-  {label:"∪", insert:"∪"},
-  {label:"∩", insert:"∩"},
-  {label:"P( )", insert:"P()"},
-  {label:"E[ ]", insert:"E[]"},
-  {label:"Var( )", insert:"Var()"},
-  {label:"SD", insert:"SD"},
-  {label:"r", insert:"r"},
-  {label:"r²", insert:"r²"},
   {label:"ρ", insert:"ρ"},
   {label:"β₀", insert:"β₀"},
   {label:"β₁", insert:"β₁"},
@@ -484,9 +476,36 @@ const SYMBOLS = [
   {label:"H₀", insert:"H₀"},
   {label:"Hₐ", insert:"Hₐ"},
   {label:"α", insert:"α"},
-  {label:"z", insert:"z"},
-  {label:"t", insert:"t"},
-  {label:"χ²", insert:"χ²"}
+  {label:"χ²", insert:"χ²"},
+  {label:"r", insert:"r"},
+  {label:"r²", insert:"r²"},
+
+  // Handy templates (non-stacked fractions)
+  {label:"Fraction", insert:"( )/( )"},
+  {label:"( )", insert:"()"},
+  {label:"[ ]", insert:"[]"},
+  {label:"Subscript _", insert:"₀"},
+  {label:"Superscript ²", insert:"²"},
+
+  // ====== FORMULAS (examples) ======
+  {label:"x̄ = (∑x)/n", insert:"x̄ = (∑x)/n"},
+  {label:"ȳ = (∑y)/n", insert:"ȳ = (∑y)/n"},
+
+  // SSx, SSy, Sxy (two common equivalent forms)
+  {label:"SSx = ∑(x − x̄)²", insert:"SSx = ∑(x − x̄)²"},
+  {label:"SSx = ∑x² − (∑x)²/n", insert:"SSx = ∑x² − (∑x)²/n"},
+
+  {label:"SSy = ∑(y − ȳ)²", insert:"SSy = ∑(y − ȳ)²"},
+  {label:"SSy = ∑y² − (∑y)²/n", insert:"SSy = ∑y² − (∑y)²/n"},
+
+  {label:"Sxy = ∑(x − x̄)(y − ȳ)", insert:"Sxy = ∑(x − x̄)(y − ȳ)"},
+  {label:"Sxy = ∑xy − (∑x)(∑y)/n", insert:"Sxy = ∑xy − (∑x)(∑y)/n"},
+
+  // Regression helpers (optional but super useful)
+  {label:"b₁ = Sxy/SSx", insert:"b₁ = Sxy/SSx"},
+  {label:"b₀ = ȳ − b₁x̄", insert:"b₀ = ȳ − b₁x̄"},
+  {label:"ŷ = b₀ + b₁x", insert:"ŷ = b₀ + b₁x"},
+  {label:"r = Sxy/√(SSx·SSy)", insert:"r = Sxy/√(SSx·SSy)"}
 ];
 
 let lastFocusedEditable = null;
