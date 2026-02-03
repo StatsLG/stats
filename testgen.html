@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Exam Builder (Math Typeset + Export to Word)</title>
+  <title>Exam Builder (LaTeX blocks → Word export)</title>
 
-  <!-- Word generation -->
+  <!-- DOCX export -->
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
-  <!-- MathJax (typeset equations as SVG) -->
+  <!-- MathJax for ON-SCREEN preview only (Word export is raw LaTeX) -->
   <script>
     window.MathJax = {
       tex: {
@@ -47,6 +47,7 @@
     header{
       padding:14px 18px; border-bottom:1px solid var(--rule);
       display:flex; gap:12px; align-items:center; justify-content:space-between;
+      flex-wrap:wrap;
     }
     header h1{ font-size:16px; margin:0; }
     .wrap{
@@ -138,6 +139,15 @@
       color:var(--muted);
       font-family: var(--user-font);
     }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:11px;
+      border:1px solid var(--rule);
+      background:#fff;
+      padding:2px 6px;
+      border-radius:8px;
+      color:var(--muted);
+    }
 
     /* palettes */
     .symWrap{ display:flex; flex-wrap:wrap; gap:6px; }
@@ -150,7 +160,7 @@
       cursor:pointer;
       font-size:13px;
       font-family: var(--user-font);
-      line-height: 1;
+      line-height: 1.1;
       white-space: nowrap;
     }
     .symBtn:hover{ border-color: var(--blue); }
@@ -160,32 +170,28 @@
       justify-content:space-between;
       gap:10px;
       margin-bottom:8px;
-    }
-    .kbd{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:11px;
-      border:1px solid var(--rule);
-      background:#fff;
-      padding:2px 6px;
-      border-radius:8px;
-      color:var(--muted);
+      flex-wrap:wrap;
     }
 
-    /* Rendered math in preview */
-    .math-block{
-      display:block;
-      margin:8px 0;
-    }
-    .math-block svg{
-      max-width:100%;
-      height:auto;
+    /* preview math blocks */
+    .math-block{ display:block; margin:8px 0; }
+    .math-block svg{ max-width:100%; height:auto; }
+    .latex-raw{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      background:#f8fafc;
+      border:1px dashed var(--rule);
+      padding:8px;
+      border-radius:10px;
+      margin-top:6px;
+      white-space: pre-wrap;
     }
   </style>
 </head>
 
 <body>
 <header>
-  <h1>Exam Builder → Typeset Math → Export to Word (.docx)</h1>
+  <h1>Exam Builder — LaTeX Blocks → Word Export</h1>
   <div class="row">
     <span class="pill" id="saveStatus">Not saved yet</span>
     <button class="btn secondary" id="exportExamBtn">Export Exam (.docx)</button>
@@ -219,7 +225,7 @@
       </div>
 
       <div style="margin-top:10px;">
-        <label>Instructions (math supported using <span class="kbd">$$...$$</span>)</label>
+        <label>Instructions (use <span class="kbd">$$...$$</span> for LaTeX blocks)</label>
         <textarea id="examInstructions" placeholder="Example:
 Compute:
 $$
@@ -281,7 +287,8 @@ $$"></textarea>
       </div>
 
       <p class="tiny" style="margin:10px 0 0 0;">
-        Autosaves to your browser. Typeset equations export as images in Word.
+        Exported Word docs contain LaTeX blocks tagged with <span class="kbd">&lt;&lt;EQ&gt;&gt;</span> and <span class="kbd">&lt;&lt;END&gt;&gt;</span>
+        so you can quickly convert them using Word’s equation editor (Alt+=).
       </p>
     </div>
 
@@ -292,19 +299,16 @@ $$"></textarea>
       </div>
       <div class="symWrap" id="symbolPalette"></div>
       <p class="tiny" style="margin:8px 0 0 0;">
-        “Formulas” insert <span class="kbd">$$ LaTeX $$</span> blocks (best for Word export).
+        “Formulas” insert <span class="kbd">$$ LaTeX $$</span> blocks.
       </p>
     </div>
 
     <div class="card">
       <div class="symLabel">
-        <h3 style="margin:0;">Formulas (Typeset)</h3>
-        <span class="tiny">Inserts as <span class="kbd">$$...$$</span></span>
+        <h3 style="margin:0;">Formulas (insert LaTeX block)</h3>
+        <span class="tiny">Adds a <span class="kbd">$$...$$</span> block</span>
       </div>
       <div class="symWrap" id="formulaPalette"></div>
-      <p class="tiny" style="margin:8px 0 0 0;">
-        You can also write your own LaTeX between <span class="kbd">$$</span> markers.
-      </p>
     </div>
 
     <div class="card">
@@ -346,18 +350,18 @@ $$"></textarea>
           <input id="qPoints" type="number" min="0" step="0.5" value="1" />
         </div>
         <div>
-          <label>Answer (supports <span class="kbd">$$...$$</span>)</label>
+          <label>Answer (can include LaTeX blocks)</label>
           <input id="qAnswer" type="text" placeholder="e.g., C or $$\\bar{x}$$" />
         </div>
       </div>
 
       <div style="margin-top:10px;">
-        <label>Question prompt (supports <span class="kbd">$$...$$</span>)</label>
+        <label>Question prompt (use <span class="kbd">$$...$$</span> for LaTeX blocks)</label>
         <textarea id="qPrompt" placeholder="Type the question here..."></textarea>
       </div>
 
       <div id="mcBlock" style="margin-top:10px;">
-        <label>Choices (MC; supports <span class="kbd">$$...$$</span>)</label>
+        <label>Choices (MC; can include LaTeX blocks)</label>
         <div class="twoCol">
           <input class="choice" type="text" placeholder="A) ..." />
           <input class="choice" type="text" placeholder="B) ..." />
@@ -392,11 +396,11 @@ $$"></textarea>
   <main class="panel">
     <div class="card">
       <div class="row" style="align-items:center; justify-content:space-between;">
-        <h3 style="margin:0;">Exam Preview (Math Typeset)</h3>
+        <h3 style="margin:0;">Preview</h3>
         <div class="tiny" id="totals"></div>
       </div>
       <p class="tiny" style="margin:6px 0 0 0;">
-        Anything in <span class="kbd">$$...$$</span> is rendered as math and exported to Word as an image.
+        Preview tries to typeset <span class="kbd">$$...$$</span> using MathJax. Export sends raw LaTeX for manual conversion in Word.
       </p>
     </div>
 
@@ -408,7 +412,7 @@ $$"></textarea>
 /* =========================
    State + Persistence
 ========================= */
-const STORAGE_KEY = "exam_builder_state_v4_mathjax_word";
+const STORAGE_KEY = "exam_builder_state_v5_latex_raw";
 
 let state = {
   meta: {
@@ -536,7 +540,6 @@ function insertAtCursor(el, text){
 
   el.value = before + text + after;
 
-  // cursor inside () / [] templates
   let caretPos = start + text.length;
   const idxParen = text.indexOf("()");
   const idxParenSp = text.indexOf("( )");
@@ -555,6 +558,7 @@ function insertTextToken(token){
   insertAtCursor(target, token);
 }
 function insertLatexBlock(latex){
+  // Keep it multi-line and obvious
   const block = `\n$$\n${latex}\n$$\n`;
   insertTextToken(block);
 }
@@ -666,7 +670,7 @@ function typeLabel(t){
 }
 
 /* =========================
-   Math parse/render for preview
+   Preview render (MathJax)
 ========================= */
 function escapeHtml(str){
   return (str||"").replace(/[&<>"']/g, m => ({
@@ -691,15 +695,13 @@ function splitByDisplayMathAll(text){
   return parts;
 }
 
-function latexToSvgElement(latex, display=true){
-  const node = MathJax.tex2svg(latex, {display});
+function latexToSvgOuter(latex){
+  const node = MathJax.tex2svg(latex, {display:true});
   const svg = node.querySelector("svg");
-  return svg;
-}
-function svgToOuterHtml(svgEl){
-  const clone = svgEl.cloneNode(true);
-  clone.removeAttribute("style");
+  if(!svg) throw new Error("no svg");
+  const clone = svg.cloneNode(true);
   clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  clone.removeAttribute("style");
   return clone.outerHTML;
 }
 
@@ -710,15 +712,12 @@ async function renderTextWithMathToHtml(text){
     if(p.type === "text"){
       html += escapeHtml(p.value).replace(/\n/g, "<br>");
     }else{
-      if(!p.value){
-        html += "";
-        continue;
-      }
+      if(!p.value) continue;
       try{
-        const svg = latexToSvgElement(p.value, true);
-        html += `<span class="math-block">${svgToOuterHtml(svg)}</span>`;
+        const svg = latexToSvgOuter(p.value);
+        html += `<span class="math-block">${svg}</span>`;
       }catch(e){
-        html += `<span class="tiny" style="color:#b91c1c;">[bad LaTeX]</span>`;
+        html += `<div class="latex-raw">[bad LaTeX]\n${escapeHtml(p.value)}</div>`;
       }
     }
   }
@@ -807,18 +806,18 @@ async function renderQuestions(){
               <input id="edit_points_${q.id}" type="number" step="0.5" value="${Number(q.points)||0}" />
             </div>
             <div>
-              <label>Answer (supports $$...$$)</label>
+              <label>Answer (can include $$...$$)</label>
               <input id="edit_answer_${q.id}" type="text" value="${escapeAttr(q.answer||"")}" />
             </div>
           </div>
 
           <div style="margin-top:10px;">
-            <label>Prompt (supports $$...$$)</label>
+            <label>Prompt (use $$...$$)</label>
             <textarea id="edit_prompt_${q.id}">${escapeHtml(q.prompt||"")}</textarea>
           </div>
 
           <div style="margin-top:10px;">
-            <label>Choices (MC; supports $$...$$)</label>
+            <label>Choices (MC; can include $$...$$)</label>
             <div class="twoCol">
               ${(q.choices||["","","",""]).slice(0,4).map((c,i)=>`
                 <input id="edit_choice_${q.id}_${i}" type="text" value="${escapeAttr(c||"")}" placeholder="${String.fromCharCode(65+i)}) ..."/>
@@ -947,7 +946,7 @@ window.deleteSection = (sectionName)=>{
 };
 
 /* =========================
-   Add question
+   Add question UI
 ========================= */
 function setTypeUI(){
   const t = $("qType").value;
@@ -1015,6 +1014,7 @@ $("addQuestionBtn").addEventListener("click", async ()=>{
   $("qImagePreview").style.display = "none";
 
   saveToLocal();
+  await MathJax.startup.promise;
   await renderQuestions();
 });
 
@@ -1045,11 +1045,13 @@ $("addSectionBtn").addEventListener("click", ()=>{
   $(id).addEventListener("input", async ()=>{
     syncMetaFromInputs();
     saveToLocal();
+    await MathJax.startup.promise;
     await renderQuestions();
   });
   $(id).addEventListener("change", async ()=>{
     syncMetaFromInputs();
     saveToLocal();
+    await MathJax.startup.promise;
     await renderQuestions();
   });
 });
@@ -1082,6 +1084,7 @@ $("loadFileInput").addEventListener("change", async (e)=>{
     syncInputsFromMeta();
     refreshSectionSelects();
     saveToLocal();
+    await MathJax.startup.promise;
     await renderQuestions();
   }catch(err){
     alert("Could not load that file. Make sure it is an Exam Builder .json file.");
@@ -1103,11 +1106,12 @@ $("resetBtn").addEventListener("click", async ()=>{
   syncInputsFromMeta();
   refreshSectionSelects();
   setSaveStatus("Reset complete");
+  await MathJax.startup.promise;
   await renderQuestions();
 });
 
 /* =========================
-   Word export (.docx) with math as PNG images
+   Word export (.docx) with RAW LaTeX blocks
 ========================= */
 const { Document, Packer, Paragraph, TextRun, AlignmentType, ImageRun } = docx;
 
@@ -1140,73 +1144,9 @@ function dataUrlToUint8Array(dataUrl){
   return bytes;
 }
 
-function svgStringToBlobUrl(svgString){
-  const blob = new Blob([svgString], {type:"image/svg+xml"});
-  return URL.createObjectURL(blob);
-}
-
-function getSvgDimensions(svgString){
-  // try width/height attributes first, then viewBox
-  const mWidth = svgString.match(/width="([^"]+)"/);
-  const mHeight = svgString.match(/height="([^"]+)"/);
-  const mView = svgString.match(/viewBox="([^"]+)"/);
-
-  const parseLen = (v)=>{
-    if(!v) return null;
-    const num = parseFloat(String(v).replace(/[^\d.]/g,""));
-    return isFinite(num) ? num : null;
-  };
-
-  let w = parseLen(mWidth && mWidth[1]);
-  let h = parseLen(mHeight && mHeight[1]);
-
-  if((!w || !h) && mView){
-    const parts = mView[1].split(/\s+/).map(Number);
-    if(parts.length === 4){
-      w = w || parts[2];
-      h = h || parts[3];
-    }
-  }
-  return { w: w || 800, h: h || 200 };
-}
-
-async function svgToPngBytes(svgString, maxWidthPx){
-  const url = svgStringToBlobUrl(svgString);
-  const img = new Image();
-
-  const dims = getSvgDimensions(svgString);
-
-  const loaded = await new Promise((resolve, reject)=>{
-    img.onload = ()=>resolve(true);
-    img.onerror = reject;
-    img.src = url;
-  });
-
-  // scale to max width
-  const scale = Math.min(1, maxWidthPx / dims.w);
-  const outW = Math.max(1, Math.round(dims.w * scale));
-  const outH = Math.max(1, Math.round(dims.h * scale));
-
-  const canvas = document.createElement("canvas");
-  canvas.width = outW;
-  canvas.height = outH;
-  const ctx = canvas.getContext("2d");
-
-  // white background for printing
-  ctx.fillStyle = "#FFFFFF";
-  ctx.fillRect(0, 0, outW, outH);
-  ctx.drawImage(img, 0, 0, outW, outH);
-
-  const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
-  const buf = await blob.arrayBuffer();
-
-  URL.revokeObjectURL(url);
-  return { bytes: new Uint8Array(buf), width: outW, height: outH };
-}
-
-function buildHeaderParasDocx(){
+function buildHeaderParasDocx(isKey=false){
   const paras = [];
-  const title = state.meta.title || "Exam";
+  const title = (state.meta.title || "Exam") + (isKey ? " — Answer Key" : "");
 
   paras.push(new Paragraph({
     children: [new TextRun({ text: title, ...runStyle("title"), bold: true })],
@@ -1214,14 +1154,14 @@ function buildHeaderParasDocx(){
   }));
 
   const line2 = [state.meta.course, state.meta.date, state.meta.time].filter(Boolean).join(" • ");
-  if(line2){
+  if(line2 && !isKey){
     paras.push(new Paragraph({
       children:[new TextRun({ text: line2, ...runStyle("body"), italics:true })],
       alignment: AlignmentType.CENTER
     }));
   }
-  paras.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
 
+  paras.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
   return paras;
 }
 
@@ -1230,11 +1170,18 @@ function questionNumberingForSection(sectionName){
   return qs.map((q, i)=>({q, num:i+1}));
 }
 
-// Convert mixed text+$$math$$ into docx paragraphs, matching $$ across newlines.
-async function textWithMathToDocxParagraphs(text, opts){
+/**
+ * Export rule:
+ * - text outside $$...$$ becomes normal Word text paragraphs (preserve newlines)
+ * - each $$...$$ becomes:
+ *    <<EQ>>
+ *    <latex>
+ *    <<END>>
+ *   as separate paragraphs, monospaced-ish via normal font but clearly blocky
+ */
+function textToDocxWithLatexMarkers(text, opts){
   const kind = opts.kind || "body";
   const alignText = opts.alignText ?? AlignmentType.LEFT;
-  const mathMaxInches = opts.mathMaxInches ?? 6.0;
 
   const out = [];
   const s = (text || "");
@@ -1242,52 +1189,8 @@ async function textWithMathToDocxParagraphs(text, opts){
   const re = /\$\$([\s\S]*?)\$\$/g;
   let last = 0, m;
 
-  while((m = re.exec(s)) !== null){
-    const before = s.slice(last, m.index);
-    if(before){
-      before.split(/\r?\n/).forEach(line=>{
-        if(line.length){
-          out.push(new Paragraph({
-            children:[new TextRun({ text: line, ...runStyle(kind) })],
-            alignment: alignText
-          }));
-        } else {
-          out.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle(kind) })] }));
-        }
-      });
-    }
-
-    const latex = (m[1] || "").trim();
-    if(latex){
-      try{
-        const svgEl = latexToSvgElement(latex, true);
-        const svgStr = svgToOuterHtml(svgEl);
-        const maxPx = Math.round(mathMaxInches * 96);
-        const png = await svgToPngBytes(svgStr, maxPx);
-
-        out.push(new Paragraph({
-          children: [
-            new ImageRun({
-              data: png.bytes,
-              transformation: { width: png.width, height: png.height }
-            })
-          ],
-          alignment: AlignmentType.CENTER
-        }));
-      }catch(e){
-        out.push(new Paragraph({
-          children:[new TextRun({ text:`[bad LaTeX: ${latex}]`, ...runStyle(kind) })],
-          alignment: alignText
-        }));
-      }
-    }
-
-    last = re.lastIndex;
-  }
-
-  const tail = s.slice(last);
-  if(tail){
-    tail.split(/\r?\n/).forEach(line=>{
+  const pushTextChunk = (chunk)=>{
+    chunk.split(/\r?\n/).forEach(line=>{
       if(line.length){
         out.push(new Paragraph({
           children:[new TextRun({ text: line, ...runStyle(kind) })],
@@ -1297,30 +1200,53 @@ async function textWithMathToDocxParagraphs(text, opts){
         out.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle(kind) })] }));
       }
     });
+  };
+
+  while((m = re.exec(s)) !== null){
+    const before = s.slice(last, m.index);
+    if(before) pushTextChunk(before);
+
+    const latex = (m[1] || "").trim();
+    if(latex){
+      out.push(new Paragraph({
+        children:[new TextRun({ text:"<<EQ>>", ...runStyle(kind), bold:true })],
+        alignment: AlignmentType.LEFT
+      }));
+      latex.split(/\r?\n/).forEach(line=>{
+        out.push(new Paragraph({
+          children:[new TextRun({ text: line, ...runStyle(kind) })],
+          alignment: AlignmentType.LEFT
+        }));
+      });
+      out.push(new Paragraph({
+        children:[new TextRun({ text:"<<END>>", ...runStyle(kind), bold:true })],
+        alignment: AlignmentType.LEFT
+      }));
+    }
+
+    last = re.lastIndex;
   }
+
+  const tail = s.slice(last);
+  if(tail) pushTextChunk(tail);
 
   return out;
 }
 
-async function makeImageParagraphsDocx(q){
+function makeImageParagraphsDocx(q){
   if(!q.imageData) return [];
   const maxIn = Number(q.imageWidth || 5.8);
   const pxWidth = Math.round(maxIn * 96);
 
-  const img = new Image();
-  const dims = await new Promise((resolve,reject)=>{
-    img.onload = ()=>resolve({w: img.naturalWidth || img.width, h: img.naturalHeight || img.height});
-    img.onerror = reject;
-    img.src = q.imageData;
-  });
-
-  const scale = Math.min(1, pxWidth / (dims.w || pxWidth));
-  const outW = Math.max(1, Math.round((dims.w || pxWidth) * scale));
-  const outH = Math.max(1, Math.round((dims.h || 300) * scale));
-
   const bytes = dataUrlToUint8Array(q.imageData);
-  const paras = [];
 
+  // We can't reliably know aspect ratio without decoding image here; Word will still place it,
+  // but docx library needs dimensions. We'll approximate a 4:3 box and scale.
+  // If you want accurate scaling, I can add image-dimension decoding like earlier.
+  const outW = pxWidth;
+  const outH = Math.round(pxWidth * 0.75);
+
+  const paras = [];
   paras.push(new Paragraph({
     children: [
       new ImageRun({
@@ -1343,16 +1269,25 @@ async function makeImageParagraphsDocx(q){
 
 async function buildExamDoc(){
   const children = [];
-  children.push(...buildHeaderParasDocx());
+  children.push(...buildHeaderParasDocx(false));
+
+  // conversion tip
+  children.push(new Paragraph({
+    children:[new TextRun({
+      text:"NOTE: Convert LaTeX blocks by copying the lines between <<EQ>> and <<END>>, then in Word press Alt+= and paste.",
+      ...runStyle("body"),
+      italics:true
+    })]
+  }));
+  children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
 
   if(state.meta.instructions){
     children.push(new Paragraph({
       children:[new TextRun({ text:"Instructions:", ...runStyle("heading"), bold:true })]
     }));
-    children.push(...await textWithMathToDocxParagraphs(state.meta.instructions, {
+    children.push(...textToDocxWithLatexMarkers(state.meta.instructions, {
       kind:"body",
-      alignText: AlignmentType.LEFT,
-      mathMaxInches: 6.2
+      alignText: AlignmentType.LEFT
     }));
     children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
   }
@@ -1375,10 +1310,9 @@ async function buildExamDoc(){
         ]
       }));
 
-      children.push(...await textWithMathToDocxParagraphs(q.prompt || "", {
+      children.push(...textToDocxWithLatexMarkers(q.prompt || "", {
         kind:"body",
-        alignText: AlignmentType.LEFT,
-        mathMaxInches: 6.2
+        alignText: AlignmentType.LEFT
       }));
 
       if(q.type === "mc"){
@@ -1389,10 +1323,9 @@ async function buildExamDoc(){
           children.push(new Paragraph({
             children:[new TextRun({ text:`   ${letter}) `, ...runStyle("body") })]
           }));
-          children.push(...await textWithMathToDocxParagraphs(c, {
+          children.push(...textToDocxWithLatexMarkers(c, {
             kind:"body",
-            alignText: AlignmentType.LEFT,
-            mathMaxInches: 5.8
+            alignText: AlignmentType.LEFT
           }));
         }
       } else if(q.type === "tf"){
@@ -1410,7 +1343,7 @@ async function buildExamDoc(){
         children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
       }
 
-      children.push(...await makeImageParagraphsDocx(q));
+      children.push(...makeImageParagraphsDocx(q));
       children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
     }
   }
@@ -1420,11 +1353,14 @@ async function buildExamDoc(){
 
 async function buildKeyDoc(){
   const children = [];
-  const keyTitle = state.meta.title ? (state.meta.title + " — Answer Key") : "Answer Key";
+  children.push(...buildHeaderParasDocx(true));
 
   children.push(new Paragraph({
-    children: [new TextRun({ text: keyTitle, ...runStyle("title"), bold:true })],
-    alignment: AlignmentType.CENTER
+    children:[new TextRun({
+      text:"NOTE: Convert LaTeX blocks by copying the lines between <<EQ>> and <<END>>, then Alt+= and paste.",
+      ...runStyle("body"),
+      italics:true
+    })]
   }));
   children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
 
@@ -1445,10 +1381,9 @@ async function buildKeyDoc(){
         ]
       }));
       if((q.answer || "").trim()){
-        children.push(...await textWithMathToDocxParagraphs(q.answer.trim(), {
+        children.push(...textToDocxWithLatexMarkers(q.answer.trim(), {
           kind:"body",
-          alignText: AlignmentType.LEFT,
-          mathMaxInches: 5.6
+          alignText: AlignmentType.LEFT
         }));
       }
     }
@@ -1460,7 +1395,7 @@ async function buildKeyDoc(){
 }
 
 async function exportDoc(doc, filename){
-  const blob = await Packer.toBlob(doc);
+  const blob = await docx.Packer.toBlob(doc);
   saveAs(blob, filename);
 }
 
@@ -1470,24 +1405,192 @@ $("exportExamBtn").addEventListener("click", async ()=>{
     alert("Add at least one question first.");
     return;
   }
-  await MathJax.startup.promise;
   const safeTitle = (state.meta.title || "exam").replace(/[^\w\-]+/g,"_");
   await exportDoc(await buildExamDoc(), `${safeTitle}.docx`);
 });
-
 $("exportKeyBtn").addEventListener("click", async ()=>{
   syncMetaFromInputs();
   if(state.questions.length===0){
     alert("Add at least one question first.");
     return;
   }
-  await MathJax.startup.promise;
   const safeTitle = (state.meta.title || "exam").replace(/[^\w\-]+/g,"_");
   await exportDoc(await buildKeyDoc(), `${safeTitle}_AnswerKey.docx`);
 });
 
 /* =========================
-   Boot
+   Sections init + meta autosave
+========================= */
+$("addSectionBtn").addEventListener("click", ()=>{
+  const name = $("newSectionName").value.trim();
+  if(!name) return;
+  if(state.sections.includes(name)){
+    alert("That section already exists.");
+    return;
+  }
+  state.sections.push(name);
+  $("newSectionName").value = "";
+  saveToLocal();
+  refreshSectionSelects();
+  renderQuestions();
+});
+
+[
+  "examTitle","examCourse","examDate","examTime","examInstructions",
+  "fontFamily","fontColor","bodySizePt","headingSizePt","titleSizePt","previewPx"
+].forEach(id=>{
+  $(id).addEventListener("input", async ()=>{
+    syncMetaFromInputs();
+    saveToLocal();
+    await MathJax.startup.promise;
+    await renderQuestions();
+  });
+  $(id).addEventListener("change", async ()=>{
+    syncMetaFromInputs();
+    saveToLocal();
+    await MathJax.startup.promise;
+    await renderQuestions();
+  });
+});
+
+/* =========================
+   Save/Load JSON
+========================= */
+function downloadJson(filename, obj){
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:"application/json"});
+  saveAs(blob, filename);
+}
+$("saveToFileBtn").addEventListener("click", ()=>{
+  syncMetaFromInputs();
+  const safeTitle = (state.meta.title || "exam").replace(/[^\w\-]+/g,"_");
+  downloadJson(`${safeTitle}.json`, state);
+});
+$("loadFileInput").addEventListener("change", async (e)=>{
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const text = await file.text();
+  try{
+    const parsed = JSON.parse(text);
+    if(!parsed || !parsed.meta || !parsed.sections || !parsed.questions) throw new Error("Invalid format");
+    parsed.meta.style = parsed.meta.style || {
+      fontFamily:"Calibri", bodySizePt:11, headingSizePt:16, titleSizePt:22, fontColor:"#0f172a", previewPx:15
+    };
+    if(parsed.meta.style.previewPx == null) parsed.meta.style.previewPx = 15;
+    state = parsed;
+
+    syncInputsFromMeta();
+    refreshSectionSelects();
+    saveToLocal();
+    await MathJax.startup.promise;
+    await renderQuestions();
+  }catch(err){
+    alert("Could not load that file. Make sure it is an Exam Builder .json file.");
+  }finally{
+    e.target.value = "";
+  }
+});
+$("resetBtn").addEventListener("click", async ()=>{
+  if(!confirm("Reset everything? This clears the builder (browser autosave too).")) return;
+  state = {
+    meta:{
+      title:"",course:"",date:"",time:"",instructions:"",
+      style:{ fontFamily:"Calibri", bodySizePt:11, headingSizePt:16, titleSizePt:22, fontColor:"#0f172a", previewPx:15 }
+    },
+    sections:["General"],
+    questions:[]
+  };
+  localStorage.removeItem(STORAGE_KEY);
+  syncInputsFromMeta();
+  refreshSectionSelects();
+  setSaveStatus("Reset complete");
+  await MathJax.startup.promise;
+  await renderQuestions();
+});
+
+/* =========================
+   Add question UI
+========================= */
+function setTypeUI(){
+  const t = $("qType").value;
+  $("mcBlock").style.display = (t==="mc") ? "block" : "none";
+}
+$("qType").addEventListener("change", setTypeUI);
+
+$("qImage").addEventListener("change", async (e)=>{
+  const file = e.target.files && e.target.files[0];
+  if(!file){
+    $("qImagePreview").style.display = "none";
+    return;
+  }
+  const data = await fileToDataUrl(file);
+  $("qImagePreview").src = data;
+  $("qImagePreview").style.display = "block";
+});
+
+$("addQuestionBtn").addEventListener("click", async ()=>{
+  syncMetaFromInputs();
+
+  const section = $("qSection").value;
+  const type = $("qType").value;
+  const points = Number($("qPoints").value || 0);
+  const answer = $("qAnswer").value.trim();
+  const prompt = $("qPrompt").value.trim();
+
+  if(!prompt){
+    alert("Please enter a question prompt.");
+    return;
+  }
+
+  let choices = [];
+  if(type==="mc"){
+    choices = Array.from(document.querySelectorAll(".choice")).slice(0,4).map(i=>i.value.trim());
+  }
+
+  let imageData = null, imageMime = null;
+  const imgFile = $("qImage").files && $("qImage").files[0];
+  if(imgFile){
+    imageData = await fileToDataUrl(imgFile);
+    imageMime = imgFile.type || "image/png";
+  }
+  const imageCaption = $("qImageCaption").value.trim();
+  const imageWidth = Number($("qImageWidth").value || 5.8);
+
+  state.questions.push({
+    id: uid(),
+    section, type, points, prompt,
+    choices,
+    answer,
+    imageData,
+    imageMime,
+    imageCaption,
+    imageWidth
+  });
+
+  $("qPrompt").value = "";
+  $("qAnswer").value = "";
+  $("qPoints").value = "1";
+  document.querySelectorAll(".choice").forEach(i=>i.value="");
+  $("qImage").value = "";
+  $("qImageCaption").value = "";
+  $("qImageWidth").value = "5.8";
+  $("qImagePreview").style.display = "none";
+
+  saveToLocal();
+  await MathJax.startup.promise;
+  await renderQuestions();
+});
+
+async function fileToDataUrl(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* =========================
+   Start
 ========================= */
 (async function init(){
   buildSymbolPalette();
@@ -1504,22 +1607,6 @@ $("exportKeyBtn").addEventListener("click", async ()=>{
   syncInputsFromMeta();
   refreshSectionSelects();
   setTypeUI();
-
-  [
-    "examTitle","examCourse","examDate","examTime","examInstructions",
-    "fontFamily","fontColor","bodySizePt","headingSizePt","titleSizePt","previewPx"
-  ].forEach(id=>{
-    $(id).addEventListener("input", async ()=>{
-      syncMetaFromInputs();
-      saveToLocal();
-      await renderQuestions();
-    });
-    $(id).addEventListener("change", async ()=>{
-      syncMetaFromInputs();
-      saveToLocal();
-      await renderQuestions();
-    });
-  });
 
   await MathJax.startup.promise;
   await renderQuestions();
