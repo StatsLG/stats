@@ -3,11 +3,23 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Exam Builder (Export to Word)</title>
+  <title>Exam Builder (Math Typeset + Export to Word)</title>
 
-  <!-- docx (Word generation) -->
+  <!-- Word generation -->
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+
+  <!-- MathJax (typeset equations as SVG) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
   <style>
     :root{
@@ -18,12 +30,10 @@
       --muted:#475569;
       --rule:#e5e7eb;
       --blue:#00467f;
-      --gold:#e7a614;
 
-      /* preview font styling (editable) */
       --user-font: Calibri, Arial, sans-serif;
       --user-color: #0f172a;
-      --user-body-size: 15px; /* approx preview, not docx */
+      --user-body-size: 15px;
     }
     *{ box-sizing:border-box; }
     body{
@@ -40,7 +50,7 @@
     header h1{ font-size:16px; margin:0; }
     .wrap{
       display:grid;
-      grid-template-columns: 420px 1fr;
+      grid-template-columns: 440px 1fr;
       gap:14px;
       padding:14px;
     }
@@ -69,7 +79,7 @@
       border-radius:10px;
       font-size:14px;
       background:#fff;
-      color: var(--ink);
+      color:var(--ink);
       font-family: var(--user-font);
     }
     textarea{ min-height:70px; resize:vertical; }
@@ -84,19 +94,9 @@
       font-size:14px;
       font-family: var(--user-font);
     }
-    .btn.secondary{
-      background:white;
-      color:var(--blue);
-    }
-    .btn.ghost{
-      background:transparent;
-      color:var(--blue);
-      border-color:var(--rule);
-    }
-    .btn.danger{
-      background:#b91c1c;
-      border-color:#b91c1c;
-    }
+    .btn.secondary{ background:white; color:var(--blue); }
+    .btn.ghost{ background:transparent; color:var(--blue); border-color:var(--rule); }
+    .btn.danger{ background:#b91c1c; border-color:#b91c1c; }
     .btn:disabled{ opacity:.6; cursor:not-allowed; }
     .tiny{ font-size:12px; color:var(--muted); }
     .list{ display:flex; flex-direction:column; gap:10px; }
@@ -106,17 +106,10 @@
       padding:12px;
       background:#fff;
     }
-    .qhead{
-      display:flex; gap:10px; align-items:flex-start; justify-content:space-between;
-    }
+    .qhead{ display:flex; gap:10px; align-items:flex-start; justify-content:space-between; }
     .badge{
-      display:inline-block;
-      font-size:12px;
-      padding:3px 8px;
-      border-radius:999px;
-      background:#eef2ff;
-      color:#3730a3;
-      margin-right:6px;
+      display:inline-block; font-size:12px; padding:3px 8px; border-radius:999px;
+      background:#eef2ff; color:#3730a3; margin-right:6px;
     }
     .controls{ display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
     .hr{ height:1px; background:var(--rule); margin:10px 0; }
@@ -145,10 +138,8 @@
       font-family: var(--user-font);
     }
 
-    /* Symbol palette */
-    .symWrap{
-      display:flex; flex-wrap:wrap; gap:6px;
-    }
+    /* Symbol / formula palette */
+    .symWrap{ display:flex; flex-wrap:wrap; gap:6px; }
     .symBtn{
       border:1px solid var(--rule);
       background:#fff;
@@ -156,13 +147,12 @@
       border-radius:10px;
       padding:6px 10px;
       cursor:pointer;
-      font-size:14px;
+      font-size:13px;
       font-family: var(--user-font);
       line-height: 1;
+      white-space: nowrap;
     }
-    .symBtn:hover{
-      border-color: var(--blue);
-    }
+    .symBtn:hover{ border-color: var(--blue); }
     .symLabel{
       display:flex;
       align-items:center;
@@ -179,220 +169,242 @@
       border-radius:8px;
       color:var(--muted);
     }
+
+    /* Rendered math in preview */
+    .math-block{
+      display:block;
+      margin:8px 0;
+    }
+    .math-inline{
+      display:inline-block;
+      vertical-align:middle;
+      margin:0 2px;
+    }
+    /* keep MathJax SVG from overflowing */
+    .math-block svg, .math-inline svg{ max-width:100%; height:auto; }
   </style>
 </head>
+
 <body>
-  <header>
-    <h1>Exam Builder → Export to Word (.docx)</h1>
-    <div class="row">
-      <span class="pill" id="saveStatus">Not saved yet</span>
-      <button class="btn secondary" id="exportExamBtn">Export Exam (.docx)</button>
-      <button class="btn secondary" id="exportKeyBtn">Export Answer Key (.docx)</button>
-    </div>
-  </header>
-
-  <div class="wrap">
-    <!-- LEFT -->
-    <aside class="panel">
-      <div class="card">
-        <h3 style="margin:0 0 8px 0;">Exam Info</h3>
-        <div class="twoCol">
-          <div>
-            <label>Title</label>
-            <input id="examTitle" type="text" placeholder="STA 220 Exam 1" />
-          </div>
-          <div>
-            <label>Course / Section</label>
-            <input id="examCourse" type="text" placeholder="STA 220" />
-          </div>
-          <div>
-            <label>Date (optional)</label>
-            <input id="examDate" type="text" placeholder="Feb 10, 2026" />
-          </div>
-          <div>
-            <label>Time limit (optional)</label>
-            <input id="examTime" type="text" placeholder="50 minutes" />
-          </div>
-        </div>
-
-        <div style="margin-top:10px;">
-          <label>Instructions (optional)</label>
-          <textarea id="examInstructions" placeholder="Show work. No notes. Calculator allowed..."></textarea>
-        </div>
-
-        <div class="hr"></div>
-
-        <h3 style="margin:0 0 8px 0;">Style</h3>
-        <div class="twoCol">
-          <div>
-            <label>Font family</label>
-            <select id="fontFamily">
-              <option value="Calibri">Calibri</option>
-              <option value="Arial">Arial</option>
-              <option value="Times New Roman">Times New Roman</option>
-              <option value="Georgia">Georgia</option>
-              <option value="Verdana">Verdana</option>
-              <option value="Tahoma">Tahoma</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Font color</label>
-            <input id="fontColor" type="color" value="#0f172a" />
-          </div>
-
-          <div>
-            <label>Body font size (pt)</label>
-            <input id="bodySizePt" type="number" min="8" max="20" step="1" value="11" />
-          </div>
-
-          <div>
-            <label>Heading font size (pt)</label>
-            <input id="headingSizePt" type="number" min="10" max="28" step="1" value="16" />
-          </div>
-
-          <div>
-            <label>Title font size (pt)</label>
-            <input id="titleSizePt" type="number" min="14" max="40" step="1" value="22" />
-          </div>
-
-          <div>
-            <label>Preview zoom (px)</label>
-            <input id="previewPx" type="number" min="12" max="22" step="1" value="15" />
-          </div>
-        </div>
-
-        <div class="hr"></div>
-
-        <div class="row">
-          <button class="btn" id="saveToFileBtn">Save Exam File (.json)</button>
-          <label class="btn ghost" style="display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
-            Load Exam File
-            <input id="loadFileInput" type="file" accept=".json" style="display:none;">
-          </label>
-          <button class="btn danger" id="resetBtn">Reset</button>
-        </div>
-        <p class="tiny" style="margin:10px 0 0 0;">
-          Progress auto-saves to your browser. “Save Exam File” gives you a portable backup.
-        </p>
-      </div>
-
-      <!-- Symbol palette -->
-      <div class="card">
-        <div class="symLabel">
-          <h3 style="margin:0;">Stats Symbols</h3>
-          <span class="tiny">Insert into active field • <span class="kbd">Alt</span>+<span class="kbd">S</span> focuses Prompt</span>
-        </div>
-        <div class="symWrap" id="symbolPalette"></div>
-        <p class="tiny" style="margin:8px 0 0 0;">
-          Click a symbol to insert it. Works in Instructions, Prompt, Choices, Answers, etc.
-        </p>
-      </div>
-
-      <div class="card">
-        <h3 style="margin:0 0 8px 0;">Sections</h3>
-        <div class="row" style="width:100%;">
-          <div style="flex:1;">
-            <label>New section name</label>
-            <input id="newSectionName" type="text" placeholder="Multiple Choice" />
-          </div>
-          <div style="align-self:flex-end;">
-            <button class="btn" id="addSectionBtn">Add Section</button>
-          </div>
-        </div>
-        <div id="sectionList" class="tiny" style="margin-top:8px;"></div>
-      </div>
-
-      <div class="card">
-        <h3 style="margin:0 0 8px 0;">Add Question</h3>
-
-        <div class="twoCol">
-          <div>
-            <label>Section</label>
-            <select id="qSection"></select>
-          </div>
-          <div>
-            <label>Type</label>
-            <select id="qType">
-              <option value="mc">Multiple Choice</option>
-              <option value="tf">True / False</option>
-              <option value="sa">Short Answer</option>
-              <option value="fr">Free Response</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="twoCol" style="margin-top:10px;">
-          <div>
-            <label>Points</label>
-            <input id="qPoints" type="number" min="0" step="0.5" value="1" />
-          </div>
-          <div>
-            <label>Answer (for key)</label>
-            <input id="qAnswer" type="text" placeholder="e.g., C or 12.4 or True" />
-          </div>
-        </div>
-
-        <div style="margin-top:10px;">
-          <label>Question prompt</label>
-          <textarea id="qPrompt" placeholder="Type the question here..."></textarea>
-        </div>
-
-        <!-- MC choices -->
-        <div id="mcBlock" style="margin-top:10px;">
-          <label>Choices (Multiple Choice)</label>
-          <div class="twoCol">
-            <input class="choice" type="text" placeholder="A) ..." />
-            <input class="choice" type="text" placeholder="B) ..." />
-            <input class="choice" type="text" placeholder="C) ..." />
-            <input class="choice" type="text" placeholder="D) ..." />
-          </div>
-          <p class="tiny" style="margin:6px 0 0 0;">Tip: You can leave unused choices blank.</p>
-        </div>
-
-        <!-- Image upload -->
-        <div style="margin-top:10px;">
-          <label>Attach image (graph, figure, etc.)</label>
-          <input id="qImage" type="file" accept="image/png,image/jpeg" />
-          <div class="twoCol" style="margin-top:8px;">
-            <div>
-              <label>Image caption (optional)</label>
-              <input id="qImageCaption" type="text" placeholder="Figure 1" />
-            </div>
-            <div>
-              <label>Max width in Word (inches)</label>
-              <input id="qImageWidth" type="number" min="1" max="7" step="0.1" value="5.8" />
-            </div>
-          </div>
-          <img id="qImagePreview" class="imgPrev" style="display:none;" alt="preview"/>
-        </div>
-
-        <div class="hr"></div>
-        <button class="btn" id="addQuestionBtn" style="width:100%;">Add Question</button>
-      </div>
-    </aside>
-
-    <!-- RIGHT -->
-    <main class="panel">
-      <div class="card">
-        <div class="row" style="align-items:center; justify-content:space-between;">
-          <h3 style="margin:0;">Exam Preview</h3>
-          <div class="tiny" id="totals"></div>
-        </div>
-        <p class="tiny" style="margin:6px 0 0 0;">
-          Reorder with ↑↓. Edit/delete inline.
-        </p>
-      </div>
-
-      <div id="questionList" class="list"></div>
-    </main>
+<header>
+  <h1>Exam Builder → Typeset Math (MathJax) → Export to Word (.docx)</h1>
+  <div class="row">
+    <span class="pill" id="saveStatus">Not saved yet</span>
+    <button class="btn secondary" id="exportExamBtn">Export Exam (.docx)</button>
+    <button class="btn secondary" id="exportKeyBtn">Export Answer Key (.docx)</button>
   </div>
+</header>
+
+<div class="wrap">
+  <aside class="panel">
+    <div class="card">
+      <h3 style="margin:0 0 8px 0;">Exam Info</h3>
+
+      <div class="twoCol">
+        <div>
+          <label>Title</label>
+          <input id="examTitle" type="text" placeholder="STA 220 Exam 1" />
+        </div>
+        <div>
+          <label>Course / Section</label>
+          <input id="examCourse" type="text" placeholder="STA 220" />
+        </div>
+        <div>
+          <label>Date (optional)</label>
+          <input id="examDate" type="text" placeholder="Feb 10, 2026" />
+        </div>
+        <div>
+          <label>Time limit (optional)</label>
+          <input id="examTime" type="text" placeholder="50 minutes" />
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <label>Instructions (supports LaTeX in $$...$$)</label>
+        <textarea id="examInstructions" placeholder="Example: Compute $$SS_x = \sum (x-\bar{x})^2$$"></textarea>
+      </div>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:0 0 8px 0;">Style</h3>
+      <div class="twoCol">
+        <div>
+          <label>Font family</label>
+          <select id="fontFamily">
+            <option value="Calibri">Calibri</option>
+            <option value="Arial">Arial</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Tahoma">Tahoma</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Font color</label>
+          <input id="fontColor" type="color" value="#0f172a" />
+        </div>
+
+        <div>
+          <label>Body font size (pt)</label>
+          <input id="bodySizePt" type="number" min="8" max="20" step="1" value="11" />
+        </div>
+
+        <div>
+          <label>Heading font size (pt)</label>
+          <input id="headingSizePt" type="number" min="10" max="28" step="1" value="16" />
+        </div>
+
+        <div>
+          <label>Title font size (pt)</label>
+          <input id="titleSizePt" type="number" min="14" max="40" step="1" value="22" />
+        </div>
+
+        <div>
+          <label>Preview zoom (px)</label>
+          <input id="previewPx" type="number" min="12" max="22" step="1" value="15" />
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <button class="btn" id="saveToFileBtn">Save Exam File (.json)</button>
+        <label class="btn ghost" style="display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
+          Load Exam File
+          <input id="loadFileInput" type="file" accept=".json" style="display:none;">
+        </label>
+        <button class="btn danger" id="resetBtn">Reset</button>
+      </div>
+
+      <p class="tiny" style="margin:10px 0 0 0;">
+        Autosaves to your browser. Equations are stored as LaTeX inside <span class="kbd">$$...$$</span>.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="symLabel">
+        <h3 style="margin:0;">Symbols</h3>
+        <span class="tiny">Insert into active field • <span class="kbd">Alt</span>+<span class="kbd">S</span> focuses Prompt</span>
+      </div>
+      <div class="symWrap" id="symbolPalette"></div>
+      <p class="tiny" style="margin:8px 0 0 0;">
+        For typeset math, use the <b>Formulas</b> buttons (they insert <span class="kbd">$$ LaTeX $$</span>).
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="symLabel">
+        <h3 style="margin:0;">Formulas (Typeset)</h3>
+        <span class="tiny">Click to insert as <span class="kbd">$$...$$</span></span>
+      </div>
+      <div class="symWrap" id="formulaPalette"></div>
+      <p class="tiny" style="margin:8px 0 0 0;">
+        These render nicely on-screen and export to Word as equation images.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px 0;">Sections</h3>
+      <div class="row" style="width:100%;">
+        <div style="flex:1;">
+          <label>New section name</label>
+          <input id="newSectionName" type="text" placeholder="Multiple Choice" />
+        </div>
+        <div style="align-self:flex-end;">
+          <button class="btn" id="addSectionBtn">Add Section</button>
+        </div>
+      </div>
+      <div id="sectionList" class="tiny" style="margin-top:8px;"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px 0;">Add Question</h3>
+
+      <div class="twoCol">
+        <div>
+          <label>Section</label>
+          <select id="qSection"></select>
+        </div>
+        <div>
+          <label>Type</label>
+          <select id="qType">
+            <option value="mc">Multiple Choice</option>
+            <option value="tf">True / False</option>
+            <option value="sa">Short Answer</option>
+            <option value="fr">Free Response</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="twoCol" style="margin-top:10px;">
+        <div>
+          <label>Points</label>
+          <input id="qPoints" type="number" min="0" step="0.5" value="1" />
+        </div>
+        <div>
+          <label>Answer (can include $$...$$)</label>
+          <input id="qAnswer" type="text" placeholder="e.g., C or $$\bar{x}$$" />
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <label>Question prompt (supports $$...$$)</label>
+        <textarea id="qPrompt" placeholder="Type the question here..."></textarea>
+      </div>
+
+      <div id="mcBlock" style="margin-top:10px;">
+        <label>Choices (Multiple Choice; can include $$...$$)</label>
+        <div class="twoCol">
+          <input class="choice" type="text" placeholder="A) ..." />
+          <input class="choice" type="text" placeholder="B) ..." />
+          <input class="choice" type="text" placeholder="C) ..." />
+          <input class="choice" type="text" placeholder="D) ..." />
+        </div>
+        <p class="tiny" style="margin:6px 0 0 0;">Tip: leave unused choices blank.</p>
+      </div>
+
+      <div style="margin-top:10px;">
+        <label>Attach image (graph, figure, etc.)</label>
+        <input id="qImage" type="file" accept="image/png,image/jpeg" />
+        <div class="twoCol" style="margin-top:8px;">
+          <div>
+            <label>Image caption (optional)</label>
+            <input id="qImageCaption" type="text" placeholder="Figure 1" />
+          </div>
+          <div>
+            <label>Max width in Word (inches)</label>
+            <input id="qImageWidth" type="number" min="1" max="7" step="0.1" value="5.8" />
+          </div>
+        </div>
+        <img id="qImagePreview" class="imgPrev" style="display:none;" alt="preview"/>
+      </div>
+
+      <div class="hr"></div>
+      <button class="btn" id="addQuestionBtn" style="width:100%;">Add Question</button>
+    </div>
+  </aside>
+
+  <main class="panel">
+    <div class="card">
+      <div class="row" style="align-items:center; justify-content:space-between;">
+        <h3 style="margin:0;">Exam Preview (Math Typeset)</h3>
+        <div class="tiny" id="totals"></div>
+      </div>
+      <p class="tiny" style="margin:6px 0 0 0;">
+        Reorder with ↑↓. Edit/delete inline. Anything in <span class="kbd">$$...$$</span> is rendered as math.
+      </p>
+    </div>
+
+    <div id="questionList" class="list"></div>
+  </main>
+</div>
 
 <script>
 /* =========================
    State + Persistence
 ========================= */
-const STORAGE_KEY = "exam_builder_state_v2_symbols_styles";
+const STORAGE_KEY = "exam_builder_state_v3_mathjax";
 
 let state = {
   meta: {
@@ -403,11 +415,11 @@ let state = {
     instructions: "",
     style: {
       fontFamily: "Calibri",
-      bodySizePt: 11,     // docx
-      headingSizePt: 16,  // docx
-      titleSizePt: 22,    // docx
+      bodySizePt: 11,
+      headingSizePt: 16,
+      titleSizePt: 22,
       fontColor: "#0f172a",
-      previewPx: 15       // browser preview only
+      previewPx: 15
     }
   },
   sections: ["General"],
@@ -419,10 +431,7 @@ const $ = (id) => document.getElementById(id);
 function uid(){
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
-
-function setSaveStatus(text){
-  $("saveStatus").textContent = text;
-}
+function setSaveStatus(text){ $("saveStatus").textContent = text; }
 
 function saveToLocal(){
   try{
@@ -432,14 +441,12 @@ function saveToLocal(){
     setSaveStatus("Local save failed (storage blocked?)");
   }
 }
-
 function loadFromLocal(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
     if(!raw) return false;
     const parsed = JSON.parse(raw);
     if(parsed && parsed.meta && parsed.sections && parsed.questions){
-      // backwards safety defaults
       parsed.meta.style = parsed.meta.style || {
         fontFamily:"Calibri", bodySizePt:11, headingSizePt:16, titleSizePt:22, fontColor:"#0f172a", previewPx:15
       };
@@ -452,149 +459,13 @@ function loadFromLocal(){
 }
 
 /* =========================
-   Symbol palette
-========================= */
-const SYMBOLS = [
-  // Core stats symbols
-  {label:"x̄", insert:"x̄"},
-  {label:"ȳ", insert:"ȳ"},
-  {label:"Σ", insert:"Σ"},
-  {label:"∑", insert:"∑"},
-  {label:"σ", insert:"σ"},
-  {label:"μ", insert:"μ"},
-  {label:"π", insert:"π"},
-  {label:"√", insert:"√"},
-  {label:"≤", insert:"≤"},
-  {label:"≥", insert:"≥"},
-  {label:"≠", insert:"≠"},
-  {label:"±", insert:"±"},
-  {label:"∞", insert:"∞"},
-  {label:"ρ", insert:"ρ"},
-  {label:"β₀", insert:"β₀"},
-  {label:"β₁", insert:"β₁"},
-  {label:"p̂", insert:"p̂"},
-  {label:"H₀", insert:"H₀"},
-  {label:"Hₐ", insert:"Hₐ"},
-  {label:"α", insert:"α"},
-  {label:"χ²", insert:"χ²"},
-  {label:"r", insert:"r"},
-  {label:"r²", insert:"r²"},
-
-  // Handy templates (non-stacked fractions)
-  {label:"Fraction", insert:"( )/( )"},
-  {label:"( )", insert:"()"},
-  {label:"[ ]", insert:"[]"},
-  {label:"Subscript _", insert:"₀"},
-  {label:"Superscript ²", insert:"²"},
-
-  // ====== FORMULAS (examples) ======
-  {label:"x̄ = (∑x)/n", insert:"x̄ = (∑x)/n"},
-  {label:"ȳ = (∑y)/n", insert:"ȳ = (∑y)/n"},
-
-  // SSx, SSy, Sxy (two common equivalent forms)
-  {label:"SSx = ∑(x − x̄)²", insert:"SSx = ∑(x − x̄)²"},
-  {label:"SSx = ∑x² − (∑x)²/n", insert:"SSx = ∑x² − (∑x)²/n"},
-
-  {label:"SSy = ∑(y − ȳ)²", insert:"SSy = ∑(y − ȳ)²"},
-  {label:"SSy = ∑y² − (∑y)²/n", insert:"SSy = ∑y² − (∑y)²/n"},
-
-  {label:"Sxy = ∑(x − x̄)(y − ȳ)", insert:"Sxy = ∑(x − x̄)(y − ȳ)"},
-  {label:"Sxy = ∑xy − (∑x)(∑y)/n", insert:"Sxy = ∑xy − (∑x)(∑y)/n"},
-
-  // Regression helpers (optional but super useful)
-  {label:"b₁ = Sxy/SSx", insert:"b₁ = Sxy/SSx"},
-  {label:"b₀ = ȳ − b₁x̄", insert:"b₀ = ȳ − b₁x̄"},
-  {label:"ŷ = b₀ + b₁x", insert:"ŷ = b₀ + b₁x"},
-  {label:"r = Sxy/√(SSx·SSy)", insert:"r = Sxy/√(SSx·SSy)"}
-];
-
-let lastFocusedEditable = null;
-
-function isEditable(el){
-  if(!el) return false;
-  const tag = el.tagName;
-  return (tag === "TEXTAREA") || (tag === "INPUT" && (el.type === "text" || el.type === "number" || el.type === "search" || el.type === "email"));
-}
-
-function trackFocus(e){
-  const el = e.target;
-  if(isEditable(el)){
-    lastFocusedEditable = el;
-  }
-}
-document.addEventListener("focusin", trackFocus);
-
-function insertAtCursor(el, text){
-  if(!el || !isEditable(el)) return false;
-
-  // For number inputs, insert makes no sense; use end append
-  if(el.tagName === "INPUT" && el.type === "number"){
-    el.value = (el.value || "") + String(text);
-    el.dispatchEvent(new Event("input", {bubbles:true}));
-    return true;
-  }
-
-  const start = el.selectionStart ?? el.value.length;
-  const end   = el.selectionEnd ?? el.value.length;
-  const before = el.value.slice(0, start);
-  const after  = el.value.slice(end);
-
-  // Special helpers: place caret inside () or []
-  let newValue = before + text + after;
-  el.value = newValue;
-
-  let caretPos = start + text.length;
-  // If inserted token includes () or [], place cursor inside them
-  const idxParen = text.indexOf("()");
-  const idxBrack = text.indexOf("[]");
-  if(idxParen !== -1) caretPos = start + idxParen + 1;
-  else if(idxBrack !== -1) caretPos = start + idxBrack + 1;
-
-  el.focus();
-  el.setSelectionRange(caretPos, caretPos);
-  el.dispatchEvent(new Event("input", {bubbles:true}));
-  return true;
-}
-
-function insertSymbol(symbolText){
-  const target = (isEditable(document.activeElement) ? document.activeElement : lastFocusedEditable) || $("qPrompt");
-  insertAtCursor(target, symbolText);
-}
-
-function buildSymbolPalette(){
-  const wrap = $("symbolPalette");
-  wrap.innerHTML = "";
-  SYMBOLS.forEach(s=>{
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "symBtn";
-    b.textContent = s.label;
-    b.title = `Insert ${s.insert}`;
-    b.addEventListener("click", ()=>insertSymbol(s.insert));
-    wrap.appendChild(b);
-  });
-}
-
-// Quick keyboard helper: Alt+S focuses the question prompt
-document.addEventListener("keydown", (e)=>{
-  if(e.altKey && (e.key === "s" || e.key === "S")){
-    e.preventDefault();
-    $("qPrompt").focus();
-  }
-});
-
-/* =========================
-   UI Helpers
+   Preview style
 ========================= */
 function applyPreviewStyle(){
   const st = state.meta.style || {};
-  const fam = st.fontFamily || "Calibri";
-  const col = st.fontColor || "#0f172a";
-  const px  = Number(st.previewPx ?? 15);
-
-  document.documentElement.style.setProperty("--user-font", fam);
-  document.documentElement.style.setProperty("--user-color", col);
-  document.documentElement.style.setProperty("--user-body-size", px + "px");
+  document.documentElement.style.setProperty("--user-font", st.fontFamily || "Calibri");
+  document.documentElement.style.setProperty("--user-color", st.fontColor || "#0f172a");
+  document.documentElement.style.setProperty("--user-body-size", (Number(st.previewPx ?? 15)) + "px");
 }
 
 function syncMetaFromInputs(){
@@ -614,7 +485,6 @@ function syncMetaFromInputs(){
 
   applyPreviewStyle();
 }
-
 function syncInputsFromMeta(){
   $("examTitle").value = state.meta.title || "";
   $("examCourse").value = state.meta.course || "";
@@ -633,6 +503,144 @@ function syncInputsFromMeta(){
   applyPreviewStyle();
 }
 
+/* =========================
+   Insert into active field
+========================= */
+let lastFocusedEditable = null;
+function isEditable(el){
+  if(!el) return false;
+  const tag = el.tagName;
+  return (tag === "TEXTAREA") || (tag === "INPUT" && (el.type === "text" || el.type === "number" || el.type === "search" || el.type === "email"));
+}
+document.addEventListener("focusin", (e)=>{
+  if(isEditable(e.target)) lastFocusedEditable = e.target;
+});
+
+function insertAtCursor(el, text){
+  if(!el || !isEditable(el)) return false;
+
+  if(el.tagName === "INPUT" && el.type === "number"){
+    el.value = (el.value || "") + String(text);
+    el.dispatchEvent(new Event("input", {bubbles:true}));
+    return true;
+  }
+
+  const start = el.selectionStart ?? el.value.length;
+  const end   = el.selectionEnd ?? el.value.length;
+  const before = el.value.slice(0, start);
+  const after  = el.value.slice(end);
+
+  el.value = before + text + after;
+
+  // cursor inside () or []
+  let caretPos = start + text.length;
+  const idxParen = text.indexOf("()");
+  const idxParenSp = text.indexOf("( )");
+  const idxBrack = text.indexOf("[]");
+  if(idxParen !== -1) caretPos = start + idxParen + 1;
+  else if(idxParenSp !== -1) caretPos = start + idxParenSp + 1;
+  else if(idxBrack !== -1) caretPos = start + idxBrack + 1;
+
+  el.focus();
+  el.setSelectionRange(caretPos, caretPos);
+  el.dispatchEvent(new Event("input", {bubbles:true}));
+  return true;
+}
+
+function insertTextToken(token){
+  const target = (isEditable(document.activeElement) ? document.activeElement : lastFocusedEditable) || $("qPrompt");
+  insertAtCursor(target, token);
+}
+function insertLatexBlock(latex){
+  // Put on its own line for clean rendering + export
+  const block = `\n$$${latex}$$\n`;
+  insertTextToken(block);
+}
+
+document.addEventListener("keydown", (e)=>{
+  if(e.altKey && (e.key === "s" || e.key === "S")){
+    e.preventDefault();
+    $("qPrompt").focus();
+  }
+});
+
+/* =========================
+   Palettes
+========================= */
+const SYMBOLS = [
+  {label:"x̄", insert:"x̄"},
+  {label:"ȳ", insert:"ȳ"},
+  {label:"Σ", insert:"Σ"},
+  {label:"∑", insert:"∑"},
+  {label:"σ", insert:"σ"},
+  {label:"μ", insert:"μ"},
+  {label:"√", insert:"√"},
+  {label:"≤", insert:"≤"},
+  {label:"≥", insert:"≥"},
+  {label:"≠", insert:"≠"},
+  {label:"±", insert:"±"},
+  {label:"∞", insert:"∞"},
+  {label:"ρ", insert:"ρ"},
+  {label:"β₀", insert:"β₀"},
+  {label:"β₁", insert:"β₁"},
+  {label:"p̂", insert:"p̂"},
+  {label:"H₀", insert:"H₀"},
+  {label:"Hₐ", insert:"Hₐ"},
+  {label:"α", insert:"α"},
+  {label:"χ²", insert:"χ²"},
+  {label:"r²", insert:"r²"},
+  {label:"Fraction (inline)", insert:"( )/( )"},
+  {label:"()", insert:"()"},
+  {label:"[]", insert:"[]"},
+  {label:"²", insert:"²"},
+  {label:"·", insert:"·"}
+];
+
+const FORMULAS = [
+  {label:"x̄ = (∑x)/n", latex:"\\bar{x} = \\frac{\\sum x}{n}"},
+  {label:"ȳ = (∑y)/n", latex:"\\bar{y} = \\frac{\\sum y}{n}"},
+  {label:"SSx = ∑(x − x̄)²", latex:"SS_x = \\sum (x - \\bar{x})^2"},
+  {label:"SSx = ∑x² − (∑x)²/n", latex:"SS_x = \\sum x^2 - \\frac{(\\sum x)^2}{n}"},
+  {label:"SSy = ∑(y − ȳ)²", latex:"SS_y = \\sum (y - \\bar{y})^2"},
+  {label:"SSy = ∑y² − (∑y)²/n", latex:"SS_y = \\sum y^2 - \\frac{(\\sum y)^2}{n}"},
+  {label:"Sxy = ∑(x − x̄)(y − ȳ)", latex:"S_{xy} = \\sum (x - \\bar{x})(y - \\bar{y})"},
+  {label:"Sxy = ∑xy − (∑x)(∑y)/n", latex:"S_{xy} = \\sum xy - \\frac{(\\sum x)(\\sum y)}{n}"},
+  {label:"b₁ = Sxy/SSx", latex:"b_1 = \\frac{S_{xy}}{SS_x}"},
+  {label:"b₀ = ȳ − b₁x̄", latex:"b_0 = \\bar{y} - b_1\\bar{x}"},
+  {label:"ŷ = b₀ + b₁x", latex:"\\hat{y} = b_0 + b_1x"},
+  {label:"r = Sxy/√(SSx·SSy)", latex:"r = \\frac{S_{xy}}{\\sqrt{SS_x\\cdot SS_y}}"}
+];
+
+function buildSymbolPalette(){
+  const wrap = $("symbolPalette");
+  wrap.innerHTML = "";
+  SYMBOLS.forEach(s=>{
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "symBtn";
+    b.textContent = s.label;
+    b.title = `Insert ${s.insert}`;
+    b.addEventListener("click", ()=>insertTextToken(s.insert));
+    wrap.appendChild(b);
+  });
+}
+function buildFormulaPalette(){
+  const wrap = $("formulaPalette");
+  wrap.innerHTML = "";
+  FORMULAS.forEach(f=>{
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "symBtn";
+    b.textContent = f.label;
+    b.title = "Insert as $$...$$";
+    b.addEventListener("click", ()=>insertLatexBlock(f.latex));
+    wrap.appendChild(b);
+  });
+}
+
+/* =========================
+   Sections + totals
+========================= */
 function refreshSectionSelects(){
   const sel = $("qSection");
   sel.innerHTML = "";
@@ -651,17 +659,18 @@ function refreshSectionSelects(){
 function totalPoints(){
   return state.questions.reduce((sum,q)=>sum+(Number(q.points)||0),0);
 }
-
 function refreshTotals(){
   const n = state.questions.length;
   const tp = totalPoints();
   $("totals").textContent = `${n} question${n===1?"":"s"} • ${tp} point${tp===1?"":"s"}`;
 }
-
 function typeLabel(t){
   return ({mc:"Multiple Choice", tf:"True/False", sa:"Short Answer", fr:"Free Response"})[t] || t;
 }
 
+/* =========================
+   Math rendering helpers
+========================= */
 function escapeHtml(str){
   return (str||"").replace(/[&<>"']/g, m => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
@@ -671,32 +680,94 @@ function escapeAttr(str){
   return (str||"").replace(/"/g,"&quot;");
 }
 
+// parse $$...$$ blocks (display math) in plain text
+function splitByDisplayMath(text){
+  const parts = [];
+  const re = /\$\$([\s\S]*?)\$\$/g;
+  let last = 0;
+  let m;
+  while((m = re.exec(text)) !== null){
+    if(m.index > last) parts.push({type:"text", value:text.slice(last, m.index)});
+    parts.push({type:"math", value:m[1].trim()});
+    last = re.lastIndex;
+  }
+  if(last < text.length) parts.push({type:"text", value:text.slice(last)});
+  return parts;
+}
+
+// Render a LaTeX string to SVG element via MathJax
+function latexToSvgElement(latex, display=true){
+  // display=true => block style; false => inline style
+  const node = MathJax.tex2svg(latex, {display});
+  // node is <span> containing <svg>
+  const svg = node.querySelector("svg");
+  return svg;
+}
+
+function svgToOuterHtml(svgEl){
+  // Clone to avoid MathJax internal refs issues
+  const clone = svgEl.cloneNode(true);
+  clone.removeAttribute("style");
+  clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  return clone.outerHTML;
+}
+
+// Turn mixed text+math into safe preview HTML
+async function renderTextWithMathToHtml(text){
+  // Note: other parts are escaped. Math blocks are rendered as SVG.
+  const pieces = splitByDisplayMath(text || "");
+  let html = "";
+  for(const p of pieces){
+    if(p.type === "text"){
+      // preserve line breaks
+      html += escapeHtml(p.value).replace(/\n/g, "<br>");
+    }else{
+      try{
+        const svg = latexToSvgElement(p.value, true);
+        html += `<span class="math-block">${svgToOuterHtml(svg)}</span>`;
+      }catch(e){
+        html += `<span class="tiny" style="color:#b91c1c;">[bad LaTeX: ${escapeHtml(p.value)}]</span>`;
+      }
+    }
+  }
+  return html;
+}
+
 /* =========================
-   Render question list
+   Render question list (preview)
 ========================= */
-function renderQuestions(){
+async function renderQuestions(){
   const wrap = $("questionList");
   wrap.innerHTML = "";
 
-  state.sections.forEach(sectionName=>{
+  for(const sectionName of state.sections){
     const qs = state.questions.filter(q=>q.section===sectionName);
-    if(qs.length===0) return;
+    if(qs.length===0) continue;
 
     const secCard = document.createElement("div");
     secCard.className = "card";
     secCard.innerHTML = `<h3 style="margin:0 0 8px 0;">${escapeHtml(sectionName)}</h3>`;
     wrap.appendChild(secCard);
 
-    qs.forEach(q=>{
+    for(const q of qs){
       const card = document.createElement("div");
       card.className = "qcard";
 
       const hasImg = !!q.imageData;
-      const choicesPreview = (q.type==="mc" && q.choices && q.choices.some(c=>c.trim()))
-        ? `<ol style="margin:8px 0 0 18px;">
-            ${q.choices.filter(c=>c.trim()).map(c=>`<li>${escapeHtml(c)}</li>`).join("")}
-           </ol>`
-        : "";
+
+      const promptHtml = await renderTextWithMathToHtml(q.prompt || "");
+
+      // choices
+      let choicesHtml = "";
+      if(q.type === "mc" && q.choices && q.choices.some(c=>c.trim())){
+        const items = [];
+        for(const c of q.choices.filter(x=>x.trim())){
+          items.push(`<li>${await renderTextWithMathToHtml(c)}</li>`);
+        }
+        choicesHtml = `<ol style="margin:8px 0 0 18px;">${items.join("")}</ol>`;
+      }
+
+      const answerHtml = q.answer ? await renderTextWithMathToHtml(q.answer) : "";
 
       card.innerHTML = `
         <div class="qhead">
@@ -713,14 +784,16 @@ function renderQuestions(){
         </div>
 
         <div style="margin-top:8px;">
-          <div><b>Prompt:</b> <span>${escapeHtml(q.prompt)}</span></div>
-          ${choicesPreview}
+          <div><b>Prompt:</b></div>
+          <div style="margin-top:6px;">${promptHtml}</div>
+          ${choicesHtml}
           ${hasImg ? `<img class="imgPrev" src="${q.imageData}" alt="question image" />` : ""}
           ${hasImg && q.imageCaption ? `<div class="tiny" style="margin-top:6px;">${escapeHtml(q.imageCaption)}</div>` : ""}
-          ${q.answer ? `<div class="tiny" style="margin-top:8px;"><b>Key:</b> ${escapeHtml(q.answer)}</div>` : ""}
+          ${q.answer ? `<div class="tiny" style="margin-top:10px;"><b>Key:</b><div style="margin-top:6px;">${answerHtml}</div></div>` : ""}
         </div>
 
         <div class="hr"></div>
+
         <div id="edit_${q.id}" style="display:none;">
           <div class="twoCol">
             <div>
@@ -744,18 +817,18 @@ function renderQuestions(){
               <input id="edit_points_${q.id}" type="number" step="0.5" value="${Number(q.points)||0}" />
             </div>
             <div>
-              <label>Answer (for key)</label>
+              <label>Answer (can include $$...$$)</label>
               <input id="edit_answer_${q.id}" type="text" value="${escapeAttr(q.answer||"")}" />
             </div>
           </div>
 
           <div style="margin-top:10px;">
-            <label>Prompt</label>
+            <label>Prompt (supports $$...$$)</label>
             <textarea id="edit_prompt_${q.id}">${escapeHtml(q.prompt||"")}</textarea>
           </div>
 
           <div style="margin-top:10px;">
-            <label>Choices (MC only)</label>
+            <label>Choices (MC only; can include $$...$$)</label>
             <div class="twoCol">
               ${(q.choices||["","","",""]).slice(0,4).map((c,i)=>`
                 <input id="edit_choice_${q.id}_${i}" type="text" value="${escapeAttr(c||"")}" placeholder="${String.fromCharCode(65+i)}) ..."/>
@@ -793,12 +866,15 @@ function renderQuestions(){
         </div>
       `;
       wrap.appendChild(card);
-    });
-  });
+    }
+  }
 
   refreshTotals();
 }
 
+/* =========================
+   Question actions
+========================= */
 window.toggleEdit = (id)=>{
   const el = document.getElementById("edit_"+id);
   if(!el) return;
@@ -839,6 +915,14 @@ window.saveEdit = (id)=>{
   renderQuestions();
 };
 
+async function fileToDataUrl(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 window.replaceImage = async (evt, id)=>{
   const file = evt.target.files && evt.target.files[0];
   if(!file) return;
@@ -850,7 +934,6 @@ window.replaceImage = async (evt, id)=>{
   saveToLocal();
   renderQuestions();
 };
-
 window.removeImage = (id)=>{
   const q = state.questions.find(q=>q.id===id);
   if(!q) return;
@@ -862,7 +945,6 @@ window.removeImage = (id)=>{
 
 window.deleteSection = (sectionName)=>{
   if(state.sections.length<=1) return;
-
   const s = sectionName;
   if(!confirm(`Delete section "${s}"? Questions in it will move to "${state.sections[0]}".`)) return;
 
@@ -878,22 +960,13 @@ window.deleteSection = (sectionName)=>{
 };
 
 /* =========================
-   Add question
+   Add Question UI
 ========================= */
 function setTypeUI(){
   const t = $("qType").value;
   $("mcBlock").style.display = (t==="mc") ? "block" : "none";
 }
 $("qType").addEventListener("change", setTypeUI);
-
-async function fileToDataUrl(file){
-  return new Promise((resolve,reject)=>{
-    const reader = new FileReader();
-    reader.onload = ()=>resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
 
 $("qImage").addEventListener("change", async (e)=>{
   const file = e.target.files && e.target.files[0];
@@ -955,7 +1028,7 @@ $("addQuestionBtn").addEventListener("click", async ()=>{
   $("qImagePreview").style.display = "none";
 
   saveToLocal();
-  renderQuestions();
+  await renderQuestions();
 });
 
 /* =========================
@@ -982,13 +1055,15 @@ $("addSectionBtn").addEventListener("click", ()=>{
   "examTitle","examCourse","examDate","examTime","examInstructions",
   "fontFamily","fontColor","bodySizePt","headingSizePt","titleSizePt","previewPx"
 ].forEach(id=>{
-  $(id).addEventListener("input", ()=>{
+  $(id).addEventListener("input", async ()=>{
     syncMetaFromInputs();
     saveToLocal();
+    await renderQuestions();
   });
-  $(id).addEventListener("change", ()=>{
+  $(id).addEventListener("change", async ()=>{
     syncMetaFromInputs();
     saveToLocal();
+    await renderQuestions();
   });
 });
 
@@ -999,13 +1074,11 @@ function downloadJson(filename, obj){
   const blob = new Blob([JSON.stringify(obj, null, 2)], {type:"application/json"});
   saveAs(blob, filename);
 }
-
 $("saveToFileBtn").addEventListener("click", ()=>{
   syncMetaFromInputs();
   const safeTitle = (state.meta.title || "exam").replace(/[^\w\-]+/g,"_");
   downloadJson(`${safeTitle}.json`, state);
 });
-
 $("loadFileInput").addEventListener("change", async (e)=>{
   const file = e.target.files && e.target.files[0];
   if(!file) return;
@@ -1021,16 +1094,15 @@ $("loadFileInput").addEventListener("change", async (e)=>{
 
     syncInputsFromMeta();
     refreshSectionSelects();
-    renderQuestions();
     saveToLocal();
+    await renderQuestions();
   }catch(err){
     alert("Could not load that file. Make sure it is an Exam Builder .json file.");
   }finally{
     e.target.value = "";
   }
 });
-
-$("resetBtn").addEventListener("click", ()=>{
+$("resetBtn").addEventListener("click", async ()=>{
   if(!confirm("Reset everything? This clears the builder (browser autosave too).")) return;
   state = {
     meta:{
@@ -1043,14 +1115,14 @@ $("resetBtn").addEventListener("click", ()=>{
   localStorage.removeItem(STORAGE_KEY);
   syncInputsFromMeta();
   refreshSectionSelects();
-  renderQuestions();
   setSaveStatus("Reset complete");
+  await renderQuestions();
 });
 
 /* =========================
-   Word export (.docx)
+   Word export (.docx) with math as images
 ========================= */
-const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, ImageRun } = docx;
+const { Document, Packer, Paragraph, TextRun, AlignmentType, ImageRun } = docx;
 
 function cleanHexColor(hex){
   return (hex || "#000000").replace("#","").toUpperCase();
@@ -1071,6 +1143,7 @@ function runStyle(kind="body"){
     size: ptToHalfPoints(sizePt)
   };
 }
+
 function dataUrlToUint8Array(dataUrl){
   const base64 = dataUrl.split(",")[1];
   const bin = atob(base64);
@@ -1080,7 +1153,48 @@ function dataUrlToUint8Array(dataUrl){
   return bytes;
 }
 
-function buildHeaderParas(){
+function svgStringToDataUrl(svgString){
+  const encoded = encodeURIComponent(svgString)
+    .replace(/'/g, "%27").replace(/"/g, "%22");
+  return "data:image/svg+xml;charset=utf-8," + encoded;
+}
+
+async function svgToPngBytes(svgString, maxWidthPx){
+  // Load SVG into an Image, draw to canvas, export PNG bytes
+  const img = new Image();
+  const svgUrl = svgStringToDataUrl(svgString);
+
+  const dims = await new Promise((resolve, reject)=>{
+    img.onload = ()=>resolve({w: img.width, h: img.height});
+    img.onerror = reject;
+    img.src = svgUrl;
+  });
+
+  // If browser doesn't give width/height, fall back to viewBox
+  let w = dims.w || 800;
+  let h = dims.h || 200;
+
+  // scale to max width
+  const scale = Math.min(1, maxWidthPx / w);
+  const outW = Math.max(1, Math.round(w * scale));
+  const outH = Math.max(1, Math.round(h * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = outW;
+  canvas.height = outH;
+  const ctx = canvas.getContext("2d");
+
+  // white background to avoid weird transparency on print
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0,0,outW,outH);
+  ctx.drawImage(img, 0, 0, outW, outH);
+
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+  const buf = await blob.arrayBuffer();
+  return { bytes: new Uint8Array(buf), width: outW, height: outH };
+}
+
+function buildHeaderParasDocx(){
   const paras = [];
   const title = state.meta.title || "Exam";
 
@@ -1098,16 +1212,6 @@ function buildHeaderParas(){
   }
   paras.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
 
-  if(state.meta.instructions){
-    paras.push(new Paragraph({
-      children:[new TextRun({ text:"Instructions:", ...runStyle("heading"), bold:true })]
-    }));
-    paras.push(new Paragraph({
-      children:[new TextRun({ text: state.meta.instructions, ...runStyle("body") })]
-    }));
-    paras.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
-  }
-
   return paras;
 }
 
@@ -1116,37 +1220,123 @@ function questionNumberingForSection(sectionName){
   return qs.map((q, i)=>({q, num:i+1}));
 }
 
-function makeImageParagraphs(q){
-  if(!q.imageData) return [];
-  const bytes = dataUrlToUint8Array(q.imageData);
+function splitTextByLines(text){
+  return (text || "").split(/\r?\n/);
+}
 
-  // Width in "px" approximation. This is stable enough for exam graphics.
+async function textWithMathToDocxParagraphs(text, opts){
+  // opts: { kind, alignText, mathMaxInches, mathDisplay }
+  const kind = opts.kind || "body";
+  const alignText = opts.alignText ?? AlignmentType.LEFT;
+  const mathMaxInches = opts.mathMaxInches ?? 6.0;
+
+  const out = [];
+  const lines = splitTextByLines(text);
+
+  // For each line, render any $$...$$ blocks as separate centered paragraphs
+  for(const line of lines){
+    const parts = splitByDisplayMath(line);
+    // If line contains only math blocks/spaces, emit them centered
+    for(const part of parts){
+      if(part.type === "text"){
+        const txt = part.value;
+        if(txt.length){
+          out.push(new Paragraph({
+            children:[new TextRun({ text: txt, ...runStyle(kind) })],
+            alignment: alignText
+          }));
+        }
+      } else {
+        // math block
+        try{
+          const svgEl = latexToSvgElement(part.value, true);
+          const svgStr = svgToOuterHtml(svgEl);
+
+          // Convert inches -> pixels (96 dpi)
+          const maxPx = Math.round(mathMaxInches * 96);
+          const png = await svgToPngBytes(svgStr, maxPx);
+
+          out.push(new Paragraph({
+            children: [
+              new ImageRun({
+                data: png.bytes,
+                transformation: { width: png.width, height: png.height }
+              })
+            ],
+            alignment: AlignmentType.CENTER
+          }));
+        }catch(e){
+          out.push(new Paragraph({
+            children:[new TextRun({ text:`[bad LaTeX: ${part.value}]`, ...runStyle(kind) })]
+          }));
+        }
+      }
+    }
+  }
+
+  return out;
+}
+
+async function makeImageParagraphsDocx(q){
+  if(!q.imageData) return [];
   const maxIn = Number(q.imageWidth || 5.8);
   const pxWidth = Math.round(maxIn * 96);
 
-  const imgPara = new Paragraph({
+  // keep aspect ratio by decoding bitmap dimensions
+  const img = new Image();
+  const dims = await new Promise((resolve,reject)=>{
+    img.onload = ()=>resolve({w: img.naturalWidth || img.width, h: img.naturalHeight || img.height});
+    img.onerror = reject;
+    img.src = q.imageData;
+  });
+
+  const scale = Math.min(1, pxWidth / (dims.w || pxWidth));
+  const outW = Math.max(1, Math.round((dims.w || pxWidth) * scale));
+  const outH = Math.max(1, Math.round((dims.h || 300) * scale));
+
+  const bytes = dataUrlToUint8Array(q.imageData);
+  const paras = [];
+
+  paras.push(new Paragraph({
     children: [
       new ImageRun({
         data: bytes,
-        transformation: { width: pxWidth, height: Math.round(pxWidth * 0.6) }
+        transformation: { width: outW, height: outH }
       })
-    ]
-  });
+    ],
+    alignment: AlignmentType.CENTER
+  }));
 
-  const captionPara = q.imageCaption
-    ? new Paragraph({ children:[ new TextRun({ text: q.imageCaption, ...runStyle("body"), italics:true }) ] })
-    : null;
+  if(q.imageCaption){
+    paras.push(new Paragraph({
+      children:[new TextRun({ text: q.imageCaption, ...runStyle("body"), italics:true })],
+      alignment: AlignmentType.CENTER
+    }));
+  }
 
-  return captionPara ? [imgPara, captionPara] : [imgPara];
+  return paras;
 }
 
-function buildExamDoc(){
+async function buildExamDoc(){
   const children = [];
-  children.push(...buildHeaderParas());
+  children.push(...buildHeaderParasDocx());
 
-  state.sections.forEach(sectionName=>{
+  // Instructions (typeset)
+  if(state.meta.instructions){
+    children.push(new Paragraph({
+      children:[new TextRun({ text:"Instructions:", ...runStyle("heading"), bold:true })]
+    }));
+    children.push(...await textWithMathToDocxParagraphs(state.meta.instructions, {
+      kind:"body",
+      alignText: AlignmentType.LEFT,
+      mathMaxInches: 6.2
+    }));
+    children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
+  }
+
+  for(const sectionName of state.sections){
     const qs = state.questions.filter(q=>q.section===sectionName);
-    if(qs.length===0) return;
+    if(qs.length===0) continue;
 
     children.push(new Paragraph({
       children:[new TextRun({ text: sectionName, ...runStyle("heading"), bold:true })]
@@ -1154,32 +1344,47 @@ function buildExamDoc(){
     children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
 
     const numbered = questionNumberingForSection(sectionName);
-    numbered.forEach(({q, num})=>{
+    for(const {q, num} of numbered){
+      // prompt label line
       children.push(new Paragraph({
         children: [
-          new TextRun({text: `${num}. `, ...runStyle("body"), bold:true}),
-          new TextRun({text: q.prompt || "", ...runStyle("body")}),
-          new TextRun({text: `  (${Number(q.points)||0} pt)`, ...runStyle("body"), italics:true})
+          new TextRun({ text: `${num}. `, ...runStyle("body"), bold:true }),
+          new TextRun({ text: `(${Number(q.points)||0} pt)`, ...runStyle("body"), italics:true })
         ]
       }));
 
-      if(q.type==="mc"){
+      // prompt content with math
+      children.push(...await textWithMathToDocxParagraphs(q.prompt || "", {
+        kind:"body",
+        alignText: AlignmentType.LEFT,
+        mathMaxInches: 6.2
+      }));
+
+      // choices / response lines
+      if(q.type === "mc"){
         const choices = (q.choices||[]).filter(c=>c && c.trim());
-        choices.forEach((c, idx)=>{
-          const letter = String.fromCharCode(65+idx);
+        let idx = 0;
+        for(const c of choices){
+          const letter = String.fromCharCode(65+idx++);
+          // support $$...$$ in choices too
           children.push(new Paragraph({
-            children:[new TextRun({ text:`   ${letter}) ${c}`, ...runStyle("body") })]
+            children:[new TextRun({ text:`   ${letter}) `, ...runStyle("body") })]
           }));
-        });
-      }else if(q.type==="tf"){
+          children.push(...await textWithMathToDocxParagraphs(c, {
+            kind:"body",
+            alignText: AlignmentType.LEFT,
+            mathMaxInches: 5.8
+          }));
+        }
+      } else if(q.type === "tf"){
         children.push(new Paragraph({
           children:[new TextRun({ text:"   ☐ True     ☐ False", ...runStyle("body") })]
         }));
-      }else if(q.type==="sa"){
+      } else if(q.type === "sa"){
         children.push(new Paragraph({
           children:[new TextRun({ text:"   ________________________________", ...runStyle("body") })]
         }));
-      }else if(q.type==="fr"){
+      } else if(q.type === "fr"){
         children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
         children.push(new Paragraph({
           children:[new TextRun({ text:"   (show work)", ...runStyle("body"), italics:true })]
@@ -1187,49 +1392,55 @@ function buildExamDoc(){
         children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
       }
 
-      makeImageParagraphs(q).forEach(p=>children.push(p));
-      children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
-    });
-  });
+      // attached image
+      children.push(...await makeImageParagraphsDocx(q));
 
-  return new Document({
-    sections: [{ properties: {}, children }]
-  });
+      children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
+    }
+  }
+
+  return new Document({ sections: [{ properties: {}, children }] });
 }
 
-function buildKeyDoc(){
+async function buildKeyDoc(){
   const children = [];
-
   const keyTitle = state.meta.title ? (state.meta.title + " — Answer Key") : "Answer Key";
+
   children.push(new Paragraph({
     children: [new TextRun({ text: keyTitle, ...runStyle("title"), bold:true })],
     alignment: AlignmentType.CENTER
   }));
   children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
 
-  state.sections.forEach(sectionName=>{
+  for(const sectionName of state.sections){
     const qs = state.questions.filter(q=>q.section===sectionName);
-    if(qs.length===0) return;
+    if(qs.length===0) continue;
 
     children.push(new Paragraph({
       children:[new TextRun({ text: sectionName, ...runStyle("heading"), bold:true })]
     }));
 
     const numbered = questionNumberingForSection(sectionName);
-    numbered.forEach(({q, num})=>{
-      const a = (q.answer || "").trim();
+    for(const {q, num} of numbered){
       children.push(new Paragraph({
         children:[
           new TextRun({text:`${num}. `, ...runStyle("body"), bold:true}),
-          new TextRun({text: a ? a : "(no answer provided)", ...runStyle("body")})
+          new TextRun({text:(q.answer || "").trim() ? "" : "(no answer provided)", ...runStyle("body")})
         ]
       }));
-    });
+      if((q.answer || "").trim()){
+        children.push(...await textWithMathToDocxParagraphs(q.answer.trim(), {
+          kind:"body",
+          alignText: AlignmentType.LEFT,
+          mathMaxInches: 5.6
+        }));
+      }
+    }
 
     children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
-  });
+  }
 
-  return new Document({ sections:[{children}]});
+  return new Document({ sections:[{children}] });
 }
 
 async function exportDoc(doc, filename){
@@ -1237,14 +1448,18 @@ async function exportDoc(doc, filename){
   saveAs(blob, filename);
 }
 
+/* =========================
+   Export buttons (ensure MathJax ready)
+========================= */
 $("exportExamBtn").addEventListener("click", async ()=>{
   syncMetaFromInputs();
   if(state.questions.length===0){
     alert("Add at least one question first.");
     return;
   }
+  await MathJax.startup.promise;
   const safeTitle = (state.meta.title || "exam").replace(/[^\w\-]+/g,"_");
-  await exportDoc(buildExamDoc(), `${safeTitle}.docx`);
+  await exportDoc(await buildExamDoc(), `${safeTitle}.docx`);
 });
 
 $("exportKeyBtn").addEventListener("click", async ()=>{
@@ -1253,15 +1468,17 @@ $("exportKeyBtn").addEventListener("click", async ()=>{
     alert("Add at least one question first.");
     return;
   }
+  await MathJax.startup.promise;
   const safeTitle = (state.meta.title || "exam").replace(/[^\w\-]+/g,"_");
-  await exportDoc(buildKeyDoc(), `${safeTitle}_AnswerKey.docx`);
+  await exportDoc(await buildKeyDoc(), `${safeTitle}_AnswerKey.docx`);
 });
 
 /* =========================
    Boot
 ========================= */
-(function init(){
+(async function init(){
   buildSymbolPalette();
+  buildFormulaPalette();
 
   const loaded = loadFromLocal();
   if(!loaded){
@@ -1274,8 +1491,36 @@ $("exportKeyBtn").addEventListener("click", async ()=>{
   syncInputsFromMeta();
   refreshSectionSelects();
   setTypeUI();
-  renderQuestions();
+
+  // autosave bindings
+  [
+    "examTitle","examCourse","examDate","examTime","examInstructions",
+    "fontFamily","fontColor","bodySizePt","headingSizePt","titleSizePt","previewPx"
+  ].forEach(id=>{
+    $(id).addEventListener("input", async ()=>{
+      syncMetaFromInputs();
+      saveToLocal();
+      await renderQuestions();
+    });
+    $(id).addEventListener("change", async ()=>{
+      syncMetaFromInputs();
+      saveToLocal();
+      await renderQuestions();
+    });
+  });
+
+  await MathJax.startup.promise;
+  await renderQuestions();
 })();
 </script>
+
+<script>
+/* =========================
+   Remaining small helpers
+========================= */
+function buildSymbolPalette(){ /* defined above */ }
+function buildFormulaPalette(){ /* defined above */ }
+</script>
+
 </body>
 </html>
