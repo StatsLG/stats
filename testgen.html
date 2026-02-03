@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Exam Builder (Export to Word)</title>
+
+  <!-- docx (Word generation) -->
+  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#ffffff;
+      --panel:#f5f7fb;
+      --card:#ffffff;
+      --ink:#0f172a;
+      --muted:#475569;
+      --rule:#e5e7eb;
+      --blue:#00467f;
+      --gold:#e7a614;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--ink); background:var(--bg);
+    }
+    header{
+      padding:14px 18px; border-bottom:1px solid var(--rule);
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+    }
+    header h1{ font-size:16px; margin:0; }
+    .wrap{
+      display:grid;
+      grid-template-columns: 380px 1fr;
+      gap:14px;
+      padding:14px;
+    }
+    @media (max-width: 1000px){
+      .wrap{ grid-template-columns:1fr; }
+    }
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--rule);
+      border-radius:14px;
+      padding:12px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--rule);
+      border-radius:14px;
+      padding:12px;
+      margin-bottom:12px;
+    }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; }
+    label{ font-size:12px; color:var(--muted); display:block; margin-bottom:6px; }
+    input[type="text"], input[type="number"], textarea, select{
+      width:100%;
+      padding:9px 10px;
+      border:1px solid var(--rule);
+      border-radius:10px;
+      font-size:14px;
+      background:#fff;
+    }
+    textarea{ min-height:70px; resize:vertical; }
+    .btn{
+      border:1px solid var(--blue);
+      background:var(--blue);
+      color:white;
+      padding:9px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:14px;
+    }
+    .btn.secondary{
+      background:white;
+      color:var(--blue);
+    }
+    .btn.ghost{
+      background:transparent;
+      color:var(--blue);
+      border-color:var(--rule);
+    }
+    .btn.danger{
+      background:#b91c1c;
+      border-color:#b91c1c;
+    }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; }
+    .tiny{ font-size:12px; color:var(--muted); }
+    .list{ display:flex; flex-direction:column; gap:10px; }
+    .qcard{
+      border:1px solid var(--rule);
+      border-radius:14px;
+      padding:12px;
+      background:#fff;
+    }
+    .qhead{
+      display:flex; gap:10px; align-items:flex-start; justify-content:space-between;
+    }
+    .badge{
+      display:inline-block;
+      font-size:12px;
+      padding:3px 8px;
+      border-radius:999px;
+      background:#eef2ff;
+      color:#3730a3;
+      margin-right:6px;
+    }
+    .controls{ display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+    .hr{ height:1px; background:var(--rule); margin:10px 0; }
+    .imgPrev{
+      max-width:100%;
+      border:1px solid var(--rule);
+      border-radius:10px;
+      margin-top:8px;
+      display:block;
+    }
+    .twoCol{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 700px){
+      .twoCol{ grid-template-columns:1fr; }
+    }
+    .pill{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--rule);
+      background:#fff;
+      font-size:12px;
+      color:var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Exam Builder → Export to Word (.docx)</h1>
+    <div class="row">
+      <span class="pill" id="saveStatus">Not saved yet</span>
+      <button class="btn secondary" id="exportExamBtn">Export Exam (.docx)</button>
+      <button class="btn secondary" id="exportKeyBtn">Export Answer Key (.docx)</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- LEFT: Exam settings + Add question -->
+    <aside class="panel">
+      <div class="card">
+        <h3 style="margin:0 0 8px 0;">Exam Info</h3>
+        <div class="twoCol">
+          <div>
+            <label>Title</label>
+            <input id="examTitle" type="text" placeholder="STA 220 Exam 1" />
+          </div>
+          <div>
+            <label>Course / Section</label>
+            <input id="examCourse" type="text" placeholder="STA 220" />
+          </div>
+          <div>
+            <label>Date (optional)</label>
+            <input id="examDate" type="text" placeholder="Feb 10, 2026" />
+          </div>
+          <div>
+            <label>Time limit (optional)</label>
+            <input id="examTime" type="text" placeholder="50 minutes" />
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <label>Instructions (optional)</label>
+          <textarea id="examInstructions" placeholder="Show work. No notes. Calculator allowed..."></textarea>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row">
+          <button class="btn" id="saveToFileBtn">Save Exam File (.json)</button>
+          <label class="btn ghost" style="display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
+            Load Exam File
+            <input id="loadFileInput" type="file" accept=".json" style="display:none;">
+          </label>
+          <button class="btn danger" id="resetBtn">Reset</button>
+        </div>
+        <p class="tiny" style="margin:10px 0 0 0;">
+          Progress auto-saves to your browser. “Save Exam File” gives you a portable backup.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 8px 0;">Sections</h3>
+        <div class="row" style="width:100%;">
+          <div style="flex:1;">
+            <label>New section name</label>
+            <input id="newSectionName" type="text" placeholder="Multiple Choice" />
+          </div>
+          <div style="align-self:flex-end;">
+            <button class="btn" id="addSectionBtn">Add Section</button>
+          </div>
+        </div>
+        <div id="sectionList" class="tiny" style="margin-top:8px;"></div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 8px 0;">Add Question</h3>
+
+        <div class="twoCol">
+          <div>
+            <label>Section</label>
+            <select id="qSection"></select>
+          </div>
+          <div>
+            <label>Type</label>
+            <select id="qType">
+              <option value="mc">Multiple Choice</option>
+              <option value="tf">True / False</option>
+              <option value="sa">Short Answer</option>
+              <option value="fr">Free Response</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="twoCol" style="margin-top:10px;">
+          <div>
+            <label>Points</label>
+            <input id="qPoints" type="number" min="0" step="0.5" value="1" />
+          </div>
+          <div>
+            <label>Answer (for key)</label>
+            <input id="qAnswer" type="text" placeholder="e.g., C or 12.4 or 'True'" />
+          </div>
+        </div>
+
+        <div style="margin-top:10px;">
+          <label>Question prompt</label>
+          <textarea id="qPrompt" placeholder="Type the question here..."></textarea>
+        </div>
+
+        <!-- MC choices -->
+        <div id="mcBlock" style="margin-top:10px;">
+          <label>Choices (Multiple Choice)</label>
+          <div class="twoCol">
+            <input class="choice" type="text" placeholder="A) ..." />
+            <input class="choice" type="text" placeholder="B) ..." />
+            <input class="choice" type="text" placeholder="C) ..." />
+            <input class="choice" type="text" placeholder="D) ..." />
+          </div>
+          <p class="tiny" style="margin:6px 0 0 0;">Tip: You can leave unused choices blank.</p>
+        </div>
+
+        <!-- Image upload -->
+        <div style="margin-top:10px;">
+          <label>Attach image (graph, figure, etc.)</label>
+          <input id="qImage" type="file" accept="image/png,image/jpeg" />
+          <div class="twoCol" style="margin-top:8px;">
+            <div>
+              <label>Image caption (optional)</label>
+              <input id="qImageCaption" type="text" placeholder="Figure 1" />
+            </div>
+            <div>
+              <label>Max width in Word (inches)</label>
+              <input id="qImageWidth" type="number" min="1" max="7" step="0.1" value="5.8" />
+            </div>
+          </div>
+          <img id="qImagePreview" class="imgPrev" style="display:none;" alt="preview"/>
+        </div>
+
+        <div class="hr"></div>
+        <button class="btn" id="addQuestionBtn" style="width:100%;">Add Question</button>
+      </div>
+    </aside>
+
+    <!-- RIGHT: Preview / edit list -->
+    <main class="panel">
+      <div class="card">
+        <div class="row" style="align-items:center; justify-content:space-between;">
+          <h3 style="margin:0;">Exam Preview</h3>
+          <div class="tiny" id="totals"></div>
+        </div>
+        <p class="tiny" style="margin:6px 0 0 0;">
+          Reorder with ↑↓. Edit/delete inline.
+        </p>
+      </div>
+
+      <div id="questionList" class="list"></div>
+    </main>
+  </div>
+
+<script>
+/* =========================
+   State + Persistence
+========================= */
+const STORAGE_KEY = "exam_builder_state_v1";
+
+let state = {
+  meta: {
+    title: "",
+    course: "",
+    date: "",
+    time: "",
+    instructions: ""
+  },
+  sections: ["General"],
+  questions: [] // {id, section, type, points, prompt, choices[], answer, imageData, imageMime, imageCaption, imageWidth}
+};
+
+const $ = (id) => document.getElementById(id);
+
+function uid(){
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+function setSaveStatus(text){
+  $("saveStatus").textContent = text;
+}
+
+function saveToLocal(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    setSaveStatus("Saved to browser: " + new Date().toLocaleTimeString());
+  }catch(e){
+    setSaveStatus("Local save failed (storage blocked?)");
+  }
+}
+
+function loadFromLocal(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const parsed = JSON.parse(raw);
+    if(parsed && parsed.meta && parsed.sections && parsed.questions){
+      state = parsed;
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+/* =========================
+   UI Helpers
+========================= */
+function syncMetaFromInputs(){
+  state.meta.title = $("examTitle").value.trim();
+  state.meta.course = $("examCourse").value.trim();
+  state.meta.date = $("examDate").value.trim();
+  state.meta.time = $("examTime").value.trim();
+  state.meta.instructions = $("examInstructions").value.trim();
+}
+
+function syncInputsFromMeta(){
+  $("examTitle").value = state.meta.title || "";
+  $("examCourse").value = state.meta.course || "";
+  $("examDate").value = state.meta.date || "";
+  $("examTime").value = state.meta.time || "";
+  $("examInstructions").value = state.meta.instructions || "";
+}
+
+function refreshSectionSelects(){
+  const sel = $("qSection");
+  sel.innerHTML = "";
+  state.sections.forEach(s=>{
+    const opt = document.createElement("option");
+    opt.value = s; opt.textContent = s;
+    sel.appendChild(opt);
+  });
+
+  // section list display
+  $("sectionList").innerHTML = state.sections.map((s, idx) => {
+    if(idx === 0) return `• <b>${escapeHtml(s)}</b>`;
+    return `• ${escapeHtml(s)} <button class="btn ghost" style="padding:4px 8px; font-size:12px;" onclick="deleteSection('${escapeAttr(s)}')">Delete</button>`;
+  }).join("<br>");
+}
+
+function totalPoints(){
+  return state.questions.reduce((sum,q)=>sum+(Number(q.points)||0),0);
+}
+
+function refreshTotals(){
+  const n = state.questions.length;
+  $("totals").textContent = `${n} question${n===1?"":"s"} • ${totalPoints()} point${totalPoints()===1?"":"s"}`;
+}
+
+function typeLabel(t){
+  return ({mc:"Multiple Choice", tf:"True/False", sa:"Short Answer", fr:"Free Response"})[t] || t;
+}
+
+function escapeHtml(str){
+  return (str||"").replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
+}
+function escapeAttr(str){
+  return (str||"").replace(/"/g,"&quot;");
+}
+
+/* =========================
+   Render question list
+========================= */
+function renderQuestions(){
+  const wrap = $("questionList");
+  wrap.innerHTML = "";
+
+  // group by sections in order
+  state.sections.forEach(sectionName=>{
+    const qs = state.questions.filter(q=>q.section===sectionName);
+    if(qs.length===0) return;
+
+    const secCard = document.createElement("div");
+    secCard.className = "card";
+    secCard.innerHTML = `<h3 style="margin:0 0 8px 0;">${escapeHtml(sectionName)}</h3>`;
+    wrap.appendChild(secCard);
+
+    qs.forEach(q=>{
+      const card = document.createElement("div");
+      card.className = "qcard";
+
+      const hasImg = !!q.imageData;
+      const choicesPreview = (q.type==="mc" && q.choices && q.choices.some(c=>c.trim()))
+        ? `<ol style="margin:8px 0 0 18px;">
+            ${q.choices.filter(c=>c.trim()).map(c=>`<li>${escapeHtml(c)}</li>`).join("")}
+           </ol>`
+        : "";
+
+      card.innerHTML = `
+        <div class="qhead">
+          <div>
+            <span class="badge">${escapeHtml(typeLabel(q.type))}</span>
+            <span class="tiny">${Number(q.points)||0} pt</span>
+          </div>
+          <div class="controls">
+            <button class="btn ghost" onclick="moveQuestion('${q.id}', -1)">↑</button>
+            <button class="btn ghost" onclick="moveQuestion('${q.id}', 1)">↓</button>
+            <button class="btn ghost" onclick="toggleEdit('${q.id}')">Edit</button>
+            <button class="btn danger" onclick="deleteQuestion('${q.id}')">Delete</button>
+          </div>
+        </div>
+
+        <div style="margin-top:8px;">
+          <div><b>Prompt:</b> <span>${escapeHtml(q.prompt)}</span></div>
+          ${choicesPreview}
+          ${hasImg ? `<img class="imgPrev" src="${q.imageData}" alt="question image" />` : ""}
+          ${hasImg && q.imageCaption ? `<div class="tiny" style="margin-top:6px;">${escapeHtml(q.imageCaption)}</div>` : ""}
+          ${q.answer ? `<div class="tiny" style="margin-top:8px;"><b>Key:</b> ${escapeHtml(q.answer)}</div>` : ""}
+        </div>
+
+        <div class="hr"></div>
+        <div id="edit_${q.id}" style="display:none;">
+          <div class="twoCol">
+            <div>
+              <label>Section</label>
+              <select id="edit_section_${q.id}">${state.sections.map(s=>`<option ${s===q.section?"selected":""}>${escapeHtml(s)}</option>`).join("")}</select>
+            </div>
+            <div>
+              <label>Type</label>
+              <select id="edit_type_${q.id}">
+                <option value="mc" ${q.type==="mc"?"selected":""}>Multiple Choice</option>
+                <option value="tf" ${q.type==="tf"?"selected":""}>True / False</option>
+                <option value="sa" ${q.type==="sa"?"selected":""}>Short Answer</option>
+                <option value="fr" ${q.type==="fr"?"selected":""}>Free Response</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="twoCol" style="margin-top:10px;">
+            <div>
+              <label>Points</label>
+              <input id="edit_points_${q.id}" type="number" step="0.5" value="${Number(q.points)||0}" />
+            </div>
+            <div>
+              <label>Answer (for key)</label>
+              <input id="edit_answer_${q.id}" type="text" value="${escapeAttr(q.answer||"")}" />
+            </div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <label>Prompt</label>
+            <textarea id="edit_prompt_${q.id}">${escapeHtml(q.prompt||"")}</textarea>
+          </div>
+
+          <div style="margin-top:10px;">
+            <label>Choices (MC only)</label>
+            <div class="twoCol">
+              ${(q.choices||["","","",""]).slice(0,4).map((c,i)=>`
+                <input id="edit_choice_${q.id}_${i}" type="text" value="${escapeAttr(c||"")}" placeholder="${String.fromCharCode(65+i)}) ..."/>
+              `).join("")}
+            </div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <label>Image</label>
+            <div class="row">
+              <label class="btn ghost" style="display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
+                Replace image
+                <input type="file" accept="image/png,image/jpeg" style="display:none;"
+                  onchange="replaceImage(event,'${q.id}')">
+              </label>
+              <button class="btn ghost" onclick="removeImage('${q.id}')" ${hasImg ? "" : "disabled"}>Remove image</button>
+            </div>
+            ${hasImg ? `<img class="imgPrev" src="${q.imageData}" alt="edit image" />` : `<div class="tiny">No image attached.</div>`}
+
+            <div class="twoCol" style="margin-top:8px;">
+              <div>
+                <label>Caption</label>
+                <input id="edit_caption_${q.id}" type="text" value="${escapeAttr(q.imageCaption||"")}" />
+              </div>
+              <div>
+                <label>Max width in Word (inches)</label>
+                <input id="edit_width_${q.id}" type="number" min="1" max="7" step="0.1" value="${Number(q.imageWidth)||5.8}" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px; justify-content:flex-end;">
+            <button class="btn secondary" onclick="saveEdit('${q.id}')">Save</button>
+          </div>
+        </div>
+      `;
+      wrap.appendChild(card);
+    });
+  });
+
+  refreshTotals();
+}
+
+window.toggleEdit = (id)=>{
+  const el = document.getElementById("edit_"+id);
+  if(!el) return;
+  el.style.display = (el.style.display==="none" || !el.style.display) ? "block" : "none";
+};
+
+window.deleteQuestion = (id)=>{
+  state.questions = state.questions.filter(q=>q.id!==id);
+  saveToLocal();
+  renderQuestions();
+};
+
+window.moveQuestion = (id, dir)=>{
+  // move within overall order (not just section)
+  const idx = state.questions.findIndex(q=>q.id===id);
+  if(idx<0) return;
+  const j = idx + dir;
+  if(j<0 || j>=state.questions.length) return;
+  const tmp = state.questions[idx];
+  state.questions[idx] = state.questions[j];
+  state.questions[j] = tmp;
+  saveToLocal();
+  renderQuestions();
+};
+
+window.saveEdit = (id)=>{
+  const q = state.questions.find(q=>q.id===id);
+  if(!q) return;
+  q.section = document.getElementById("edit_section_"+id).value;
+  q.type = document.getElementById("edit_type_"+id).value;
+  q.points = Number(document.getElementById("edit_points_"+id).value || 0);
+  q.answer = document.getElementById("edit_answer_"+id).value.trim();
+  q.prompt = document.getElementById("edit_prompt_"+id).value.trim();
+  q.choices = [0,1,2,3].map(i=>document.getElementById(`edit_choice_${id}_${i}`).value.trim());
+  q.imageCaption = document.getElementById("edit_caption_"+id).value.trim();
+  q.imageWidth = Number(document.getElementById("edit_width_"+id).value || 5.8);
+
+  saveToLocal();
+  renderQuestions();
+};
+
+window.replaceImage = async (evt, id)=>{
+  const file = evt.target.files && evt.target.files[0];
+  if(!file) return;
+  const data = await fileToDataUrl(file);
+  const q = state.questions.find(q=>q.id===id);
+  if(!q) return;
+  q.imageData = data;
+  q.imageMime = file.type || "image/png";
+  saveToLocal();
+  renderQuestions();
+};
+
+window.removeImage = (id)=>{
+  const q = state.questions.find(q=>q.id===id);
+  if(!q) return;
+  q.imageData = null;
+  q.imageMime = null;
+  saveToLocal();
+  renderQuestions();
+};
+
+window.deleteSection = (sectionName)=>{
+  // keep at least one
+  if(state.sections.length<=1) return;
+
+  const s = sectionName;
+  if(!confirm(`Delete section "${s}"? Questions in it will move to "${state.sections[0]}".`)) return;
+
+  const fallback = state.sections[0];
+  state.sections = state.sections.filter(x=>x!==s);
+  state.questions.forEach(q=>{
+    if(q.section===s) q.section = fallback;
+  });
+
+  saveToLocal();
+  refreshSectionSelects();
+  renderQuestions();
+};
+
+/* =========================
+   Add question
+========================= */
+function setTypeUI(){
+  const t = $("qType").value;
+  $("mcBlock").style.display = (t==="mc") ? "block" : "none";
+}
+$("qType").addEventListener("change", setTypeUI);
+
+async function fileToDataUrl(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+$("qImage").addEventListener("change", async (e)=>{
+  const file = e.target.files && e.target.files[0];
+  if(!file){
+    $("qImagePreview").style.display = "none";
+    return;
+  }
+  const data = await fileToDataUrl(file);
+  $("qImagePreview").src = data;
+  $("qImagePreview").style.display = "block";
+});
+
+$("addQuestionBtn").addEventListener("click", async ()=>{
+  syncMetaFromInputs();
+
+  const section = $("qSection").value;
+  const type = $("qType").value;
+  const points = Number($("qPoints").value || 0);
+  const answer = $("qAnswer").value.trim();
+  const prompt = $("qPrompt").value.trim();
+
+  if(!prompt){
+    alert("Please enter a question prompt.");
+    return;
+  }
+
+  let choices = [];
+  if(type==="mc"){
+    choices = Array.from(document.querySelectorAll(".choice"))
+      .map(i=>i.value.trim())
+      .filter((_, idx)=>idx<6); // safety
+    // Keep empty choices too (first 4) to preserve structure
+    choices = Array.from(document.querySelectorAll(".choice")).slice(0,4).map(i=>i.value.trim());
+  }
+
+  // Image
+  let imageData = null, imageMime = null;
+  const imgFile = $("qImage").files && $("qImage").files[0];
+  if(imgFile){
+    imageData = await fileToDataUrl(imgFile);
+    imageMime = imgFile.type || "image/png";
+  }
+  const imageCaption = $("qImageCaption").value.trim();
+  const imageWidth = Number($("qImageWidth").value || 5.8);
+
+  state.questions.push({
+    id: uid(),
+    section, type, points, prompt,
+    choices,
+    answer,
+    imageData,
+    imageMime,
+    imageCaption,
+    imageWidth
+  });
+
+  // clear inputs for next question
+  $("qPrompt").value = "";
+  $("qAnswer").value = "";
+  $("qPoints").value = "1";
+  document.querySelectorAll(".choice").forEach(i=>i.value="");
+  $("qImage").value = "";
+  $("qImageCaption").value = "";
+  $("qImageWidth").value = "5.8";
+  $("qImagePreview").style.display = "none";
+
+  saveToLocal();
+  renderQuestions();
+});
+
+/* =========================
+   Sections
+========================= */
+$("addSectionBtn").addEventListener("click", ()=>{
+  const name = $("newSectionName").value.trim();
+  if(!name) return;
+  if(state.sections.includes(name)){
+    alert("That section already exists.");
+    return;
+  }
+  state.sections.push(name);
+  $("newSectionName").value = "";
+  saveToLocal();
+  refreshSectionSelects();
+  renderQuestions();
+});
+
+/* =========================
+   Meta auto-save
+========================= */
+["examTitle","examCourse","examDate","examTime","examInstructions"].forEach(id=>{
+  $(id).addEventListener("input", ()=>{
+    syncMetaFromInputs();
+    saveToLocal();
+  });
+});
+
+/* =========================
+   Save/Load JSON
+========================= */
+function downloadJson(filename, obj){
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:"application/json"});
+  saveAs(blob, filename);
+}
+
+$("saveToFileBtn").addEventListener("click", ()=>{
+  syncMetaFromInputs();
+  const safeTitle = (state.meta.title || "exam").replace(/[^\w\-]+/g,"_");
+  downloadJson(`${safeTitle}.json`, state);
+});
+
+$("loadFileInput").addEventListener("change", async (e)=>{
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const text = await file.text();
+  try{
+    const parsed = JSON.parse(text);
+    if(!parsed || !parsed.meta || !parsed.sections || !parsed.questions) throw new Error("Invalid format");
+    state = parsed;
+    syncInputsFromMeta();
+    refreshSectionSelects();
+    renderQuestions();
+    saveToLocal();
+  }catch(err){
+    alert("Could not load that file. Make sure it is an Exam Builder .json file.");
+  }finally{
+    e.target.value = "";
+  }
+});
+
+$("resetBtn").addEventListener("click", ()=>{
+  if(!confirm("Reset everything? This clears the builder (browser autosave too).")) return;
+  state = {
+    meta:{title:"",course:"",date:"",time:"",instructions:""},
+    sections:["General"],
+    questions:[]
+  };
+  localStorage.removeItem(STORAGE_KEY);
+  syncInputsFromMeta();
+  refreshSectionSelects();
+  renderQuestions();
+  setSaveStatus("Reset complete");
+});
+
+/* =========================
+   Word export (.docx)
+========================= */
+const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, ImageRun } = docx;
+
+function dataUrlToUint8Array(dataUrl){
+  // data:image/png;base64,...
+  const base64 = dataUrl.split(",")[1];
+  const bin = atob(base64);
+  const len = bin.length;
+  const bytes = new Uint8Array(len);
+  for(let i=0;i<len;i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+function inchesToTwips(inches){
+  // 1 inch = 1440 twips
+  return Math.round(inches * 1440);
+}
+
+function buildHeaderParas(){
+  const paras = [];
+  const title = state.meta.title || "Exam";
+  paras.push(new Paragraph({
+    text: title,
+    heading: HeadingLevel.TITLE,
+    alignment: AlignmentType.CENTER
+  }));
+
+  const line2 = [state.meta.course, state.meta.date, state.meta.time].filter(Boolean).join(" • ");
+  if(line2){
+    paras.push(new Paragraph({
+      children:[new TextRun({text: line2, italics:true})],
+      alignment: AlignmentType.CENTER
+    }));
+  }
+  paras.push(new Paragraph({text:""}));
+
+  if(state.meta.instructions){
+    paras.push(new Paragraph({text:"Instructions:", heading: HeadingLevel.HEADING_2}));
+    paras.push(new Paragraph(state.meta.instructions));
+    paras.push(new Paragraph({text:""}));
+  }
+
+  return paras;
+}
+
+function questionNumberingForSection(sectionName){
+  // number within whole exam (global), but we display within section as 1..n in order of appearance
+  const qs = state.questions.filter(q=>q.section===sectionName);
+  return qs.map((q, i)=>({q, num:i+1}));
+}
+
+function makeImageParagraph(q){
+  if(!q.imageData) return [];
+  const bytes = dataUrlToUint8Array(q.imageData);
+
+  // Width control: docx uses pixels in transformation, but we can approximate using twips
+  // We'll set a width in twips and let docx keep aspect ratio based on the image data.
+  // docx's ImageRun transformation prefers pixels; however it also accepts width/height.
+  // We'll use a conservative pixel width mapping: 96 px per inch.
+  const maxIn = Number(q.imageWidth || 5.8);
+  const pxWidth = Math.round(maxIn * 96);
+
+  const imgPara = new Paragraph({
+    children: [
+      new ImageRun({
+        data: bytes,
+        transformation: { width: pxWidth, height: Math.round(pxWidth * 0.6) } // height will be adjusted visually; Word keeps as given
+      })
+    ]
+  });
+
+  const captionPara = q.imageCaption
+    ? new Paragraph({ children:[ new TextRun({text: q.imageCaption, italics:true}) ] })
+    : null;
+
+  return captionPara ? [imgPara, captionPara] : [imgPara];
+}
+
+function buildExamDoc(){
+  const children = [];
+  children.push(...buildHeaderParas());
+
+  state.sections.forEach(sectionName=>{
+    const qs = state.questions.filter(q=>q.section===sectionName);
+    if(qs.length===0) return;
+
+    children.push(new Paragraph({text: sectionName, heading: HeadingLevel.HEADING_1}));
+    children.push(new Paragraph({text:""}));
+
+    const numbered = questionNumberingForSection(sectionName);
+    numbered.forEach(({q, num})=>{
+      // Question line
+      children.push(new Paragraph({
+        children: [
+          new TextRun({text: `${num}. `, bold:true}),
+          new TextRun({text: q.prompt || ""}),
+          new TextRun({text: `  (${Number(q.points)||0} pt)`, italics:true})
+        ]
+      }));
+
+      // Choices
+      if(q.type==="mc"){
+        const choices = (q.choices||[]).filter(c=>c && c.trim());
+        choices.forEach((c, idx)=>{
+          const letter = String.fromCharCode(65+idx);
+          children.push(new Paragraph({ text: `   ${letter}) ${c}` }));
+        });
+      }else if(q.type==="tf"){
+        children.push(new Paragraph({ text: "   ☐ True     ☐ False" }));
+      }else if(q.type==="sa"){
+        children.push(new Paragraph({ text: "   ________________________________" }));
+      }else if(q.type==="fr"){
+        children.push(new Paragraph({ text: "" }));
+        children.push(new Paragraph({ text: "   (show work)" }));
+        children.push(new Paragraph({ text: "" }));
+      }
+
+      // Image
+      const imgParas = makeImageParagraph(q);
+      imgParas.forEach(p=>children.push(p));
+
+      children.push(new Paragraph({text:""}));
+    });
+  });
+
+  return new Document({
+    sections: [{ properties: {}, children }]
+  });
+}
+
+function buildKeyDoc(){
+  const children = [];
+  children.push(new Paragraph({
+    text: (state.meta.title ? state.meta.title + " — Answer Key" : "Answer Key"),
+    heading: HeadingLevel.TITLE,
+    alignment: AlignmentType.CENTER
+  }));
+  children.push(new Paragraph({text:""}));
+
+  state.sections.forEach(sectionName=>{
+    const qs = state.questions.filter(q=>q.section===sectionName);
+    if(qs.length===0) return;
+
+    children.push(new Paragraph({text: sectionName, heading: HeadingLevel.HEADING_1}));
+
+    const numbered = questionNumberingForSection(sectionName);
+    numbered.forEach(({q, num})=>{
+      const a = (q.answer || "").trim();
+      children.push(new Paragraph({
+        children:[
+          new TextRun({text:`${num}. `, bold:true}),
+          new TextRun({text: a ? a : "(no answer provided)"})
+        ]
+      }));
+    });
+
+    children.push(new Paragraph({text:""}));
+  });
+
+  return new Document({ sections:[{children}]});
+}
+
+async function exportDoc(doc, filename){
+  const blob = await Packer.toBlob(doc);
+  saveAs(blob, filename);
+}
+
+$("exportExamBtn").addEventListener("click", async ()=>{
+  syncMetaFromInputs();
+  if(state.questions.length===0){
+    alert("Add at least one question first.");
+    return;
+  }
+  const safeTitle = (state.meta.title || "exam").replace(/[^\w\-]+/g,"_");
+  await exportDoc(buildExamDoc(), `${safeTitle}.docx`);
+});
+
+$("exportKeyBtn").addEventListener("click", async ()=>{
+  syncMetaFromInputs();
+  if(state.questions.length===0){
+    alert("Add at least one question first.");
+    return;
+  }
+  const safeTitle = (state.meta.title || "exam").replace(/[^\w\-]+/g,"_");
+  await exportDoc(buildKeyDoc(), `${safeTitle}_AnswerKey.docx`);
+});
+
+/* =========================
+   Boot
+========================= */
+(function init(){
+  const loaded = loadFromLocal();
+  if(!loaded){
+    saveToLocal(); // initialize storage
+    setSaveStatus("Autosave ready");
+  }else{
+    setSaveStatus("Loaded from browser autosave");
+  }
+  syncInputsFromMeta();
+  refreshSectionSelects();
+  setTypeUI();
+  renderQuestions();
+})();
+</script>
+</body>
+</html>
