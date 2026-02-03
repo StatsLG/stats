@@ -19,11 +19,19 @@
       --rule:#e5e7eb;
       --blue:#00467f;
       --gold:#e7a614;
+
+      /* preview font styling (editable) */
+      --user-font: Calibri, Arial, sans-serif;
+      --user-color: #0f172a;
+      --user-body-size: 15px; /* approx preview, not docx */
     }
     *{ box-sizing:border-box; }
     body{
-      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--ink); background:var(--bg);
+      margin:0;
+      font-family: var(--user-font);
+      color: var(--user-color);
+      font-size: var(--user-body-size);
+      background:var(--bg);
     }
     header{
       padding:14px 18px; border-bottom:1px solid var(--rule);
@@ -32,11 +40,11 @@
     header h1{ font-size:16px; margin:0; }
     .wrap{
       display:grid;
-      grid-template-columns: 380px 1fr;
+      grid-template-columns: 420px 1fr;
       gap:14px;
       padding:14px;
     }
-    @media (max-width: 1000px){
+    @media (max-width: 1100px){
       .wrap{ grid-template-columns:1fr; }
     }
     .panel{
@@ -61,6 +69,8 @@
       border-radius:10px;
       font-size:14px;
       background:#fff;
+      color: var(--ink);
+      font-family: var(--user-font);
     }
     textarea{ min-height:70px; resize:vertical; }
     .btn{
@@ -72,6 +82,7 @@
       cursor:pointer;
       font-weight:600;
       font-size:14px;
+      font-family: var(--user-font);
     }
     .btn.secondary{
       background:white;
@@ -131,6 +142,42 @@
       background:#fff;
       font-size:12px;
       color:var(--muted);
+      font-family: var(--user-font);
+    }
+
+    /* Symbol palette */
+    .symWrap{
+      display:flex; flex-wrap:wrap; gap:6px;
+    }
+    .symBtn{
+      border:1px solid var(--rule);
+      background:#fff;
+      color:var(--ink);
+      border-radius:10px;
+      padding:6px 10px;
+      cursor:pointer;
+      font-size:14px;
+      font-family: var(--user-font);
+      line-height: 1;
+    }
+    .symBtn:hover{
+      border-color: var(--blue);
+    }
+    .symLabel{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:11px;
+      border:1px solid var(--rule);
+      background:#fff;
+      padding:2px 6px;
+      border-radius:8px;
+      color:var(--muted);
     }
   </style>
 </head>
@@ -145,7 +192,7 @@
   </header>
 
   <div class="wrap">
-    <!-- LEFT: Exam settings + Add question -->
+    <!-- LEFT -->
     <aside class="panel">
       <div class="card">
         <h3 style="margin:0 0 8px 0;">Exam Info</h3>
@@ -167,9 +214,52 @@
             <input id="examTime" type="text" placeholder="50 minutes" />
           </div>
         </div>
+
         <div style="margin-top:10px;">
           <label>Instructions (optional)</label>
           <textarea id="examInstructions" placeholder="Show work. No notes. Calculator allowed..."></textarea>
+        </div>
+
+        <div class="hr"></div>
+
+        <h3 style="margin:0 0 8px 0;">Style</h3>
+        <div class="twoCol">
+          <div>
+            <label>Font family</label>
+            <select id="fontFamily">
+              <option value="Calibri">Calibri</option>
+              <option value="Arial">Arial</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Verdana">Verdana</option>
+              <option value="Tahoma">Tahoma</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Font color</label>
+            <input id="fontColor" type="color" value="#0f172a" />
+          </div>
+
+          <div>
+            <label>Body font size (pt)</label>
+            <input id="bodySizePt" type="number" min="8" max="20" step="1" value="11" />
+          </div>
+
+          <div>
+            <label>Heading font size (pt)</label>
+            <input id="headingSizePt" type="number" min="10" max="28" step="1" value="16" />
+          </div>
+
+          <div>
+            <label>Title font size (pt)</label>
+            <input id="titleSizePt" type="number" min="14" max="40" step="1" value="22" />
+          </div>
+
+          <div>
+            <label>Preview zoom (px)</label>
+            <input id="previewPx" type="number" min="12" max="22" step="1" value="15" />
+          </div>
         </div>
 
         <div class="hr"></div>
@@ -184,6 +274,18 @@
         </div>
         <p class="tiny" style="margin:10px 0 0 0;">
           Progress auto-saves to your browser. “Save Exam File” gives you a portable backup.
+        </p>
+      </div>
+
+      <!-- Symbol palette -->
+      <div class="card">
+        <div class="symLabel">
+          <h3 style="margin:0;">Stats Symbols</h3>
+          <span class="tiny">Insert into active field • <span class="kbd">Alt</span>+<span class="kbd">S</span> focuses Prompt</span>
+        </div>
+        <div class="symWrap" id="symbolPalette"></div>
+        <p class="tiny" style="margin:8px 0 0 0;">
+          Click a symbol to insert it. Works in Instructions, Prompt, Choices, Answers, etc.
         </p>
       </div>
 
@@ -227,7 +329,7 @@
           </div>
           <div>
             <label>Answer (for key)</label>
-            <input id="qAnswer" type="text" placeholder="e.g., C or 12.4 or 'True'" />
+            <input id="qAnswer" type="text" placeholder="e.g., C or 12.4 or True" />
           </div>
         </div>
 
@@ -270,7 +372,7 @@
       </div>
     </aside>
 
-    <!-- RIGHT: Preview / edit list -->
+    <!-- RIGHT -->
     <main class="panel">
       <div class="card">
         <div class="row" style="align-items:center; justify-content:space-between;">
@@ -290,7 +392,7 @@
 /* =========================
    State + Persistence
 ========================= */
-const STORAGE_KEY = "exam_builder_state_v1";
+const STORAGE_KEY = "exam_builder_state_v2_symbols_styles";
 
 let state = {
   meta: {
@@ -298,10 +400,18 @@ let state = {
     course: "",
     date: "",
     time: "",
-    instructions: ""
+    instructions: "",
+    style: {
+      fontFamily: "Calibri",
+      bodySizePt: 11,     // docx
+      headingSizePt: 16,  // docx
+      titleSizePt: 22,    // docx
+      fontColor: "#0f172a",
+      previewPx: 15       // browser preview only
+    }
   },
   sections: ["General"],
-  questions: [] // {id, section, type, points, prompt, choices[], answer, imageData, imageMime, imageCaption, imageWidth}
+  questions: []
 };
 
 const $ = (id) => document.getElementById(id);
@@ -329,6 +439,11 @@ function loadFromLocal(){
     if(!raw) return false;
     const parsed = JSON.parse(raw);
     if(parsed && parsed.meta && parsed.sections && parsed.questions){
+      // backwards safety defaults
+      parsed.meta.style = parsed.meta.style || {
+        fontFamily:"Calibri", bodySizePt:11, headingSizePt:16, titleSizePt:22, fontColor:"#0f172a", previewPx:15
+      };
+      if(parsed.meta.style.previewPx == null) parsed.meta.style.previewPx = 15;
       state = parsed;
       return true;
     }
@@ -337,14 +452,148 @@ function loadFromLocal(){
 }
 
 /* =========================
+   Symbol palette
+========================= */
+const SYMBOLS = [
+  {label:"x̄", insert:"x̄"},        // x + macron (may be combining depending on font)
+  {label:"ȳ", insert:"ȳ"},          // y with macron
+  {label:"Σ", insert:"Σ"},
+  {label:"∑", insert:"∑"},
+  {label:"σ", insert:"σ"},
+  {label:"μ", insert:"μ"},
+  {label:"π", insert:"π"},
+  {label:"√", insert:"√"},
+  {label:"≤", insert:"≤"},
+  {label:"≥", insert:"≥"},
+  {label:"≠", insert:"≠"},
+  {label:"±", insert:"±"},
+  {label:"∞", insert:"∞"},
+  {label:"∈", insert:"∈"},
+  {label:"∪", insert:"∪"},
+  {label:"∩", insert:"∩"},
+  {label:"P( )", insert:"P()"},
+  {label:"E[ ]", insert:"E[]"},
+  {label:"Var( )", insert:"Var()"},
+  {label:"SD", insert:"SD"},
+  {label:"r", insert:"r"},
+  {label:"r²", insert:"r²"},
+  {label:"ρ", insert:"ρ"},
+  {label:"β₀", insert:"β₀"},
+  {label:"β₁", insert:"β₁"},
+  {label:"p̂", insert:"p̂"},
+  {label:"H₀", insert:"H₀"},
+  {label:"Hₐ", insert:"Hₐ"},
+  {label:"α", insert:"α"},
+  {label:"z", insert:"z"},
+  {label:"t", insert:"t"},
+  {label:"χ²", insert:"χ²"}
+];
+
+let lastFocusedEditable = null;
+
+function isEditable(el){
+  if(!el) return false;
+  const tag = el.tagName;
+  return (tag === "TEXTAREA") || (tag === "INPUT" && (el.type === "text" || el.type === "number" || el.type === "search" || el.type === "email"));
+}
+
+function trackFocus(e){
+  const el = e.target;
+  if(isEditable(el)){
+    lastFocusedEditable = el;
+  }
+}
+document.addEventListener("focusin", trackFocus);
+
+function insertAtCursor(el, text){
+  if(!el || !isEditable(el)) return false;
+
+  // For number inputs, insert makes no sense; use end append
+  if(el.tagName === "INPUT" && el.type === "number"){
+    el.value = (el.value || "") + String(text);
+    el.dispatchEvent(new Event("input", {bubbles:true}));
+    return true;
+  }
+
+  const start = el.selectionStart ?? el.value.length;
+  const end   = el.selectionEnd ?? el.value.length;
+  const before = el.value.slice(0, start);
+  const after  = el.value.slice(end);
+
+  // Special helpers: place caret inside () or []
+  let newValue = before + text + after;
+  el.value = newValue;
+
+  let caretPos = start + text.length;
+  // If inserted token includes () or [], place cursor inside them
+  const idxParen = text.indexOf("()");
+  const idxBrack = text.indexOf("[]");
+  if(idxParen !== -1) caretPos = start + idxParen + 1;
+  else if(idxBrack !== -1) caretPos = start + idxBrack + 1;
+
+  el.focus();
+  el.setSelectionRange(caretPos, caretPos);
+  el.dispatchEvent(new Event("input", {bubbles:true}));
+  return true;
+}
+
+function insertSymbol(symbolText){
+  const target = (isEditable(document.activeElement) ? document.activeElement : lastFocusedEditable) || $("qPrompt");
+  insertAtCursor(target, symbolText);
+}
+
+function buildSymbolPalette(){
+  const wrap = $("symbolPalette");
+  wrap.innerHTML = "";
+  SYMBOLS.forEach(s=>{
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "symBtn";
+    b.textContent = s.label;
+    b.title = `Insert ${s.insert}`;
+    b.addEventListener("click", ()=>insertSymbol(s.insert));
+    wrap.appendChild(b);
+  });
+}
+
+// Quick keyboard helper: Alt+S focuses the question prompt
+document.addEventListener("keydown", (e)=>{
+  if(e.altKey && (e.key === "s" || e.key === "S")){
+    e.preventDefault();
+    $("qPrompt").focus();
+  }
+});
+
+/* =========================
    UI Helpers
 ========================= */
+function applyPreviewStyle(){
+  const st = state.meta.style || {};
+  const fam = st.fontFamily || "Calibri";
+  const col = st.fontColor || "#0f172a";
+  const px  = Number(st.previewPx ?? 15);
+
+  document.documentElement.style.setProperty("--user-font", fam);
+  document.documentElement.style.setProperty("--user-color", col);
+  document.documentElement.style.setProperty("--user-body-size", px + "px");
+}
+
 function syncMetaFromInputs(){
   state.meta.title = $("examTitle").value.trim();
   state.meta.course = $("examCourse").value.trim();
   state.meta.date = $("examDate").value.trim();
   state.meta.time = $("examTime").value.trim();
   state.meta.instructions = $("examInstructions").value.trim();
+
+  state.meta.style = state.meta.style || {};
+  state.meta.style.fontFamily = $("fontFamily").value;
+  state.meta.style.fontColor = $("fontColor").value;
+  state.meta.style.bodySizePt = Number($("bodySizePt").value || 11);
+  state.meta.style.headingSizePt = Number($("headingSizePt").value || 16);
+  state.meta.style.titleSizePt = Number($("titleSizePt").value || 22);
+  state.meta.style.previewPx = Number($("previewPx").value || 15);
+
+  applyPreviewStyle();
 }
 
 function syncInputsFromMeta(){
@@ -353,6 +602,16 @@ function syncInputsFromMeta(){
   $("examDate").value = state.meta.date || "";
   $("examTime").value = state.meta.time || "";
   $("examInstructions").value = state.meta.instructions || "";
+
+  const st = state.meta.style || {};
+  $("fontFamily").value = st.fontFamily || "Calibri";
+  $("fontColor").value = st.fontColor || "#0f172a";
+  $("bodySizePt").value = st.bodySizePt ?? 11;
+  $("headingSizePt").value = st.headingSizePt ?? 16;
+  $("titleSizePt").value = st.titleSizePt ?? 22;
+  $("previewPx").value = st.previewPx ?? 15;
+
+  applyPreviewStyle();
 }
 
 function refreshSectionSelects(){
@@ -364,7 +623,6 @@ function refreshSectionSelects(){
     sel.appendChild(opt);
   });
 
-  // section list display
   $("sectionList").innerHTML = state.sections.map((s, idx) => {
     if(idx === 0) return `• <b>${escapeHtml(s)}</b>`;
     return `• ${escapeHtml(s)} <button class="btn ghost" style="padding:4px 8px; font-size:12px;" onclick="deleteSection('${escapeAttr(s)}')">Delete</button>`;
@@ -377,7 +635,8 @@ function totalPoints(){
 
 function refreshTotals(){
   const n = state.questions.length;
-  $("totals").textContent = `${n} question${n===1?"":"s"} • ${totalPoints()} point${totalPoints()===1?"":"s"}`;
+  const tp = totalPoints();
+  $("totals").textContent = `${n} question${n===1?"":"s"} • ${tp} point${tp===1?"":"s"}`;
 }
 
 function typeLabel(t){
@@ -400,7 +659,6 @@ function renderQuestions(){
   const wrap = $("questionList");
   wrap.innerHTML = "";
 
-  // group by sections in order
   state.sections.forEach(sectionName=>{
     const qs = state.questions.filter(q=>q.section===sectionName);
     if(qs.length===0) return;
@@ -535,7 +793,6 @@ window.deleteQuestion = (id)=>{
 };
 
 window.moveQuestion = (id, dir)=>{
-  // move within overall order (not just section)
   const idx = state.questions.findIndex(q=>q.id===id);
   if(idx<0) return;
   const j = idx + dir;
@@ -585,7 +842,6 @@ window.removeImage = (id)=>{
 };
 
 window.deleteSection = (sectionName)=>{
-  // keep at least one
   if(state.sections.length<=1) return;
 
   const s = sectionName;
@@ -647,14 +903,9 @@ $("addQuestionBtn").addEventListener("click", async ()=>{
 
   let choices = [];
   if(type==="mc"){
-    choices = Array.from(document.querySelectorAll(".choice"))
-      .map(i=>i.value.trim())
-      .filter((_, idx)=>idx<6); // safety
-    // Keep empty choices too (first 4) to preserve structure
     choices = Array.from(document.querySelectorAll(".choice")).slice(0,4).map(i=>i.value.trim());
   }
 
-  // Image
   let imageData = null, imageMime = null;
   const imgFile = $("qImage").files && $("qImage").files[0];
   if(imgFile){
@@ -675,7 +926,6 @@ $("addQuestionBtn").addEventListener("click", async ()=>{
     imageWidth
   });
 
-  // clear inputs for next question
   $("qPrompt").value = "";
   $("qAnswer").value = "";
   $("qPoints").value = "1";
@@ -707,10 +957,17 @@ $("addSectionBtn").addEventListener("click", ()=>{
 });
 
 /* =========================
-   Meta auto-save
+   Autosave meta + style
 ========================= */
-["examTitle","examCourse","examDate","examTime","examInstructions"].forEach(id=>{
+[
+  "examTitle","examCourse","examDate","examTime","examInstructions",
+  "fontFamily","fontColor","bodySizePt","headingSizePt","titleSizePt","previewPx"
+].forEach(id=>{
   $(id).addEventListener("input", ()=>{
+    syncMetaFromInputs();
+    saveToLocal();
+  });
+  $(id).addEventListener("change", ()=>{
     syncMetaFromInputs();
     saveToLocal();
   });
@@ -737,7 +994,12 @@ $("loadFileInput").addEventListener("change", async (e)=>{
   try{
     const parsed = JSON.parse(text);
     if(!parsed || !parsed.meta || !parsed.sections || !parsed.questions) throw new Error("Invalid format");
+    parsed.meta.style = parsed.meta.style || {
+      fontFamily:"Calibri", bodySizePt:11, headingSizePt:16, titleSizePt:22, fontColor:"#0f172a", previewPx:15
+    };
+    if(parsed.meta.style.previewPx == null) parsed.meta.style.previewPx = 15;
     state = parsed;
+
     syncInputsFromMeta();
     refreshSectionSelects();
     renderQuestions();
@@ -752,7 +1014,10 @@ $("loadFileInput").addEventListener("change", async (e)=>{
 $("resetBtn").addEventListener("click", ()=>{
   if(!confirm("Reset everything? This clears the builder (browser autosave too).")) return;
   state = {
-    meta:{title:"",course:"",date:"",time:"",instructions:""},
+    meta:{
+      title:"",course:"",date:"",time:"",instructions:"",
+      style:{ fontFamily:"Calibri", bodySizePt:11, headingSizePt:16, titleSizePt:22, fontColor:"#0f172a", previewPx:15 }
+    },
     sections:["General"],
     questions:[]
   };
@@ -768,8 +1033,26 @@ $("resetBtn").addEventListener("click", ()=>{
 ========================= */
 const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, ImageRun } = docx;
 
+function cleanHexColor(hex){
+  return (hex || "#000000").replace("#","").toUpperCase();
+}
+function ptToHalfPoints(pt){
+  return Math.round((Number(pt) || 11) * 2);
+}
+function runStyle(kind="body"){
+  const st = state.meta.style || {};
+  const sizePt =
+    kind === "title" ? (st.titleSizePt ?? 22) :
+    kind === "heading" ? (st.headingSizePt ?? 16) :
+    (st.bodySizePt ?? 11);
+
+  return {
+    font: st.fontFamily || "Calibri",
+    color: cleanHexColor(st.fontColor || "#0f172a"),
+    size: ptToHalfPoints(sizePt)
+  };
+}
 function dataUrlToUint8Array(dataUrl){
-  // data:image/png;base64,...
   const base64 = dataUrl.split(",")[1];
   const bin = atob(base64);
   const len = bin.length;
@@ -778,52 +1061,47 @@ function dataUrlToUint8Array(dataUrl){
   return bytes;
 }
 
-function inchesToTwips(inches){
-  // 1 inch = 1440 twips
-  return Math.round(inches * 1440);
-}
-
 function buildHeaderParas(){
   const paras = [];
   const title = state.meta.title || "Exam";
+
   paras.push(new Paragraph({
-    text: title,
-    heading: HeadingLevel.TITLE,
+    children: [new TextRun({ text: title, ...runStyle("title"), bold: true })],
     alignment: AlignmentType.CENTER
   }));
 
   const line2 = [state.meta.course, state.meta.date, state.meta.time].filter(Boolean).join(" • ");
   if(line2){
     paras.push(new Paragraph({
-      children:[new TextRun({text: line2, italics:true})],
+      children:[new TextRun({ text: line2, ...runStyle("body"), italics:true })],
       alignment: AlignmentType.CENTER
     }));
   }
-  paras.push(new Paragraph({text:""}));
+  paras.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
 
   if(state.meta.instructions){
-    paras.push(new Paragraph({text:"Instructions:", heading: HeadingLevel.HEADING_2}));
-    paras.push(new Paragraph(state.meta.instructions));
-    paras.push(new Paragraph({text:""}));
+    paras.push(new Paragraph({
+      children:[new TextRun({ text:"Instructions:", ...runStyle("heading"), bold:true })]
+    }));
+    paras.push(new Paragraph({
+      children:[new TextRun({ text: state.meta.instructions, ...runStyle("body") })]
+    }));
+    paras.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
   }
 
   return paras;
 }
 
 function questionNumberingForSection(sectionName){
-  // number within whole exam (global), but we display within section as 1..n in order of appearance
   const qs = state.questions.filter(q=>q.section===sectionName);
   return qs.map((q, i)=>({q, num:i+1}));
 }
 
-function makeImageParagraph(q){
+function makeImageParagraphs(q){
   if(!q.imageData) return [];
   const bytes = dataUrlToUint8Array(q.imageData);
 
-  // Width control: docx uses pixels in transformation, but we can approximate using twips
-  // We'll set a width in twips and let docx keep aspect ratio based on the image data.
-  // docx's ImageRun transformation prefers pixels; however it also accepts width/height.
-  // We'll use a conservative pixel width mapping: 96 px per inch.
+  // Width in "px" approximation. This is stable enough for exam graphics.
   const maxIn = Number(q.imageWidth || 5.8);
   const pxWidth = Math.round(maxIn * 96);
 
@@ -831,13 +1109,13 @@ function makeImageParagraph(q){
     children: [
       new ImageRun({
         data: bytes,
-        transformation: { width: pxWidth, height: Math.round(pxWidth * 0.6) } // height will be adjusted visually; Word keeps as given
+        transformation: { width: pxWidth, height: Math.round(pxWidth * 0.6) }
       })
     ]
   });
 
   const captionPara = q.imageCaption
-    ? new Paragraph({ children:[ new TextRun({text: q.imageCaption, italics:true}) ] })
+    ? new Paragraph({ children:[ new TextRun({ text: q.imageCaption, ...runStyle("body"), italics:true }) ] })
     : null;
 
   return captionPara ? [imgPara, captionPara] : [imgPara];
@@ -851,42 +1129,47 @@ function buildExamDoc(){
     const qs = state.questions.filter(q=>q.section===sectionName);
     if(qs.length===0) return;
 
-    children.push(new Paragraph({text: sectionName, heading: HeadingLevel.HEADING_1}));
-    children.push(new Paragraph({text:""}));
+    children.push(new Paragraph({
+      children:[new TextRun({ text: sectionName, ...runStyle("heading"), bold:true })]
+    }));
+    children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
 
     const numbered = questionNumberingForSection(sectionName);
     numbered.forEach(({q, num})=>{
-      // Question line
       children.push(new Paragraph({
         children: [
-          new TextRun({text: `${num}. `, bold:true}),
-          new TextRun({text: q.prompt || ""}),
-          new TextRun({text: `  (${Number(q.points)||0} pt)`, italics:true})
+          new TextRun({text: `${num}. `, ...runStyle("body"), bold:true}),
+          new TextRun({text: q.prompt || "", ...runStyle("body")}),
+          new TextRun({text: `  (${Number(q.points)||0} pt)`, ...runStyle("body"), italics:true})
         ]
       }));
 
-      // Choices
       if(q.type==="mc"){
         const choices = (q.choices||[]).filter(c=>c && c.trim());
         choices.forEach((c, idx)=>{
           const letter = String.fromCharCode(65+idx);
-          children.push(new Paragraph({ text: `   ${letter}) ${c}` }));
+          children.push(new Paragraph({
+            children:[new TextRun({ text:`   ${letter}) ${c}`, ...runStyle("body") })]
+          }));
         });
       }else if(q.type==="tf"){
-        children.push(new Paragraph({ text: "   ☐ True     ☐ False" }));
+        children.push(new Paragraph({
+          children:[new TextRun({ text:"   ☐ True     ☐ False", ...runStyle("body") })]
+        }));
       }else if(q.type==="sa"){
-        children.push(new Paragraph({ text: "   ________________________________" }));
+        children.push(new Paragraph({
+          children:[new TextRun({ text:"   ________________________________", ...runStyle("body") })]
+        }));
       }else if(q.type==="fr"){
-        children.push(new Paragraph({ text: "" }));
-        children.push(new Paragraph({ text: "   (show work)" }));
-        children.push(new Paragraph({ text: "" }));
+        children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
+        children.push(new Paragraph({
+          children:[new TextRun({ text:"   (show work)", ...runStyle("body"), italics:true })]
+        }));
+        children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
       }
 
-      // Image
-      const imgParas = makeImageParagraph(q);
-      imgParas.forEach(p=>children.push(p));
-
-      children.push(new Paragraph({text:""}));
+      makeImageParagraphs(q).forEach(p=>children.push(p));
+      children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
     });
   });
 
@@ -897,31 +1180,34 @@ function buildExamDoc(){
 
 function buildKeyDoc(){
   const children = [];
+
+  const keyTitle = state.meta.title ? (state.meta.title + " — Answer Key") : "Answer Key";
   children.push(new Paragraph({
-    text: (state.meta.title ? state.meta.title + " — Answer Key" : "Answer Key"),
-    heading: HeadingLevel.TITLE,
+    children: [new TextRun({ text: keyTitle, ...runStyle("title"), bold:true })],
     alignment: AlignmentType.CENTER
   }));
-  children.push(new Paragraph({text:""}));
+  children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
 
   state.sections.forEach(sectionName=>{
     const qs = state.questions.filter(q=>q.section===sectionName);
     if(qs.length===0) return;
 
-    children.push(new Paragraph({text: sectionName, heading: HeadingLevel.HEADING_1}));
+    children.push(new Paragraph({
+      children:[new TextRun({ text: sectionName, ...runStyle("heading"), bold:true })]
+    }));
 
     const numbered = questionNumberingForSection(sectionName);
     numbered.forEach(({q, num})=>{
       const a = (q.answer || "").trim();
       children.push(new Paragraph({
         children:[
-          new TextRun({text:`${num}. `, bold:true}),
-          new TextRun({text: a ? a : "(no answer provided)"})
+          new TextRun({text:`${num}. `, ...runStyle("body"), bold:true}),
+          new TextRun({text: a ? a : "(no answer provided)", ...runStyle("body")})
         ]
       }));
     });
 
-    children.push(new Paragraph({text:""}));
+    children.push(new Paragraph({ children:[new TextRun({ text:"", ...runStyle("body") })] }));
   });
 
   return new Document({ sections:[{children}]});
@@ -956,13 +1242,16 @@ $("exportKeyBtn").addEventListener("click", async ()=>{
    Boot
 ========================= */
 (function init(){
+  buildSymbolPalette();
+
   const loaded = loadFromLocal();
   if(!loaded){
-    saveToLocal(); // initialize storage
+    saveToLocal();
     setSaveStatus("Autosave ready");
   }else{
     setSaveStatus("Loaded from browser autosave");
   }
+
   syncInputsFromMeta();
   refreshSectionSelects();
   setTypeUI();
