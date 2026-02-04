@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Guess the Correlation — StatsLG</title>
+  <meta name="description" content="Interactive game: visually estimate the correlation from a scatterplot." />
+
+  <!-- If you have your site CSS, keep this (adjust path as needed) -->
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <style>
+    /* If your site CSS already styles .wrap/.card/.btn, this will blend in.
+       Otherwise, these minimal styles keep it looking clean. */
+    :root{
+      --ink:#0f172a; --muted:#4b5563; --rule:#e5e7eb;
+      --panel:#f5f7fb; --card:#ffffff;
+      --kblue:#00467f; --kgold:#e7a614;
+    }
+    body{ margin:0; color:var(--ink); background:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    .wrap{ max-width:1100px; margin:0 auto; padding:18px; }
+    .grid{ display:grid; grid-template-columns: 1.2fr 0.8fr; gap:16px; align-items:start; }
+    @media (max-width: 900px){ .grid{ grid-template-columns:1fr; } }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--rule);
+      border-radius:14px;
+      box-shadow:0 2px 14px rgba(2,6,23,0.06);
+      padding:14px;
+    }
+    h1{ font-size:1.35rem; margin:0 0 6px; }
+    .sub{ color:var(--muted); margin:0 0 10px; }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .row > *{ flex:0 0 auto; }
+    .btn{
+      background:var(--kblue);
+      color:#fff;
+      border:0;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:650;
+      cursor:pointer;
+    }
+    .btn.secondary{ background:#e9eef7; color:var(--ink); border:1px solid var(--rule); }
+    .btn.gold{ background:var(--kgold); color:#111827; }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; }
+
+    .control{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    label{ font-weight:650; }
+    .hint{ color:var(--muted); font-size:.92rem; line-height:1.25rem; }
+    .statline{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    .pill{
+      border:1px solid var(--rule);
+      border-radius:12px;
+      padding:10px 12px;
+      background:var(--panel);
+    }
+    .pill b{ display:block; font-size:.85rem; color:var(--muted); margin-bottom:4px; }
+    .pill span{ font-size:1.2rem; font-weight:750; }
+    .feedback{
+      border:1px solid var(--rule);
+      border-radius:12px;
+      padding:12px;
+      background:#fff;
+      line-height:1.3rem;
+    }
+    .good{ border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.08); }
+    .mid{ border-color: rgba(234,179,8,.35); background: rgba(234,179,8,.10); }
+    .bad{ border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.08); }
+
+    .canvasWrap{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    canvas{
+      width:100%;
+      height:auto;
+      border:1px solid var(--rule);
+      border-radius:14px;
+      background:#fff;
+    }
+    .small{ font-size:.9rem; color:var(--muted); }
+    .divider{ height:1px; background:var(--rule); margin:10px 0; }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    input[type="range"]{ width:100%; }
+    input[type="number"], select{
+      width:100%;
+      padding:10px 10px;
+      border:1px solid var(--rule);
+      border-radius:12px;
+      font-size:1rem;
+      background:#fff;
+    }
+    .twoCol{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .kbd{
+      display:inline-block;
+      padding:2px 7px;
+      border:1px solid var(--rule);
+      border-bottom-width:2px;
+      border-radius:8px;
+      background:#fff;
+      font-size:.85rem;
+      color:var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card" style="margin-bottom:16px;">
+      <h1>Guess the Correlation</h1>
+      <p class="sub">Estimate Pearson’s correlation <span class="mono">r</span> from the scatterplot. Then check your guess.</p>
+      <div class="row">
+        <button class="btn secondary" id="newRoundBtn" title="New random dataset (N)">New Round <span class="kbd">N</span></button>
+        <button class="btn" id="checkBtn" title="Reveal r and score (Enter)">Check My Guess <span class="kbd">Enter</span></button>
+        <button class="btn gold" id="replayBtn" title="Replay the same round">Replay Round</button>
+        <div style="flex:1 1 auto;"></div>
+        <span class="small">Score: <b id="score">0</b> / <b id="rounds">0</b></span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: plot -->
+      <div class="card canvasWrap">
+        <canvas id="plot" width="900" height="640" aria-label="scatterplot"></canvas>
+        <div class="small">
+          Tip: Correlation is about <b>strength + direction</b> of a <b>linear</b> relationship (not slope).
+        </div>
+      </div>
+
+      <!-- RIGHT: controls + feedback -->
+      <div class="card">
+        <div class="control">
+          <div>
+            <label for="guessRange">Your guess for r</label>
+            <div class="twoCol" style="margin-top:8px;">
+              <input id="guessRange" type="range" min="-1" max="1" step="0.01" value="0" />
+              <input id="guessNum" type="number" min="-1" max="1" step="0.01" value="0" />
+            </div>
+            <div class="hint" style="margin-top:6px;">
+              Use the slider or type a value between <b>-1</b> and <b>+1</b>.
+            </div>
+          </div>
+
+          <div class="twoCol">
+            <div>
+              <label for="difficulty">Difficulty</label>
+              <select id="difficulty">
+                <option value="intro">Intro (clean)</option>
+                <option value="intermediate">Intermediate (more noise)</option>
+                <option value="advanced">Advanced (smaller N + outliers)</option>
+                <option value="evil">Evil Mode (tricks + nonlinearity)</option>
+              </select>
+            </div>
+            <div>
+              <label for="showGrid">Plot options</label>
+              <select id="showGrid">
+                <option value="on">Show grid</option>
+                <option value="off">Hide grid</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="statline">
+            <div class="pill">
+              <b>Actual r</b>
+              <span id="actualR">—</span>
+            </div>
+            <div class="pill">
+              <b>Your error</b>
+              <span id="err">—</span>
+            </div>
+          </div>
+
+          <div class="feedback" id="feedbackBox">
+            Make a guess, then click <b>Check My Guess</b>.
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="hint">
+            <b>Teacher note:</b> “Replay Round” keeps the same dataset so you can discuss it.
+            “New Round” generates a fresh one.
+          </div>
+
+          <div class="hint">
+            Keyboard: <span class="kbd">N</span> new round, <span class="kbd">Enter</span> check.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // -----------------------------
+  // Utilities
+  // -----------------------------
+  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+  const round2 = (x) => Math.round(x * 100) / 100;
+  const round3 = (x) => Math.round(x * 1000) / 1000;
+
+  // Normal-ish noise via Box-Muller
+  function randn() {
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+
+  // Pearson correlation
+  function pearsonR(xs, ys) {
+    const n = xs.length;
+    let sx = 0, sy = 0;
+    for (let i = 0; i < n; i++) { sx += xs[i]; sy += ys[i]; }
+    const mx = sx / n, my = sy / n;
+
+    let num = 0, dx = 0, dy = 0;
+    for (let i = 0; i < n; i++) {
+      const a = xs[i] - mx;
+      const b = ys[i] - my;
+      num += a * b;
+      dx += a * a;
+      dy += b * b;
+    }
+    const den = Math.sqrt(dx * dy);
+    if (den === 0) return 0;
+    return num / den;
+  }
+
+  // Generate correlated data (approx target correlation)
+  // Strategy: y = a*x + noise ; then standardize; correlation emerges from noise level.
+  function generateLinearData(n, targetR, noiseScale = 1) {
+    // x ~ N(0,1)
+    const xs = Array.from({length:n}, () => randn());
+    // y = x + e; choose e variance to match targetR roughly:
+    // Corr(x, x+e) = 1 / sqrt(1 + Var(e)/Var(x)) with Var(x)=1 -> Var(e)= (1/r^2) - 1
+    const r = clamp(Math.abs(targetR), 0.01, 0.99);
+    const varE = (1 / (r*r)) - 1;
+    const eSD = Math.sqrt(varE) * noiseScale;
+
+    const sign = targetR >= 0 ? 1 : -1;
+    const ys = xs.map(x => sign * x + randn() * eSD);
+
+    // Optional rescale to look nice (not necessary for r)
+    return { xs, ys };
+  }
+
+  // Nonlinear (evil): curve or cluster mix
+  function generateNonlinearData(n) {
+    const xs = [];
+    const ys = [];
+    for (let i = 0; i < n; i++) {
+      const x = (Math.random() * 6) - 3; // -3..3
+      // U-shape with noise
+      const y = 0.45 * (x*x) + randn() * 0.8;
+      xs.push(x);
+      ys.push(y);
+    }
+    return { xs, ys };
+  }
+
+  function addOutlier(data, strength = 4.5) {
+    // Add a single influential outlier
+    const xs = data.xs.slice();
+    const ys = data.ys.slice();
+    const ox = (Math.random() < 0.5 ? -1 : 1) * (3 + Math.random() * strength);
+    const oy = (Math.random() < 0.5 ? -1 : 1) * (3 + Math.random() * strength);
+    xs.push(ox);
+    ys.push(oy);
+    return { xs, ys };
+  }
+
+  // -----------------------------
+  // Plotting
+  // -----------------------------
+  const canvas = document.getElementById('plot');
+  const ctx = canvas.getContext('2d');
+
+  function getBounds(xs, ys) {
+    let xmin = Infinity, xmax = -Infinity, ymin = Infinity, ymax = -Infinity;
+    for (let i = 0; i < xs.length; i++) {
+      xmin = Math.min(xmin, xs[i]);
+      xmax = Math.max(xmax, xs[i]);
+      ymin = Math.min(ymin, ys[i]);
+      ymax = Math.max(ymax, ys[i]);
+    }
+    // pad
+    const xpad = (xmax - xmin) * 0.08 || 1;
+    const ypad = (ymax - ymin) * 0.08 || 1;
+    return { xmin: xmin - xpad, xmax: xmax + xpad, ymin: ymin - ypad, ymax: ymax + ypad };
+  }
+
+  function drawPlot(xs, ys, opts) {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // panel background
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, W, H);
+
+    const pad = 58;
+    const plotW = W - pad*2;
+    const plotH = H - pad*2;
+
+    const { xmin, xmax, ymin, ymax } = getBounds(xs, ys);
+
+    const xToPx = (x) => pad + (x - xmin) / (xmax - xmin) * plotW;
+    const yToPx = (y) => pad + plotH - (y - ymin) / (ymax - ymin) * plotH;
+
+    // axes box
+    ctx.strokeStyle = "#e5e7eb";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(pad, pad, plotW, plotH);
+
+    // grid
+    if (opts.grid) {
+      ctx.strokeStyle = "rgba(148,163,184,0.25)";
+      ctx.lineWidth = 1;
+      const gridN = 10;
+      for (let i = 1; i < gridN; i++) {
+        const gx = pad + (plotW/gridN)*i;
+        const gy = pad + (plotH/gridN)*i;
+        ctx.beginPath(); ctx.moveTo(gx, pad); ctx.lineTo(gx, pad+plotH); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(pad, gy); ctx.lineTo(pad+plotW, gy); ctx.stroke();
+      }
+    }
+
+    // points
+    ctx.fillStyle = "rgba(0,70,127,0.85)";
+    for (let i = 0; i < xs.length; i++) {
+      const px = xToPx(xs[i]);
+      const py = yToPx(ys[i]);
+      ctx.beginPath();
+      ctx.arc(px, py, 5, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // labels (simple, no numeric ticks to keep it “visual first”)
+    ctx.fillStyle = "#0f172a";
+    ctx.font = "700 18px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif";
+    ctx.fillText("Scatterplot (guess r)", pad, 32);
+
+    ctx.fillStyle = "#4b5563";
+    ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif";
+    ctx.fillText(`n = ${xs.length}`, W - pad - 70, 32);
+
+    // axis labels
+    ctx.save();
+    ctx.fillStyle = "#4b5563";
+    ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif";
+    ctx.fillText("X", pad + plotW/2, H - 18);
+    ctx.translate(18, pad + plotH/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillText("Y", 0, 0);
+    ctx.restore();
+  }
+
+  // -----------------------------
+  // Game state
+  // -----------------------------
+  const guessRange = document.getElementById('guessRange');
+  const guessNum = document.getElementById('guessNum');
+  const difficultySel = document.getElementById('difficulty');
+  const showGridSel = document.getElementById('showGrid');
+
+  const newRoundBtn = document.getElementById('newRoundBtn');
+  const checkBtn = document.getElementById('checkBtn');
+  const replayBtn = document.getElementById('replayBtn');
+
+  const actualREl = document.getElementById('actualR');
+  const errEl = document.getElementById('err');
+  const feedbackBox = document.getElementById('feedbackBox');
+  const scoreEl = document.getElementById('score');
+  const roundsEl = document.getElementById('rounds');
+
+  let state = {
+    data: null,
+    r: null,
+    revealed: false,
+    rounds: 0,
+    score: 0
+  };
+
+  function syncGuessInputs(from) {
+    if (from === 'range') {
+      guessNum.value = guessRange.value;
+    } else {
+      let v = parseFloat(guessNum.value);
+      if (Number.isNaN(v)) v = 0;
+      v = clamp(v, -1, 1);
+      guessNum.value = v.toFixed(2);
+      guessRange.value = v;
+    }
+  }
+
+  function setFeedback(kind, html) {
+    feedbackBox.classList.remove('good','mid','bad');
+    if (kind) feedbackBox.classList.add(kind);
+    feedbackBox.innerHTML = html;
+  }
+
+  function explain(r, n, hasOutlier, nonlinear) {
+    const absr = Math.abs(r);
+    let strength = "very weak";
+    if (absr >= 0.85) strength = "very strong";
+    else if (absr >= 0.65) strength = "strong";
+    else if (absr >= 0.40) strength = "moderate";
+    else if (absr >= 0.20) strength = "weak";
+
+    const dir = r >= 0 ? "positive" : "negative";
+    const extra = [];
+    if (hasOutlier) extra.push("An outlier can pull r up/down a lot.");
+    if (nonlinear) extra.push("This pattern isn’t linear, so r can be misleading.");
+
+    return `
+      This is a <b>${strength}</b>, <b>${dir}</b> linear association (n = ${n}).
+      ${extra.length ? "<div style='margin-top:8px; color:#374151;'>" + extra.join(" ") + "</div>" : ""}
+    `;
+  }
+
+  function grade(error) {
+    // error thresholds: <=0.10 excellent, <=0.20 good, <=0.35 ok, else miss
+    if (error <= 0.10) return { points: 3, kind: "good", label: "Nailed it" };
+    if (error <= 0.20) return { points: 2, kind: "good", label: "Very close" };
+    if (error <= 0.35) return { points: 1, kind: "mid", label: "Close-ish" };
+    return { points: 0, kind: "bad", label: "Off target" };
+  }
+
+  function makeRound({ replay = false } = {}) {
+    state.revealed = false;
+    actualREl.textContent = "—";
+    errEl.textContent = "—";
+
+    const difficulty = difficultySel.value;
+
+    let data, nonlinear = false, hasOutlier = false;
+
+    if (replay && state.data) {
+      data = state.data;
+      // keep flags from previous by recomputing heuristically
+      // (we also store them below)
+      nonlinear = !!state.nonlinear;
+      hasOutlier = !!state.hasOutlier;
+    } else {
+      // choose target r and build dataset
+      if (difficulty === "evil" && Math.random() < 0.35) {
+        data = generateNonlinearData(60);
+        nonlinear = true;
+      } else {
+        // random target correlation, avoid tiny near-zero too often in non-intro
+        let targetR = (Math.random() * 1.9) - 0.95; // -0.95..0.95
+        if (difficulty !== "intro" && Math.random() < 0.35) {
+          // push away from 0 sometimes
+          if (Math.abs(targetR) < 0.25) targetR = (targetR < 0 ? -1 : 1) * (0.25 + Math.random()*0.6);
+        }
+
+        let n = 90, noiseScale = 1.0;
+        if (difficulty === "intro") { n = 110; noiseScale = 0.9; }
+        if (difficulty === "intermediate") { n = 90; noiseScale = 1.15; }
+        if (difficulty === "advanced") { n = 55; noiseScale = 1.35; }
+        if (difficulty === "evil") { n = 45; noiseScale = 1.45; }
+
+        data = generateLinearData(n, targetR, noiseScale);
+
+        // add outlier sometimes
+        if (difficulty === "advanced" && Math.random() < 0.55) {
+          data = addOutlier(data, 5.5);
+          hasOutlier = true;
+        }
+        if (difficulty === "evil" && Math.random() < 0.6) {
+          data = addOutlier(data, 6.5);
+          hasOutlier = true;
+        }
+      }
+
+      state.data = data;
+      state.nonlinear = nonlinear;
+      state.hasOutlier = hasOutlier;
+    }
+
+    // actual r from the generated data
+    const r = pearsonR(data.xs, data.ys);
+    state.r = r;
+
+    drawPlot(data.xs, data.ys, { grid: showGridSel.value === "on" });
+
+    setFeedback(null, "Make a guess, then click <b>Check My Guess</b>.");
+    checkBtn.disabled = false;
+  }
+
+  function checkGuess() {
+    if (!state.data || state.revealed) return;
+
+    const g = clamp(parseFloat(guessRange.value), -1, 1);
+    const r = state.r;
+
+    const error = Math.abs(g - r);
+    const { points, kind, label } = grade(error);
+
+    state.rounds += 1;
+    state.score += points;
+
+    roundsEl.textContent = state.rounds;
+    scoreEl.textContent = state.score;
+
+    actualREl.textContent = round3(r).toFixed(3);
+    errEl.textContent = round3(error).toFixed(3);
+
+    const expl = explain(r, state.data.xs.length, state.hasOutlier, state.nonlinear);
+
+    setFeedback(kind, `
+      <div style="font-weight:800; margin-bottom:6px;">${label} (+${points} pts)</div>
+      <div>${expl}</div>
+      <div style="margin-top:10px; color:#374151;">
+        Your guess: <b>${round2(g).toFixed(2)}</b> &nbsp;|&nbsp; Actual r: <b>${round3(r).toFixed(3)}</b> &nbsp;|&nbsp; Error: <b>${round3(error).toFixed(3)}</b>
+      </div>
+    `);
+
+    state.revealed = true;
+    checkBtn.disabled = true;
+  }
+
+  // -----------------------------
+  // Events
+  // -----------------------------
+  guessRange.addEventListener('input', () => syncGuessInputs('range'));
+  guessNum.addEventListener('input', () => syncGuessInputs('num'));
+
+  newRoundBtn.addEventListener('click', () => makeRound({ replay:false }));
+  replayBtn.addEventListener('click', () => makeRound({ replay:true }));
+  checkBtn.addEventListener('click', checkGuess);
+
+  difficultySel.addEventListener('change', () => makeRound({ replay:false }));
+  showGridSel.addEventListener('change', () => {
+    if (state.data) drawPlot(state.data.xs, state.data.ys, { grid: showGridSel.value === "on" });
+  });
+
+  // Keyboard shortcuts
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); checkGuess(); }
+    if (e.key.toLowerCase() === 'n') { e.preventDefault(); makeRound({ replay:false }); }
+  });
+
+  // Init
+  syncGuessInputs('range');
+  makeRound({ replay:false });
+})();
+</script>
+</body>
+</html>
