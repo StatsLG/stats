@@ -16,6 +16,8 @@
         <input id="file" type="file" accept=".csv, .xlsx" />
         <button class="btn" id="loadBtn">Load File</button>
         <button class="btn" id="sampleBtn">Load Sample</button>
+        <!-- ✅ NEW -->
+        <button class="btn" id="lab4Btn">Load Lab 4 Data</button>
         <div id="status" class="muted" style="margin-top:6px"></div>
       </div>
 
@@ -66,6 +68,7 @@
             </select>
           </div>
         </div>
+
         <div class="row">
           <div>
             <label>Line Color</label>
@@ -74,6 +77,25 @@
           <div>
             <label>Line Width</label>
             <input id="regWidth" type="number" min="1" value="2" />
+          </div>
+        </div>
+
+        <!-- ✅ NEW: equation placement controls -->
+        <div class="row">
+          <div>
+            <label>Equation Placement</label>
+            <select id="eqPlacement">
+              <option value="inChart" selected>On Chart</option>
+              <option value="belowChart">Below Chart</option>
+            </select>
+          </div>
+          <div>
+            <label>Below Alignment</label>
+            <select id="eqAlign">
+              <option value="left" selected>Left</option>
+              <option value="center">Center</option>
+              <option value="right">Right</option>
+            </select>
           </div>
         </div>
       </div>
@@ -131,7 +153,12 @@
     <main class="panel">
       <div class="chart-wrap"><canvas id="chart"></canvas></div>
 
-      <!-- ✅ NEW: Regression sums table -->
+      <!-- ✅ NEW: equation / r can live below chart -->
+      <div id="eqBelow"
+           class="muted"
+           style="margin-top:8px; display:none; font-weight:600;">
+      </div>
+
       <div class="card" style="margin-top:12px;">
         <strong>Regression Sums</strong>
         <div id="regSums" class="muted" style="margin-top:8px;">
@@ -148,52 +175,91 @@ function validAlpha(a){ let x=parseFloat(a); if(isNaN(x)) x=0.85; return Math.mi
 function hexToRgb(hex){ const m=/^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex||'#60a5fa'); if(!m) return [96,165,250]; return [parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)]; }
 function rgba([r,g,b],a){ return `rgba(${r},${g},${b},${a})`; }
 
-function buildTable(rows){ if(!rows.length) return '<div>No data loaded</div>'; const headers=Object.keys(rows[0]); let html='<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>'; for(const r of rows.slice(0,20)){ html+='<tr>'+headers.map(h=>`<td>${r[h]}</td>`).join('')+'</tr>'; } html+='</tbody></table>'; return html; }
+function buildTable(rows){
+  if(!rows.length) return '<div>No data loaded</div>';
+  const headers=Object.keys(rows[0]);
+  let html='<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>';
+  for(const r of rows.slice(0,20)){
+    html+='<tr>'+headers.map(h=>`<td>${r[h]}</td>`).join('')+'</tr>';
+  }
+  html+='</tbody></table>';
+  return html;
+}
 
 async function loadFile(file){
   try{
     const isExcel=(file.name||'').toLowerCase().endsWith('.xlsx');
     if(isExcel){
-      const buf=await file.arrayBuffer(); const wb=XLSX.read(buf,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]];
+      const buf=await file.arrayBuffer();
+      const wb=XLSX.read(buf,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
       setData(XLSX.utils.sheet_to_json(ws,{defval:''}));
     } else {
-      const text=await file.text(); const wb=XLSX.read(text,{type:'string'}); const ws=wb.Sheets[wb.SheetNames[0]];
+      const text=await file.text();
+      const wb=XLSX.read(text,{type:'string'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
       setData(XLSX.utils.sheet_to_json(ws,{defval:''}));
     }
-  } catch(e){ console.error(e); document.getElementById('status').textContent='Failed to parse file. Use CSV or XLSX.'; }
+  } catch(e){
+    console.error(e);
+    document.getElementById('status').textContent='Failed to parse file. Use CSV or XLSX.';
+  }
 }
 
 function setData(rows){
-  DATA=rows||[]; HEADERS=DATA.length?Object.keys(DATA[0]):[];
+  DATA=rows||[];
+  HEADERS=DATA.length?Object.keys(DATA[0]):[];
   const numericCols=HEADERS.filter(h=> DATA.some(r=> Number.isFinite(parseFloat(r[h])) ));
-  const xSel=document.getElementById('xSelect'); const ySel=document.getElementById('ySelect');
+
+  const xSel=document.getElementById('xSelect');
+  const ySel=document.getElementById('ySelect');
   const opts=numericCols.map(h=>`<option value="${h}">${h}</option>`).join('');
+
   xSel.innerHTML='<option value="">—</option>'+opts;
   ySel.innerHTML='<option value="">—</option>'+opts;
+
+  // helpful defaults: first numeric column for X, second for Y if available
+  if(numericCols.length>=1) xSel.value = numericCols[0];
+  if(numericCols.length>=2) ySel.value = numericCols[1];
+
   document.getElementById('preview').innerHTML=buildTable(DATA);
   document.getElementById('status').textContent=`Loaded ${DATA.length} rows / ${HEADERS.length} cols`;
 
-  // ✅ NEW: clear sums display when new data loads
   document.getElementById('regSums').textContent='Select X and Y, then draw a scatterplot to see sums.';
+  setEqBelowText(''); // clear
 }
 
 function getXY(xcol,ycol){
-  const pts=[]; for(const r of DATA){ const x=parseFloat(r[xcol]), y=parseFloat(r[ycol]); if(Number.isFinite(x)&&Number.isFinite(y)) pts.push({x,y}); }
+  const pts=[];
+  for(const r of DATA){
+    const x=parseFloat(r[xcol]), y=parseFloat(r[ycol]);
+    if(Number.isFinite(x)&&Number.isFinite(y)) pts.push({x,y});
+  }
   return pts;
 }
 
 function linreg(points){
-  const n=points.length; if(n<2) return null;
+  const n=points.length;
+  if(n<2) return null;
+
   let sx=0, sy=0, sxx=0, syy=0, sxy=0;
-  for(const p of points){ sx+=p.x; sy+=p.y; sxx+=p.x*p.x; syy+=p.y*p.y; sxy+=p.x*p.y; }
+  for(const p of points){
+    sx+=p.x; sy+=p.y;
+    sxx+=p.x*p.x; syy+=p.y*p.y; sxy+=p.x*p.y;
+  }
   const xbar=sx/n, ybar=sy/n;
-  const Sxx=sxx - n*xbar*xbar; const Syy=syy - n*ybar*ybar; const Sxy=sxy - n*xbar*ybar;
+  const Sxx=sxx - n*xbar*xbar;
+  const Syy=syy - n*ybar*ybar;
+  const Sxy=sxy - n*xbar*ybar;
+
   if(Sxx===0||Syy===0) return {a:ybar, b:0, r:0};
-  const b=Sxy/Sxx; const a=ybar - b*xbar; const r=Sxy/Math.sqrt(Sxx*Syy);
+  const b=Sxy/Sxx;
+  const a=ybar - b*xbar;
+  const r=Sxy/Math.sqrt(Sxx*Syy);
   return {a,b,r};
 }
 
-/* ✅ NEW: compute and render requested sums */
+/* Regression sums table */
 function computeSums(points){
   const n = points.length;
   let sx=0, sy=0, sxx=0, syy=0, sxy=0;
@@ -204,9 +270,9 @@ function computeSums(points){
     syy += p.y*p.y;     // Σ(y^2)
     sxy += p.x*p.y;     // Σ(xy)
   }
-  const ssx = sxx - (sx*sx)/n;  // SSX = Σ(x^2) - (Σx)^2/n
-  const ssy = syy - (sy*sy)/n;  // SSY = Σ(y^2) - (Σy)^2/n
-  const sxy_adj = sxy - (sx*sy)/n; // SXY = Σ(xy) - (Σx Σy)/n
+  const ssx = sxx - (sx*sx)/n;        // SSX
+  const ssy = syy - (sy*sy)/n;        // SSY
+  const sxy_adj = sxy - (sx*sy)/n;    // SXY
 
   return {
     n,
@@ -222,15 +288,12 @@ function computeSums(points){
     SXY: sxy_adj
   };
 }
-
 function fmt(v){
-  // nice classroom-friendly formatting
   if(!Number.isFinite(v)) return '—';
   const abs = Math.abs(v);
   if(abs !== 0 && (abs >= 1e6 || abs < 1e-3)) return v.toExponential(4);
   return (Math.round(v*10000)/10000).toString();
 }
-
 function renderSumsTable(points){
   const box = document.getElementById('regSums');
   if(!box) return;
@@ -241,7 +304,6 @@ function renderSumsTable(points){
   }
 
   const s = computeSums(points);
-
   const rows = [
     ['n', s.n],
     ['Σx', s.sumx],
@@ -259,9 +321,7 @@ function renderSumsTable(points){
   box.innerHTML = `
     <div style="overflow:auto;">
       <table>
-        <thead>
-          <tr><th>Quantity</th><th>Value</th></tr>
-        </thead>
+        <thead><tr><th>Quantity</th><th>Value</th></tr></thead>
         <tbody>
           ${rows.map(([k,v])=>`<tr><td>${k}</td><td>${fmt(v)}</td></tr>`).join('')}
         </tbody>
@@ -270,7 +330,33 @@ function renderSumsTable(points){
   `;
 }
 
-const backgroundPlugin={ id:'custom_bgcolor', beforeDraw:(chart)=>{ const ctx=chart.ctx; const bg=(document.getElementById('bgColor')?.value)||'#ffffff'; ctx.save(); ctx.fillStyle=bg; ctx.fillRect(0,0,chart.width,chart.height); ctx.restore(); } };
+/* ✅ NEW: equation below-chart helper */
+function setEqBelowText(text){
+  const el = document.getElementById('eqBelow');
+  const placement = document.getElementById('eqPlacement')?.value || 'inChart';
+  const align = document.getElementById('eqAlign')?.value || 'left';
+
+  if(placement === 'belowChart' && text){
+    el.style.display = 'block';
+    el.textContent = text;
+    el.style.textAlign = align;
+  } else {
+    el.style.display = 'none';
+    el.textContent = '';
+  }
+}
+
+const backgroundPlugin={
+  id:'custom_bgcolor',
+  beforeDraw:(chart)=>{
+    const ctx=chart.ctx;
+    const bg=(document.getElementById('bgColor')?.value)||'#ffffff';
+    ctx.save();
+    ctx.fillStyle=bg;
+    ctx.fillRect(0,0,chart.width,chart.height);
+    ctx.restore();
+  }
+};
 
 // readable text color over chosen background
 function bestTextColorForBg(hex){
@@ -279,23 +365,37 @@ function bestTextColorForBg(hex){
   const luma=0.2126*r+0.7152*g+0.0722*b;
   return luma>180? '#111827' : '#e5e7eb';
 }
-const annotationPlugin={ id:'reg_annotation', afterDraw:(chart)=>{
-  if(!statsText) return;
-  const area=chart.chartArea, ctx=chart.ctx;
-  const fontFamily=document.getElementById('fontFamily')?.value||'sans-serif';
-  const fontSize=parseInt(document.getElementById('fontSize')?.value,10)||12;
-  const bg=(document.getElementById('bgColor')?.value)||'#ffffff';
-  const color=bestTextColorForBg(bg);
-  ctx.save();
-  ctx.font=`${fontSize}px ${fontFamily}`;
-  ctx.fillStyle=color; ctx.textAlign='left'; ctx.textBaseline='top';
-  const x=area.left+8, y=area.top+8;
-  // subtle outline for readability
-  ctx.strokeStyle = color==='#e5e7eb' ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.35)';
-  ctx.lineWidth=3; ctx.strokeText(statsText, x, y);
-  ctx.fillText(statsText, x, y);
-  ctx.restore();
-} };
+
+const annotationPlugin={
+  id:'reg_annotation',
+  afterDraw:(chart)=>{
+    // ✅ NEW: if we're placing equation below chart, do NOT draw inside chart.
+    const placement = document.getElementById('eqPlacement')?.value || 'inChart';
+    if(placement === 'belowChart') return;
+
+    if(!statsText) return;
+    const area=chart.chartArea, ctx=chart.ctx;
+    const fontFamily=document.getElementById('fontFamily')?.value||'sans-serif';
+    const fontSize=parseInt(document.getElementById('fontSize')?.value,10)||12;
+    const bg=(document.getElementById('bgColor')?.value)||'#ffffff';
+    const color=bestTextColorForBg(bg);
+
+    ctx.save();
+    ctx.font=`${fontSize}px ${fontFamily}`;
+    ctx.fillStyle=color;
+    ctx.textAlign='left';
+    ctx.textBaseline='top';
+
+    const x=area.left+8, y=area.top+8;
+
+    // subtle outline for readability
+    ctx.strokeStyle = color==='#e5e7eb' ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.35)';
+    ctx.lineWidth=3;
+    ctx.strokeText(statsText, x, y);
+    ctx.fillText(statsText, x, y);
+    ctx.restore();
+  }
+};
 
 function applySize(){
   const wrap=document.querySelector('.chart-wrap');
@@ -309,7 +409,9 @@ function drawScatter(){
   const xcol=document.getElementById('xSelect').value;
   const ycol=document.getElementById('ySelect').value;
   if(!xcol||!ycol) return alert('Pick both X and Y numeric columns');
-  const pts=getXY(xcol,ycol); if(pts.length<2) return alert('Need at least 2 numeric XY pairs.');
+
+  const pts=getXY(xcol,ycol);
+  if(pts.length<2) return alert('Need at least 2 numeric XY pairs.');
 
   const alpha=validAlpha(document.getElementById('opacity').value);
   const fill=rgba(hexToRgb(document.getElementById('fillColor').value), alpha);
@@ -324,37 +426,50 @@ function drawScatter(){
   const showLegend=document.getElementById('legendDisplay').value==='show';
   const padding=parseInt(document.getElementById('chartPad').value,10)||0;
 
-  const scatterDataset={ label:`${ycol} vs ${xcol}`, data: pts, showLine:false,
-    backgroundColor:fill, borderColor:border, borderWidth:1, pointRadius:radius };
+  const scatterDataset={
+    label:`${ycol} vs ${xcol}`,
+    data: pts,
+    showLine:false,
+    backgroundColor:fill,
+    borderColor:border,
+    borderWidth:1,
+    pointRadius:radius
+  };
 
-  applySize(); if(currentChart) currentChart.destroy();
+  applySize();
+  if(currentChart) currentChart.destroy();
 
   currentChart=new Chart(document.getElementById('chart'),{
     type:'scatter',
     data:{ datasets:[scatterDataset] },
     options:{
-      responsive:true, maintainAspectRatio:false,
+      responsive:true,
+      maintainAspectRatio:false,
       layout:{ padding: padding },
       plugins:{
         legend:{ display: showLegend, labels:{ font:{ family:fontFamily, size:fontSize } } },
         title:{ display:true, text:title, font:{ family:fontFamily, size:fontSize+2 } },
-        tooltip:{ callbacks:{ label:(ctx)=>`(${ctx.parsed.x}, ${ctx.parsed.y})` },
-                  bodyFont:{ family:fontFamily, size:fontSize } }
+        tooltip:{
+          callbacks:{ label:(ctx)=>`(${ctx.parsed.x}, ${ctx.parsed.y})` },
+          bodyFont:{ family:fontFamily, size:fontSize }
+        }
       },
       scales:{
-        x:{ type:'linear', title:{ display:true, text:xlabel, font:{ family:fontFamily, size:fontSize } },
-            ticks:{ font:{ family:fontFamily, size:fontSize } } },
-        y:{ title:{ display:true, text:ylabel, font:{ family:fontFamily, size:fontSize } },
-            ticks:{ font:{ family:fontFamily, size:fontSize } } }
+        x:{
+          type:'linear',
+          title:{ display:true, text:xlabel, font:{ family:fontFamily, size:fontSize } },
+          ticks:{ font:{ family:fontFamily, size:fontSize } }
+        },
+        y:{
+          title:{ display:true, text:ylabel, font:{ family:fontFamily, size:fontSize } },
+          ticks:{ font:{ family:fontFamily, size:fontSize } }
+        }
       }
     },
     plugins:[backgroundPlugin, annotationPlugin]
   });
 
-  // ✅ NEW: build the sums table under the graph
   renderSumsTable(pts);
-
-  // Add/refresh regression after chart creation
   refreshRegression();
 }
 
@@ -378,6 +493,7 @@ function refreshPadding(){
 
 function refreshRegression(){
   if(!currentChart) return;
+
   const mode=document.getElementById('regressionMode').value;
   const show=document.getElementById('regressionShow').value;
   const regColor=document.getElementById('regColor').value;
@@ -385,11 +501,11 @@ function refreshRegression(){
 
   const scatter=currentChart.data.datasets[0];
   const pts=scatter.data||[];
+
   statsText='';
-  // Remove any existing regression dataset (assumed at index 1)
+  setEqBelowText(''); // clear each refresh
   currentChart.data.datasets=[scatter];
 
-  // ✅ NEW: keep the sums table synced (covers cases where data changes)
   renderSumsTable(pts);
 
   if(mode==='linear' && pts.length>=2){
@@ -397,19 +513,42 @@ function refreshRegression(){
     if(stats){
       const xs=pts.map(p=>p.x);
       const xmin=Math.min(...xs), xmax=Math.max(...xs);
-      const y1=stats.a + stats.b*xmin; const y2=stats.a + stats.b*xmax;
-      const regDataset={ type:'line', label:'Regression', data:[{x:xmin,y:y1},{x:xmax,y:y2}],
-        borderColor:regColor, backgroundColor:regColor, borderWidth:regWidth, pointRadius:0, tension:0 };
+      const y1=stats.a + stats.b*xmin;
+      const y2=stats.a + stats.b*xmax;
+
+      const regDataset={
+        type:'line',
+        label:'Regression',
+        data:[{x:xmin,y:y1},{x:xmax,y:y2}],
+        borderColor:regColor,
+        backgroundColor:regColor,
+        borderWidth:regWidth,
+        pointRadius:0,
+        tension:0
+      };
       currentChart.data.datasets.push(regDataset);
 
+      // build the text we want to show (either in chart or below)
+      let text = '';
       if(show.includes('eq')){
         const eq=`y = ${stats.b.toFixed(3)}x ${stats.a>=0?'+':''}${stats.a.toFixed(3)}`;
-        statsText = show.includes('r') ? `${eq}    r = ${stats.r.toFixed(3)}` : eq;
+        text = show.includes('r') ? `${eq}    r = ${stats.r.toFixed(3)}` : eq;
       } else if(show.includes('r')){
-        statsText = `r = ${stats.r.toFixed(3)}`;
+        text = `r = ${stats.r.toFixed(3)}`;
+      }
+
+      // if in chart: use statsText (drawn by plugin)
+      // if below chart: setEqBelowText(text)
+      const placement = document.getElementById('eqPlacement')?.value || 'inChart';
+      if(placement === 'belowChart'){
+        setEqBelowText(text);
+        statsText = ''; // ensure nothing drawn in chart
+      } else {
+        statsText = text;
       }
     }
   }
+
   currentChart.update();
 }
 
@@ -427,9 +566,33 @@ const SAMPLE=[
   {Hours:6, Score:83}, {Hours:6.5, Score:85}, {Hours:7, Score:88}, {Hours:7.5, Score:90}, {Hours:8, Score:92}
 ];
 
+/* ✅ NEW: Lab 4 dataset */
+const LAB4=[
+  {"Cups of Coffee":4, "Hours of Sleep":7},
+  {"Cups of Coffee":7, "Hours of Sleep":5},
+  {"Cups of Coffee":3, "Hours of Sleep":8},
+  {"Cups of Coffee":10,"Hours of Sleep":3},
+  {"Cups of Coffee":1, "Hours of Sleep":9},
+  {"Cups of Coffee":3, "Hours of Sleep":7},
+  {"Cups of Coffee":5, "Hours of Sleep":6}
+];
+
 window.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('loadBtn').onclick=()=>{ const f=document.getElementById('file').files[0]; if(f) loadFile(f); };
+  document.getElementById('loadBtn').onclick=()=>{
+    const f=document.getElementById('file').files[0];
+    if(f) loadFile(f);
+  };
   document.getElementById('sampleBtn').onclick=()=>{ setData(SAMPLE); };
+
+  // ✅ NEW
+  document.getElementById('lab4Btn').onclick=()=>{
+    setData(LAB4);
+    // nice defaults for this dataset:
+    document.getElementById('titleInput').value = 'Cups of Coffee vs Hours of Sleep';
+    document.getElementById('xlabelInput').value = 'Cups of Coffee';
+    document.getElementById('ylabelInput').value = 'Hours of Sleep';
+  };
+
   document.getElementById('drawScatterBtn').onclick=drawScatter;
   document.getElementById('downloadPNGBtn').onclick=downloadPNG;
   document.getElementById('applySizeBtn').onclick=applySize;
@@ -439,28 +602,31 @@ window.addEventListener('DOMContentLoaded',()=>{
     el.addEventListener('input',refreshColors);
     el.addEventListener('change',refreshColors);
   });
+
   ['bgColor'].forEach(id=>{
     const el=document.getElementById(id);
     el.addEventListener('input',()=>{ if(currentChart) currentChart.update(); });
     el.addEventListener('change',()=>{ if(currentChart) currentChart.update(); });
   });
+
   document.getElementById('chartPad').addEventListener('input', refreshPadding);
 
   // Live regression updates
-  ['regressionMode','regressionShow','regColor','regWidth'].forEach(id=>{
+  ['regressionMode','regressionShow','regColor','regWidth','eqPlacement','eqAlign'].forEach(id=>{
     const el=document.getElementById(id);
     el.addEventListener('change', refreshRegression);
     el.addEventListener('input', refreshRegression);
   });
 
-  // ✅ Optional: update sums immediately if X/Y changes and a chart is already drawn
+  // update sums quickly if X/Y changes (even before redraw)
   ['xSelect','ySelect'].forEach(id=>{
     document.getElementById(id).addEventListener('change', ()=>{
       if(!DATA.length) return;
       const xcol=document.getElementById('xSelect').value;
       const ycol=document.getElementById('ySelect').value;
       if(xcol && ycol){
-        renderSumsTable(getXY(xcol,ycol));
+        const pts=getXY(xcol,ycol);
+        renderSumsTable(pts);
       }
     });
   });
