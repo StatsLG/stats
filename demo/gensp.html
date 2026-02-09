@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Guess the Correlation Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    background: #f5f7fb;
+    padding: 20px;
+  }
+  .card {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+  }
+  label {
+    font-weight: 600;
+  }
+  input {
+    width: 120px;
+    padding: 6px;
+    margin-right: 10px;
+  }
+  button {
+    padding: 6px 14px;
+    cursor: pointer;
+  }
+  canvas {
+    margin-top: 20px;
+  }
+</style>
+</head>
+
+<body>
+<div class="card">
+  <h2>Scatter Plot Generator from Correlation</h2>
+
+  <label>
+    Target correlation (r):
+    <input id="rInput" type="number" step="0.01" min="-1" max="1" value="0.6">
+  </label>
+
+  <label>
+    Sample size:
+    <input id="nInput" type="number" min="10" max="500" value="50">
+  </label>
+
+  <button onclick="generate()">Generate</button>
+
+  <p><strong>Actual sample r:</strong> <span id="actualR">—</span></p>
+
+  <canvas id="chart" height="400"></canvas>
+</div>
+
+<script>
+let chart;
+
+function generate() {
+  const r = parseFloat(document.getElementById("rInput").value);
+  const n = parseInt(document.getElementById("nInput").value);
+
+  if (isNaN(r) || r < -1 || r > 1) {
+    alert("r must be between -1 and 1");
+    return;
+  }
+
+  // Generate X ~ N(0,1)
+  let x = Array.from({ length: n }, randn);
+
+  // Generate Y with target correlation
+  let y = x.map((xi) => r * xi + Math.sqrt(1 - r * r) * randn());
+
+  // Standardize
+  x = standardize(x);
+  y = standardize(y);
+
+  const data = x.map((xi, i) => ({ x: xi, y: y[i] }));
+
+  const actualR = correlation(x, y);
+  document.getElementById("actualR").textContent = actualR.toFixed(3);
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(document.getElementById("chart"), {
+    type: "scatter",
+    data: {
+      datasets: [{
+        data,
+        pointRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: { title: { display: true, text: "X" } },
+        y: { title: { display: true, text: "Y" } }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+}
+
+// ---------- Utilities ----------
+
+function randn() {
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+function mean(arr) {
+  return arr.reduce((a, b) => a + b, 0) / arr.length;
+}
+
+function sd(arr) {
+  const m = mean(arr);
+  return Math.sqrt(arr.reduce((s, x) => s + (x - m) ** 2, 0) / (arr.length - 1));
+}
+
+function standardize(arr) {
+  const m = mean(arr);
+  const s = sd(arr);
+  return arr.map(x => (x - m) / s);
+}
+
+function correlation(x, y) {
+  const mx = mean(x);
+  const my = mean(y);
+  let num = 0, dx = 0, dy = 0;
+
+  for (let i = 0; i < x.length; i++) {
+    num += (x[i] - mx) * (y[i] - my);
+    dx += (x[i] - mx) ** 2;
+    dy += (y[i] - my) ** 2;
+  }
+  return num / Math.sqrt(dx * dy);
+}
+</script>
+</body>
+</html>
