@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>4 Scatter Plots from r Values</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<style>
+  body { font-family: system-ui, sans-serif; background:#f5f7fb; padding:20px; }
+  .card { max-width: 1100px; margin:auto; background:#fff; padding:20px; border-radius:12px; }
+  .controls { display:flex; flex-wrap:wrap; gap:12px; align-items:end; }
+  label { font-weight:600; display:flex; gap:8px; align-items:center; }
+  input { width:90px; padding:6px; }
+  button { padding:8px 14px; cursor:pointer; }
+  .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:18px; }
+  .plotCard { background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:12px; }
+  .plotHeader { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .small { color:#4b5563; font-size: 0.95rem; }
+  canvas { width:100% !important; height:320px !important; }
+  @media (max-width: 900px){
+    .grid { grid-template-columns: 1fr; }
+    canvas { height:340px !important; }
+  }
+</style>
+</head>
+
+<body>
+<div class="card">
+  <h2>4 Scatter Plots from Correlations</h2>
+
+  <div class="controls">
+    <label>r1 <input id="r1" type="number" step="0.01" min="-1" max="1" value="-0.8"></label>
+    <label>r2 <input id="r2" type="number" step="0.01" min="-1" max="1" value="-0.3"></label>
+    <label>r3 <input id="r3" type="number" step="0.01" min="-1" max="1" value="0.3"></label>
+    <label>r4 <input id="r4" type="number" step="0.01" min="-1" max="1" value="0.8"></label>
+
+    <label>Sample size (n) <input id="n" type="number" min="10" max="500" value="60"></label>
+
+    <button id="genBtn">Generate 4 Plots</button>
+  </div>
+
+  <p class="small">
+    Each plot is generated independently using the same sample size. “Actual r” is computed from the generated sample.
+  </p>
+
+  <div class="grid">
+    <div class="plotCard">
+      <div class="plotHeader">
+        <div><strong>Plot 1</strong> — target r = <span id="t1">—</span></div>
+        <div class="small">actual r = <span id="a1">—</span></div>
+      </div>
+      <canvas id="c1"></canvas>
+    </div>
+
+    <div class="plotCard">
+      <div class="plotHeader">
+        <div><strong>Plot 2</strong> — target r = <span id="t2">—</span></div>
+        <div class="small">actual r = <span id="a2">—</span></div>
+      </div>
+      <canvas id="c2"></canvas>
+    </div>
+
+    <div class="plotCard">
+      <div class="plotHeader">
+        <div><strong>Plot 3</strong> — target r = <span id="t3">—</span></div>
+        <div class="small">actual r = <span id="a3">—</span></div>
+      </div>
+      <canvas id="c3"></canvas>
+    </div>
+
+    <div class="plotCard">
+      <div class="plotHeader">
+        <div><strong>Plot 4</strong> — target r = <span id="t4">—</span></div>
+        <div class="small">actual r = <span id="a4">—</span></div>
+      </div>
+      <canvas id="c4"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+let charts = [null, null, null, null];
+
+document.getElementById("genBtn").addEventListener("click", generateAll);
+generateAll(); // initial render
+
+function generateAll() {
+  const rVals = [
+    parseFloat(document.getElementById("r1").value),
+    parseFloat(document.getElementById("r2").value),
+    parseFloat(document.getElementById("r3").value),
+    parseFloat(document.getElementById("r4").value),
+  ];
+  const n = parseInt(document.getElementById("n").value);
+
+  for (let i = 0; i < 4; i++) {
+    const r = rVals[i];
+    if (isNaN(r) || r < -1 || r > 1) {
+      alert(`r${i+1} must be between -1 and 1`);
+      return;
+    }
+    document.getElementById(`t${i+1}`).textContent = r.toFixed(2);
+
+    const { data, actualR } = makeCorrelatedData(r, n);
+    document.getElementById(`a${i+1}`).textContent = actualR.toFixed(3);
+
+    renderChart(i, data);
+  }
+}
+
+function renderChart(i, data) {
+  const ctx = document.getElementById(`c${i+1}`);
+
+  if (charts[i]) charts[i].destroy();
+
+  charts[i] = new Chart(ctx, {
+    type: "scatter",
+    data: {
+      datasets: [{
+        data,
+        pointRadius: 4,
+        pointBackgroundColor: "rgba(0, 70, 127, 0.9)", // darker points
+        pointBorderColor: "#000",
+        pointBorderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { title: { display: true, text: "X" } },
+        y: { title: { display: true, text: "Y" } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false }
+      },
+      animation: false
+    }
+  });
+}
+
+function makeCorrelatedData(r, n) {
+  // X ~ N(0,1)
+  let x = Array.from({ length: n }, randn);
+
+  // Y = rX + sqrt(1-r^2) * e
+  let y = x.map(xi => r * xi + Math.sqrt(1 - r*r) * randn());
+
+  // Standardize
+  x = standardize(x);
+  y = standardize(y);
+
+  const actualR = correlation(x, y);
+  const data = x.map((xi, idx) => ({ x: xi, y: y[idx] }));
+
+  return { data, actualR };
+}
+
+// ---------- Utilities ----------
+function randn() {
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+function mean(arr) {
+  return arr.reduce((a,b)=>a+b,0) / arr.length;
+}
+
+function sd(arr) {
+  const m = mean(arr);
+  return Math.sqrt(arr.reduce((s,x)=>s+(x-m)**2,0) / (arr.length - 1));
+}
+
+function standardize(arr) {
+  const m = mean(arr);
+  const s = sd(arr);
+  return arr.map(x => (x - m) / s);
+}
+
+function correlation(x, y) {
+  const mx = mean(x), my = mean(y);
+  let num = 0, dx = 0, dy = 0;
+  for (let i=0; i<x.length; i++) {
+    const a = x[i] - mx;
+    const b = y[i] - my;
+    num += a*b;
+    dx += a*a;
+    dy += b*b;
+  }
+  return num / Math.sqrt(dx*dy);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Circuits I — Formula Sheet Calculator</title>
+  <style>
+    :root{
+      --bg:#ffffff; --panel:#f5f7fb; --card:#ffffff;
+      --ink:#0f172a; --muted:#475569; --rule:#e5e7eb;
+      --primary:#00467f; --accent:#e7a614;
+      --shadow: 0 8px 20px rgba(15,23,42,.08);
+      --radius:16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; font-family:var(--sans); color:var(--ink); background:var(--bg);
+    }
+    header{
+      padding:18px 18px 8px;
+      border-bottom:1px solid var(--rule);
+    }
+    header h1{
+      margin:0; font-size:20px; letter-spacing:.2px;
+    }
+    header p{ margin:6px 0 0; color:var(--muted); }
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:16px;
+      display:grid;
+      grid-template-columns: 320px 1fr;
+      gap:16px;
+    }
+    .nav{
+      background:var(--panel);
+      border:1px solid var(--rule);
+      border-radius:var(--radius);
+      padding:12px;
+      box-shadow:var(--shadow);
+      position:sticky;
+      top:12px;
+      height: fit-content;
+    }
+    .nav h2{ margin:0 0 10px; font-size:14px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+    .nav button{
+      width:100%;
+      text-align:left;
+      border:1px solid var(--rule);
+      background:#fff;
+      padding:10px 12px;
+      margin:0 0 8px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .nav button.active{
+      border-color: rgba(0,70,127,.35);
+      box-shadow: 0 0 0 3px rgba(0,70,127,.12);
+    }
+    .content{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--rule);
+      border-radius:var(--radius);
+      padding:14px;
+      box-shadow:var(--shadow);
+    }
+    .card h3{ margin:0 0 10px; font-size:18px; }
+    .sub{ color:var(--muted); margin:0 0 12px; }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:10px;
+    }
+    .grid.two{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.one{ grid-template-columns: 1fr; }
+    label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    input, select, textarea{
+      width:100%;
+      padding:10px 10px;
+      border:1px solid var(--rule);
+      border-radius:12px;
+      font-size:14px;
+      outline:none;
+      background:#fff;
+    }
+    textarea{ min-height:88px; resize:vertical; font-family:var(--mono); }
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:end;
+      flex-wrap:wrap;
+    }
+    .btn{
+      border:1px solid var(--rule);
+      background:linear-gradient(180deg,#ffffff,#f7fafc);
+      border-radius:12px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .btn.primary{
+      border-color: rgba(0,70,127,.25);
+      background: linear-gradient(180deg, rgba(0,70,127,.95), rgba(0,70,127,.85));
+      color:#fff;
+    }
+    .btn.ghost{
+      background:#fff;
+    }
+    .result{
+      margin-top:12px;
+      border-top:1px dashed var(--rule);
+      padding-top:12px;
+      font-family:var(--mono);
+      white-space:pre-wrap;
+      line-height:1.35;
+    }
+    .pill{
+      display:inline-block;
+      font-size:12px;
+      padding:2px 8px;
+      border-radius:999px;
+      background:rgba(231,166,20,.16);
+      border:1px solid rgba(231,166,20,.35);
+      color:#6b4b00;
+      margin-left:8px;
+      font-family:var(--sans);
+      font-weight:700;
+    }
+    .muted{ color:var(--muted); font-family:var(--sans); }
+    .hide{ display:none; }
+    @media (max-width: 900px){
+      .wrap{ grid-template-columns: 1fr; }
+      .nav{ position:relative; top:auto; }
+      .grid{ grid-template-columns: 1fr; }
+      .grid.two{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Circuits I — Formula Sheet Calculator <span class="pill">single-file</span></h1>
+  <p>Ohm’s law, series/parallel, AC reactance, trig, peak/RMS conversions, and engineering notation.</p>
+</header>
+
+<div class="wrap">
+  <aside class="nav" aria-label="Calculator Sections">
+    <h2>Sections</h2>
+    <button class="tabBtn active" data-tab="tab-notation">Engineering Notation & Prefixes</button>
+    <button class="tabBtn" data-tab="tab-ohm">Ohm’s Law</button>
+    <button class="tabBtn" data-tab="tab-seriesparallel">Series / Parallel (R, L, C)</button>
+    <button class="tabBtn" data-tab="tab-reactance">Inductive / Capacitive Reactance</button>
+    <button class="tabBtn" data-tab="tab-ac">AC Triangle + Phase Angle</button>
+    <button class="tabBtn" data-tab="tab-trig">Trig (sin / cos / tan)</button>
+    <button class="tabBtn" data-tab="tab-peak">Peak / RMS / Average</button>
+    <button class="tabBtn" data-tab="tab-wave">Instantaneous Value (sine)</button>
+  </aside>
+
+  <main class="content">
+
+    <!-- Engineering Notation -->
+    <section id="tab-notation" class="card">
+      <h3>Engineering Notation & Prefixes</h3>
+      <p class="sub">Convert a number into engineering notation (powers of 10 in multiples of 3) and common prefixes (T, G, M, k, m, μ, n, p). :contentReference[oaicite:5]{index=5}</p>
+
+      <div class="grid two">
+        <div>
+          <label>Value</label>
+          <input id="engValue" type="number" step="any" placeholder="e.g., 0.000047" />
+        </div>
+        <div>
+          <label>Unit (optional)</label>
+          <input id="engUnit" type="text" placeholder="e.g., F, H, Ω, V, A" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button class="btn primary" id="btnEng">Convert</button>
+        <button class="btn ghost" id="btnEngExample">Example</button>
+        <button class="btn" id="btnEngClear">Clear</button>
+      </div>
+
+      <div class="result" id="engOut"></div>
+    </section>
+
+    <!-- Ohm's Law -->
+    <section id="tab-ohm" class="card hide">
+      <h3>Ohm’s Law</h3>
+      <p class="sub">Enter any <strong>two</strong> values to solve for the third: V = I·R. :contentReference[oaicite:6]{index=6}</p>
+
+      <div class="grid">
+        <div>
+          <label>Voltage V (volts)</label>
+          <input id="ohmV" type="number" step="any" placeholder="e.g., 120" />
+        </div>
+        <div>
+          <label>Current I (amps)</label>
+          <input id="ohmI" type="number" step="any" placeholder="e.g., 2" />
+        </div>
+        <div>
+          <label>Resistance R (ohms)</label>
+          <input id="ohmR" type="number" step="any" placeholder="e.g., 60" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button class="btn primary" id="btnOhm">Solve</button>
+        <button class="btn ghost" id="btnOhmExample">Example</button>
+        <button class="btn" id="btnOhmClear">Clear</button>
+      </div>
+
+      <div class="result" id="ohmOut"></div>
+    </section>
+
+    <!-- Series / Parallel -->
+    <section id="tab-seriesparallel" class="card hide">
+      <h3>Series / Parallel (R, L, C)</h3>
+      <p class="sub">Paste values separated by commas or new lines. For series/parallel basics, your sheet lists “N” resistors and parallel relationships. :contentReference[oaicite:7]{index=7}</p>
+
+      <div class="grid two">
+        <div>
+          <label>Component Type</label>
+          <select id="spType">
+            <option value="R">Resistors (Ω)</option>
+            <option value="L">Inductors (H)</option>
+            <option value="C">Capacitors (F)</option>
+          </select>
+        </div>
+        <div>
+          <label>Connection</label>
+          <select id="spConn">
+            <option value="series">Series</option>
+            <option value="parallel">Parallel</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <label>Values (e.g., 10, 20, 30)</label>
+        <textarea id="spValues" placeholder="10
+20
+30"></textarea>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button class="btn primary" id="btnSP">Compute Total</button>
+        <button class="btn ghost" id="btnSPExample">Example</button>
+        <button class="btn" id="btnSPClear">Clear</button>
+      </div>
+
+      <div class="result" id="spOut"></div>
+    </section>
+
+    <!-- Reactance -->
+    <section id="tab-reactance" class="card hide">
+      <h3>Inductive / Capacitive Reactance</h3>
+      <p class="sub">Useful for AC current work under “Pure Inductive” and “Pure Capacitive” topics on your sheet. :contentReference[oaicite:8]{index=8}</p>
+
+      <div class="grid">
+        <div>
+          <label>Frequency f (Hz)</label>
+          <input id="rxF" type="number" step="any" placeholder="e.g., 60" />
+        </div>
+        <div>
+          <label>Inductance L (H)</label>
+          <input id="rxL" type="number" step="any" placeholder="e.g., 0.25" />
+        </div>
+        <div>
+          <label>Capacitance C (F)</label>
+          <input id="rxC" type="number" step="any" placeholder="e.g., 0.000047" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button class="btn primary" id="btnRx">Compute X<sub>L</sub> and X<sub>C</sub></button>
+        <button class="btn ghost" id="btnRxExample">Example</button>
+        <button class="btn" id="btnRxClear">Clear</button>
+      </div>
+
+      <div class="result" id="rxOut"></div>
+    </section>
+
+    <!-- AC Triangle -->
+    <section id="tab-ac" class="card hide">
+      <h3>AC Triangle + Phase Angle</h3>
+      <p class="sub">Compute impedance magnitude and phase angle using the Pythagorean theorem + trig idea on your sheet. :contentReference[oaicite:9]{index=9}</p>
+
+      <div class="grid three grid">
+        <div>
+          <label>Resistance R (Ω)</label>
+          <input id="acR" type="number" step="any" placeholder="e.g., 40" />
+        </div>
+        <div>
+          <label>Inductive Reactance X<sub>L</sub> (Ω)</label>
+          <input id="acXL" type="number" step="any" placeholder="e.g., 30" />
+        </div>
+        <div>
+          <label>Capacitive Reactance X<sub>C</sub> (Ω)</label>
+          <input id="acXC" type="number" step="any" placeholder="e.g., 10" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button class="btn primary" id="btnAC">Compute Z and θ</button>
+        <button class="btn ghost" id="btnACExample">Example</button>
+        <button class="btn" id="btnACClear">Clear</button>
+      </div>
+
+      <div class="result" id="acOut"></div>
+    </section>
+
+    <!-- Trig -->
+    <section id="tab-trig" class="card hide">
+      <h3>Trig (sin / cos / tan)</h3>
+      <p class="sub">Solve triangle relationships (degrees). Matches your “Sine, Cosine, Tangent” section. :contentReference[oaicite:10]{index=10}</p>
+
+      <div class="grid two">
+        <div>
+          <label>Angle θ (degrees)</label>
+          <input id="trigTheta" type="number" step="any" placeholder="e.g., 30" />
+        </div>
+        <div>
+          <label>Select Function</label>
+          <select id="trigFn">
+            <option value="sin">sin(θ)</option>
+            <option value="cos">cos(θ)</option>
+            <option value="tan">tan(θ)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid two" style="margin-top:10px;">
+        <div>
+          <label>Adjacent A (optional)</label>
+          <input id="trigA" type="number" step="any" placeholder="e.g., 10" />
+        </div>
+        <div>
+          <label>Opposite O (optional)</label>
+          <input id="trigO" type="number" step="any" placeholder="e.g., 5.77" />
+        </div>
+      </div>
+
+      <div class="grid two" style="margin-top:10px;">
+        <div>
+          <label>Hypotenuse H (optional)</label>
+          <input id="trigH" type="number" step="any" placeholder="e.g., 11.55" />
+        </div>
+        <div class="muted" style="font-size:13px; padding-top:22px;">
+          Enter θ only to get sin/cos/tan. Enter θ + one side to solve the others (right triangle).
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button class="btn primary" id="btnTrig">Compute</button>
+        <button class="btn ghost" id="btnTrigExample">Example</button>
+        <button class="btn" id="btnTrigClear">Clear</button>
+      </div>
+
+      <div class="result" id="trigOut"></div>
+    </section>
+
+    <!-- Peak/RMS/Average -->
+    <section id="tab-peak" class="card hide">
+      <h3>Peak / RMS / Average Conversions</h3>
+      <p class="sub">Uses the same multipliers shown on your sheet. :contentReference[oaicite:11]{index=11}</p>
+
+      <div class="grid two">
+        <div>
+          <label>Starting Value</label>
+          <input id="pkValue" type="number" step="any" placeholder="e.g., 170" />
+        </div>
+        <div>
+          <label>From → To</label>
+          <select id="pkMode">
+            <option value="peak_to_rms">Peak → RMS (×0.707)</option>
+            <option value="peak_to_avg">Peak → Average (×0.637)</option>
+            <option value="peak_to_pp">Peak → Peak-to-Peak (×2)</option>
+            <option value="rms_to_peak">RMS → Peak (×1.414)</option>
+            <option value="avg_to_peak">Average → Peak (×1.567)</option>
+            <option value="rms_to_avg">RMS → Average (×0.9)</option>
+            <option value="avg_to_rms">Average → RMS (×1.111)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button class="btn primary" id="btnPk">Convert</button>
+        <button class="btn ghost" id="btnPkExample">Example</button>
+        <button class="btn" id="btnPkClear">Clear</button>
+      </div>
+
+      <div class="result" id="pkOut"></div>
+    </section>
+
+    <!-- Instantaneous -->
+    <section id="tab-wave" class="card hide">
+      <h3>Instantaneous Value (Sine Wave)</h3>
+      <p class="sub">Compute instantaneous voltage/current from a sine function: x(t) = X<sub>max</sub>·sin(ωt + φ). (This lines up with your “Instantaneous and Maximum Values” heading.) :contentReference[oaicite:12]{index=12}</p>
+
+      <div class="grid two">
+        <div>
+          <label>Maximum (peak) X<sub>max</sub></label>
+          <input id="wvMax" type="number" step="any" placeholder="e.g., 170" />
+        </div>
+        <div>
+          <label>Frequency f (Hz)</label>
+          <input id="wvF" type="number" step="any" placeholder="e.g., 60" />
+        </div>
+      </div>
+
+      <div class="grid two" style="margin-top:10px;">
+        <div>
+          <label>Time t (seconds)</label>
+          <input id="wvT" type="number" step="any" placeholder="e.g., 0.002" />
+        </div>
+        <div>
+          <label>Phase φ (degrees, optional)</label>
+          <input id="wvPhi" type="number" step="any" placeholder="e.g., 30" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button class="btn primary" id="btnWave">Compute x(t)</button>
+        <button class="btn ghost" id="btnWaveExample">Example</button>
+        <button class="btn" id="btnWaveClear">Clear</button>
+      </div>
+
+      <div class="result" id="wvOut"></div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // ---------- helpers ----------
+  const $ = (id) => document.getElementById(id);
+
+  function fmt(n, digits=6){
+    if (!Number.isFinite(n)) return "—";
+    // trim to reasonable digits, remove trailing zeros
+    const s = n.toFixed(digits);
+    return s.replace(/\.?0+$/,"");
+  }
+
+  function parseList(text){
+    // split on commas or newlines
+    return text
+      .split(/[\n,]+/g)
+      .map(s => s.trim())
+      .filter(Boolean)
+      .map(Number)
+      .filter(v => Number.isFinite(v));
+  }
+
+  function degToRad(deg){ return deg * Math.PI / 180; }
+  function radToDeg(rad){ return rad * 180 / Math.PI; }
+
+  function engFormat(value){
+    if (!Number.isFinite(value) || value === 0) return {eng:"0", prefix:"", scaled:0, exp:0};
+    const sign = Math.sign(value);
+    let v = Math.abs(value);
+    // engineering exponent: multiple of 3
+    let exp = Math.floor(Math.log10(v));
+    exp = exp - (exp % 3);
+    const scaled = sign * (v / Math.pow(10, exp));
+
+    const prefixes = [
+      { exp: 12, p:"T" },
+      { exp:  9, p:"G" },
+      { exp:  6, p:"M" },
+      { exp:  3, p:"k" },
+      { exp:  0, p:""  },
+      { exp: -3, p:"m" },
+      { exp: -6, p:"μ" },
+      { exp: -9, p:"n" },
+      { exp:-12, p:"p" },
+    ];
+    const hit = prefixes.find(x => x.exp === exp) || {exp, p:""};
+    return {
+      eng: `${fmt(scaled, 6)} × 10^${exp}`,
+      prefix: hit.p,
+      scaled: scaled,
+      exp: exp
+    };
+  }
+
+  // ---------- tabs ----------
+  document.querySelectorAll(".tabBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tabBtn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const tab = btn.dataset.tab;
+      document.querySelectorAll("main section").forEach(sec => sec.classList.add("hide"));
+      document.getElementById(tab).classList.remove("hide");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+
+  // ---------- Engineering Notation ----------
+  $("btnEng").addEventListener("click", () => {
+    const v = Number($("engValue").value);
+    const unit = $("engUnit").value.trim();
+    const out = $("engOut");
+
+    if (!Number.isFinite(v)){
+      out.textContent = "Enter a numeric value.";
+      return;
+    }
+    const e = engFormat(v);
+    const withPrefix = (e.prefix !== "")
+      ? `${fmt(e.scaled, 6)} ${e.prefix}${unit || ""}`
+      : `${fmt(v, 6)} ${unit || ""}`.trim();
+
+    out.textContent =
+`Engineering: ${e.eng}${unit ? " " + unit : ""}
+Prefix form: ${withPrefix}
+(Scaled: ${fmt(e.scaled, 6)}, exponent: ${e.exp})`;
+  });
+
+  $("btnEngExample").addEventListener("click", () => {
+    $("engValue").value = 0.000047;
+    $("engUnit").value = "F";
+    $("btnEng").click();
+  });
+
+  $("btnEngClear").addEventListener("click", () => {
+    $("engValue").value = "";
+    $("engUnit").value = "";
+    $("engOut").textContent = "";
+  });
+
+  // ---------- Ohm's Law ----------
+  $("btnOhm").addEventListener("click", () => {
+    const V = Number($("ohmV").value);
+    const I = Number($("ohmI").value);
+    const R = Number($("ohmR").value);
+    const haveV = Number.isFinite(V);
+    const haveI = Number.isFinite(I);
+    const haveR = Number.isFinite(R);
+    const out = $("ohmOut");
+
+    const count = [haveV, haveI, haveR].filter(Boolean).length;
+    if (count < 2){
+      out.textContent = "Enter any TWO values to solve for the third.";
+      return;
+    }
+    if (count > 2){
+      out.textContent = "Enter ONLY TWO values (clear the one you want solved).";
+      return;
+    }
+
+    let v=V, i=I, r=R;
+
+    if (!haveV){
+      v = I * R;
+      out.textContent = `V = I·R = ${fmt(I)} × ${fmt(R)} = ${fmt(v)} V`;
+    } else if (!haveI){
+      if (R === 0){ out.textContent = "R cannot be 0 when solving for I."; return; }
+      i = V / R;
+      out.textContent = `I = V/R = ${fmt(V)} / ${fmt(R)} = ${fmt(i)} A`;
+    } else {
+      if (I === 0){ out.textContent = "I cannot be 0 when solving for R."; return; }
+      r = V / I;
+      out.textContent = `R = V/I = ${fmt(V)} / ${fmt(I)} = ${fmt(r)} Ω`;
+    }
+  });
+
+  $("btnOhmExample").addEventListener("click", () => {
+    $("ohmV").value = 120;
+    $("ohmI").value = 2;
+    $("ohmR").value = "";
+    $("btnOhm").click();
+  });
+
+  $("btnOhmClear").addEventListener("click", () => {
+    $("ohmV").value = "";
+    $("ohmI").value = "";
+    $("ohmR").value = "";
+    $("ohmOut").textContent = "";
+  });
+
+  // ---------- Series / Parallel (R, L, C) ----------
+  function seriesTotal(values){
+    return values.reduce((a,b) => a + b, 0);
+  }
+  function parallelTotal(values){
+    // 1/total = sum(1/each)
+    const sumInv = values.reduce((a,b) => a + (1/b), 0);
+    if (sumInv === 0) return NaN;
+    return 1 / sumInv;
+  }
+
+  $("btnSP").addEventListener("click", () => {
+    const type = $("spType").value; // R L C
+    const conn = $("spConn").value; // series parallel
+    const vals = parseList($("spValues").value);
+    const out = $("spOut");
+
+    if (vals.length < 1){
+      out.textContent = "Enter at least one value.";
+      return;
+    }
+    if (vals.some(v => v === 0) && conn === "parallel"){
+      out.textContent = "Parallel calculation cannot include 0 values.";
+      return;
+    }
+
+    let total;
+    let note = "";
+    // Rules:
+    // R: series add; parallel reciprocal
+    // L: series add; parallel reciprocal
+    // C: series reciprocal; parallel add
+    if (type === "R" || type === "L"){
+      total = (conn === "series") ? seriesTotal(vals) : parallelTotal(vals);
+      note = (conn === "series") ? "Total = sum(values)" : "1/Total = sum(1/value)";
+    } else { // C
+      total = (conn === "series") ? parallelTotal(vals) : seriesTotal(vals);
+      note = (conn === "series") ? "1/Total = sum(1/value)" : "Total = sum(values)";
+    }
+
+    const unit = (type === "R") ? "Ω" : (type === "L") ? "H" : "F";
+    const e = engFormat(total);
+
+    out.textContent =
+`${type} in ${conn.toUpperCase()}
+Values: ${vals.map(v => fmt(v)).join(", ")} ${unit}
+Rule: ${note}
+Total: ${fmt(total)} ${unit}
+Engineering: ${e.eng} ${unit}`;
+  });
+
+  $("btnSPExample").addEventListener("click", () => {
+    $("spType").value = "R";
+    $("spConn").value = "parallel";
+    $("spValues").value = "10\n20\n30";
+    $("btnSP").click();
+  });
+
+  $("btnSPClear").addEventListener("click", () => {
+    $("spValues").value = "";
+    $("spOut").textContent = "";
+  });
+
+  // ---------- Reactance ----------
+  $("btnRx").addEventListener("click", () => {
+    const f = Number($("rxF").value);
+    const L = Number($("rxL").value);
+    const C = Number($("rxC").value);
+    const out = $("rxOut");
+
+    if (!Number.isFinite(f) || f <= 0){
+      out.textContent = "Enter a frequency f > 0.";
+      return;
+    }
+
+    // XL = 2π f L
+    // XC = 1 / (2π f C)
+    let lines = [];
+    if (Number.isFinite(L)){
+      const XL = 2 * Math.PI * f * L;
+      lines.push(`X_L = 2π f L = 2π × ${fmt(f)} × ${fmt(L)} = ${fmt(XL)} Ω`);
+      const e = engFormat(XL);
+      lines.push(`  Engineering: ${e.eng} Ω`);
+    } else {
+      lines.push("X_L: enter L to compute.");
+    }
+
+    if (Number.isFinite(C)){
+      if (C === 0){
+        lines.push("X_C: C cannot be 0.");
+      } else {
+        const XC = 1 / (2 * Math.PI * f * C);
+        lines.push(`X_C = 1/(2π f C) = 1/(2π × ${fmt(f)} × ${fmt(C)}) = ${fmt(XC)} Ω`);
+        const e = engFormat(XC);
+        lines.push(`  Engineering: ${e.eng} Ω`);
+      }
+    } else {
+      lines.push("X_C: enter C to compute.");
+    }
+
+    out.textContent = lines.join("\n");
+  });
+
+  $("btnRxExample").addEventListener("click", () => {
+    $("rxF").value = 60;
+    $("rxL").value = 0.25;
+    $("rxC").value = 0.000047;
+    $("btnRx").click();
+  });
+
+  $("btnRxClear").addEventListener("click", () => {
+    $("rxF").value = "";
+    $("rxL").value = "";
+    $("rxC").value = "";
+    $("rxOut").textContent = "";
+  });
+
+  // ---------- AC Triangle ----------
+  $("btnAC").addEventListener("click", () => {
+    const R = Number($("acR").value);
+    const XL = Number($("acXL").value);
+    const XC = Number($("acXC").value);
+    const out = $("acOut");
+
+    if (!Number.isFinite(R) || R < 0){
+      out.textContent = "Enter R (≥ 0).";
+      return;
+    }
+    const xL = Number.isFinite(XL) ? XL : 0;
+    const xC = Number.isFinite(XC) ? XC : 0;
+
+    const X = xL - xC;                 // net reactance
+    const Z = Math.sqrt(R*R + X*X);     // impedance magnitude
+    const theta = radToDeg(Math.atan2(X, R)); // phase angle in degrees
+
+    const eZ = engFormat(Z);
+
+    out.textContent =
+`Net reactance: X = X_L − X_C = ${fmt(xL)} − ${fmt(xC)} = ${fmt(X)} Ω
+Impedance: Z = √(R² + X²) = √(${fmt(R)}² + ${fmt(X)}²) = ${fmt(Z)} Ω
+Phase angle: θ = tan⁻¹(X/R) = ${fmt(theta)}°
+Engineering (Z): ${eZ.eng} Ω
+
+Sign note:
+• θ > 0 → inductive (voltage leads current)
+• θ < 0 → capacitive (current leads voltage)`;
+  });
+
+  $("btnACExample").addEventListener("click", () => {
+    $("acR").value = 40;
+    $("acXL").value = 30;
+    $("acXC").value = 10;
+    $("btnAC").click();
+  });
+
+  $("btnACClear").addEventListener("click", () => {
+    $("acR").value = "";
+    $("acXL").value = "";
+    $("acXC").value = "";
+    $("acOut").textContent = "";
+  });
+
+  // ---------- Trig ----------
+  $("btnTrig").addEventListener("click", () => {
+    const thetaDeg = Number($("trigTheta").value);
+    const fn = $("trigFn").value;
+    const A = Number($("trigA").value);
+    const O = Number($("trigO").value);
+    const H = Number($("trigH").value);
+    const out = $("trigOut");
+
+    if (!Number.isFinite(thetaDeg)){
+      out.textContent = "Enter an angle θ in degrees.";
+      return;
+    }
+    const th = degToRad(thetaDeg);
+
+    const s = Math.sin(th), c = Math.cos(th), t = Math.tan(th);
+
+    let lines = [];
+    lines.push(`sin(θ)=${fmt(s)}   cos(θ)=${fmt(c)}   tan(θ)=${fmt(t)}`);
+
+    const haveA = Number.isFinite(A);
+    const haveO = Number.isFinite(O);
+    const haveH = Number.isFinite(H);
+
+    // Solve right triangle if θ + one side given
+    if (haveH){
+      const a = H * c;
+      const o = H * s;
+      lines.push(`Given H=${fmt(H)}: A = H·cos(θ) = ${fmt(a)}, O = H·sin(θ) = ${fmt(o)}`);
+    } else if (haveA){
+      const h = A / c;
+      const o = A * t;
+      lines.push(`Given A=${fmt(A)}: H = A/cos(θ) = ${fmt(h)}, O = A·tan(θ) = ${fmt(o)}`);
+    } else if (haveO){
+      const h = O / s;
+      const a = O / t;
+      lines.push(`Given O=${fmt(O)}: H = O/sin(θ) = ${fmt(h)}, A = O/tan(θ) = ${fmt(a)}`);
+    } else {
+      lines.push("(Enter one side (A, O, or H) to solve the other sides.)");
+    }
+
+    out.textContent = lines.join("\n");
+  });
+
+  $("btnTrigExample").addEventListener("click", () => {
+    $("trigTheta").value = 30;
+    $("trigFn").value = "sin";
+    $("trigA").value = 10;
+    $("trigO").value = "";
+    $("trigH").value = "";
+    $("btnTrig").click();
+  });
+
+  $("btnTrigClear").addEventListener("click", () => {
+    $("trigTheta").value = "";
+    $("trigA").value = "";
+    $("trigO").value = "";
+    $("trigH").value = "";
+    $("trigOut").textContent = "";
+  });
+
+  // ---------- Peak/RMS/Average ----------
+  const pkMult = {
+    peak_to_rms: 0.707,
+    peak_to_avg: 0.637,
+    peak_to_pp: 2,
+    rms_to_peak: 1.414,
+    avg_to_peak: 1.567,
+    rms_to_avg: 0.9,
+    avg_to_rms: 1.111
+  };
+
+  $("btnPk").addEventListener("click", () => {
+    const v = Number($("pkValue").value);
+    const mode = $("pkMode").value;
+    const out = $("pkOut");
+    if (!Number.isFinite(v)){
+      out.textContent = "Enter a starting value.";
+      return;
+    }
+    const m = pkMult[mode];
+    const res = v * m;
+    out.textContent = `Result = ${fmt(v)} × ${m} = ${fmt(res)}`;
+  });
+
+  $("btnPkExample").addEventListener("click", () => {
+    $("pkValue").value = 170;
+    $("pkMode").value = "peak_to_rms";
+    $("btnPk").click();
+  });
+
+  $("btnPkClear").addEventListener("click", () => {
+    $("pkValue").value = "";
+    $("pkOut").textContent = "";
+  });
+
+  // ---------- Instantaneous ----------
+  $("btnWave").addEventListener("click", () => {
+    const Xmax = Number($("wvMax").value);
+    const f = Number($("wvF").value);
+    const t = Number($("wvT").value);
+    const phiDeg = Number($("wvPhi").value || 0);
+    const out = $("wvOut");
+
+    if (!Number.isFinite(Xmax) || !Number.isFinite(f) || !Number.isFinite(t)){
+      out.textContent = "Enter Xmax, f, and t.";
+      return;
+    }
+    if (f <= 0){
+      out.textContent = "Frequency f must be > 0.";
+      return;
+    }
+    const omega = 2 * Math.PI * f;
+    const phi = degToRad(phiDeg);
+    const x = Xmax * Math.sin(omega * t + phi);
+
+    out.textContent =
+`ω = 2πf = 2π × ${fmt(f)} = ${fmt(omega)} rad/s
+x(t) = Xmax · sin(ωt + φ)
+= ${fmt(Xmax)} · sin(${fmt(omega)}·${fmt(t)} + ${fmt(phiDeg)}°)
+= ${fmt(x)}`;
+  });
+
+  $("btnWaveExample").addEventListener("click", () => {
+    $("wvMax").value = 170;
+    $("wvF").value = 60;
+    $("wvT").value = 0.002;
+    $("wvPhi").value = 0;
+    $("btnWave").click();
+  });
+
+  $("btnWaveClear").addEventListener("click", () => {
+    $("wvMax").value = "";
+    $("wvF").value = "";
+    $("wvT").value = "";
+    $("wvPhi").value = "";
+    $("wvOut").textContent = "";
+  });
+</script>
+</body>
+</html>
