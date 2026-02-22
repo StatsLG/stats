@@ -1,700 +1,102 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Georgetown College XCTF History (2010–Present)</title>
-  <meta name="description" content="Georgetown College Cross Country and Track &amp; Field History (2010–Present). Search, filter, and sort results."/>
-  <style>
-    :root {
-      --gc-orange: #ff6600;
-      --gc-black: #0b0b0b;
-      --gc-white: #ffffff;
-      --line: rgba(0,0,0,.12);
-      --muted: rgba(0,0,0,.65);
-      --shadow: 0 10px 30px rgba(0,0,0,.10);
-      --radius: 16px;
-      --radius2: 22px;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: linear-gradient(180deg, #fff 0%, #fafafa 55%, #fff 100%);
-      color: var(--gc-black);
-    }
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(255,255,255,.92);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--line);
-    }
-    .wrap {
-      max-width: 1250px;
-      margin: 0 auto;
-      padding: 16px 16px;
-    }
-    .top {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .brand {
-      display:flex;
-      gap:12px;
-      align-items:center;
-      min-width: 280px;
-    }
-    .mark {
-      width: 44px; height: 44px;
-      border-radius: 14px;
-      background: var(--gc-orange);
-      box-shadow: var(--shadow);
-      display:grid; place-items:center;
-      color: white;
-      font-weight: 900;
-      letter-spacing: .5px;
-    }
-    h1 {
-      margin: 0;
-      font-size: 18px;
-      line-height: 1.15;
-    }
-    .sub {
-      margin-top: 3px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .actions {
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-    button {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--gc-black);
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-weight: 650;
-      cursor: pointer;
-    }
-    button.primary {
-      background: var(--gc-black);
-      color: white;
-      border-color: rgba(0,0,0,.2);
-    }
-    button.orange {
-      background: var(--gc-orange);
-      color: white;
-      border-color: rgba(0,0,0,.05);
-    }
-    button:active { transform: translateY(1px); }
-
-    main .wrap { padding-top: 18px; padding-bottom: 36px; }
-
-    .grid {
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 14px;
-    }
-    @media (max-width: 980px) {
-      .grid { grid-template-columns: 1fr; }
-    }
-
-    .card {
-      background: white;
-      border: 1px solid var(--line);
-      border-radius: var(--radius2);
-      box-shadow: 0 8px 30px rgba(0,0,0,.06);
-      overflow: hidden;
-    }
-    .card .hd {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--line);
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .hd h2 {
-      margin: 0;
-      font-size: 14px;
-      letter-spacing: .2px;
-    }
-    .hd .meta {
-      font-size: 12px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-    .card .bd { padding: 14px 16px; }
-
-    .filters {
-      display:flex;
-      flex-wrap:wrap;
-      gap: 10px;
-      align-items:flex-end;
-    }
-    .ctrl {
-      display:flex;
-      flex-direction: column;
-      gap: 6px;
-      min-width: 160px;
-      flex: 1 1 160px;
-    }
-    label {
-      font-size: 12px;
-      color: var(--muted);
-    }
-    select, input {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      outline: none;
-      background: #fff;
-    }
-    input:focus, select:focus {
-      border-color: rgba(255, 102, 0, .55);
-      box-shadow: 0 0 0 4px rgba(255,102,0,.12);
-    }
-
-    .kpis {
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .kpi {
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 12px 12px;
-      background: linear-gradient(180deg, #fff 0%, #fff 60%, #fafafa 100%);
-    }
-    .kpi .big {
-      font-size: 22px;
-      font-weight: 850;
-      margin-bottom: 2px;
-    }
-    .kpi .lab {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .tablewrap {
-      border-top: 1px solid var(--line);
-      overflow:auto;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 1100px;
-      font-size: 13px;
-    }
-    th, td {
-      padding: 11px 10px;
-      border-bottom: 1px solid rgba(0,0,0,.06);
-      text-align:left;
-      vertical-align: top;
-    }
-    th {
-      position: sticky;
-      top: 0;
-      background: #fff;
-      z-index: 2;
-      cursor: pointer;
-      user-select: none;
-      white-space: nowrap;
-      border-bottom: 1px solid var(--line);
-    }
-    tr:hover td { background: rgba(255,102,0,.06); }
-
-    .pill {
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding: 2px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(0,0,0,.10);
-      font-size: 12px;
-      color: rgba(0,0,0,.78);
-      white-space: nowrap;
-    }
-    .pill.orange {
-      border-color: rgba(255,102,0,.35);
-      background: rgba(255,102,0,.08);
-    }
-    .right { text-align:right; }
-    .nowrap { white-space: nowrap; }
-    .muted { color: var(--muted); }
-    .small { font-size: 12px; }
-    .foot {
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Georgetown College Cross Country and Track &amp; Field History 2010-Present</title>
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <div class="top">
-      <div class="brand">
-        <div class="mark">GC</div>
-        <div>
-          <h1>Georgetown College Cross Country &amp; Track &amp; Field History</h1>
-          <div class="sub">2010–Present • Search, filter, sort • Generated 2026-02-22 02:51:47</div>
-        </div>
-      </div>
-      <div class="actions">
-        <button id="btnReset" class="primary">Reset filters</button>
-        <button id="btnCSV" class="orange">Download filtered CSV</button>
+  <header>
+    <h1>Georgetown College Cross Country and Track &amp; Field History 2010-Present</h1>
+    <div class="meta">
+      <span class="pill"><span class="dot"></span><span id="lastUpdated">Last updated: —</span></span>
+      <span class="pill"><span id="rowCount">Rows: —</span></span>
+      <span class="pill"><span id="loadState">Loading data…</span></span>
+    </div>
+  </header>
+
+  <section class="controls">
+    <div class="control">
+      <label for="sex">Roster</label>
+      <select id="sex">
+        <option value="m">Male</option>
+        <option value="f">Female</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label for="season">Season</label>
+      <select id="season">
+        <option value="Outdoor">Outdoor</option>
+        <option value="Indoor">Indoor</option>
+        <option value="Cross Country">XC</option>
+      </select>
+    </div>
+
+    <div class="control wide">
+      <label for="event">Event</label>
+      <select id="event">
+        <option value="">All events</option>
+      </select>
+    </div>
+
+    <div class="control wide">
+      <label for="search">Search athlete</label>
+      <input id="search" type="text" placeholder="Type a last name, first name…" />
+    </div>
+
+    <div class="control">
+      <label>Display</label>
+      <div class="checkrow">
+        <input id="bestOnly" type="checkbox" checked />
+        <span><b>Best mark</b> per athlete</span>
       </div>
     </div>
-  </div>
-</header>
 
-<main>
-  <div class="wrap">
-    <div class="grid">
-      <section class="card">
-        <div class="hd">
-          <h2>Results</h2>
-          <div class="meta" id="metaLine">Loading…</div>
-        </div>
-
-        <div class="bd">
-          <div class="filters">
-            <div class="ctrl" style="flex: 2 1 280px; min-width: 260px;">
-              <label for="q">Search (any field)</label>
-              <input id="q" type="text" placeholder="athlete, meet, event, mark, place…" />
-            </div>
-
-            <div class="ctrl">
-              <label for="sex">Sex</label>
-              <select id="sex"><option value="">All</option></select>
-            </div>
-
-            <div class="ctrl">
-              <label for="sport">Sport</label>
-              <select id="sport"><option value="">All</option></select>
-            </div>
-
-            <div class="ctrl">
-              <label for="season">Season</label>
-              <select id="season"><option value="">All</option></select>
-            </div>
-
-            <div class="ctrl">
-              <label for="year">Year</label>
-              <select id="year"><option value="">All</option></select>
-            </div>
-
-            <div class="ctrl">
-              <label for="event">Event</label>
-              <select id="event"><option value="">All</option></select>
-            </div>
-
-            <div class="ctrl" style="min-width: 150px;">
-              <label for="pageSize">Rows / page</label>
-              <select id="pageSize">
-                <option>50</option>
-                <option>100</option>
-                <option>200</option>
-                <option>500</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="foot">
-            Tip: click column headers to sort. Shift+click for multi-sort. For sorting, times use smaller-is-better; distances use bigger-is-better.
-          </div>
-        </div>
-
-        <div class="tablewrap">
-          <table id="tbl">
-            <thead>
-              <tr>
-                <th data-key="athlete_name">Athlete</th>
-                <th data-key="sex">Sex</th>
-                <th data-key="sport">Sport</th>
-                <th data-key="season_type">Season</th>
-                <th data-key="meet_date">Date</th>
-                <th data-key="meet_name">Meet</th>
-                <th data-key="event_code">Event</th>
-                <th data-key="mark">Mark</th>
-                <th data-key="wind">Wind</th>
-                <th data-key="place">Place</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-
-        <div class="bd" style="display:flex; justify-content:space-between; gap: 10px; flex-wrap:wrap;">
-          <div class="small muted" id="pageInfo">—</div>
-          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-            <button id="prev">Prev</button>
-            <button id="next">Next</button>
-          </div>
-        </div>
-      </section>
-
-      <aside class="card">
-        <div class="hd">
-          <h2>Summary</h2>
-          <div class="meta"><span class="pill orange">#ff6600</span> <span class="pill">black</span> <span class="pill">white</span></div>
-        </div>
-        <div class="bd">
-          <div class="kpis">
-            <div class="kpi">
-              <div class="big" id="kRows">—</div>
-              <div class="lab">Rows (filtered)</div>
-            </div>
-            <div class="kpi">
-              <div class="big" id="kAth">—</div>
-              <div class="lab">Athletes (filtered)</div>
-            </div>
-            <div class="kpi">
-              <div class="big" id="kMeets">—</div>
-              <div class="lab">Meets (filtered)</div>
-            </div>
-            <div class="kpi">
-              <div class="big" id="kYears">—</div>
-              <div class="lab">Years (filtered)</div>
-            </div>
-          </div>
-
-          <div style="margin-top: 14px;">
-            <div class="pill orange">Data file: <span class="muted">gc_results_updated.json</span></div>
-            <div class="foot">Want athlete profile pages (PRs by event), top-10 lists, and charts? Tell me and I’ll add them.</div>
-          </div>
-        </div>
-      </aside>
+    <div class="control">
+      <button id="exportBtn" class="btn secondary" title="Download the currently filtered rows as CSV">Export CSV</button>
     </div>
-  </div>
-</main>
 
-<script>
-  const DATA_URL = "gc_results_updated.json";
+    <div class="control full">
+      <div class="small">
+        Tip: Default is “Best mark per athlete.” Uncheck it to show every performance.
+      </div>
+    </div>
+  </section>
 
-  const $ = (id) => document.getElementById(id);
-  const norm = (v) => (v ?? "").toString().trim();
-  const lower = (v) => norm(v).toLowerCase();
+  <main>
+    <div class="statusbar">
+      <div>
+        <span class="badge" id="resultCount">0 results</span>
+        <span class="muted" id="sortHint"></span>
+      </div>
+      <div class="muted small" id="filterSummary"></div>
+    </div>
 
-  let allRows = [];
-  let filtered = [];
-  let page = 1;
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 220px;">Athlete</th>
+            <th style="width: 120px;">Mark</th>
+            <th style="width: 90px;">Wind</th>
+            <th>Meet</th>
+            <th style="width: 120px;">Date</th>
+            <th style="width: 180px;">Event</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="6" class="muted">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
 
-  let sortKeys = [
-    { key: "meet_date", dir: "desc" },
-    { key: "id", dir: "desc" }
-  ];
+    <div class="note">
+      Data displayed from <code>docs/data/performances.json</code>. Update the site by re-exporting JSON and pushing to GitHub Pages.
+    </div>
+  </main>
 
-  function uniqSorted(arr) {
-    return [...new Set(arr.map(v => norm(v)).filter(Boolean))]
-      .sort((a,b) => a.localeCompare(b, undefined, {numeric:true, sensitivity:"base"}));
-  }
-
-  function parseMark(mark) {
-    const s0 = norm(mark);
-    if (!s0) return {kind:"other", value:null};
-    const s = s0.replace(/\s*\(.*?\)\s*/g, " ").trim();
-
-    if (s.includes(":")) {
-      const parts = s.split(":").map(p => p.trim());
-      if (parts.some(p => p === "")) return {kind:"other", value:null};
-      const nums = parts.map(p => Number(p));
-      if (nums.some(n => !Number.isFinite(n))) return {kind:"other", value:null};
-      if (nums.length === 2) {
-        const [m, sec] = nums;
-        return {kind:"time", value: m*60 + sec};
-      }
-      if (nums.length === 3) {
-        const [h, m, sec] = nums;
-        return {kind:"time", value: h*3600 + m*60 + sec};
-      }
-    }
-
-    const x = Number(s);
-    if (Number.isFinite(x)) return {kind:"num", value:x};
-
-    const m = s.match(/([0-9]+(?:\.[0-9]+)?)\s*m\b/i);
-    if (m) return {kind:"dist", value:Number(m[1])};
-
-    const fi = s.match(/(\d+)\s*'\s*(\d+(?:\.\d+)?)\s*"?/);
-    if (fi) {
-      const ft = Number(fi[1]); const inch = Number(fi[2]);
-      if (Number.isFinite(ft) && Number.isFinite(inch)) {
-        const meters = (ft*12 + inch) * 0.0254;
-        return {kind:"dist", value: meters};
-      }
-    }
-    return {kind:"other", value:null};
-  }
-
-  function isDistanceEvent(eventCode) {
-    const e = lower(eventCode);
-    return ["lj","tj","hj","pv","sp","wt","dt","ht","jt","discus","hammer","shot","jav","pole"].some(k => e.includes(k));
-  }
-
-  function markSortValue(row) {
-    const pm = parseMark(row.mark);
-    const distEvent = isDistanceEvent(row.event_code);
-    if (pm.value == null) return { kind:"other", value:null };
-
-    if (pm.kind === "num") {
-      if (distEvent) return {kind:"dist", value: pm.value};
-      return {kind:"time", value: pm.value};
-    }
-    return pm;
-  }
-
-  function compare(a, b, key, dir) {
-    const d = dir === "asc" ? 1 : -1;
-
-    if (key === "mark") {
-      const av = markSortValue(a);
-      const bv = markSortValue(b);
-
-      if (av.value != null && bv.value != null) {
-        const aIsDist = av.kind === "dist";
-        const bIsDist = bv.kind === "dist";
-        if (aIsDist !== bIsDist) return (aIsDist ? 1 : -1) * d;
-
-        if (av.kind === "time") return (av.value - bv.value) * d;
-        if (av.kind === "dist") return (bv.value - av.value) * d;
-      }
-      return (norm(a.mark)).localeCompare(norm(b.mark), undefined, {numeric:true, sensitivity:"base"}) * d;
-    }
-
-    if (key === "meet_date") {
-      return norm(a.meet_date).localeCompare(norm(b.meet_date)) * d;
-    }
-
-    const av = a[key];
-    const bv = b[key];
-    const aNum = typeof av === "number" && Number.isFinite(av);
-    const bNum = typeof bv === "number" && Number.isFinite(bv);
-    if (aNum && bNum) return (av - bv) * d;
-    return (norm(av)).localeCompare(norm(bv), undefined, {numeric:true, sensitivity:"base"}) * d;
-  }
-
-  function multiSort(rows) {
-    return rows.slice().sort((a,b) => {
-      for (const s of sortKeys) {
-        const c = compare(a,b,s.key,s.dir);
-        if (c !== 0) return c;
-      }
-      return 0;
-    });
-  }
-
-  function fillSelect(id, values) {
-    const s = $(id);
-    const cur = s.value;
-    s.innerHTML = '<option value="">All</option>' + values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
-    s.value = cur;
-  }
-
-  function escapeHtml(x) {
-    return norm(x)
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-
-  function getYear(dateStr) {
-    const s = norm(dateStr);
-    const m = s.match(/^(\d{4})/);
-    return m ? Number(m[1]) : "";
-  }
-
-  function applyFilters() {
-    const q = lower($("q").value);
-    const sex = $("sex").value;
-    const sport = $("sport").value;
-    const season = $("season").value;
-    const year = $("year").value;
-    const event = $("event").value;
-
-    filtered = allRows.filter(r => {
-      if (sex && norm(r.sex) !== sex) return false;
-      if (sport && norm(r.sport) !== sport) return false;
-      if (season && norm(r.season_type) !== season) return false;
-      if (year && String(getYear(r.meet_date)) !== year) return false;
-      if (event && norm(r.event_code) !== event) return false;
-
-      if (q) {
-        const hay = [
-          r.athlete_name, r.sex, r.sport, r.season_type,
-          r.meet_date, r.meet_name, r.event_code, r.mark, r.wind, r.place, r.team_name
-        ].map(v => lower(v)).join(" | ");
-        if (!hay.includes(q)) return false;
-      }
-      return true;
-    });
-
-    page = 1;
-    render();
-  }
-
-  function computeKPIs() {
-    $("kRows").textContent = filtered.length.toLocaleString();
-    const athletes = new Set(filtered.map(r => norm(r.athlete_name)).filter(Boolean));
-    $("kAth").textContent = athletes.size.toLocaleString();
-    const meets = new Set(filtered.map(r => `${norm(r.meet_name)}|${norm(r.meet_date)}`).filter(v => v !== "|"));
-    $("kMeets").textContent = meets.size.toLocaleString();
-    const years = new Set(filtered.map(r => String(getYear(r.meet_date))).filter(Boolean));
-    $("kYears").textContent = years.size.toLocaleString();
-  }
-
-  function render() {
-    fillSelect("sex", uniqSorted(allRows.map(r => r.sex)));
-    fillSelect("sport", uniqSorted(allRows.map(r => r.sport)));
-    fillSelect("season", uniqSorted(allRows.map(r => r.season_type)));
-    fillSelect("year", uniqSorted(allRows.map(r => String(getYear(r.meet_date))).filter(Boolean)).reverse());
-    fillSelect("event", uniqSorted(allRows.map(r => r.event_code)));
-
-    const sorted = multiSort(filtered);
-    const pageSize = Number($("pageSize").value) || 50;
-    const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
-    if (page > totalPages) page = totalPages;
-
-    const start = (page - 1) * pageSize;
-    const slice = sorted.slice(start, start + pageSize);
-
-    const tbody = $("tbl").querySelector("tbody");
-    tbody.innerHTML = slice.map(r => `
-      <tr>
-        <td>${escapeHtml(r.athlete_name)}</td>
-        <td>${escapeHtml(r.sex)}</td>
-        <td>${escapeHtml(r.sport)}</td>
-        <td>${escapeHtml(r.season_type)}</td>
-        <td class="nowrap">${escapeHtml(r.meet_date)}</td>
-        <td>${escapeHtml(r.meet_name)}</td>
-        <td class="nowrap">${escapeHtml(r.event_code)}</td>
-        <td class="nowrap"><strong>${escapeHtml(r.mark)}</strong></td>
-        <td class="nowrap">${escapeHtml(r.wind)}</td>
-        <td class="nowrap">${escapeHtml(r.place)}</td>
-      </tr>
-    `).join("");
-
-    computeKPIs();
-
-    $("metaLine").textContent = `${sorted.length.toLocaleString()} filtered of ${allRows.length.toLocaleString()} total`;
-    $("pageInfo").textContent = `Page ${page} of ${totalPages} • Showing rows ${sorted.length ? (start+1).toLocaleString() : "0"}–${Math.min(start+pageSize, sorted.length).toLocaleString()}`;
-
-    document.querySelectorAll("th[data-key]").forEach(th => {
-      const key = th.dataset.key;
-      const idx = sortKeys.findIndex(s => s.key === key);
-      const base = th.textContent.replace(/\s*[↑↓]\d*$/,"");
-      th.textContent = base;
-      if (idx >= 0) {
-        const arrow = sortKeys[idx].dir === "asc" ? "↑" : "↓";
-        const suffix = sortKeys.length > 1 ? `${arrow}${idx+1}` : arrow;
-        th.textContent = base + " " + suffix;
-      }
-    });
-  }
-
-  function downloadCSV() {
-    const sorted = multiSort(filtered);
-    const header = ["athlete_name","sex","sport","season_type","meet_date","meet_name","event_code","mark","wind","place","team_name","athlete_url"];
-    const esc = (v) => {
-      const s = norm(v);
-      if (s.includes('"') || s.includes(",") || s.includes("\n")) return '"' + s.replaceAll('"','""') + '"';
-      return s;
-    };
-    const lines = [header.join(",")].concat(sorted.map(r => header.map(h => esc(r[h])).join(",")));
-    const blob = new Blob([lines.join("\n")], {type:"text/csv;charset=utf-8"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "georgetown_xctf_filtered.csv";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  }
-
-  ["q","sex","sport","season","year","event"].forEach(id => {
-    $(id).addEventListener(id === "q" ? "input" : "change", () => {
-      if (id === "q") {
-        clearTimeout(window.__deb);
-        window.__deb = setTimeout(applyFilters, 120);
-      } else applyFilters();
-    });
-  });
-  $("pageSize").addEventListener("change", () => { page = 1; render(); });
-  $("prev").addEventListener("click", () => { if (page > 1) { page--; render(); }});
-  $("next").addEventListener("click", () => {
-    const pageSize = Number($("pageSize").value) || 50;
-    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-    if (page < totalPages) { page++; render(); }
-  });
-  $("btnReset").addEventListener("click", () => {
-    $("q").value = "";
-    $("sex").value = "";
-    $("sport").value = "";
-    $("season").value = "";
-    $("year").value = "";
-    $("event").value = "";
-    page = 1;
-    applyFilters();
-  });
-  $("btnCSV").addEventListener("click", downloadCSV);
-
-  document.querySelectorAll("th[data-key]").forEach(th => {
-    th.addEventListener("click", (ev) => {
-      const key = th.dataset.key;
-      const shift = ev.shiftKey;
-      const idx = sortKeys.findIndex(s => s.key === key);
-
-      if (!shift) {
-        if (idx === 0) sortKeys[0].dir = sortKeys[0].dir === "asc" ? "desc" : "asc";
-        else sortKeys = [{key, dir:"asc"}];
-      } else {
-        if (idx >= 0) sortKeys[idx].dir = sortKeys[idx].dir === "asc" ? "desc" : "asc";
-        else sortKeys.push({key, dir:"asc"});
-      }
-      render();
-    });
-  });
-
-  async function init() {
-    const res = await fetch(DATA_URL, {cache:"no-store"});
-    if (!res.ok) {
-      $("metaLine").textContent = "Could not load gc_results_updated.json (make sure it’s in the same folder).";
-      return;
-    }
-    allRows = await res.json();
-    allRows = allRows.map(r => ({
-      id: r.id,
-      athlete_url: r.athlete_url,
-      athlete_name: r.athlete_name ?? "",
-      team_name: r.team_name ?? "",
-      sex: r.sex ?? "",
-      sport: r.sport ?? "",
-      season_type: r.season_type ?? "",
-      meet_date: r.meet_date ?? "",
-      meet_name: r.meet_name ?? "",
-      event_code: r.event_code ?? "",
-      mark: r.mark ?? "",
-      wind: r.wind ?? "",
-      place: r.place ?? ""
-    }));
-
-    filtered = allRows.slice();
-    render();
-  }
-
-  init();
-</script>
+  <script src="./app.js"></script>
 </body>
 </html>
