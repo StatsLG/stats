@@ -58,9 +58,12 @@ function parseMeetDateToTs(s){
 
   // Common TFRRS examples:
   //   "Feb 17, 2026"
-  //   "Apr 24-25, 2015"  -> treat as "Apr 24, 2015"
-  //   "Apr 24, 2015"
-  const m = str.match(/^([A-Za-z]{3,9})\s+(\d{1,2})(?:-\d{1,2})?,\s*(\d{4})$/);
+  //   "Feb 6-7, 2026"
+  //   "Feb 6- 7, 2026"
+  //   "Feb 6 - 7, 2026"
+  //   "Feb 6–7, 2026"  (en dash)
+  // We treat ranges as the first day.
+  const m = str.match(/^([A-Za-z]{3,9})\s+(\d{1,2})(?:\s*[-–]\s*\d{1,2})?,\s*(\d{4})$/);
   if(m){
     const month = m[1];
     const day = m[2];
