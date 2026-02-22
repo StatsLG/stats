@@ -27,6 +27,117 @@ const FIELD_HINTS = [
 
 const BAD_MARKS = new Set(["DQ","DNS","DNF","NH","FOUL","NO MARK","NM","NT"]);
 
+// --- Indoor school record progression tagging ---
+// For Indoor only: walk earliest -> latest per (sex,event), flag rows that were a school record at that time.
+// Mark as:
+//   "FSR" = former school record (record at the time, later broken)
+//   "SR"  = current school record (latest/best overall)
+//
+// Note: requires a usable meet_date. If meet_date is missing/unparseable, row won't be considered for SR/FSR tagging.
+let INDOOR_RECORD_STATUS = new Map(); // key -> "FSR" | "SR"
+
+function rowKey(r){
+  // best-effort stable key across exports
+  return [
+    r.athlete_url || "",
+    r.athlete_name || "",
+    r.season_type || "",
+    r.event_name || "",
+    r.meet_name || "",
+    r.meet_date || "",
+    r.mark || "",
+    r.mark_extra || "",
+    r.wind || ""
+  ].join("||");
+}
+
+function parseMeetDateToTs(s){
+  if(!s) return null;
+  const str = String(s).trim();
+  if(!str) return null;
+
+  // Common TFRRS examples:
+  //   "Feb 17, 2026"
+  //   "Apr 24-25, 2015"  -> treat as "Apr 24, 2015"
+  //   "Apr 24, 2015"
+  const m = str.match(/^([A-Za-z]{3,9})\s+(\d{1,2})(?:-\d{1,2})?,\s*(\d{4})$/);
+  if(m){
+    const month = m[1];
+    const day = m[2];
+    const year = m[3];
+    const d = new Date(`${month} ${day}, ${year}`);
+    const ts = d.getTime();
+    return Number.isFinite(ts) ? ts : null;
+  }
+
+  // Fallback: try native parse
+  const d = new Date(str);
+  const ts = d.getTime();
+  return Number.isFinite(ts) ? ts : null;
+}
+
+function computeIndoorRecordStatus(){
+  INDOOR_RECORD_STATUS = new Map();
+
+  // group by sex + event
+  const groups = new Map(); // "m||event" -> rows
+  for(const r of ALL){
+    if(r.season_type !== "Indoor") continue;
+    if(!r.event_name) continue;
+    const ts = parseMeetDateToTs(r.meet_date);
+    if(ts === null) continue;
+
+    const bv = bestValueForRow(r);
+    if(bv.value === null) continue;
+
+    const key = `${r.sex || ""}||${r.event_name}`;
+    if(!groups.has(key)) groups.set(key, []);
+    groups.get(key).push({ r, ts, bv });
+  }
+
+  for(const [gkey, arr] of groups.entries()){
+    if(arr.length === 0) continue;
+
+    // Sort earliest -> latest; within same date, put "better" first
+    arr.sort((a,b) => {
+      if(a.ts !== b.ts) return a.ts - b.ts;
+      if(a.bv.direction === "min") return a.bv.value - b.bv.value;
+      return b.bv.value - a.bv.value;
+    });
+
+    let current = null; // {value, direction}
+    const recordHolders = []; // in chronological order of new records
+
+    for(const item of arr){
+      if(!current){
+        current = { value: item.bv.value, direction: item.bv.direction };
+        recordHolders.push(item.r);
+        continue;
+      }
+      if(current.direction === "min"){
+        if(item.bv.value < current.value){
+          current.value = item.bv.value;
+          recordHolders.push(item.r);
+        }
+      } else {
+        if(item.bv.value > current.value){
+          current.value = item.bv.value;
+          recordHolders.push(item.r);
+        }
+      }
+    }
+
+    if(recordHolders.length === 0) continue;
+
+    // last is current SR, earlier are FSR
+    for(let i=0; i<recordHolders.length; i++){
+      const rr = recordHolders[i];
+      const k = rowKey(rr);
+      INDOOR_RECORD_STATUS.set(k, (i === recordHolders.length - 1) ? "SR" : "FSR");
+    }
+  }
+}
+
 function isFieldEvent(eventName){
   if(!eventName) return false;
   const e = eventName.toLowerCase();
@@ -235,11 +346,18 @@ function filterRows(){
   return rows;
 }
 
+function renderRecordBadge(r){
+  if(r.season_type !== "Indoor") return "<span class='muted'>—</span>";
+  const status = INDOOR_RECORD_STATUS.get(rowKey(r));
+  if(!status) return "<span class='muted'>—</span>";
+  return `<span class="badge">${status}</span>`;
+}
+
 function render(rows){
   els.resultCount.textContent = `${rows.length} result${rows.length === 1 ? "" : "s"}`;
 
   if(rows.length === 0){
-    els.tbody.innerHTML = `<tr><td colspan="6" class="muted">No results for the current filters.</td></tr>`;
+    els.tbody.innerHTML = `<tr><td colspan="7" class="muted">No results for the current filters.</td></tr>`;
     return;
   }
 
@@ -262,6 +380,7 @@ function render(rows){
       <td>${athleteCell}</td>
       <td><b>${mark || "—"}</b>${r.mark_extra ? `<div class="small">${escapeHtml(r.mark_extra)}</div>` : ""}</td>
       <td>${wind || "<span class='muted'>—</span>"}</td>
+      <td>${renderRecordBadge(r)}</td>
       <td>${meetCell}</td>
       <td>${date || "<span class='muted'>—</span>"}</td>
       <td>${event || "<span class='muted'>—</span>"}</td>
@@ -290,10 +409,11 @@ function toCsvValue(v){
 }
 
 function exportCsv(rows){
-  const cols = ["athlete_name","sex","season_type","event_name","mark","mark_extra","wind","meet_name","meet_date","athlete_url"];
+  const cols = ["athlete_name","sex","season_type","event_name","mark","mark_extra","wind","record_status","meet_name","meet_date","athlete_url"];
   const lines = [];
   lines.push(cols.join(","));
-  for(const r of rows){
+  for(const r0 of rows){
+    const r = { ...r0, record_status: (r0.season_type === "Indoor" ? (INDOOR_RECORD_STATUS.get(rowKey(r0)) || "") : "") };
     const line = cols.map(c => toCsvValue(r[c])).join(",");
     lines.push(line);
   }
@@ -328,6 +448,9 @@ async function init(){
     const perfRes = await fetch("./data/performances.json", { cache: "no-store" });
     ALL = await perfRes.json();
 
+    // Precompute indoor school record progression tags
+    computeIndoorRecordStatus();
+
     els.loadState.textContent = "Ready";
     buildEventOptions();
     refresh();
@@ -351,7 +474,7 @@ async function init(){
   } catch(err){
     console.error(err);
     els.loadState.textContent = "Error loading data";
-    els.tbody.innerHTML = `<tr><td colspan="6" class="muted">Error: could not load JSON files. Make sure you are viewing via GitHub Pages (not opening index.html directly from disk), and that docs/data/*.json exists.</td></tr>`;
+    els.tbody.innerHTML = `<tr><td colspan="7" class="muted">Error: could not load JSON files. Make sure you are viewing via GitHub Pages (not opening index.html directly from disk), and that docs/data/*.json exists.</td></tr>`;
   }
 }
 
