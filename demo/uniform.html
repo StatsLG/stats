@@ -253,12 +253,10 @@
 
 <script>
 (() => {
-  // ===== Constants =====
   const RANGE_START = 92.45;
   const RANGE_END   = 138.73;
   const THEORY_P = (RANGE_END - RANGE_START) / 360;
 
-  // ===== Elements =====
   const dial = document.getElementById('dial');
   const dctx = dial.getContext('2d');
 
@@ -285,19 +283,15 @@
   const inPctEl = document.getElementById('inPct');
   const outPctEl = document.getElementById('outPct');
 
-  // ===== Spinner state =====
-  // needleDeg uses unit-circle convention: 0° at +x, increases CCW.
-  // We draw the needle by rotating the canvas by -needleDeg (canvas y-axis is down),
-  // which makes the needle appear to rotate CCW as needleDeg increases.
+  // Unit-circle degrees stored as: 0° at +x, increasing CCW.
+  // Canvas y is down, so to draw unit-circle CCW correctly on screen we use rad = -deg.
   let needleDeg = 0;
   let spinning = false;
 
-  // ===== Data =====
   const angles = [];
   const BIN_COUNT = 36;
   const binCounts = new Array(BIN_COUNT).fill(0);
 
-  // ===== Helpers =====
   function norm360(deg){
     let x = deg % 360;
     if (x < 0) x += 360;
@@ -311,6 +305,9 @@
   function angleToBin(a){
     const w = 360 / BIN_COUNT;
     return Math.min(BIN_COUNT - 1, Math.max(0, Math.floor(a / w)));
+  }
+  function ucDegToCanvasRad(deg){
+    return -(deg * Math.PI / 180);
   }
 
   function updateRangeTable(){
@@ -342,13 +339,6 @@
     updateRangeTable();
   }
 
-  // Convert unit-circle degrees to canvas radians (canvas y is down),
-  // so we negate degrees to make CCW positive appear "upward" on screen.
-  function ucDegToCanvasRad(deg){
-    return -(deg * Math.PI / 180);
-  }
-
-  // ===== Draw: Dial =====
   function drawDial(needleDegLocal){
     const w = dial.width, h = dial.height;
     const cx = w/2, cy = h/2;
@@ -358,42 +348,13 @@
     dctx.save();
     dctx.translate(cx, cy);
 
-    // face
+    // Face
     dctx.beginPath();
     dctx.arc(0, 0, r, 0, Math.PI*2);
     dctx.fillStyle = "#fff";
     dctx.fill();
 
-    // ===== Interval highlight (on the spinner itself) =====
-    if (rangeToggle.checked){
-      const startRad = ucDegToCanvasRad(RANGE_START);
-      const endRad   = ucDegToCanvasRad(RANGE_END);
-
-      // We want the CCW interval from RANGE_START to RANGE_END.
-      // In canvas-rad space (negated), that corresponds to drawing the arc with anticlockwise=true.
-      dctx.beginPath();
-      dctx.moveTo(0,0);
-      dctx.arc(0, 0, r*0.88, startRad, endRad, true);
-      dctx.closePath();
-      dctx.fillStyle = "rgba(0,0,0,0.10)";
-      dctx.fill();
-
-      // Outline the arc edges
-      dctx.strokeStyle = "rgba(0,0,0,0.35)";
-      dctx.lineWidth = r * 0.012;
-      dctx.beginPath();
-      dctx.arc(0, 0, r*0.88, startRad, endRad, true);
-      dctx.stroke();
-
-      // boundary rays
-      const sx = Math.cos(startRad) * r*0.88, sy = Math.sin(startRad) * r*0.88;
-      const ex = Math.cos(endRad)   * r*0.88, ey = Math.sin(endRad)   * r*0.88;
-      dctx.lineWidth = r * 0.008;
-      dctx.beginPath(); dctx.moveTo(0,0); dctx.lineTo(sx, sy); dctx.stroke();
-      dctx.beginPath(); dctx.moveTo(0,0); dctx.lineTo(ex, ey); dctx.stroke();
-    }
-
-    // subtle segments
+    // Subtle segments (background)
     const segs = 24;
     for (let i = 0; i < segs; i++){
       const a0 = (i/segs) * Math.PI*2;
@@ -406,14 +367,40 @@
       dctx.fill();
     }
 
-    // outer ring
+    // === HIGHLIGHT ON TOP of background (so it stays visible) ===
+    if (rangeToggle.checked){
+      const startRad = ucDegToCanvasRad(RANGE_START);
+      const endRad   = ucDegToCanvasRad(RANGE_END);
+
+      // Thick ring arc
+      dctx.save();
+      dctx.strokeStyle = "rgba(0,0,0,0.28)";
+      dctx.lineWidth = r * 0.14; // thick band
+      dctx.lineCap = "butt";
+      dctx.beginPath();
+      dctx.arc(0, 0, r*0.78, startRad, endRad, true);
+      dctx.stroke();
+      dctx.restore();
+
+      // Edge rays (very clear endpoints)
+      dctx.save();
+      dctx.strokeStyle = "rgba(0,0,0,0.55)";
+      dctx.lineWidth = r * 0.012;
+      const sx = Math.cos(startRad) * r*0.92, sy = Math.sin(startRad) * r*0.92;
+      const ex = Math.cos(endRad)   * r*0.92, ey = Math.sin(endRad)   * r*0.92;
+      dctx.beginPath(); dctx.moveTo(0,0); dctx.lineTo(sx, sy); dctx.stroke();
+      dctx.beginPath(); dctx.moveTo(0,0); dctx.lineTo(ex, ey); dctx.stroke();
+      dctx.restore();
+    }
+
+    // Outer ring
     dctx.lineWidth = r * 0.03;
     dctx.strokeStyle = "#111";
     dctx.beginPath();
     dctx.arc(0,0,r,0,Math.PI*2);
     dctx.stroke();
 
-    // tick marks every 10° (unit-circle placement)
+    // Tick marks every 10° (unit circle)
     for (let deg = 0; deg < 360; deg += 10){
       const rad = ucDegToCanvasRad(deg);
       const isMajor = (deg % 30 === 0);
@@ -434,7 +421,7 @@
       dctx.stroke();
     }
 
-    // Labels at cardinal angles
+    // Labels
     dctx.fillStyle = "#111";
     dctx.font = `800 ${Math.round(r*0.09)}px system-ui, -apple-system, Segoe UI, Roboto, Arial`;
     dctx.textAlign = "center";
@@ -444,10 +431,9 @@
     dctx.fillText("180°",-r*0.78,  0);
     dctx.fillText("270°", 0,      r*0.78);
 
-    // ===== Needle (spins CCW visually) =====
+    // Needle (CCW visually as degrees increase)
     dctx.save();
-    dctx.rotate(ucDegToCanvasRad(needleDegLocal)); // rotate by negated radians
-
+    dctx.rotate(ucDegToCanvasRad(needleDegLocal)); // negative radians
     dctx.lineCap = "round";
     dctx.strokeStyle = "#111";
     dctx.lineWidth = r * 0.03;
@@ -463,10 +449,9 @@
     dctx.lineTo(r*0.72,  r*0.06);
     dctx.closePath();
     dctx.fill();
-
     dctx.restore();
 
-    // hub
+    // Hub
     dctx.beginPath();
     dctx.arc(0,0,r*0.09,0,Math.PI*2);
     dctx.fillStyle = "#111";
@@ -479,7 +464,6 @@
     dctx.restore();
   }
 
-  // ===== Histogram =====
   function drawHistogram(){
     const w = histCanvas.width, h = histCanvas.height;
     hctx.clearRect(0,0,w,h);
@@ -488,7 +472,6 @@
     const plotW = w - padL - padR;
     const plotH = h - padT - padB;
 
-    // axes
     hctx.strokeStyle = "#111";
     hctx.lineWidth = 2;
     hctx.beginPath();
@@ -497,7 +480,6 @@
     hctx.lineTo(padL + plotW, padT + plotH);
     hctx.stroke();
 
-    // labels
     hctx.fillStyle = "#111";
     hctx.font = "700 13px system-ui, -apple-system, Segoe UI, Roboto, Arial";
     hctx.textAlign = "center";
@@ -553,7 +535,6 @@
       const x = padL + i * barW;
       const y = padT + plotH - bh;
 
-      // Optional: darken bins that overlap the interval when toggle on
       const binStart = i * (360 / BIN_COUNT);
       const binEnd = (i+1) * (360 / BIN_COUNT);
       const overlaps = rangeToggle.checked && !(binEnd < RANGE_START || binStart > RANGE_END);
@@ -567,7 +548,6 @@
     }
   }
 
-  // ===== Spin logic =====
   function setButtonsDisabled(disabled){
     spinBtn.disabled = disabled;
     spin100Btn.disabled = disabled;
@@ -586,7 +566,6 @@
     const extraTurns = 5 + Math.floor(Math.random() * 4);
     const start = needleDeg;
 
-    // Move needleDeg forward (increasing) => CCW
     let end = start + extraTurns * 360;
     end = end - norm360(end) + target;
     if (end <= start) end += 360;
@@ -597,7 +576,7 @@
     function step(now){
       const t = (now - t0) / duration;
       const clamped = Math.min(1, Math.max(0, t));
-      const eased = 1 - Math.pow(1 - clamped, 3);
+      const eased = easeOutCubic(clamped);
 
       needleDeg = start + (end - start) * eased;
       drawDial(needleDeg);
@@ -650,7 +629,6 @@
     setStatus("Ready");
   }
 
-  // ===== Toggle =====
   function onToggleChanged(){
     rangePanel.style.display = rangeToggle.checked ? "grid" : "none";
     drawDial(needleDeg);
@@ -658,15 +636,13 @@
     updateRangeTable();
   }
 
-  // ===== Init =====
-  function setCount(){ countPill.textContent = `Spins: ${angles.length}`; }
+  // init
   setCount();
   drawDial(needleDeg);
   drawHistogram();
   theoryNote.textContent =
     `Theoretical P(IN) = (138.73 − 92.45) / 360 = ${THEORY_P.toFixed(5)} ≈ ${(100*THEORY_P).toFixed(2)}%.`;
 
-  // ===== Events =====
   spinBtn.addEventListener('click', spinAnimated);
   spin100Btn.addEventListener('click', () => spinFast(100));
   spin1000Btn.addEventListener('click', () => spinFast(1000));
