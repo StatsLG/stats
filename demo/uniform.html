@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Uniform Spinner (0–360°)</title>
+  <style>
+    :root { --size: 360px; }
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 0; padding: 24px;
+      display: grid; place-items: center;
+      background: #f6f7fb;
+      color: #111;
+    }
+    .card{
+      width: min(720px, 95vw);
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+    .row{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      align-items: center;
+      justify-items: center;
+    }
+    .stage{
+      width: var(--size);
+      height: calc(var(--size) * 0.88);
+      display: grid;
+      place-items: center;
+      position: relative;
+      user-select: none;
+    }
+    canvas{
+      width: var(--size);
+      height: var(--size);
+      border-radius: 50%;
+      background: #fff;
+    }
+    .pointer{
+      position: absolute;
+      top: 2px;
+      width: 0; height: 0;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-bottom: 34px solid #111;
+      filter: drop-shadow(0 4px 4px rgba(0,0,0,.15));
+      transform: translateY(-6px);
+    }
+    .controls{
+      width: min(560px, 95%);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    button{
+      appearance: none;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-weight: 700;
+      font-size: 16px;
+      background: #111;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:disabled{ opacity: .55; cursor: not-allowed; }
+    .out{
+      display: grid;
+      gap: 6px;
+      text-align: center;
+      font-size: 16px;
+    }
+    .out .deg{
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+    .small{
+      font-size: 13px;
+      color: #444;
+    }
+    .inline{
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .pill{
+      background: #f1f3f7;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 13px;
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="row">
+      <h2 style="margin:0;">Random Spinner (Uniform 0–360°)</h2>
+
+      <div class="stage">
+        <div class="pointer" aria-hidden="true"></div>
+        <canvas id="wheel" width="720" height="720"></canvas>
+      </div>
+
+      <div class="controls">
+        <button id="spinBtn">SPIN</button>
+        <div class="out" aria-live="polite">
+          <div class="deg" id="angleText">—</div>
+          <div class="small">Final angle (degrees), reported to the hundredths place.</div>
+          <div class="inline">
+            <div class="pill" id="statusPill">Ready</div>
+            <div class="pill" id="seedPill">Uniform: U(0, 360)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('wheel');
+  const ctx = canvas.getContext('2d');
+  const spinBtn = document.getElementById('spinBtn');
+  const angleText = document.getElementById('angleText');
+  const statusPill = document.getElementById('statusPill');
+
+  // Current rotation in degrees; 0° means "marker at top"
+  let currentDeg = 0;
+  let spinning = false;
+
+  // Draw a simple wheel with tick marks and subtle segments
+  function drawWheel(rotationDeg) {
+    const w = canvas.width;
+    const h = canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+    const r = Math.min(cx, cy) * 0.92;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Background ring
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate((rotationDeg * Math.PI) / 180);
+
+    // Wheel face
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+
+    // Subtle segments (just for visual motion)
+    const segs = 24;
+    for (let i = 0; i < segs; i++) {
+      const a0 = (i / segs) * Math.PI * 2;
+      const a1 = ((i + 1) / segs) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, r, a0, a1);
+      ctx.closePath();
+      ctx.fillStyle = (i % 2 === 0) ? "#f1f3f7" : "#ffffff";
+      ctx.fill();
+    }
+
+    // Outer ring stroke
+    ctx.lineWidth = r * 0.03;
+    ctx.strokeStyle = "#111";
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Tick marks every 10°, longer at 30° and 90°
+    for (let deg = 0; deg < 360; deg += 10) {
+      const rad = (deg * Math.PI) / 180;
+      const isMajor = (deg % 30 === 0);
+      const isCardinal = (deg % 90 === 0);
+      const len = isCardinal ? r * 0.16 : isMajor ? r * 0.11 : r * 0.07;
+
+      ctx.lineWidth = isCardinal ? r * 0.012 : isMajor ? r * 0.009 : r * 0.006;
+      ctx.strokeStyle = "#111";
+
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(rad) * (r - len), Math.sin(rad) * (r - len));
+      ctx.lineTo(Math.cos(rad) * (r - r * 0.02), Math.sin(rad) * (r - r * 0.02));
+      ctx.stroke();
+    }
+
+    // Center hub
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.09, 0, Math.PI * 2);
+    ctx.fillStyle = "#111";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.05, 0, Math.PI * 2);
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+
+    ctx.restore();
+
+    // Label for the pointer at the top
+    // (We keep it in screen coordinates)
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.fillStyle = "#111";
+    ctx.font = "700 26px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("▲", 0, -r * 1.02);
+    ctx.restore();
+  }
+
+  // Easing function (nice smooth stop)
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  // Normalize degrees to [0, 360)
+  function norm360(deg) {
+    let x = deg % 360;
+    if (x < 0) x += 360;
+    return x;
+  }
+
+  function setStatus(text) {
+    statusPill.textContent = text;
+  }
+
+  // Convert wheel rotation to "angle under pointer"
+  // Pointer is at 0° (top). If wheel rotated +θ, the mark under the pointer is (360 - θ).
+  function pointerAngleFromRotation(rotationDeg) {
+    return norm360(360 - norm360(rotationDeg));
+  }
+
+  function formatDeg(x) {
+    return `${x.toFixed(2)}°`;
+  }
+
+  // Initial draw
+  drawWheel(currentDeg);
+
+  spinBtn.addEventListener('click', () => {
+    if (spinning) return;
+
+    spinning = true;
+    spinBtn.disabled = true;
+    setStatus("Spinning…");
+
+    // True target angle under the pointer (uniform continuous)
+    const targetAngle = Math.random() * 360; // U(0,360)
+
+    // We need to choose a final wheel rotation so that the pointer reads targetAngle.
+    // pointerAngle = 360 - rotation  (mod 360)  => rotation = 360 - pointerAngle
+    const targetRotationMod = norm360(360 - targetAngle);
+
+    // Add a bunch of full spins for animation flair, then land exactly on targetRotationMod.
+    const extraTurns = 5 + Math.floor(Math.random() * 4); // 5–8 full turns
+    const startRotation = currentDeg;
+    // We want endRotation ≡ targetRotationMod (mod 360) and >= startRotation by a lot.
+    let endRotation = startRotation + extraTurns * 360;
+    // Adjust to hit the exact modulo target:
+    endRotation = endRotation - norm360(endRotation) + targetRotationMod;
+    // Ensure it's still ahead (rare edge case if modulo alignment goes backward)
+    if (endRotation <= startRotation) endRotation += 360;
+
+    const duration = 2200 + Math.random() * 700; // ms
+    const t0 = performance.now();
+
+    function step(now) {
+      const t = (now - t0) / duration;
+      const clamped = Math.min(1, Math.max(0, t));
+      const eased = easeOutCubic(clamped);
+
+      currentDeg = startRotation + (endRotation - startRotation) * eased;
+      drawWheel(currentDeg);
+
+      if (clamped < 1) {
+        requestAnimationFrame(step);
+      } else {
+        // Finalize to exact endRotation (avoid floating drift)
+        currentDeg = endRotation;
+        drawWheel(currentDeg);
+
+        const finalAngle = pointerAngleFromRotation(currentDeg);
+        angleText.textContent = formatDeg(finalAngle);
+
+        setStatus("Done");
+        spinning = false;
+        spinBtn.disabled = false;
+      }
+    }
+
+    requestAnimationFrame(step);
+  });
+})();
+</script>
+</body>
+</html>
