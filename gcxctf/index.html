@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Georgetown College Cross Country and Track &amp; Field History 2010-Present</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Georgetown College Cross Country and Track &amp; Field History 2010-Present</h1>
+    <div class="meta">
+      <span class="pill"><span class="dot"></span><span id="lastUpdated">Last updated: —</span></span>
+      <span class="pill"><span id="rowCount">Rows: —</span></span>
+      <span class="pill"><span id="loadState">Loading data…</span></span>
+    </div>
+  </header>
+
+  <section class="controls">
+    <div class="control">
+      <label for="sex">Roster</label>
+      <select id="sex">
+        <option value="m">Male</option>
+        <option value="f">Female</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label for="season">Season</label>
+      <select id="season">
+        <option value="Outdoor">Outdoor</option>
+        <option value="Indoor">Indoor</option>
+        <option value="Cross Country">XC</option>
+      </select>
+    </div>
+
+    <div class="control wide">
+      <label for="event">Event</label>
+      <select id="event">
+        <option value="">All events</option>
+      </select>
+    </div>
+
+    <div class="control wide">
+      <label for="search">Search athlete</label>
+      <input id="search" type="text" placeholder="Type a last name, first name…" />
+    </div>
+
+    <div class="control">
+      <label>Display</label>
+      <div class="checkrow">
+        <input id="bestOnly" type="checkbox" checked />
+        <span><b>Best mark</b> per athlete</span>
+      </div>
+    </div>
+
+    <div class="control">
+      <button id="exportBtn" class="btn secondary" title="Download the currently filtered rows as CSV">Export CSV</button>
+    </div>
+
+    <div class="control full">
+      <div class="small">
+        Tip: Default is “Best mark per athlete.” Uncheck it to show every performance.
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <div class="statusbar">
+      <div>
+        <span class="badge" id="resultCount">0 results</span>
+        <span class="muted" id="sortHint"></span>
+      </div>
+      <div class="muted small" id="filterSummary"></div>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 220px;">Athlete</th>
+            <th style="width: 120px;">Mark</th>
+            <th style="width: 90px;">Wind</th>
+            <th style="width: 70px;">Record</th>
+            <th>Meet</th>
+            <th style="width: 120px;">Date</th>
+            <th style="width: 180px;">Event</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="7" class="muted">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      Data displayed from <code>docs/data/performances.json</code>. Update the site by re-exporting JSON and pushing to GitHub Pages.
+    </div>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
