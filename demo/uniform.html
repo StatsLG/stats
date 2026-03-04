@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CCW Unit-Circle Spinner + Histogram + Interval Toggle</title>
+  <title>CCW Unit-Circle Spinner + Histogram + Interval Highlight</title>
   <style>
     :root { --size: 360px; --panelW: 820px; }
     body{
@@ -60,6 +60,29 @@
     button.light{ background: #444; }
     button:disabled{ opacity: .55; cursor: not-allowed; }
 
+    .toggleRow{
+      width: min(720px, 95%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+    .toggle{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #f1f3f7;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 14px;
+      color: #111;
+      user-select: none;
+    }
+    .toggle input{ transform: scale(1.2); cursor: pointer; }
+    .intervalText{ font-weight: 900; letter-spacing: .2px; }
+
     .out{
       text-align: center;
       display: grid;
@@ -83,32 +106,6 @@
       padding: 6px 10px;
       font-size: 13px;
       color: #222;
-    }
-
-    .toggleRow{
-      width: min(720px, 95%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 2px;
-    }
-    .toggle{
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: #f1f3f7;
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 14px;
-      color: #111;
-      user-select: none;
-    }
-    .toggle input{ transform: scale(1.2); cursor: pointer; }
-    .intervalText{
-      font-weight: 800;
-      letter-spacing: .2px;
     }
 
     .gridBelow{
@@ -164,7 +161,7 @@
       font-weight: 900;
     }
     tr:last-child td{ border-bottom: 0; }
-    .muted{ color: #444; font-weight: 700; }
+    .muted{ color: #444; font-weight: 800; }
 
     @media (max-width: 900px){
       .gridBelow{ grid-template-columns: 1fr; }
@@ -191,10 +188,10 @@
     </div>
 
     <div class="toggleRow">
-      <label class="toggle" title="Highlight the target interval on the wheel and show the in/out table">
+      <label class="toggle">
         <input type="checkbox" id="rangeToggle" />
         Highlight interval:
-        <span class="intervalText" id="intervalLabel">92.45° to 138.73°</span>
+        <span class="intervalText">92.45° to 138.73°</span>
       </label>
       <div class="pill">0° on +x, CCW positive</div>
       <div class="pill">Uniform U(0, 360)</div>
@@ -202,11 +199,11 @@
 
     <div class="out" aria-live="polite">
       <div class="deg" id="angleText">—</div>
-      <div class="small">Angle in degrees (to the hundredths place). Needle spins counter-clockwise.</div>
+      <div class="small">Angle in degrees (to the hundredths place). Needle spins CCW.</div>
       <div class="pills">
         <div class="pill" id="statusPill">Ready</div>
         <div class="pill" id="countPill">Spins: 0</div>
-        <div class="pill" id="binsPill">Bins: 36 (10° each)</div>
+        <div class="pill">Bins: 36 (10° each)</div>
       </div>
     </div>
   </div>
@@ -246,7 +243,7 @@
           <tr>
             <td class="muted">Total</td>
             <td id="totalCount" class="muted">0</td>
-            <td id="totalPct" class="muted">100.00%</td>
+            <td class="muted">100.00%</td>
           </tr>
         </tbody>
       </table>
@@ -259,8 +256,6 @@
   // ===== Constants =====
   const RANGE_START = 92.45;
   const RANGE_END   = 138.73;
-
-  // Theoretical probability for continuous uniform on [0,360):
   const THEORY_P = (RANGE_END - RANGE_START) / 360;
 
   // ===== Elements =====
@@ -289,17 +284,17 @@
   const totalCountEl = document.getElementById('totalCount');
   const inPctEl = document.getElementById('inPct');
   const outPctEl = document.getElementById('outPct');
-  const totalPctEl = document.getElementById('totalPct');
 
   // ===== Spinner state =====
   // needleDeg uses unit-circle convention: 0° at +x, increases CCW.
-  // We'll DRAW it CCW by rotating the canvas by -needleDeg (because canvas positive rotation looks clockwise).
+  // We draw the needle by rotating the canvas by -needleDeg (canvas y-axis is down),
+  // which makes the needle appear to rotate CCW as needleDeg increases.
   let needleDeg = 0;
   let spinning = false;
 
   // ===== Data =====
   const angles = [];
-  const BIN_COUNT = 36;      // 10° bins
+  const BIN_COUNT = 36;
   const binCounts = new Array(BIN_COUNT).fill(0);
 
   // ===== Helpers =====
@@ -312,16 +307,10 @@
   function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
   function setStatus(t){ statusPill.textContent = t; }
   function setCount(){ countPill.textContent = `Spins: ${angles.length}`; }
-
-  function inRange(a){
-    // inclusive endpoints (for display). For continuous theory, endpoints don't matter.
-    return a >= RANGE_START && a <= RANGE_END;
-  }
-
+  function inRange(a){ return a >= RANGE_START && a <= RANGE_END; }
   function angleToBin(a){
     const w = 360 / BIN_COUNT;
-    const idx = Math.floor(a / w);
-    return Math.min(BIN_COUNT - 1, Math.max(0, idx));
+    return Math.min(BIN_COUNT - 1, Math.max(0, Math.floor(a / w)));
   }
 
   function updateRangeTable(){
@@ -338,10 +327,8 @@
     inCountEl.textContent = String(inC);
     outCountEl.textContent = String(outC);
     totalCountEl.textContent = String(total);
-
     inPctEl.textContent = `${inPct.toFixed(2)}%`;
     outPctEl.textContent = `${outPct.toFixed(2)}%`;
-    totalPctEl.textContent = `100.00%`;
 
     theoryNote.textContent =
       `Theoretical P(IN) = (138.73 − 92.45) / 360 = ${THEORY_P.toFixed(5)} ≈ ${(100*THEORY_P).toFixed(2)}%.`;
@@ -349,21 +336,25 @@
 
   function recordAngle(a){
     angles.push(a);
-    const b = angleToBin(a);
-    binCounts[b] += 1;
+    binCounts[angleToBin(a)] += 1;
     setCount();
     drawHistogram();
     updateRangeTable();
   }
 
-  // ===== Draw: Dial (static wheel, moving needle) =====
+  // Convert unit-circle degrees to canvas radians (canvas y is down),
+  // so we negate degrees to make CCW positive appear "upward" on screen.
+  function ucDegToCanvasRad(deg){
+    return -(deg * Math.PI / 180);
+  }
+
+  // ===== Draw: Dial =====
   function drawDial(needleDegLocal){
     const w = dial.width, h = dial.height;
     const cx = w/2, cy = h/2;
     const r = Math.min(cx, cy) * 0.92;
 
     dctx.clearRect(0, 0, w, h);
-
     dctx.save();
     dctx.translate(cx, cy);
 
@@ -373,27 +364,33 @@
     dctx.fillStyle = "#fff";
     dctx.fill();
 
-    // optional highlighted wedge (target interval)
+    // ===== Interval highlight (on the spinner itself) =====
     if (rangeToggle.checked){
-      // Convert unit-circle CCW degrees to canvas angles (clockwise-positive) by negating.
-      const startRad = -(RANGE_START * Math.PI / 180);
-      const endRad   = -(RANGE_END   * Math.PI / 180);
+      const startRad = ucDegToCanvasRad(RANGE_START);
+      const endRad   = ucDegToCanvasRad(RANGE_END);
 
+      // We want the CCW interval from RANGE_START to RANGE_END.
+      // In canvas-rad space (negated), that corresponds to drawing the arc with anticlockwise=true.
       dctx.beginPath();
-      dctx.moveTo(0, 0);
-      // Draw in the CCW direction along the unit-circle interval:
-      // Since we negated angles, we want to go from startRad to endRad "anticlockwise" on canvas.
-      dctx.arc(0, 0, r*0.90, startRad, endRad, true);
+      dctx.moveTo(0,0);
+      dctx.arc(0, 0, r*0.88, startRad, endRad, true);
       dctx.closePath();
-      dctx.fillStyle = "rgba(0,0,0,0.08)";
+      dctx.fillStyle = "rgba(0,0,0,0.10)";
       dctx.fill();
 
-      // darker boundary lines
+      // Outline the arc edges
       dctx.strokeStyle = "rgba(0,0,0,0.35)";
-      dctx.lineWidth = r * 0.01;
+      dctx.lineWidth = r * 0.012;
       dctx.beginPath();
-      dctx.arc(0, 0, r*0.90, startRad, endRad, true);
+      dctx.arc(0, 0, r*0.88, startRad, endRad, true);
       dctx.stroke();
+
+      // boundary rays
+      const sx = Math.cos(startRad) * r*0.88, sy = Math.sin(startRad) * r*0.88;
+      const ex = Math.cos(endRad)   * r*0.88, ey = Math.sin(endRad)   * r*0.88;
+      dctx.lineWidth = r * 0.008;
+      dctx.beginPath(); dctx.moveTo(0,0); dctx.lineTo(sx, sy); dctx.stroke();
+      dctx.beginPath(); dctx.moveTo(0,0); dctx.lineTo(ex, ey); dctx.stroke();
     }
 
     // subtle segments
@@ -416,9 +413,9 @@
     dctx.arc(0,0,r,0,Math.PI*2);
     dctx.stroke();
 
-    // tick marks every 10° using unit-circle angles (0° at +x)
+    // tick marks every 10° (unit-circle placement)
     for (let deg = 0; deg < 360; deg += 10){
-      const rad = (deg * Math.PI)/180;
+      const rad = ucDegToCanvasRad(deg);
       const isMajor = (deg % 30 === 0);
       const isCardinal = (deg % 90 === 0);
       const len = isCardinal ? r*0.16 : isMajor ? r*0.11 : r*0.07;
@@ -426,13 +423,10 @@
       dctx.lineWidth = isCardinal ? r*0.012 : isMajor ? r*0.009 : r*0.006;
       dctx.strokeStyle = "#111";
 
-      // NOTE: In canvas coordinate system, +y is down.
-      // For unit-circle feel, we still place ticks using cos/sin (this draws 90° up if we invert sin).
-      // We'll invert sin so 90° points UP visually.
       const x1 = Math.cos(rad) * (r - len);
-      const y1 = -Math.sin(rad) * (r - len);
+      const y1 = Math.sin(rad) * (r - len);
       const x2 = Math.cos(rad) * (r - r*0.02);
-      const y2 = -Math.sin(rad) * (r - r*0.02);
+      const y2 = Math.sin(rad) * (r - r*0.02);
 
       dctx.beginPath();
       dctx.moveTo(x1, y1);
@@ -440,7 +434,7 @@
       dctx.stroke();
     }
 
-    // Labels: 0° right, 90° up, 180° left, 270° down
+    // Labels at cardinal angles
     dctx.fillStyle = "#111";
     dctx.font = `800 ${Math.round(r*0.09)}px system-ui, -apple-system, Segoe UI, Roboto, Arial`;
     dctx.textAlign = "center";
@@ -450,23 +444,18 @@
     dctx.fillText("180°",-r*0.78,  0);
     dctx.fillText("270°", 0,      r*0.78);
 
-    // Moving needle:
-    // To make the needle rotate CCW visually as needleDeg increases,
-    // rotate canvas by NEGATIVE angle and also invert y for drawing.
+    // ===== Needle (spins CCW visually) =====
     dctx.save();
-    dctx.rotate(-(needleDegLocal * Math.PI) / 180);
+    dctx.rotate(ucDegToCanvasRad(needleDegLocal)); // rotate by negated radians
 
     dctx.lineCap = "round";
     dctx.strokeStyle = "#111";
     dctx.lineWidth = r * 0.03;
-
-    // needle body along +x axis
     dctx.beginPath();
     dctx.moveTo(-r*0.06, 0);
     dctx.lineTo(r*0.78, 0);
     dctx.stroke();
 
-    // tip triangle
     dctx.fillStyle = "#111";
     dctx.beginPath();
     dctx.moveTo(r*0.82, 0);
@@ -482,7 +471,6 @@
     dctx.arc(0,0,r*0.09,0,Math.PI*2);
     dctx.fillStyle = "#111";
     dctx.fill();
-
     dctx.beginPath();
     dctx.arc(0,0,r*0.05,0,Math.PI*2);
     dctx.fillStyle = "#fff";
@@ -491,7 +479,7 @@
     dctx.restore();
   }
 
-  // ===== Draw: Histogram =====
+  // ===== Histogram =====
   function drawHistogram(){
     const w = histCanvas.width, h = histCanvas.height;
     hctx.clearRect(0,0,w,h);
@@ -522,7 +510,6 @@
     hctx.fillText("Count", 0, 0);
     hctx.restore();
 
-    // max count for scaling
     let maxCount = 0;
     for (const c of binCounts) if (c > maxCount) maxCount = c;
     maxBinNote.textContent = `Max bin: ${maxCount}`;
@@ -535,7 +522,6 @@
       return;
     }
 
-    // y ticks
     const yMax = Math.max(1, maxCount);
     const yticks = [0, Math.ceil(yMax/2), yMax];
     hctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, Arial";
@@ -549,7 +535,6 @@
       hctx.fillText(String(t), padL - 10, yy + 4);
     }
 
-    // x ticks at 0, 90, 180, 270, 360
     const xticks = [0, 90, 180, 270, 360];
     hctx.textAlign = "center";
     for (const t of xticks){
@@ -561,7 +546,6 @@
       hctx.fillText(String(t), x, padT + plotH + 22);
     }
 
-    // bars
     const barW = plotW / BIN_COUNT;
     for (let i = 0; i < BIN_COUNT; i++){
       const c = binCounts[i];
@@ -569,13 +553,10 @@
       const x = padL + i * barW;
       const y = padT + plotH - bh;
 
-      // If range highlighting is ON, softly distinguish bars whose BIN overlaps the interval.
-      // (This is optional visual help; still grayscale.)
+      // Optional: darken bins that overlap the interval when toggle on
       const binStart = i * (360 / BIN_COUNT);
       const binEnd = (i+1) * (360 / BIN_COUNT);
-      const overlaps =
-        rangeToggle.checked &&
-        !(binEnd < RANGE_START || binStart > RANGE_END);
+      const overlaps = rangeToggle.checked && !(binEnd < RANGE_START || binStart > RANGE_END);
 
       hctx.fillStyle = overlaps ? "#2b2b2b" : "#111";
       hctx.fillRect(x + 1, y, Math.max(0, barW - 2), bh);
@@ -586,13 +567,13 @@
     }
   }
 
-  // ===== Spinning =====
+  // ===== Spin logic =====
   function setButtonsDisabled(disabled){
     spinBtn.disabled = disabled;
     spin100Btn.disabled = disabled;
     spin1000Btn.disabled = disabled;
     clearBtn.disabled = disabled;
-    rangeToggle.disabled = disabled; // prevent redraw glitches mid-animation
+    rangeToggle.disabled = disabled;
   }
 
   function spinAnimated(){
@@ -601,13 +582,13 @@
     setButtonsDisabled(true);
     setStatus("Spinning…");
 
-    const target = Math.random() * 360; // Uniform(0,360)
-    const extraTurns = 5 + Math.floor(Math.random() * 4); // 5–8
+    const target = Math.random() * 360;
+    const extraTurns = 5 + Math.floor(Math.random() * 4);
     const start = needleDeg;
 
-    // To spin CCW, we move needleDeg forward (increasing) and draw with negative rotation.
+    // Move needleDeg forward (increasing) => CCW
     let end = start + extraTurns * 360;
-    end = end - norm360(end) + target;  // land exactly on target mod 360
+    end = end - norm360(end) + target;
     if (end <= start) end += 360;
 
     const duration = 2200 + Math.random() * 700;
@@ -616,7 +597,7 @@
     function step(now){
       const t = (now - t0) / duration;
       const clamped = Math.min(1, Math.max(0, t));
-      const eased = easeOutCubic(clamped);
+      const eased = 1 - Math.pow(1 - clamped, 3);
 
       needleDeg = start + (end - start) * eased;
       drawDial(needleDeg);
@@ -650,8 +631,7 @@
       last = Math.random() * 360;
       recordAngle(last);
     }
-
-    needleDeg = last; // show last angle
+    needleDeg = last;
     drawDial(needleDeg);
     angleText.textContent = formatDeg(norm360(last));
 
@@ -670,7 +650,7 @@
     setStatus("Ready");
   }
 
-  // ===== Toggle behavior =====
+  // ===== Toggle =====
   function onToggleChanged(){
     rangePanel.style.display = rangeToggle.checked ? "grid" : "none";
     drawDial(needleDeg);
@@ -679,6 +659,7 @@
   }
 
   // ===== Init =====
+  function setCount(){ countPill.textContent = `Spins: ${angles.length}`; }
   setCount();
   drawDial(needleDeg);
   drawHistogram();
