@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Uniform Spinner + PDF + Histogram</title>
+  <title>Unit-Circle Spinner + Histogram</title>
   <style>
     :root { --size: 360px; --panelW: 760px; }
     body{
@@ -32,23 +32,18 @@
       place-items: center;
       user-select: none;
     }
-    canvas{
-      width: 100%;
-      height: 100%;
-      border-radius: 16px;
-      background: #fff;
-      display: block;
-    }
     .dialCanvas{
       width: var(--size);
       height: var(--size);
       border-radius: 50%;
       background: #fff;
+      display: block;
     }
+
     .controls{
-      width: min(520px, 95%);
+      width: min(660px, 95%);
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 10px;
     }
     button{
@@ -94,9 +89,10 @@
     .charts{
       width: min(var(--panelW), 95vw);
       display: grid;
-      grid-template-columns: 1fr 1.2fr;
+      grid-template-columns: 1fr;
       gap: 14px;
       align-items: start;
+      margin-top: 14px;
     }
     .panel{
       background: #fff;
@@ -126,14 +122,16 @@
       color: #222;
     }
     .metaRow .pill{ font-size: 12.5px; }
-    @media (max-width: 860px){
-      .charts{ grid-template-columns: 1fr; }
+
+    @media (max-width: 760px){
+      .controls{ grid-template-columns: 1fr 1fr; }
+      :root { --size: 320px; }
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <h2>Static Wheel + Moving Needle + PDF + Histogram</h2>
+    <h2>Unit-Circle Spinner (0° on +x) + Histogram</h2>
 
     <div class="stage">
       <canvas id="dial" class="dialCanvas" width="720" height="720"></canvas>
@@ -142,15 +140,17 @@
     <div class="controls">
       <button id="spinBtn">SPIN (animated)</button>
       <button id="spin100Btn" class="secondary">SPIN 100 (fast)</button>
+      <button id="spin1000Btn" class="secondary">SPIN 1000 (fast)</button>
       <button id="clearBtn" class="light">CLEAR DATA</button>
     </div>
 
     <div class="out" aria-live="polite">
       <div class="deg" id="angleText">—</div>
-      <div class="small">Needle angle (degrees), shown to the hundredths place.</div>
+      <div class="small">Angle in degrees, to the hundredths place (unit-circle convention).</div>
       <div class="pills">
         <div class="pill" id="statusPill">Ready</div>
         <div class="pill" id="countPill">Spins: 0</div>
+        <div class="pill" id="binsPill">Bins: 36 (10° each)</div>
         <div class="pill">Model: Uniform U(0, 360)</div>
       </div>
     </div>
@@ -158,22 +158,12 @@
 
   <div class="charts">
     <div class="panel">
-      <h3>PDF (Uniform on 0–360°)</h3>
-      <div class="note">The probability density is constant: \( f(x)=1/360 \) for 0 ≤ x &lt; 360</div>
-      <canvas id="pdfCanvas" width="760" height="320"></canvas>
-      <div class="metaRow">
-        <div class="pill">Area under curve = 1</div>
-        <div class="pill">Height = 1/360 ≈ 0.00278</div>
-      </div>
-    </div>
-
-    <div class="panel">
       <h3>Histogram of Spin Angles</h3>
       <div class="note">More spins → bars should level out (roughly flat).</div>
-      <canvas id="histCanvas" width="760" height="320"></canvas>
+      <canvas id="histCanvas" width="760" height="340"></canvas>
       <div class="metaRow">
-        <div class="pill" id="binsPill">Bins: 36 (10° each)</div>
         <div class="pill" id="maxBinPill">Max bin: 0</div>
+        <div class="pill" id="meanPill">Mean: —</div>
       </div>
     </div>
   </div>
@@ -184,28 +174,29 @@
   const dial = document.getElementById('dial');
   const dctx = dial.getContext('2d');
 
-  const pdfCanvas = document.getElementById('pdfCanvas');
-  const pctx = pdfCanvas.getContext('2d');
-
   const histCanvas = document.getElementById('histCanvas');
   const hctx = histCanvas.getContext('2d');
 
   const spinBtn = document.getElementById('spinBtn');
   const spin100Btn = document.getElementById('spin100Btn');
+  const spin1000Btn = document.getElementById('spin1000Btn');
   const clearBtn = document.getElementById('clearBtn');
 
   const angleText = document.getElementById('angleText');
   const statusPill = document.getElementById('statusPill');
   const countPill = document.getElementById('countPill');
   const maxBinPill = document.getElementById('maxBinPill');
+  const meanPill = document.getElementById('meanPill');
 
   // ===== Spinner state =====
-  let needleDeg = 0;      // 0° = pointing up
+  // Unit-circle convention: 0° on +x (to the right), increasing CCW.
+  // We will store needleDeg in that same convention.
+  let needleDeg = 0;
   let spinning = false;
 
-  // Data
-  const angles = [];      // store final angles in degrees
-  const BIN_COUNT = 36;   // 36 bins => 10° per bin
+  // ===== Data =====
+  const angles = [];
+  const BIN_COUNT = 36;      // 10° bins
   const binCounts = new Array(BIN_COUNT).fill(0);
 
   // ===== Helpers =====
@@ -220,9 +211,17 @@
   function setCount(){ countPill.textContent = `Spins: ${angles.length}`; }
 
   function angleToBin(a){
-    // bins are [0,10), [10,20), ... [350,360)
-    const idx = Math.floor(a / (360 / BIN_COUNT));
+    const w = 360 / BIN_COUNT;
+    const idx = Math.floor(a / w);
     return Math.min(BIN_COUNT - 1, Math.max(0, idx));
+  }
+
+  function updateMean(){
+    if (angles.length === 0) { meanPill.textContent = "Mean: —"; return; }
+    // For circular data, "mean angle" is trickier; but for teaching uniform,
+    // a simple arithmetic mean is fine as a quick statistic.
+    const s = angles.reduce((acc,v)=>acc+v,0);
+    meanPill.textContent = `Mean: ${(s/angles.length).toFixed(2)}°`;
   }
 
   function recordAngle(a){
@@ -230,6 +229,7 @@
     const b = angleToBin(a);
     binCounts[b] += 1;
     setCount();
+    updateMean();
     drawHistogram();
   }
 
@@ -241,10 +241,11 @@
 
     dctx.clearRect(0, 0, w, h);
 
-    // Static wheel
+    // Static wheel background
     dctx.save();
     dctx.translate(cx, cy);
 
+    // face
     dctx.beginPath();
     dctx.arc(0, 0, r, 0, Math.PI*2);
     dctx.fillStyle = "#fff";
@@ -270,9 +271,9 @@
     dctx.arc(0,0,r,0,Math.PI*2);
     dctx.stroke();
 
-    // ticks
+    // tick marks every 10°
     for (let deg = 0; deg < 360; deg += 10){
-      const rad = (deg * Math.PI)/180;
+      const rad = (deg * Math.PI)/180; // 0 rad is +x axis (unit circle)
       const isMajor = (deg % 30 === 0);
       const isCardinal = (deg % 90 === 0);
       const len = isCardinal ? r*0.16 : isMajor ? r*0.11 : r*0.07;
@@ -286,19 +287,20 @@
       dctx.stroke();
     }
 
-    // labels
+    // Labels: 0° right, 90° up, 180° left, 270° down
     dctx.fillStyle = "#111";
     dctx.font = `800 ${Math.round(r*0.09)}px system-ui, -apple-system, Segoe UI, Roboto, Arial`;
     dctx.textAlign = "center";
     dctx.textBaseline = "middle";
-    dctx.fillText("0°", 0, -r*0.78);
-    dctx.fillText("90°", r*0.78, 0);
-    dctx.fillText("180°", 0, r*0.78);
-    dctx.fillText("270°", -r*0.78, 0);
+    dctx.fillText("0°",  r*0.78,  0);
+    dctx.fillText("90°", 0,     -r*0.78);
+    dctx.fillText("180°",-r*0.78, 0);
+    dctx.fillText("270°",0,      r*0.78);
 
-    // moving needle (0° is up; canvas 0 rad is right => rotate by (deg - 90))
+    // Moving needle:
+    // With unit-circle convention, we can rotate by needleDeg directly.
     dctx.save();
-    dctx.rotate(((needleDegLocal - 90) * Math.PI) / 180);
+    dctx.rotate((needleDegLocal * Math.PI) / 180);
 
     dctx.lineCap = "round";
     dctx.strokeStyle = "#111";
@@ -308,12 +310,12 @@
     dctx.lineTo(r*0.78, 0);
     dctx.stroke();
 
-    // needle tip
+    // tip triangle
     dctx.fillStyle = "#111";
     dctx.beginPath();
     dctx.moveTo(r*0.82, 0);
     dctx.lineTo(r*0.72, -r*0.06);
-    dctx.lineTo(r*0.72, r*0.06);
+    dctx.lineTo(r*0.72,  r*0.06);
     dctx.closePath();
     dctx.fill();
 
@@ -331,88 +333,6 @@
     dctx.fill();
 
     dctx.restore();
-  }
-
-  // ===== Draw: PDF =====
-  function drawPDF(){
-    const w = pdfCanvas.width, h = pdfCanvas.height;
-    pctx.clearRect(0,0,w,h);
-
-    const padL = 60, padR = 18, padT = 20, padB = 46;
-    const plotW = w - padL - padR;
-    const plotH = h - padT - padB;
-
-    // axes
-    pctx.strokeStyle = "#111";
-    pctx.lineWidth = 2;
-    pctx.beginPath();
-    pctx.moveTo(padL, padT);
-    pctx.lineTo(padL, padT + plotH);
-    pctx.lineTo(padL + plotW, padT + plotH);
-    pctx.stroke();
-
-    // labels
-    pctx.fillStyle = "#111";
-    pctx.font = "700 13px system-ui, -apple-system, Segoe UI, Roboto, Arial";
-    pctx.textAlign = "center";
-    pctx.fillText("x (degrees)", padL + plotW/2, h - 14);
-
-    pctx.save();
-    pctx.translate(18, padT + plotH/2);
-    pctx.rotate(-Math.PI/2);
-    pctx.textAlign = "center";
-    pctx.fillText("f(x)", 0, 0);
-    pctx.restore();
-
-    // x ticks: 0, 90, 180, 270, 360
-    const xticks = [0, 90, 180, 270, 360];
-    pctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, Arial";
-    pctx.textAlign = "center";
-    for (const t of xticks){
-      const x = padL + (t/360)*plotW;
-      pctx.beginPath();
-      pctx.moveTo(x, padT + plotH);
-      pctx.lineTo(x, padT + plotH + 6);
-      pctx.stroke();
-      pctx.fillText(String(t), x, padT + plotH + 22);
-    }
-
-    // Uniform PDF height: 1/360, but that is tiny; we scale y-axis for visualization.
-    // We'll set y max = 0.01 so the flat line is visible.
-    const yMax = 0.01;
-    const pdfHeight = 1/360; // ≈ 0.002777...
-    const y = padT + plotH - (pdfHeight / yMax) * plotH;
-
-    // y ticks: 0, 0.005, 0.01
-    const yticks = [0, 0.005, 0.01];
-    pctx.textAlign = "right";
-    for (const t of yticks){
-      const yy = padT + plotH - (t / yMax) * plotH;
-      pctx.beginPath();
-      pctx.moveTo(padL - 6, yy);
-      pctx.lineTo(padL, yy);
-      pctx.stroke();
-      pctx.fillText(t.toFixed(3), padL - 10, yy + 4);
-    }
-
-    // draw the uniform "rectangle"
-    // outline
-    pctx.lineWidth = 2.5;
-    pctx.strokeStyle = "#111";
-    pctx.beginPath();
-    pctx.moveTo(padL, y);
-    pctx.lineTo(padL + plotW, y);
-    pctx.stroke();
-
-    // fill under line lightly
-    pctx.fillStyle = "#f1f3f7";
-    pctx.fillRect(padL, y, plotW, (padT + plotH - y));
-
-    // annotate height
-    pctx.fillStyle = "#111";
-    pctx.font = "700 12.5px system-ui, -apple-system, Segoe UI, Roboto, Arial";
-    pctx.textAlign = "left";
-    pctx.fillText("f(x)=1/360", padL + 10, y - 8);
   }
 
   // ===== Draw: Histogram =====
@@ -437,7 +357,7 @@
     hctx.fillStyle = "#111";
     hctx.font = "700 13px system-ui, -apple-system, Segoe UI, Roboto, Arial";
     hctx.textAlign = "center";
-    hctx.fillText("Angle bins (degrees)", padL + plotW/2, h - 14);
+    hctx.fillText("Angle (degrees, unit-circle)", padL + plotW/2, h - 14);
 
     hctx.save();
     hctx.translate(18, padT + plotH/2);
@@ -446,12 +366,11 @@
     hctx.fillText("Count", 0, 0);
     hctx.restore();
 
-    // determine max bin for scaling
+    // max count for scaling
     let maxCount = 0;
     for (const c of binCounts) if (c > maxCount) maxCount = c;
     maxBinPill.textContent = `Max bin: ${maxCount}`;
 
-    // if no data, show hint
     if (angles.length === 0){
       hctx.fillStyle = "#444";
       hctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, Arial";
@@ -460,7 +379,7 @@
       return;
     }
 
-    // y ticks (0, mid, max)
+    // y ticks
     const yMax = Math.max(1, maxCount);
     const yticks = [0, Math.ceil(yMax/2), yMax];
     hctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, Arial";
@@ -486,7 +405,7 @@
       hctx.fillText(String(t), x, padT + plotH + 22);
     }
 
-    // draw bars
+    // bars
     const barW = plotW / BIN_COUNT;
     for (let i = 0; i < BIN_COUNT; i++){
       const c = binCounts[i];
@@ -494,24 +413,27 @@
       const x = padL + i * barW;
       const y = padT + plotH - bh;
 
-      // bars in dark, but not specifying palette beyond grayscale
       hctx.fillStyle = "#111";
       hctx.fillRect(x + 1, y, Math.max(0, barW - 2), bh);
 
-      // light bar outline
       hctx.strokeStyle = "#fff";
       hctx.lineWidth = 1;
       hctx.strokeRect(x + 1, y, Math.max(0, barW - 2), bh);
     }
   }
 
-  // ===== Spin logic =====
+  // ===== Spinning =====
+  function setButtonsDisabled(disabled){
+    spinBtn.disabled = disabled;
+    spin100Btn.disabled = disabled;
+    spin1000Btn.disabled = disabled;
+    clearBtn.disabled = disabled;
+  }
+
   function spinAnimated(){
     if (spinning) return;
     spinning = true;
-    spinBtn.disabled = true;
-    spin100Btn.disabled = true;
-    clearBtn.disabled = true;
+    setButtonsDisabled(true);
     setStatus("Spinning…");
 
     const target = Math.random() * 360; // Uniform(0,360)
@@ -519,7 +441,7 @@
     const start = needleDeg;
 
     let end = start + extraTurns * 360;
-    end = end - norm360(end) + target;
+    end = end - norm360(end) + target; // land exactly on target mod 360
     if (end <= start) end += 360;
 
     const duration = 2200 + Math.random() * 700;
@@ -541,14 +463,11 @@
 
         const finalAngle = norm360(needleDeg);
         angleText.textContent = formatDeg(finalAngle);
-
         recordAngle(finalAngle);
 
         setStatus("Done");
         spinning = false;
-        spinBtn.disabled = false;
-        spin100Btn.disabled = false;
-        clearBtn.disabled = false;
+        setButtonsDisabled(false);
       }
     }
     requestAnimationFrame(step);
@@ -557,27 +476,22 @@
   function spinFast(n){
     if (spinning) return;
     spinning = true;
-    spinBtn.disabled = true;
-    spin100Btn.disabled = true;
-    clearBtn.disabled = true;
+    setButtonsDisabled(true);
     setStatus(`Spinning ${n} (fast)…`);
 
-    // No animation; just generate and record quickly
+    let last = 0;
     for (let i = 0; i < n; i++){
-      const a = Math.random() * 360;
-      recordAngle(a);
+      last = Math.random() * 360;
+      recordAngle(last);
     }
-    // Update needle to last angle for visual
-    const last = angles[angles.length - 1] ?? 0;
+
     needleDeg = last;
     drawDial(needleDeg);
     angleText.textContent = formatDeg(norm360(last));
 
     setStatus("Done");
     spinning = false;
-    spinBtn.disabled = false;
-    spin100Btn.disabled = false;
-    clearBtn.disabled = false;
+    setButtonsDisabled(false);
   }
 
   function clearData(){
@@ -585,19 +499,21 @@
     binCounts.fill(0);
     angleText.textContent = "—";
     setCount();
+    updateMean();
     drawHistogram();
     setStatus("Ready");
   }
 
   // ===== Init =====
   drawDial(needleDeg);
-  drawPDF();
   drawHistogram();
   setCount();
+  updateMean();
 
   // ===== Events =====
   spinBtn.addEventListener('click', spinAnimated);
   spin100Btn.addEventListener('click', () => spinFast(100));
+  spin1000Btn.addEventListener('click', () => spinFast(1000));
   clearBtn.addEventListener('click', clearData);
 })();
 </script>
