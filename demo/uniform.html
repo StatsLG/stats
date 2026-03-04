@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CCW Unit-Circle Spinner + Histogram + Interval Highlight</title>
+  <title>Lab 7 Spinner</title>
   <style>
     :root { --size: 360px; --panelW: 820px; }
     body{
@@ -174,7 +174,7 @@
 </head>
 <body>
   <div class="card">
-    <h2>CCW Unit-Circle Spinner + Histogram</h2>
+    <h2>Lab 7 Spinner</h2>
 
     <div class="stage">
       <canvas id="dial" class="dialCanvas" width="720" height="720"></canvas>
@@ -193,13 +193,11 @@
         Highlight interval:
         <span class="intervalText">92.45° to 138.73°</span>
       </label>
-      <div class="pill">0° on +x, CCW positive</div>
-      <div class="pill">Uniform U(0, 360)</div>
     </div>
 
     <div class="out" aria-live="polite">
       <div class="deg" id="angleText">—</div>
-      <div class="small">Angle in degrees (to the hundredths place). Needle spins CCW.</div>
+      <div class="small">Angle in degrees (to the hundredths place).</div>
       <div class="pills">
         <div class="pill" id="statusPill">Ready</div>
         <div class="pill" id="countPill">Spins: 0</div>
@@ -211,7 +209,6 @@
   <div class="gridBelow">
     <div class="panel">
       <h3>Histogram of Spin Angles</h3>
-      <div class="note">More spins → bars should level out (roughly flat).</div>
       <canvas id="histCanvas" width="900" height="360"></canvas>
       <div class="note" id="maxBinNote">Max bin: 0</div>
     </div>
