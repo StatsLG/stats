@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Uniform Spinner Needle (0–360°)</title>
+  <title>Uniform Spinner + PDF + Histogram</title>
   <style>
-    :root { --size: 360px; }
+    :root { --size: 360px; --panelW: 760px; }
     body{
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       margin: 0; padding: 24px;
@@ -14,7 +14,7 @@
       color: #111;
     }
     .card{
-      width: min(720px, 95vw);
+      width: min(var(--panelW), 95vw);
       background: #fff;
       border-radius: 16px;
       padding: 18px 18px 16px;
@@ -23,7 +23,7 @@
       justify-items: center;
       gap: 14px;
     }
-    h2{ margin: 0; font-size: 22px; }
+    h2{ margin: 0; font-size: 22px; text-align:center; }
     .stage{
       width: var(--size);
       height: var(--size);
@@ -33,24 +33,39 @@
       user-select: none;
     }
     canvas{
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      background: #fff;
+      display: block;
+    }
+    .dialCanvas{
       width: var(--size);
       height: var(--size);
       border-radius: 50%;
       background: #fff;
     }
+    .controls{
+      width: min(520px, 95%);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
     button{
       appearance: none;
       border: 0;
       border-radius: 12px;
-      padding: 12px 14px;
+      padding: 12px 10px;
       font-weight: 800;
-      font-size: 16px;
+      font-size: 14px;
       background: #111;
       color: #fff;
       cursor: pointer;
-      width: min(420px, 92%);
     }
+    button.secondary{ background: #2b2b2b; }
+    button.light{ background: #444; }
     button:disabled{ opacity: .55; cursor: not-allowed; }
+
     .out{
       text-align: center;
       display: grid;
@@ -75,174 +90,436 @@
       font-size: 13px;
       color: #222;
     }
+
+    .charts{
+      width: min(var(--panelW), 95vw);
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .panel{
+      background: #fff;
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.06);
+      display: grid;
+      gap: 8px;
+    }
+    .panel h3{
+      margin: 0;
+      font-size: 16px;
+      text-align: center;
+    }
+    .note{
+      font-size: 12.5px;
+      color: #444;
+      text-align: center;
+      margin-top: -4px;
+    }
+    .metaRow{
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: #222;
+    }
+    .metaRow .pill{ font-size: 12.5px; }
+    @media (max-width: 860px){
+      .charts{ grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <h2>Static Wheel + Moving Needle (Uniform 0–360°)</h2>
+    <h2>Static Wheel + Moving Needle + PDF + Histogram</h2>
 
     <div class="stage">
-      <canvas id="dial" width="720" height="720"></canvas>
+      <canvas id="dial" class="dialCanvas" width="720" height="720"></canvas>
     </div>
 
-    <button id="spinBtn">SPIN</button>
+    <div class="controls">
+      <button id="spinBtn">SPIN (animated)</button>
+      <button id="spin100Btn" class="secondary">SPIN 100 (fast)</button>
+      <button id="clearBtn" class="light">CLEAR DATA</button>
+    </div>
 
     <div class="out" aria-live="polite">
       <div class="deg" id="angleText">—</div>
       <div class="small">Needle angle (degrees), shown to the hundredths place.</div>
       <div class="pills">
         <div class="pill" id="statusPill">Ready</div>
-        <div class="pill">Uniform: U(0, 360)</div>
+        <div class="pill" id="countPill">Spins: 0</div>
+        <div class="pill">Model: Uniform U(0, 360)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts">
+    <div class="panel">
+      <h3>PDF (Uniform on 0–360°)</h3>
+      <div class="note">The probability density is constant: \( f(x)=1/360 \) for 0 ≤ x &lt; 360</div>
+      <canvas id="pdfCanvas" width="760" height="320"></canvas>
+      <div class="metaRow">
+        <div class="pill">Area under curve = 1</div>
+        <div class="pill">Height = 1/360 ≈ 0.00278</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Histogram of Spin Angles</h3>
+      <div class="note">More spins → bars should level out (roughly flat).</div>
+      <canvas id="histCanvas" width="760" height="320"></canvas>
+      <div class="metaRow">
+        <div class="pill" id="binsPill">Bins: 36 (10° each)</div>
+        <div class="pill" id="maxBinPill">Max bin: 0</div>
       </div>
     </div>
   </div>
 
 <script>
 (() => {
-  const canvas = document.getElementById('dial');
-  const ctx = canvas.getContext('2d');
+  // ===== Elements =====
+  const dial = document.getElementById('dial');
+  const dctx = dial.getContext('2d');
+
+  const pdfCanvas = document.getElementById('pdfCanvas');
+  const pctx = pdfCanvas.getContext('2d');
+
+  const histCanvas = document.getElementById('histCanvas');
+  const hctx = histCanvas.getContext('2d');
+
   const spinBtn = document.getElementById('spinBtn');
+  const spin100Btn = document.getElementById('spin100Btn');
+  const clearBtn = document.getElementById('clearBtn');
+
   const angleText = document.getElementById('angleText');
   const statusPill = document.getElementById('statusPill');
+  const countPill = document.getElementById('countPill');
+  const maxBinPill = document.getElementById('maxBinPill');
 
-  let needleDeg = 0;     // 0° = pointing straight up
+  // ===== Spinner state =====
+  let needleDeg = 0;      // 0° = pointing up
   let spinning = false;
 
+  // Data
+  const angles = [];      // store final angles in degrees
+  const BIN_COUNT = 36;   // 36 bins => 10° per bin
+  const binCounts = new Array(BIN_COUNT).fill(0);
+
+  // ===== Helpers =====
   function norm360(deg){
     let x = deg % 360;
     if (x < 0) x += 360;
     return x;
   }
-  function formatDeg(x){
-    return `${x.toFixed(2)}°`;
-  }
-  function easeOutCubic(t){
-    return 1 - Math.pow(1 - t, 3);
+  function formatDeg(x){ return `${x.toFixed(2)}°`; }
+  function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+  function setStatus(t){ statusPill.textContent = t; }
+  function setCount(){ countPill.textContent = `Spins: ${angles.length}`; }
+
+  function angleToBin(a){
+    // bins are [0,10), [10,20), ... [350,360)
+    const idx = Math.floor(a / (360 / BIN_COUNT));
+    return Math.min(BIN_COUNT - 1, Math.max(0, idx));
   }
 
-  function drawDial(staticNeedleDeg){
-    const w = canvas.width, h = canvas.height;
+  function recordAngle(a){
+    angles.push(a);
+    const b = angleToBin(a);
+    binCounts[b] += 1;
+    setCount();
+    drawHistogram();
+  }
+
+  // ===== Draw: Dial (static wheel, moving needle) =====
+  function drawDial(needleDegLocal){
+    const w = dial.width, h = dial.height;
     const cx = w/2, cy = h/2;
     const r = Math.min(cx, cy) * 0.92;
 
-    ctx.clearRect(0, 0, w, h);
+    dctx.clearRect(0, 0, w, h);
 
-    // ===== Static wheel face =====
-    // Base circle
-    ctx.save();
-    ctx.translate(cx, cy);
+    // Static wheel
+    dctx.save();
+    dctx.translate(cx, cy);
 
-    ctx.beginPath();
-    ctx.arc(0, 0, r, 0, Math.PI*2);
-    ctx.fillStyle = "#fff";
-    ctx.fill();
+    dctx.beginPath();
+    dctx.arc(0, 0, r, 0, Math.PI*2);
+    dctx.fillStyle = "#fff";
+    dctx.fill();
 
-    // Subtle alternating segments just as a static background reference
+    // subtle segments
     const segs = 24;
     for (let i = 0; i < segs; i++){
       const a0 = (i/segs) * Math.PI*2;
       const a1 = ((i+1)/segs) * Math.PI*2;
-      ctx.beginPath();
-      ctx.moveTo(0,0);
-      ctx.arc(0,0,r,a0,a1);
-      ctx.closePath();
-      ctx.fillStyle = (i%2===0) ? "#f1f3f7" : "#ffffff";
-      ctx.fill();
+      dctx.beginPath();
+      dctx.moveTo(0,0);
+      dctx.arc(0,0,r,a0,a1);
+      dctx.closePath();
+      dctx.fillStyle = (i%2===0) ? "#f1f3f7" : "#ffffff";
+      dctx.fill();
     }
 
-    // Outer ring
-    ctx.lineWidth = r * 0.03;
-    ctx.strokeStyle = "#111";
-    ctx.beginPath();
-    ctx.arc(0,0,r,0,Math.PI*2);
-    ctx.stroke();
+    // outer ring
+    dctx.lineWidth = r * 0.03;
+    dctx.strokeStyle = "#111";
+    dctx.beginPath();
+    dctx.arc(0,0,r,0,Math.PI*2);
+    dctx.stroke();
 
-    // Tick marks every 10°
+    // ticks
     for (let deg = 0; deg < 360; deg += 10){
       const rad = (deg * Math.PI)/180;
       const isMajor = (deg % 30 === 0);
       const isCardinal = (deg % 90 === 0);
       const len = isCardinal ? r*0.16 : isMajor ? r*0.11 : r*0.07;
 
-      ctx.lineWidth = isCardinal ? r*0.012 : isMajor ? r*0.009 : r*0.006;
-      ctx.strokeStyle = "#111";
+      dctx.lineWidth = isCardinal ? r*0.012 : isMajor ? r*0.009 : r*0.006;
+      dctx.strokeStyle = "#111";
 
-      ctx.beginPath();
-      ctx.moveTo(Math.cos(rad)*(r-len), Math.sin(rad)*(r-len));
-      ctx.lineTo(Math.cos(rad)*(r-r*0.02), Math.sin(rad)*(r-r*0.02));
-      ctx.stroke();
+      dctx.beginPath();
+      dctx.moveTo(Math.cos(rad)*(r-len), Math.sin(rad)*(r-len));
+      dctx.lineTo(Math.cos(rad)*(r-r*0.02), Math.sin(rad)*(r-r*0.02));
+      dctx.stroke();
     }
 
-    // Optional labels N/E/S/W for orientation
-    ctx.fillStyle = "#111";
-    ctx.font = `800 ${Math.round(r*0.09)}px system-ui, -apple-system, Segoe UI, Roboto, Arial`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("0°", 0, -r*0.78);
-    ctx.fillText("90°", r*0.78, 0);
-    ctx.fillText("180°", 0, r*0.78);
-    ctx.fillText("270°", -r*0.78, 0);
+    // labels
+    dctx.fillStyle = "#111";
+    dctx.font = `800 ${Math.round(r*0.09)}px system-ui, -apple-system, Segoe UI, Roboto, Arial`;
+    dctx.textAlign = "center";
+    dctx.textBaseline = "middle";
+    dctx.fillText("0°", 0, -r*0.78);
+    dctx.fillText("90°", r*0.78, 0);
+    dctx.fillText("180°", 0, r*0.78);
+    dctx.fillText("270°", -r*0.78, 0);
 
-    // ===== Moving needle =====
-    // Needle rotates; 0° points up. Canvas angle 0 points right, so subtract 90°.
-    ctx.save();
-    ctx.rotate(((staticNeedleDeg - 90) * Math.PI) / 180);
+    // moving needle (0° is up; canvas 0 rad is right => rotate by (deg - 90))
+    dctx.save();
+    dctx.rotate(((needleDegLocal - 90) * Math.PI) / 180);
 
-    // Needle body
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "#111";
-    ctx.lineWidth = r * 0.03;
-    ctx.beginPath();
-    ctx.moveTo(-r*0.06, 0);
-    ctx.lineTo(r*0.78, 0);
-    ctx.stroke();
+    dctx.lineCap = "round";
+    dctx.strokeStyle = "#111";
+    dctx.lineWidth = r * 0.03;
+    dctx.beginPath();
+    dctx.moveTo(-r*0.06, 0);
+    dctx.lineTo(r*0.78, 0);
+    dctx.stroke();
 
-    // Needle tip triangle
-    ctx.fillStyle = "#111";
-    ctx.beginPath();
-    ctx.moveTo(r*0.82, 0);
-    ctx.lineTo(r*0.72, -r*0.06);
-    ctx.lineTo(r*0.72, r*0.06);
-    ctx.closePath();
-    ctx.fill();
+    // needle tip
+    dctx.fillStyle = "#111";
+    dctx.beginPath();
+    dctx.moveTo(r*0.82, 0);
+    dctx.lineTo(r*0.72, -r*0.06);
+    dctx.lineTo(r*0.72, r*0.06);
+    dctx.closePath();
+    dctx.fill();
 
-    ctx.restore();
+    dctx.restore();
 
-    // Hub
-    ctx.beginPath();
-    ctx.arc(0,0,r*0.09,0,Math.PI*2);
-    ctx.fillStyle = "#111";
-    ctx.fill();
+    // hub
+    dctx.beginPath();
+    dctx.arc(0,0,r*0.09,0,Math.PI*2);
+    dctx.fillStyle = "#111";
+    dctx.fill();
 
-    ctx.beginPath();
-    ctx.arc(0,0,r*0.05,0,Math.PI*2);
-    ctx.fillStyle = "#fff";
-    ctx.fill();
+    dctx.beginPath();
+    dctx.arc(0,0,r*0.05,0,Math.PI*2);
+    dctx.fillStyle = "#fff";
+    dctx.fill();
 
-    ctx.restore();
+    dctx.restore();
   }
 
-  // initial render
-  drawDial(needleDeg);
+  // ===== Draw: PDF =====
+  function drawPDF(){
+    const w = pdfCanvas.width, h = pdfCanvas.height;
+    pctx.clearRect(0,0,w,h);
 
-  function setStatus(t){ statusPill.textContent = t; }
+    const padL = 60, padR = 18, padT = 20, padB = 46;
+    const plotW = w - padL - padR;
+    const plotH = h - padT - padB;
 
-  spinBtn.addEventListener('click', () => {
+    // axes
+    pctx.strokeStyle = "#111";
+    pctx.lineWidth = 2;
+    pctx.beginPath();
+    pctx.moveTo(padL, padT);
+    pctx.lineTo(padL, padT + plotH);
+    pctx.lineTo(padL + plotW, padT + plotH);
+    pctx.stroke();
+
+    // labels
+    pctx.fillStyle = "#111";
+    pctx.font = "700 13px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+    pctx.textAlign = "center";
+    pctx.fillText("x (degrees)", padL + plotW/2, h - 14);
+
+    pctx.save();
+    pctx.translate(18, padT + plotH/2);
+    pctx.rotate(-Math.PI/2);
+    pctx.textAlign = "center";
+    pctx.fillText("f(x)", 0, 0);
+    pctx.restore();
+
+    // x ticks: 0, 90, 180, 270, 360
+    const xticks = [0, 90, 180, 270, 360];
+    pctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+    pctx.textAlign = "center";
+    for (const t of xticks){
+      const x = padL + (t/360)*plotW;
+      pctx.beginPath();
+      pctx.moveTo(x, padT + plotH);
+      pctx.lineTo(x, padT + plotH + 6);
+      pctx.stroke();
+      pctx.fillText(String(t), x, padT + plotH + 22);
+    }
+
+    // Uniform PDF height: 1/360, but that is tiny; we scale y-axis for visualization.
+    // We'll set y max = 0.01 so the flat line is visible.
+    const yMax = 0.01;
+    const pdfHeight = 1/360; // ≈ 0.002777...
+    const y = padT + plotH - (pdfHeight / yMax) * plotH;
+
+    // y ticks: 0, 0.005, 0.01
+    const yticks = [0, 0.005, 0.01];
+    pctx.textAlign = "right";
+    for (const t of yticks){
+      const yy = padT + plotH - (t / yMax) * plotH;
+      pctx.beginPath();
+      pctx.moveTo(padL - 6, yy);
+      pctx.lineTo(padL, yy);
+      pctx.stroke();
+      pctx.fillText(t.toFixed(3), padL - 10, yy + 4);
+    }
+
+    // draw the uniform "rectangle"
+    // outline
+    pctx.lineWidth = 2.5;
+    pctx.strokeStyle = "#111";
+    pctx.beginPath();
+    pctx.moveTo(padL, y);
+    pctx.lineTo(padL + plotW, y);
+    pctx.stroke();
+
+    // fill under line lightly
+    pctx.fillStyle = "#f1f3f7";
+    pctx.fillRect(padL, y, plotW, (padT + plotH - y));
+
+    // annotate height
+    pctx.fillStyle = "#111";
+    pctx.font = "700 12.5px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+    pctx.textAlign = "left";
+    pctx.fillText("f(x)=1/360", padL + 10, y - 8);
+  }
+
+  // ===== Draw: Histogram =====
+  function drawHistogram(){
+    const w = histCanvas.width, h = histCanvas.height;
+    hctx.clearRect(0,0,w,h);
+
+    const padL = 60, padR = 18, padT = 20, padB = 46;
+    const plotW = w - padL - padR;
+    const plotH = h - padT - padB;
+
+    // axes
+    hctx.strokeStyle = "#111";
+    hctx.lineWidth = 2;
+    hctx.beginPath();
+    hctx.moveTo(padL, padT);
+    hctx.lineTo(padL, padT + plotH);
+    hctx.lineTo(padL + plotW, padT + plotH);
+    hctx.stroke();
+
+    // labels
+    hctx.fillStyle = "#111";
+    hctx.font = "700 13px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+    hctx.textAlign = "center";
+    hctx.fillText("Angle bins (degrees)", padL + plotW/2, h - 14);
+
+    hctx.save();
+    hctx.translate(18, padT + plotH/2);
+    hctx.rotate(-Math.PI/2);
+    hctx.textAlign = "center";
+    hctx.fillText("Count", 0, 0);
+    hctx.restore();
+
+    // determine max bin for scaling
+    let maxCount = 0;
+    for (const c of binCounts) if (c > maxCount) maxCount = c;
+    maxBinPill.textContent = `Max bin: ${maxCount}`;
+
+    // if no data, show hint
+    if (angles.length === 0){
+      hctx.fillStyle = "#444";
+      hctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+      hctx.textAlign = "center";
+      hctx.fillText("Spin to build the histogram…", padL + plotW/2, padT + plotH/2);
+      return;
+    }
+
+    // y ticks (0, mid, max)
+    const yMax = Math.max(1, maxCount);
+    const yticks = [0, Math.ceil(yMax/2), yMax];
+    hctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+    hctx.textAlign = "right";
+    for (const t of yticks){
+      const yy = padT + plotH - (t / yMax) * plotH;
+      hctx.beginPath();
+      hctx.moveTo(padL - 6, yy);
+      hctx.lineTo(padL, yy);
+      hctx.stroke();
+      hctx.fillText(String(t), padL - 10, yy + 4);
+    }
+
+    // x ticks at 0, 90, 180, 270, 360
+    const xticks = [0, 90, 180, 270, 360];
+    hctx.textAlign = "center";
+    for (const t of xticks){
+      const x = padL + (t/360)*plotW;
+      hctx.beginPath();
+      hctx.moveTo(x, padT + plotH);
+      hctx.lineTo(x, padT + plotH + 6);
+      hctx.stroke();
+      hctx.fillText(String(t), x, padT + plotH + 22);
+    }
+
+    // draw bars
+    const barW = plotW / BIN_COUNT;
+    for (let i = 0; i < BIN_COUNT; i++){
+      const c = binCounts[i];
+      const bh = (c / yMax) * plotH;
+      const x = padL + i * barW;
+      const y = padT + plotH - bh;
+
+      // bars in dark, but not specifying palette beyond grayscale
+      hctx.fillStyle = "#111";
+      hctx.fillRect(x + 1, y, Math.max(0, barW - 2), bh);
+
+      // light bar outline
+      hctx.strokeStyle = "#fff";
+      hctx.lineWidth = 1;
+      hctx.strokeRect(x + 1, y, Math.max(0, barW - 2), bh);
+    }
+  }
+
+  // ===== Spin logic =====
+  function spinAnimated(){
     if (spinning) return;
     spinning = true;
     spinBtn.disabled = true;
+    spin100Btn.disabled = true;
+    clearBtn.disabled = true;
     setStatus("Spinning…");
 
-    // Uniform target angle in degrees (0 <= angle < 360)
-    const target = Math.random() * 360;
-
-    // Add extra rotations for animation: needleDeg increases beyond 360
-    const extraTurns = 5 + Math.floor(Math.random() * 4); // 5–8 turns
+    const target = Math.random() * 360; // Uniform(0,360)
+    const extraTurns = 5 + Math.floor(Math.random() * 4); // 5–8
     const start = needleDeg;
 
-    // Choose an end angle that lands EXACTLY on target (mod 360)
     let end = start + extraTurns * 360;
-    end = end - norm360(end) + target;   // match modulo
+    end = end - norm360(end) + target;
     if (end <= start) end += 360;
 
     const duration = 2200 + Math.random() * 700;
@@ -259,21 +536,69 @@
       if (clamped < 1){
         requestAnimationFrame(step);
       } else {
-        needleDeg = end;          // finalize
+        needleDeg = end;
         drawDial(needleDeg);
 
-        // Display normalized final angle to hundredths
         const finalAngle = norm360(needleDeg);
         angleText.textContent = formatDeg(finalAngle);
+
+        recordAngle(finalAngle);
 
         setStatus("Done");
         spinning = false;
         spinBtn.disabled = false;
+        spin100Btn.disabled = false;
+        clearBtn.disabled = false;
       }
     }
-
     requestAnimationFrame(step);
-  });
+  }
+
+  function spinFast(n){
+    if (spinning) return;
+    spinning = true;
+    spinBtn.disabled = true;
+    spin100Btn.disabled = true;
+    clearBtn.disabled = true;
+    setStatus(`Spinning ${n} (fast)…`);
+
+    // No animation; just generate and record quickly
+    for (let i = 0; i < n; i++){
+      const a = Math.random() * 360;
+      recordAngle(a);
+    }
+    // Update needle to last angle for visual
+    const last = angles[angles.length - 1] ?? 0;
+    needleDeg = last;
+    drawDial(needleDeg);
+    angleText.textContent = formatDeg(norm360(last));
+
+    setStatus("Done");
+    spinning = false;
+    spinBtn.disabled = false;
+    spin100Btn.disabled = false;
+    clearBtn.disabled = false;
+  }
+
+  function clearData(){
+    angles.length = 0;
+    binCounts.fill(0);
+    angleText.textContent = "—";
+    setCount();
+    drawHistogram();
+    setStatus("Ready");
+  }
+
+  // ===== Init =====
+  drawDial(needleDeg);
+  drawPDF();
+  drawHistogram();
+  setCount();
+
+  // ===== Events =====
+  spinBtn.addEventListener('click', spinAnimated);
+  spin100Btn.addEventListener('click', () => spinFast(100));
+  clearBtn.addEventListener('click', clearData);
 })();
 </script>
 </body>
