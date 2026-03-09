@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dice Sampling Distribution Explorer</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+text-align:center;
+background:#f4f4f4;
+}
+
+.container{
+width:950px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:10px;
+}
+
+button{
+padding:10px 18px;
+margin:6px;
+font-size:15px;
+cursor:pointer;
+}
+
+table{
+border-collapse:collapse;
+margin:auto;
+margin-top:20px;
+}
+
+th,td{
+border:1px solid #ccc;
+padding:6px 12px;
+}
+
+canvas{
+margin-top:25px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Dice Sampling Distribution Explorer</h2>
+
+<button onclick="single()">Single Die</button>
+<button onclick="avgDice(2)">Average of 2 Dice</button>
+<button onclick="avgDice(3)">Average of 3 Dice</button>
+<button onclick="avgDice(4)">Average of 4 Dice</button>
+<button onclick="avgDice(5)">Average of 5 Dice</button>
+
+<canvas id="chart" width="800" height="400"></canvas>
+
+<div id="tableArea"></div>
+
+</div>
+
+<script>
+
+let chart;
+
+function drawChart(labels,data,title){
+
+if(chart) chart.destroy();
+
+chart = new Chart(document.getElementById("chart"),{
+type:"bar",
+data:{
+labels:labels,
+datasets:[{
+label:"Probability",
+data:data
+}]
+},
+options:{
+plugins:{
+title:{
+display:true,
+text:title
+}
+},
+scales:{
+y:{
+beginAtZero:true,
+title:{display:true,text:"Probability"}
+},
+x:{
+title:{display:true,text:"Average"}
+}
+}
+}
+});
+
+}
+
+function single(){
+
+let labels=[1,2,3,4,5,6];
+let probs=Array(6).fill(1/6);
+
+drawChart(labels,probs,"Single Die Distribution");
+
+let html="<h3>Single Die Outcomes</h3>";
+html+="<table><tr><th>Outcome</th><th>Probability</th></tr>";
+
+labels.forEach(v=>{
+html+=`<tr><td>${v}</td><td>${(1/6).toFixed(3)}</td></tr>`;
+});
+
+html+="</table>";
+
+document.getElementById("tableArea").innerHTML=html;
+
+}
+
+function avgDice(n){
+
+let outcomes={};
+
+function roll(depth,sum){
+
+if(depth===n){
+
+let avg=sum/n;
+
+if(!outcomes[avg]) outcomes[avg]=0;
+
+outcomes[avg]++;
+
+return;
+
+}
+
+for(let i=1;i<=6;i++){
+roll(depth+1,sum+i);
+}
+
+}
+
+roll(0,0);
+
+let labels=Object.keys(outcomes)
+.map(Number)
+.sort((a,b)=>a-b);
+
+let total=Math.pow(6,n);
+
+let probs=labels.map(x=>outcomes[x]/total);
+
+drawChart(labels,probs,"Average of "+n+" Dice");
+
+let html="<h3>Average of "+n+" Dice</h3>";
+html+="<table><tr><th>Average</th><th>Ways</th><th>Probability</th></tr>";
+
+labels.forEach(v=>{
+html+=`<tr>
+<td>${v}</td>
+<td>${outcomes[v]}</td>
+<td>${(outcomes[v]/total).toFixed(5)}</td>
+</tr>`;
+});
+
+html+="</table>";
+
+document.getElementById("tableArea").innerHTML=html;
+
+}
+
+single();
+
+</script>
+
+</body>
+</html>
