@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Two Sample Test - Means</title>
+  <title>Two Sample Test - Means (Grouped Data)</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
   <link rel="stylesheet" href="/style/bctcstyle.css">
@@ -22,14 +22,20 @@
       <div class="card">
         <strong>Two-Sample Test for Means</strong>
 
+        <label>Numeric Column</label>
+        <select id="numCol"><option value="">—</option></select>
+
+        <label>Group Column</label>
+        <select id="groupCol"><option value="">—</option></select>
+
         <div class="grid2">
           <div>
-            <label>Sample 1 Column</label>
-            <select id="col1"><option value="">—</option></select>
+            <label>Group 1</label>
+            <select id="group1"><option value="">—</option></select>
           </div>
           <div>
-            <label>Sample 2 Column</label>
-            <select id="col2"><option value="">—</option></select>
+            <label>Group 2</label>
+            <select id="group2"><option value="">—</option></select>
           </div>
         </div>
 
@@ -79,56 +85,105 @@
   </div>
 
 <script>
-let DATA=[]; 
-let HEADERS=[]; 
-let LAST_ROWS=[];
+let DATA = [];
+let HEADERS = [];
+let LAST_ROWS = [];
 
 function buildPreview(rows){
   if(!rows.length) return '<div>No data loaded</div>';
-  const headers=Object.keys(rows[0]);
-  let html='<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>';
+  const headers = Object.keys(rows[0]);
+  let html = '<table><thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
   for(const r of rows.slice(0,20)){
-    html+='<tr>'+headers.map(h=>`<td>${r[h]}</td>`).join('')+'</tr>';
+    html += '<tr>' + headers.map(h => `<td>${r[h]}</td>`).join('') + '</tr>';
   }
-  html+='</tbody></table>';
+  html += '</tbody></table>';
   return html;
 }
 
 async function loadFile(file){
   try{
-    const isExcel=(file.name||'').toLowerCase().endsWith('.xlsx');
+    const isExcel = (file.name || '').toLowerCase().endsWith('.xlsx');
     if(isExcel){
-      const buf=await file.arrayBuffer();
-      const wb=XLSX.read(buf,{type:'array'});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      setData(XLSX.utils.sheet_to_json(ws,{defval:''}));
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      setData(XLSX.utils.sheet_to_json(ws, {defval:''}));
     } else {
-      const text=await file.text();
-      const wb=XLSX.read(text,{type:'string'});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      setData(XLSX.utils.sheet_to_json(ws,{defval:''}));
+      const text = await file.text();
+      const wb = XLSX.read(text, {type:'string'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      setData(XLSX.utils.sheet_to_json(ws, {defval:''}));
     }
   } catch(e){
     console.error(e);
-    document.getElementById('status').textContent='Failed to parse file. Use CSV or XLSX.';
+    document.getElementById('status').textContent = 'Failed to parse file. Use CSV or XLSX.';
   }
 }
 
 function setData(rows){
-  DATA=rows||[];
-  HEADERS=DATA.length?Object.keys(DATA[0]):[];
+  DATA = rows || [];
+  HEADERS = DATA.length ? Object.keys(DATA[0]) : [];
 
-  const numericCols=HEADERS.filter(h => DATA.some(r => Number.isFinite(parseFloat(r[h]))));
+  const numericCols = HEADERS.filter(h => DATA.some(r => Number.isFinite(parseFloat(r[h]))));
+  const allCols = HEADERS;
 
-  const col1=document.getElementById('col1');
-  const col2=document.getElementById('col2');
+  document.getElementById('numCol').innerHTML =
+    '<option value="">—</option>' + numericCols.map(h => `<option value="${h}">${h}</option>`).join('');
 
-  const opts='<option value="">—</option>'+numericCols.map(h=>`<option value="${h}">${h}</option>`).join('');
-  col1.innerHTML=opts;
-  col2.innerHTML=opts;
+  document.getElementById('groupCol').innerHTML =
+    '<option value="">—</option>' + allCols.map(h => `<option value="${h}">${h}</option>`).join('');
 
-  document.getElementById('preview').innerHTML=buildPreview(DATA);
-  document.getElementById('status').textContent=`Loaded ${DATA.length} rows / ${HEADERS.length} cols`;
+  document.getElementById('group1').innerHTML = '<option value="">—</option>';
+  document.getElementById('group2').innerHTML = '<option value="">—</option>';
+
+  document.getElementById('preview').innerHTML = buildPreview(DATA);
+  document.getElementById('status').textContent = `Loaded ${DATA.length} rows / ${HEADERS.length} cols`;
+}
+
+function updateGroupChoices(){
+  const groupCol = document.getElementById('groupCol').value;
+  const group1 = document.getElementById('group1');
+  const group2 = document.getElementById('group2');
+
+  if(!groupCol){
+    group1.innerHTML = '<option value="">—</option>';
+    group2.innerHTML = '<option value="">—</option>';
+    return;
+  }
+
+  const seen = new Set();
+  const groups = [];
+
+  for(const r of DATA){
+    const val = String(r[groupCol] ?? '').trim();
+    if(val !== '' && !seen.has(val)){
+      seen.add(val);
+      groups.push(val);
+    }
+  }
+
+  groups.sort((a,b) => a.localeCompare(b, undefined, {numeric:true, sensitivity:'base'}));
+
+  const opts = '<option value="">—</option>' + groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('');
+  group1.innerHTML = opts;
+  group2.innerHTML = opts;
+
+  if(groups.length >= 2){
+    group1.value = groups[0];
+    group2.value = groups[1];
+  }
+}
+
+function getGroupValues(numCol, groupCol, targetGroup){
+  const vals = [];
+  for(const r of DATA){
+    const g = String(r[groupCol] ?? '').trim();
+    const v = parseFloat(r[numCol]);
+    if(g === targetGroup && Number.isFinite(v)){
+      vals.push(v);
+    }
+  }
+  return vals;
 }
 
 function mean(vals){
@@ -136,98 +191,117 @@ function mean(vals){
 }
 
 function sampleSD(vals){
-  return jStat.stdev(vals,true);
+  return jStat.stdev(vals, true);
 }
 
 function formatNum(x){
-  if(x===undefined||x===null||Number.isNaN(x)) return '';
-  const a=Math.abs(x);
-  if(a>=100) return x.toFixed(1);
-  if(a>=10) return x.toFixed(2);
-  if(a>=1) return x.toFixed(3);
+  if(x === undefined || x === null || Number.isNaN(x)) return '';
+  const a = Math.abs(x);
+  if(a >= 100) return x.toFixed(1);
+  if(a >= 10) return x.toFixed(2);
+  if(a >= 1) return x.toFixed(3);
   return x.toFixed(4);
 }
 
-function getNumericValues(col){
-  const vals=[];
-  for(const r of DATA){
-    const v=parseFloat(r[col]);
-    if(Number.isFinite(v)) vals.push(v);
+function escapeHtml(s){
+  return String(s)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function buildTable(rows){
+  if(!rows || rows.length === 0) return '<div>No results</div>';
+  let html = '<table><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>';
+  for(const r of rows){
+    html += `<tr><td>${r.Metric}</td><td class="num">${r.Value}</td></tr>`;
   }
-  return vals;
+  html += '</tbody></table>';
+  return html;
 }
 
 function runTest(){
-  const col1=document.getElementById('col1').value;
-  const col2=document.getElementById('col2').value;
+  const numCol = document.getElementById('numCol').value;
+  const groupCol = document.getElementById('groupCol').value;
+  const group1 = document.getElementById('group1').value;
+  const group2 = document.getElementById('group2').value;
 
-  if(!col1 || !col2) return alert('Pick two numeric columns.');
-  if(col1===col2) return alert('Choose two different columns.');
+  if(!numCol) return alert('Pick a numeric column.');
+  if(!groupCol) return alert('Pick a group column.');
+  if(!group1 || !group2) return alert('Pick two groups.');
+  if(group1 === group2) return alert('Choose two different groups.');
 
-  const muDiff0=parseFloat(document.getElementById('muDiff0').value);
-  const alt=document.getElementById('alt').value;
-  const conf=parseFloat(document.getElementById('conf').value)/100;
-  const alpha=1-conf;
-  const equalVar=document.getElementById('equalVar').checked;
+  const muDiff0 = parseFloat(document.getElementById('muDiff0').value);
+  const alt = document.getElementById('alt').value;
+  const conf = parseFloat(document.getElementById('conf').value) / 100;
+  const alpha = 1 - conf;
+  const equalVar = document.getElementById('equalVar').checked;
 
-  const x1=getNumericValues(col1);
-  const x2=getNumericValues(col2);
+  const x1 = getGroupValues(numCol, groupCol, group1);
+  const x2 = getGroupValues(numCol, groupCol, group2);
 
-  if(x1.length<2 || x2.length<2){
-    return alert('Each sample needs at least 2 numeric values.');
+  if(x1.length < 2 || x2.length < 2){
+    return alert('Each selected group needs at least 2 numeric values.');
   }
 
-  const n1=x1.length, n2=x2.length;
-  const mean1=mean(x1), mean2=mean(x2);
-  const sd1=sampleSD(x1), sd2=sampleSD(x2);
+  const n1 = x1.length;
+  const n2 = x2.length;
+  const mean1 = mean(x1);
+  const mean2 = mean(x2);
+  const sd1 = sampleSD(x1);
+  const sd2 = sampleSD(x2);
 
-  const diff=mean1-mean2;
+  const diff = mean1 - mean2;
+
   let se, stat, df, p, ciLo, ciHi, method;
 
   if(equalVar){
-    const sp2 = (((n1-1)*sd1*sd1) + ((n2-1)*sd2*sd2)) / (n1+n2-2);
+    const sp2 = (((n1 - 1) * sd1 * sd1) + ((n2 - 1) * sd2 * sd2)) / (n1 + n2 - 2);
     const sp = Math.sqrt(sp2);
     se = sp * Math.sqrt(1/n1 + 1/n2);
     stat = (diff - muDiff0) / se;
-    df = n1+n2-2;
+    df = n1 + n2 - 2;
 
-    const tcdf=jStat.studentt.cdf(stat, df);
-    if(alt==='two.sided') p = 2*(1-jStat.studentt.cdf(Math.abs(stat), df));
-    else if(alt==='less') p = tcdf;
-    else p = 1-tcdf;
+    const tcdf = jStat.studentt.cdf(stat, df);
+    if(alt === 'two.sided') p = 2 * (1 - jStat.studentt.cdf(Math.abs(stat), df));
+    else if(alt === 'less') p = tcdf;
+    else p = 1 - tcdf;
 
-    const tcrit=jStat.studentt.inv(1-alpha/2, df);
-    ciLo = diff - tcrit*se;
-    ciHi = diff + tcrit*se;
+    const tcrit = jStat.studentt.inv(1 - alpha/2, df);
+    ciLo = diff - tcrit * se;
+    ciHi = diff + tcrit * se;
 
-    method='Two-sample pooled t-test (equal variances)';
+    method = 'Two-sample pooled t-test (equal variances)';
   } else {
-    const v1=(sd1*sd1)/n1;
-    const v2=(sd2*sd2)/n2;
-    se = Math.sqrt(v1+v2);
+    const v1 = (sd1 * sd1) / n1;
+    const v2 = (sd2 * sd2) / n2;
+    se = Math.sqrt(v1 + v2);
     stat = (diff - muDiff0) / se;
+    df = Math.pow(v1 + v2, 2) / ((Math.pow(v1, 2) / (n1 - 1)) + (Math.pow(v2, 2) / (n2 - 1)));
 
-    df = Math.pow(v1+v2,2) / ( (Math.pow(v1,2)/(n1-1)) + (Math.pow(v2,2)/(n2-1)) );
+    const tcdf = jStat.studentt.cdf(stat, df);
+    if(alt === 'two.sided') p = 2 * (1 - jStat.studentt.cdf(Math.abs(stat), df));
+    else if(alt === 'less') p = tcdf;
+    else p = 1 - tcdf;
 
-    const tcdf=jStat.studentt.cdf(stat, df);
-    if(alt==='two.sided') p = 2*(1-jStat.studentt.cdf(Math.abs(stat), df));
-    else if(alt==='less') p = tcdf;
-    else p = 1-tcdf;
+    const tcrit = jStat.studentt.inv(1 - alpha/2, df);
+    ciLo = diff - tcrit * se;
+    ciHi = diff + tcrit * se;
 
-    const tcrit=jStat.studentt.inv(1-alpha/2, df);
-    ciLo = diff - tcrit*se;
-    ciHi = diff + tcrit*se;
-
-    method='Welch two-sample t-test (unequal variances)';
+    method = 'Welch two-sample t-test (unequal variances)';
   }
 
-  const pooledSD = Math.sqrt((((n1-1)*sd1*sd1)+((n2-1)*sd2*sd2))/(n1+n2-2));
-  const cohenD = (mean1-mean2)/pooledSD;
+  const pooledSD = Math.sqrt((((n1 - 1) * sd1 * sd1) + ((n2 - 1) * sd2 * sd2)) / (n1 + n2 - 2));
+  const cohenD = (mean1 - mean2) / pooledSD;
 
-  const rows=[
+  const rows = [
     {Metric:'Method', Value:method},
-    {Metric:'Sample 1 column', Value:col1},
-    {Metric:'Sample 2 column', Value:col2},
+    {Metric:'Numeric column', Value:numCol},
+    {Metric:'Group column', Value:groupCol},
+    {Metric:'Group 1', Value:group1},
+    {Metric:'Group 2', Value:group2},
     {Metric:'n₁', Value:n1},
     {Metric:'n₂', Value:n2},
     {Metric:'Mean 1', Value:formatNum(mean1)},
@@ -247,74 +321,75 @@ function runTest(){
   LAST_ROWS = rows;
 
   document.getElementById('meta').innerHTML =
-    `<span class="tag">Sample 1: ${col1}</span>` +
-    `<span class="tag">Sample 2: ${col2}</span>` +
+    `<span class="tag">Numeric: ${escapeHtml(numCol)}</span>` +
+    `<span class="tag">Group: ${escapeHtml(groupCol)}</span>` +
+    `<span class="tag">${escapeHtml(group1)} vs ${escapeHtml(group2)}</span>` +
     `<span class="tag">Alternative: ${alt.replace('two.sided','two-sided')}</span>` +
-    `<span class="tag">α = ${(alpha).toFixed(3)}</span>`;
+    `<span class="tag">α = ${alpha.toFixed(3)}</span>`;
 
-  const res=document.getElementById('result');
-  res.innerHTML = buildTable(rows) +
+  document.getElementById('result').innerHTML =
+    buildTable(rows) +
     `<div class="hl">Observed t = ${formatNum(stat)}, p = ${formatNum(p)}.</div>`;
 
-  const note = equalVar
-    ? 'Assumes the two samples are independent, populations are approximately normal, and population variances are equal.'
-    : 'Assumes the two samples are independent and populations are approximately normal; does not assume equal variances.';
-
-  document.getElementById('note').textContent = note;
-}
-
-function buildTable(rows){
-  if(!rows || rows.length===0) return '<div>No results</div>';
-  let html='<table><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>';
-  for(const r of rows){
-    html+=`<tr><td>${r.Metric}</td><td class="num">${r.Value}</td></tr>`;
-  }
-  html+='</tbody></table>';
-  return html;
+  document.getElementById('note').textContent = equalVar
+    ? 'Assumes the two selected groups are independent, approximately normal, and have equal population variances.'
+    : 'Assumes the two selected groups are independent and approximately normal; does not assume equal population variances.';
 }
 
 function downloadCSV(){
-  if(!LAST_ROWS || LAST_ROWS.length===0){
+  if(!LAST_ROWS || LAST_ROWS.length === 0){
     alert('Nothing to download yet. Run a test first.');
     return;
   }
-  const headers=['Metric','Value'];
-  const escape=(s)=>'"'+String(s).replaceAll('"','""')+'"';
-  const lines=[headers.join(',')];
+
+  const headers = ['Metric','Value'];
+  const escapeCSV = (s) => '"' + String(s).replaceAll('"','""') + '"';
+  const lines = [headers.join(',')];
+
   for(const r of LAST_ROWS){
-    lines.push(headers.map(h=>escape(r[h]!==undefined ? r[h] : '')).join(','));
+    lines.push(headers.map(h => escapeCSV(r[h] !== undefined ? r[h] : '')).join(','));
   }
-  const blob=new Blob([lines.join('\n')],{type:'text/csv'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='two_sample_mean_test.csv';
+
+  const blob = new Blob([lines.join('\n')], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'two_sample_mean_test_grouped.csv';
   a.click();
   URL.revokeObjectURL(a.href);
 }
 
-const SAMPLE=[
-  {ClassA:68, ClassB:72},
-  {ClassA:72, ClassB:75},
-  {ClassA:71, ClassB:78},
-  {ClassA:75, ClassB:74},
-  {ClassA:69, ClassB:77},
-  {ClassA:70, ClassB:80},
-  {ClassA:74, ClassB:73},
-  {ClassA:73, ClassB:79},
-  {ClassA:68, ClassB:76},
-  {ClassA:76, ClassB:81},
-  {ClassA:72, ClassB:75},
-  {ClassA:71, ClassB:78}
+const SAMPLE = [
+  {Score:82, Group:'Treatment'},
+  {Score:85, Group:'Treatment'},
+  {Score:78, Group:'Treatment'},
+  {Score:88, Group:'Treatment'},
+  {Score:84, Group:'Treatment'},
+  {Score:76, Group:'Treatment'},
+  {Score:73, Group:'Control'},
+  {Score:75, Group:'Control'},
+  {Score:79, Group:'Control'},
+  {Score:72, Group:'Control'},
+  {Score:77, Group:'Control'},
+  {Score:74, Group:'Control'},
+  {Score:81, Group:'Placebo'},
+  {Score:80, Group:'Placebo'},
+  {Score:78, Group:'Placebo'},
+  {Score:82, Group:'Placebo'}
 ];
 
-window.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('loadBtn').onclick=()=>{
-    const f=document.getElementById('file').files[0];
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('loadBtn').onclick = () => {
+    const f = document.getElementById('file').files[0];
     if(f) loadFile(f);
   };
-  document.getElementById('sampleBtn').onclick=()=>{ setData(SAMPLE); };
-  document.getElementById('runBtn').onclick=runTest;
-  document.getElementById('downloadBtn').onclick=downloadCSV;
+
+  document.getElementById('sampleBtn').onclick = () => {
+    setData(SAMPLE);
+  };
+
+  document.getElementById('groupCol').addEventListener('change', updateGroupChoices);
+  document.getElementById('runBtn').onclick = runTest;
+  document.getElementById('downloadBtn').onclick = downloadCSV;
 });
 </script>
 </body>
