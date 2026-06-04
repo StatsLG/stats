@@ -1,0 +1,412 @@
+window.RELEASE_INFO = {
+  "title": "Georgetown College Athletics Announces 2026 Hall of Fame Class",
+  "location": "GEORGETOWN, Ky.",
+  "summary": "The Georgetown College Athletics Department announced the Hall of Fame Class of 2026. Six student-athletes, one coach, and one team were designated by the selection committee to receive the honor.",
+  "ceremony": "Saturday, August 22, 2026, at 6:00pm",
+  "venue": "James A. & Martha R. Brown Conference Center on Georgetown College's East Campus",
+  "ticketNote": "Tickets for the ceremony can be purchased in mid-June. Check Georgetown College athletics social media pages for more information."
+};
+
+window.INDUCTEES = [
+  {
+    "id": "donnie-butcher",
+    "name": "Donnie Butcher",
+    "gradYear": "1987",
+    "type": "Athlete",
+    "sport": "Men's Basketball",
+    "inductionYear": 2026,
+    "years": "1986\u201387",
+    "headline": "Team captain and starting point guard for Georgetown's 1986\u201387 Final Four men's basketball team.",
+    "citation": "Donnie Butcher was a staple of the 1986-87 Final Four men's basketball team. Butcher helped guide the Tigers to a 30-8 overall record that season as team captain and starting point guard. During that campaign, Butcher set the single-season assists record that still stands to this day. He dished out 257 assists that season which helped him be named to the NAIA All-Tournament team. Butcher was a NAIA Scholar Athlete in 1986-87, a four-time Academic All-American and was also named team MVP.",
+    "highlights": [
+      "Team captain and starting point guard",
+      "Helped lead the 1986\u201387 team to a 30\u20138 record",
+      "Member of the Final Four men's basketball team",
+      "Set Georgetown's single-season assists record",
+      "Named to the NAIA All-Tournament Team",
+      "NAIA Scholar Athlete in 1986\u201387",
+      "Four-time Academic All-American",
+      "Team MVP"
+    ],
+    "stats": [
+      {
+        "label": "Single-Season Assists",
+        "value": "257",
+        "detail": "School record"
+      },
+      {
+        "label": "Team Record",
+        "value": "30\u20138",
+        "detail": "1986\u201387 season"
+      },
+      {
+        "label": "Academic All-American",
+        "value": "4x",
+        "detail": "Four-time honoree"
+      },
+      {
+        "label": "Graduation Year",
+        "value": "'87",
+        "detail": "Georgetown College"
+      }
+    ],
+    "photo": "",
+    "videos": [],
+    "sourceUrl": "https://georgetowncollegeathletics.com/general/2025-26/releases/20260520gotijb"
+  },
+  {
+    "id": "jayme-gilbert",
+    "name": "Jayme Gilbert",
+    "gradYear": "2010",
+    "type": "Athlete",
+    "sport": "Women's Basketball",
+    "inductionYear": 2026,
+    "years": "Late 2000s",
+    "headline": "A prolific four-year standout and one of the top scorers in Georgetown women's basketball history.",
+    "citation": "Jayme Gilbert was a prolific four-year standout for the Tigers in the late 2000s. Gilbert's career included consecutive nods to the NAIA All-American Honorable Mention team in both 2008 and 2009 as she cemented herself into the Georgetown record books. She was a constant scoring threat, tallying 1,370 points over her career which is tied for 13th most all-time. Gilbert was efficient in all facets of scoring the basketball, as she is still the 10th best shooter in both field goal percentage with a 50.1% clip and 3-point shooting with a 35.6% mark. Her free-throw shooting is the eighth best of all-time at 80.2%. Gilbert was a back-to-back Mid-South Conference selection in both 2007-08 and 2008-09, and her 129 made free throws during the 07-08 campaign still ranks 10th most all-time at Georgetown.",
+    "highlights": [
+      "NAIA All-American Honorable Mention in 2008 and 2009",
+      "Scored 1,370 career points",
+      "Tied for 13th all-time in career points",
+      "Ranks 10th in field goal percentage at 50.1%",
+      "Ranks 10th in three-point percentage at 35.6%",
+      "Ranks 8th in free-throw percentage at 80.2%",
+      "Back-to-back Mid-South Conference selection",
+      "129 made free throws in 2007\u201308 ranks 10th all-time"
+    ],
+    "stats": [
+      {
+        "label": "Career Points",
+        "value": "1,370",
+        "detail": "T-13th all-time"
+      },
+      {
+        "label": "Field Goal %",
+        "value": "50.1%",
+        "detail": "10th all-time"
+      },
+      {
+        "label": "3-Point %",
+        "value": "35.6%",
+        "detail": "10th all-time"
+      },
+      {
+        "label": "Free Throw %",
+        "value": "80.2%",
+        "detail": "8th all-time"
+      },
+      {
+        "label": "Made FTs",
+        "value": "129",
+        "detail": "2007\u201308 season"
+      },
+      {
+        "label": "All-American HM",
+        "value": "2x",
+        "detail": "2008, 2009"
+      }
+    ],
+    "photo": "",
+    "videos": [],
+    "sourceUrl": "https://georgetowncollegeathletics.com/general/2025-26/releases/20260520gotijb"
+  },
+  {
+    "id": "bj-mattingly",
+    "name": "B.J. Mattingly",
+    "gradYear": "2003",
+    "type": "Athlete",
+    "sport": "Football",
+    "inductionYear": 2026,
+    "years": "Early 2000s",
+    "headline": "One of Georgetown football's dominant linebackers and a national championship defensive standout.",
+    "citation": "B.J. Mattingly was one of the more dominant linebackers in school history. Over his career as a Tiger, he collected 194 solo tackles and 294 total tackles. His 294 total tackles still rank ninth most in program history. In the 2001 NAIA championship game, Mattingly was named the Most Outstanding Defensive Player of the game, helping Georgetown to claim its third national championship.",
+    "highlights": [
+      "One of the more dominant linebackers in school history",
+      "Collected 194 solo tackles",
+      "Collected 294 total tackles",
+      "294 total tackles rank ninth in program history",
+      "Named Most Outstanding Defensive Player of the 2001 NAIA championship game",
+      "Helped Georgetown claim its third national championship"
+    ],
+    "stats": [
+      {
+        "label": "Solo Tackles",
+        "value": "194",
+        "detail": "Career total"
+      },
+      {
+        "label": "Total Tackles",
+        "value": "294",
+        "detail": "9th in program history"
+      },
+      {
+        "label": "National Titles",
+        "value": "1",
+        "detail": "2001 championship team"
+      },
+      {
+        "label": "Graduation Year",
+        "value": "'03",
+        "detail": "Georgetown College"
+      }
+    ],
+    "photo": "",
+    "videos": [],
+    "sourceUrl": "https://georgetowncollegeathletics.com/general/2025-26/releases/20260520gotijb"
+  },
+  {
+    "id": "greg-spalding",
+    "name": "Greg Spalding",
+    "gradYear": "1973",
+    "type": "Athlete",
+    "sport": "Football",
+    "inductionYear": 2026,
+    "years": "1969\u20131972",
+    "headline": "A standout defensive back whose four-year career included 22 interceptions and multiple honors.",
+    "citation": "Greg Spalding was one of the best Tiger defensive backs in program history over his four-year career. From 1969 to 1972 he produced 22 interceptions for 314 yards and two touchdowns. During his junior season, he led the team with 25 solo tackles and had the fifth most total tackles on the team with 78 that season. Spalding consistently played the most games and snaps on defense. Spalding's senior season saw him named Defensive Back of the Year and complete his Tiger tenure a two-time Outstanding College Athlete in America having also secured that feat as a junior. Spalding also spent limited time as a kicker and punt returner for Georgetown. He returned six punts for 26 yards. His 39 kickoffs went for just under 1,800 yards in his first two seasons for an average kickoff of 46.1 yards. Spalding went on to complete his master's degree at Oklahoma State University.",
+    "highlights": [
+      "Produced 22 career interceptions",
+      "Returned interceptions for 314 yards and two touchdowns",
+      "Led the team with 25 solo tackles during his junior season",
+      "Recorded 78 total tackles as a junior",
+      "Named Defensive Back of the Year as a senior",
+      "Two-time Outstanding College Athlete in America",
+      "Returned six punts for 26 yards",
+      "39 kickoffs went for just under 1,800 yards",
+      "Completed a master's degree at Oklahoma State University"
+    ],
+    "stats": [
+      {
+        "label": "Interceptions",
+        "value": "22",
+        "detail": "Career total"
+      },
+      {
+        "label": "INT Return Yards",
+        "value": "314",
+        "detail": "Career total"
+      },
+      {
+        "label": "INT TDs",
+        "value": "2",
+        "detail": "Career total"
+      },
+      {
+        "label": "Junior Solo Tackles",
+        "value": "25",
+        "detail": "Team leader"
+      },
+      {
+        "label": "Junior Total Tackles",
+        "value": "78",
+        "detail": "5th on team"
+      },
+      {
+        "label": "Avg. Kickoff",
+        "value": "46.1",
+        "detail": "Yards"
+      }
+    ],
+    "photo": "",
+    "videos": [],
+    "sourceUrl": "https://georgetowncollegeathletics.com/general/2025-26/releases/20260520gotijb"
+  },
+  {
+    "id": "tracy-wachtel-lattis",
+    "name": "Tracy Wachtel Lattis",
+    "gradYear": "1990",
+    "type": "Athlete",
+    "sport": "Women's Volleyball",
+    "inductionYear": 2026,
+    "years": "Late 1980s",
+    "headline": "A four-year starting setter who helped lead Georgetown volleyball to national tournament history.",
+    "citation": "Tracy Wachtel Lattis was a standout setter for the Tigers over her four years. Wachtel Lattis started all four years for Georgetown, helping the team to a record of 135-30. Wachtel Lattis was a crucial part of leading the team to the District 32 championships her junior and senior years. She helped Georgetown to its first national tournament appearance as a senior. Georgetown finished 15th at the NAIA national tournament where Wachtel Lattis finished her career ranked third in assists per game amongst 32 setters. Wachtel Lattis was a three-time NAIA All-District 32 selection and was named a KWIC All-State selection in 1989. She ranks fifth all-time in assists at Georgetown with 2,848 for her career.",
+    "highlights": [
+      "Four-year starter for Georgetown",
+      "Helped the Tigers to a 135\u201330 record",
+      "Helped lead Georgetown to District 32 championships as a junior and senior",
+      "Helped Georgetown reach its first national tournament appearance",
+      "Georgetown finished 15th at the NAIA national tournament",
+      "Finished career ranked third in assists per game among 32 setters at nationals",
+      "Three-time NAIA All-District 32 selection",
+      "KWIC All-State selection in 1989",
+      "Ranks fifth all-time at Georgetown with 2,848 career assists"
+    ],
+    "stats": [
+      {
+        "label": "Team Record",
+        "value": "135\u201330",
+        "detail": "During her career"
+      },
+      {
+        "label": "Career Assists",
+        "value": "2,848",
+        "detail": "5th all-time"
+      },
+      {
+        "label": "All-District",
+        "value": "3x",
+        "detail": "NAIA District 32"
+      },
+      {
+        "label": "National Finish",
+        "value": "15th",
+        "detail": "NAIA tournament"
+      },
+      {
+        "label": "Grad Year",
+        "value": "'90",
+        "detail": "Georgetown College"
+      }
+    ],
+    "photo": "",
+    "videos": [],
+    "sourceUrl": "https://georgetowncollegeathletics.com/general/2025-26/releases/20260520gotijb"
+  },
+  {
+    "id": "mike-bova",
+    "name": "Mike Bova",
+    "gradYear": "1969",
+    "type": "Trail Blazer",
+    "sport": "Baseball",
+    "inductionYear": 2026,
+    "years": "1966\u20131969",
+    "headline": "A four-year catcher, team leader, and Trail Blazer inductee whose legacy extended into education.",
+    "citation": "Mike Bova was an irreplaceable catcher for the Tigers in the late 1960s. Bova started and finished every game he caught during his four-year career from 1966 to 1969. Bova was co-captain of the team for three seasons and won team MVP in 1969. The 1969 Charlie Hustle Award winner was also a member of the student judicial council and co-head dorm resident advisor for Anderson Hall. He went on to earn a master's degree from the University of Akron in 1975 in Secondary School Administration and spent 46 years as a professional educator.",
+    "highlights": [
+      "Baseball Trail Blazer Inductee",
+      "Four-year catcher from 1966 to 1969",
+      "Started and finished every game he caught",
+      "Team co-captain for three seasons",
+      "Team MVP in 1969",
+      "1969 Charlie Hustle Award winner",
+      "Member of the student judicial council",
+      "Co-head dorm resident advisor for Anderson Hall",
+      "Earned a master's degree from the University of Akron",
+      "Spent 46 years as a professional educator"
+    ],
+    "stats": [
+      {
+        "label": "Playing Years",
+        "value": "1966\u201369",
+        "detail": "Four-year career"
+      },
+      {
+        "label": "Co-Captain",
+        "value": "3",
+        "detail": "Seasons"
+      },
+      {
+        "label": "Team MVP",
+        "value": "1969",
+        "detail": "Senior season"
+      },
+      {
+        "label": "Education Career",
+        "value": "46",
+        "detail": "Years"
+      }
+    ],
+    "photo": "",
+    "videos": [],
+    "sourceUrl": "https://georgetowncollegeathletics.com/general/2025-26/releases/20260520gotijb"
+  },
+  {
+    "id": "1986-mens-tennis-team",
+    "name": "1986 Men's Tennis Team",
+    "gradYear": "",
+    "type": "Team",
+    "sport": "Men's Tennis",
+    "inductionYear": 2026,
+    "years": "1986",
+    "headline": "The first Georgetown men's tennis team to earn a trip to the NAIA national tournament.",
+    "citation": "The 1986 men's tennis team earned the school's first-ever trip to the NAIA national tournament. The Tigers won the District 32 tournament which earned them an automatic bid to the NAIA national tournament. Georgetown beat Thomas More 20-19 in a flighted tournament to secure their berth after falling to TMC in the KIAC tournament. The Tigers held a KIAC record of 11-2 and were tournament runners-up. Georgetown finished 40th of 70 teams at the national tournament this season coached by Bill Cronin in his fourth year.",
+    "highlights": [
+      "First Georgetown men's tennis team to reach the NAIA national tournament",
+      "Won the District 32 tournament",
+      "Earned an automatic bid to the NAIA national tournament",
+      "Defeated Thomas More 20\u201319 in a flighted tournament",
+      "Held an 11\u20132 KIAC record",
+      "KIAC tournament runners-up",
+      "Finished 40th of 70 teams at the national tournament",
+      "Coached by Bill Cronin in his fourth year"
+    ],
+    "stats": [
+      {
+        "label": "KIAC Record",
+        "value": "11\u20132",
+        "detail": "Season record"
+      },
+      {
+        "label": "District",
+        "value": "32",
+        "detail": "Tournament champions"
+      },
+      {
+        "label": "National Finish",
+        "value": "40th",
+        "detail": "Of 70 teams"
+      },
+      {
+        "label": "Berth Score",
+        "value": "20\u201319",
+        "detail": "Over Thomas More"
+      }
+    ],
+    "photo": "",
+    "videos": [],
+    "sourceUrl": "https://georgetowncollegeathletics.com/general/2025-26/releases/20260520gotijb"
+  },
+  {
+    "id": "red-faught",
+    "name": "Red Faught",
+    "gradYear": "",
+    "type": "Coach",
+    "sport": "Football",
+    "inductionYear": 2026,
+    "years": "1990\u20131992; 1997",
+    "headline": "An offensive coordinator behind Georgetown's record-setting 1991 national championship offense.",
+    "citation": "Red Faught was one of the most important football coaches in Georgetown College history. Faught served as the Tigers' offensive coordinator from 1990 to 1992, guiding the offense to set several school records during the 1991 National Championship run. The first-ever National Champion offense set the NAIA record for most points in a season (744) at the time and still ranks third-most all-time to this day. Faught's '91 offense scored the most touchdowns (107) in Georgetown history and still holds the standard for most rushing yards in a season with 4,039. Faught coached his running backs to 69 rushing touchdowns in 1991 also a single-season Georgetown record. Faught went on to serve as an advisor to Georgetown Hall of Fame coach Bill Cronin during the 1997 season.",
+    "highlights": [
+      "Football Coach inductee",
+      "Offensive coordinator from 1990 to 1992",
+      "Helped lead the 1991 National Championship run",
+      "1991 offense set the NAIA record for points in a season at the time",
+      "744 points still rank third-most all-time",
+      "1991 offense scored 107 touchdowns, the most in Georgetown history",
+      "1991 offense rushed for 4,039 yards",
+      "Running backs scored 69 rushing touchdowns in 1991",
+      "Served as an advisor to Bill Cronin during the 1997 season"
+    ],
+    "stats": [
+      {
+        "label": "Points",
+        "value": "744",
+        "detail": "1991 offense"
+      },
+      {
+        "label": "Touchdowns",
+        "value": "107",
+        "detail": "Program record"
+      },
+      {
+        "label": "Rushing Yards",
+        "value": "4,039",
+        "detail": "Program record"
+      },
+      {
+        "label": "Rush TDs",
+        "value": "69",
+        "detail": "Single-season record"
+      },
+      {
+        "label": "OC Years",
+        "value": "1990\u201392",
+        "detail": "Offensive coordinator"
+      }
+    ],
+    "photo": "",
+    "videos": [],
+    "sourceUrl": "https://georgetowncollegeathletics.com/general/2025-26/releases/20260520gotijb"
+  }
+];

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Georgetown Athletics Hall of Fame</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="transition"></div>
+
+  <div id="profileTransition" class="profile-transition" aria-hidden="true">
+    <div class="transition-card">
+      <div class="transition-photo">Photo Coming Soon</div>
+      <p class="eyebrow">Opening Profile</p>
+      <h2 id="transitionName">Hall of Fame</h2>
+      <p id="transitionMeta"></p>
+    </div>
+    <div class="transition-streak"></div>
+  </div>
+
+
+  <div id="museumDoors" class="museum-doors" aria-hidden="true">
+    <div class="door left-door">
+      <div class="door-panel-lines"></div>
+    </div>
+    <div class="door right-door">
+      <div class="door-panel-lines"></div>
+    </div>
+    <div class="door-light"></div>
+    <div class="light-sweep"></div>
+    <div class="door-content">
+      <img src="assets/tiger_logo.jpg" alt="" class="door-logo">
+      <p>Welcome to the Hall</p>
+    </div>
+  </div>
+
+
+  
+
+
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="assets/tiger_logo.jpg" alt="Georgetown Tiger logo">
+      <span>Hall of Fame</span>
+    </a>
+    <nav>
+      <button class="nav-button enter-hall" type="button">Enter</button>
+      <a href="#legacy">Legacy Wall</a>
+      <a href="#kiosk">Kiosk Mode</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero museum-entrance">
+      <div class="spotlight"></div>
+      <img class="hero-logo" src="assets/tiger_logo.jpg" alt="Georgetown Tiger logo">
+      <p class="eyebrow">Georgetown College Athletics</p>
+      <h1>Hall of Fame</h1>
+      <p class="tagline">A digital museum celebrating Tigers, teams, coaches, records, and moments that shaped Georgetown athletics.</p>
+      <div class="hero-actions">
+        <button class="button primary enter-hall" type="button">Enter the Hall</button>
+        <a class="button ghost" href="profile.html?id=donnie-butcher">View Sample Profile</a>
+      </div>
+    </section>
+
+    
+    <section id="announcement" class="announcement panel">
+      <div class="section-heading">
+        <p class="eyebrow">Official Announcement</p>
+        <h2>Class of 2026 Ceremony</h2>
+      </div>
+      <div class="announcement-grid">
+        <div class="box">
+          <h3>Induction Ceremony</h3>
+          <p><strong>Date:</strong> Saturday, August 22, 2026</p>
+          <p><strong>Time:</strong> 6:00pm</p>
+          <p><strong>Location:</strong> James A. & Martha R. Brown Conference Center on Georgetown College's East Campus</p>
+        </div>
+        <div class="box">
+          <h3>Class Makeup</h3>
+          <p>Six student-athletes, one coach, and one team were selected for the 2026 Hall of Fame Class.</p>
+          <p>Tickets are expected to be available in mid-June through Georgetown College athletics information channels.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <section id="hall" class="panel">
+      <div class="section-heading">
+        <p class="eyebrow">Browse the Collection</p>
+        <h2>Class of 2026</h2>
+      </div>
+
+      <div class="controls">
+        <input id="search" type="search" placeholder="Search by name, sport, type, or year..." />
+        <div class="filters">
+          <button data-filter="All" class="active">All</button>
+          <button data-filter="Athlete">Athletes</button>
+          <button data-filter="Coach">Coaches</button>
+          <button data-filter="Team">Teams</button>
+        </div>
+      </div>
+
+      <div id="cards" class="card-grid"></div>
+    </section>
+
+    <section id="legacy" class="legacy-wall">
+      <div class="section-heading">
+        <p class="eyebrow">Interactive Display Concept</p>
+        <h2>Tiger Legacy Wall</h2>
+        <p>Each tile can eventually represent an inductee, championship team, coach, or historic moment.</p>
+      </div>
+      <div id="legacyTiles" class="legacy-tiles"></div>
+    </section>
+
+    <section id="kiosk" class="kiosk panel">
+      <div>
+        <p class="eyebrow">Future Feature</p>
+        <h2>Kiosk Mode</h2>
+        <p>This version is designed so it can later run full-screen on a touchscreen or lobby display. The site already uses large buttons, clean cards, and simple navigation.</p>
+      </div>
+      <a class="button primary" href="kiosk.html">Try Kiosk Preview</a>
+    </section>
+  </main>
+<script src="data/inductees.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
