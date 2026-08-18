@@ -406,3 +406,20 @@ body .card input[type="color"]{
 .clt .btn:hover {
   background: var(--card);
 }
+
+/* =========================================
+   STATSLG HOME PAGE BANNER
+   ========================================= */
+
+.site-banner {
+  width: 100%;
+  margin: 0 0 1.5rem 0;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.site-banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
