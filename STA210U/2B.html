@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STA210U — Section 2B | StatsLG</title>
+<meta name="description" content="STA210U Section 2B — Numerical Descriptions for Univariate Data.">
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/style/bctcstyle.css">
+<script>
+  window.MathJax = {
+    tex: {inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']]}
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+.notes-page{max-width:1100px;margin:0 auto;padding:32px 40px}
+.notes-content{max-width:900px;margin:0 auto}
+.notes-content h2{margin-top:2rem;scroll-margin-top:1rem}
+.notes-content h3{margin-top:1.5rem;color:var(--ink)}
+.notes-content p,.notes-content li{line-height:1.65}
+.back-row{margin:0 0 20px;display:flex;gap:10px;flex-wrap:wrap}
+.toc{margin-bottom:1.5rem}.toc h2{margin-top:0}
+.toc a{color:var(--kctcs-blue);font-weight:700}.toc a:hover{text-decoration:underline}
+.definition{border-left:5px solid var(--kctcs-blue);padding:12px 14px;margin:14px 0;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.definition strong{color:var(--kctcs-blue)}
+.example{margin:18px 0}.example>h3{margin-top:0}
+.key-idea{border-left:5px solid var(--kctcs-gold)}
+.formula{font-size:1.2rem;text-align:center;font-weight:700;color:var(--kctcs-blue);margin:16px 0;padding:14px;background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius);overflow-x:auto}
+details.answer{margin-top:14px;border-top:1px solid var(--rule);padding-top:10px}
+details.answer summary{cursor:pointer;color:var(--kctcs-blue);font-weight:800}
+.answer-body{border-left:5px solid var(--kctcs-gold);padding:10px 14px;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.stem{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre;overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius);padding:16px;line-height:1.6}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.notes-footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted);font-size:12px}
+@media(max-width:760px){.notes-page{padding:20px 16px}.back-row{flex-direction:column;align-items:stretch}.back-row .btn{justify-content:center}.compare{grid-template-columns:1fr}}
+@media print{.back-row{display:none}.notes-page,.notes-content{max-width:none;padding:0}details.answer>*{display:block!important}}
+</style>
+</head>
+<body>
+<main class="notes-page"><div class="notes-content">
+<div class="back-row">
+<a class="btn outline btn-sm" href="index.html">← Back to STA210U Notes</a>
+<a class="btn btn-sm" href="STA210U_Section_2B_Numerical_Descriptions_for_Univariate_Data.docx" download>Download Word Notes</a>
+</div>
+
+<header class="header">
+<h1>STA210U — Section 2B</h1>
+<p>Descriptive Statistics: Numerical Descriptions for Univariate Data</p>
+</header>
+
+<section class="section panel pad toc">
+<h2>In This Section</h2>
+<ul>
+<li><a href="#center">Measures of Central Tendency</a></li>
+<li><a href="#position">Measures of Position</a></li>
+<li><a href="#dispersion">Measures of Dispersion (Variability)</a></li>
+</ul>
+</section>
+
+<section id="center" class="section">
+<h2>1. Measures of Central Tendency</h2>
+<p>In this section we will mainly deal with statistics. Remember a statistic is a numerical characteristic of a sample. These are descriptive statistics since they summarize the data in the sample.</p>
+<div class="definition"><strong>Measure of Central Tendency</strong> — a measure of average or typical value. The three most common measures are the mean, median, and mode.</div>
+
+<h3>Sample Mean</h3>
+<div class="definition"><strong>Sample Mean</strong> — when most people use the word <em>average</em>, they are talking about the mean.</div>
+<div class="formula">\[\bar{x}=\frac{\sum x}{n}\]</div>
+<ul><li>\(\bar{x}\) is the sample mean</li><li>\(\sum\) means sum</li><li>\(x\) represents the data values</li><li>\(n\) is the sample size</li></ul>
+<p>The mean is the sum of the data values divided by the sample size.</p>
+
+<article class="card example"><h3>Example 1</h3>
+<p>Select 4 students and ask, “How many brothers and sisters do you have?” Suppose the sample yields:</p>
+<p><strong>Data: 2, 3, 1, 3</strong></p><p>Calculate the mean. Do you think the mean is a good measure of center for this data?</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><div class="formula">\[\bar{x}=\frac{2+3+1+3}{4}=\frac{9}{4}=2.25\]</div><p>The mean is 2.25 siblings. It is a reasonable description of center for this small data set, although 2.25 itself is not a possible number of siblings.</p></div></details>
+</article>
+
+<article class="card example"><h3>Example 2</h3>
+<p>Suppose we selected a 5th person who had 10 siblings.</p><p><strong>New Data: 2, 3, 1, 3, 10</strong></p>
+<p>Calculate the mean. Do you think the mean is a good measure of center?</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><div class="formula">\[\bar{x}=\frac{19}{5}=3.8\]</div><p>The value 10 pulls the mean upward, illustrating that the mean is sensitive to extreme scores.</p></div></details>
+</article>
+
+<div class="card soft key-idea"><h3>Important Characteristics of the Sample Mean</h3><ul><li>\(\bar{x}\) is sensitive to extreme scores.</li><li>\(\bar{x}\) is not necessarily a possible outcome.</li></ul></div>
+<p>An applied example of the mean not being used when extreme values are present is income. If you hear anyone talk about average income, they should say median income. A billionaire in a class would make the mean income very high and not a good measure of a typical value.</p>
+
+<h3>Sample Median</h3>
+<div class="definition"><strong>Sample Median</strong> — the middle score.</div>
+<p>Procedure for calculating the sample median \(\tilde{x}\):</p>
+<ul><li>Rank the data from smallest to largest.</li><li>If \(n\) is odd, the median is the middle score.</li><li>If \(n\) is even, the median is the mean of the two middle scores.</li></ul>
+
+<article class="card example"><h3>Example 3</h3><p><strong>Data: 2, 3, 1, 3</strong></p><p>Solve for the median.</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>Ordered data: 1, 2, 3, 3.</p><div class="formula">\[\tilde{x}=\frac{2+3}{2}=2.5\]</div></div></details></article>
+
+<article class="card example"><h3>Example 4</h3><p><strong>New Data: 2, 3, 1, 3, 10</strong></p><p>Solve for the median.</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>Ordered data: 1, 2, 3, 3, 10. The middle score is <strong>3</strong>.</p></div></details></article>
+
+<div class="card soft key-idea"><h3>Important Characteristics of the Median</h3><ul><li>\(\tilde{x}\) is not sensitive to extreme scores.</li><li>Exactly half of the data is below the median and exactly half is above the median.</li></ul></div>
+<p>Because of the characteristics of the mean and median, if extreme scores exist in a data set the median is a better measure of central tendency. If extreme scores are unlikely, the mean varies less from sample to sample than the median and is a better measure of center.</p>
+
+<h3>Mean, Median, and Shape</h3>
+<p>The mean is sensitive to extreme values and is generally more affected by values farther from center. Therefore, if a distribution is skewed, the mean is pulled in the direction of the skewness. If there is no skewness, the mean and median will both be at the point of symmetry.</p>
+<div class="card soft">
+<ul>
+<li>If \(\bar{x}>\tilde{x}\), the distribution is <strong>right skewed</strong>.</li>
+<li>If \(\bar{x}<\tilde{x}\), the distribution is <strong>left skewed</strong>.</li>
+<li>If \(\bar{x}=\tilde{x}\), the distribution is <strong>symmetric</strong>.</li>
+</ul>
+</div>
+
+<h3>Sample Mode</h3>
+<div class="definition"><strong>Sample Mode</strong> — the most frequent score.</div>
+<article class="card example"><h3>Example 5</h3><p><strong>Data:</strong> 2, 3, 1, 3<br><strong>New Data:</strong> 2, 3, 1, 3, 10</p><p>Calculate the mode for both data sets.</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>The mode is <strong>3</strong> for both data sets.</p></div></details></article>
+<p>There are major weaknesses with the mode. It may have more than one value, may not exist in a useful sense, and can change dramatically when only one observation changes. This makes it unstable.</p>
+<p>The main advantage of the mode is that it can be used for qualitative data. For example, saying the “average” student in a class is female means that female is the most frequent category. The mean and median cannot be used for qualitative data.</p>
+<div class="card soft key-idea"><h3>Important Characteristics of the Mode</h3><ul><li>Does not always exist or can have more than one value.</li><li>Unstable.</li><li>Can be used with qualitative data.</li></ul></div>
+</section>
+
+<section id="position" class="section">
+<h2>2. Measures of Position</h2>
+<p>There are many measures of position. We will focus on quartiles, but first consider percentiles. If John scores in the 95th percentile in math, technically he scored better than 95% of the people who took the test. This does not necessarily tell how well he performed in absolute terms; it tells where his score is positioned relative to everyone else.</p>
+
+<div class="definition"><strong>Quartiles</strong> — divide the data into four equally sized parts.</div>
+<div class="compare">
+<div class="card"><h3>First Quartile, \(Q_1\)</h3><p>Same as the 25th percentile.</p><p>25% of the data lies below \(Q_1\) and 75% lies above.</p></div>
+<div class="card"><h3>Second Quartile, \(Q_2\)</h3><p>Same as the 50th percentile and also the median.</p><p>50% lies below and 50% lies above.</p></div>
+<div class="card"><h3>Third Quartile, \(Q_3\)</h3><p>Same as the 75th percentile.</p><p>75% lies below \(Q_3\) and 25% lies above.</p></div>
+</div>
+<h3>Procedure for Calculating Quartiles</h3>
+<ul><li>Order the data from smallest to largest.</li><li>Find the median. This is \(Q_2\).</li><li>\(Q_1\) is the median of the lower half, not including \(Q_2\).</li><li>\(Q_3\) is the median of the upper half.</li></ul>
+<div class="definition"><strong>Five Number Summary</strong> — the low score, \(Q_1\), \(Q_2\), \(Q_3\), and the high score.</div>
+
+<article class="card example"><h3>Example 6</h3><p>Find the quartiles for each data set:</p>
+<ul><li>Data set #1: 1, 2, 3, 4, 5, 6</li><li>Data set #2: 1, 2, 3, 4, 5, 6, 7</li><li>Data set #3: 1, 2, 3, 4, 5, 6, 7, 8</li><li>Data set #4: 1, 2, 3, 4, 5, 6, 7, 8, 9</li></ul>
+<details class="answer"><summary>Show Answers</summary><div class="answer-body">
+<ul><li>#1: \(Q_1=2,\ Q_2=3.5,\ Q_3=5\)</li><li>#2: \(Q_1=2,\ Q_2=4,\ Q_3=6\)</li><li>#3: \(Q_1=2.5,\ Q_2=4.5,\ Q_3=6.5\)</li><li>#4: \(Q_1=2.5,\ Q_2=5,\ Q_3=7.5\)</li></ul>
+</div></details></article>
+
+<h3>Money-in-Pockets Example</h3>
+<p>In graduate school, a group of faculty and graduate students in a meeting were asked how much money they had in their pockets. The five-number summaries were:</p>
+<table><thead><tr><th>Group</th><th>Low</th><th>\(Q_1\)</th><th>\(Q_2\)</th><th>\(Q_3\)</th><th>High</th></tr></thead>
+<tbody><tr><td>Students</td><td>0</td><td>1</td><td>5</td><td>7</td><td>10</td></tr><tr><td>Faculty</td><td>10</td><td>15</td><td>25</td><td>31</td><td>73</td></tr></tbody></table>
+<p>The value of 73 in the faculty data would be considered extreme.</p>
+</section>
+
+<section id="dispersion" class="section">
+<h2>3. Measures of Dispersion (Variability)</h2>
+<p>A measure of dispersion is a measure of the spread of the data points, or how much variability there is in the data set. Two distributions can have the same measures of center but still be very different because one has more variability.</p>
+<div class="card soft key-idea"><p>The most common way to numerically describe a data set is with <strong>a measure of center and a measure of dispersion</strong>.</p></div>
+
+<h3>Sample Range</h3>
+<div class="definition"><strong>Sample Range</strong> — represents the distance between the high and low value.</div>
+<div class="formula">\[\text{Range}=\text{High Score}-\text{Low Score}\]</div>
+<article class="card example"><h3>Example 7</h3><p>Years of experience for five faculty members: <strong>1, 30, 22, 10, 5</strong>.</p><p>Calculate the range.</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><div class="formula">\[30-1=29\]</div><p>The range is <strong>29 years</strong>.</p></div></details></article>
+<div class="card soft"><h3>Important Characteristics of the Range</h3><ul><li>Easy to compute.</li><li>Totally sensitive to extreme scores.</li><li>Not a good measure of dispersion in most cases.</li></ul></div>
+
+<h3>Interquartile Range (IQR)</h3>
+<div class="definition"><strong>Interquartile Range (IQR)</strong> — measures the range of the middle 50% of the data.</div>
+<div class="formula">\[\text{IQR}=Q_3-Q_1\]</div>
+<div class="card soft"><ul><li>Better than a typical range because it is not based on extreme values.</li><li>Still is not the best measure of dispersion in most cases.</li></ul></div>
+<article class="card example"><h3>Example 8</h3><p>Using the pocket-money five-number summaries, calculate the IQR for students and faculty.</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><p><strong>Students:</strong> \(7-1=6\)</p><p><strong>Faculty:</strong> \(31-15=16\)</p></div></details></article>
+
+<h3>Sample Variance</h3>
+<div class="definition"><strong>Sample Variance</strong> — measures the average squared distance the data values are from \(\bar{x}\).</div>
+<p><strong>Conceptual formula:</strong></p>
+<div class="formula">\[s^2=\frac{\sum (x-\bar{x})^2}{n-1}\]</div>
+<p><strong>Algebraic formula:</strong></p>
+<div class="formula">\[s^2=\frac{n\sum x^2-(\sum x)^2}{n(n-1)}\]</div>
+<ul><li>\(s^2\) is the sample variance</li><li>\(\sum\) means sum</li><li>\(x\) represents the data values</li><li>\(\bar{x}\) is the sample mean</li><li>\(n\) is the sample size</li></ul>
+<p>The conceptual formula comes directly from the definition. The algebraic formula is equivalent and is often easier when calculating variance by hand.</p>
+<div class="card soft"><h3>Why Square the Distances?</h3><p>If we calculate \(\sum(x-\bar{x})\), the result will always be zero. Values above the mean produce positive deviations and values below the mean produce negative deviations. Because the mean is the center, these balance out. Squaring prevents that cancellation.</p></div>
+<article class="card example"><h3>Example 9</h3><p><strong>Data: 1, 30, 22, 10, 5</strong></p><p>Calculate the variance.</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>\(n=5,\ \sum x=68,\ \sum x^2=1510\)</p><div class="formula">\[s^2=\frac{5(1510)-68^2}{5(4)}=\frac{2926}{20}=146.3\]</div></div></details></article>
+<div class="card soft"><h3>Important Characteristics of Variance</h3><ul><li>All data points are directly involved in the calculation.</li><li>Variance is in squared units, which makes it hard to interpret.</li></ul></div>
+
+<h3>Sample Standard Deviation</h3>
+<div class="definition"><strong>Sample Standard Deviation</strong> — measures the average distance the data values are from \(\bar{x}\).</div>
+<p>Variance is the average squared distance from the mean. To return to the original units of the data, we take the square root.</p>
+<div class="formula">\[s=\sqrt{s^2}\]</div>
+<article class="card example"><h3>Example 10</h3><p><strong>Data: 1, 30, 22, 10, 5</strong></p><p>Calculate the standard deviation.</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><div class="formula">\[s=\sqrt{146.3}\approx12.10\]</div><p>The sample standard deviation is approximately <strong>12.10 years</strong>.</p></div></details></article>
+<div class="card soft key-idea"><h3>Important Characteristics of Standard Deviation</h3><ul><li>Standard deviation uses the same units as the data.</li><li>Standard deviation is the most common measure of dispersion.</li></ul></div>
+</section>
+
+<div class="back-row" style="margin-top:36px">
+<a class="btn outline btn-sm" href="index.html">← Back to STA210U Notes</a>
+<a class="btn btn-sm" href="STA210U_Section_2B_Numerical_Descriptions_for_Univariate_Data.docx" download>Download Word Notes</a>
+</div>
+<footer class="notes-footer">Last updated: <span id="lastUpdated"></span></footer>
+</div></main>
+<script>document.getElementById('lastUpdated').textContent=new Date(document.lastModified).toLocaleString();</script>
+</body></html>
