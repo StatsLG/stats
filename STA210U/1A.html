@@ -3,15 +3,31 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>STA210U — Section 1A | StatsLG</title>
-  <meta name="description" content="STA210U Section 1A - Introduction to Statistics." />
+
+  <meta
+    name="description"
+    content="STA210U Section 1A — Introduction to Statistics."
+  />
+
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css">
 
   <style>
-    /* Section-note helpers that build on bctcstyle.css */
+    /* =========================================================
+       STA210U NOTES PAGE
+       ========================================================= */
+
+    .notes-page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 40px;
+    }
+
     .notes-content {
       max-width: 900px;
+      margin: 0 auto;
     }
 
     .notes-content h2 {
@@ -29,8 +45,25 @@
       line-height: 1.65;
     }
 
+
+    /* ---------- Top / Bottom Buttons ---------- */
+
+    .back-row {
+      margin: 0 0 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+
+    /* ---------- Table of Contents ---------- */
+
     .toc {
       margin-bottom: 1.5rem;
+    }
+
+    .toc h2 {
+      margin-top: 0;
     }
 
     .toc a {
@@ -41,6 +74,9 @@
     .toc a:hover {
       text-decoration: underline;
     }
+
+
+    /* ---------- Definitions ---------- */
 
     .definition {
       border-left: 5px solid var(--kctcs-blue);
@@ -54,6 +90,9 @@
       color: var(--kctcs-blue);
     }
 
+
+    /* ---------- Examples ---------- */
+
     .example {
       margin: 18px 0;
     }
@@ -62,6 +101,9 @@
     .example > h4 {
       margin-top: 0;
     }
+
+
+    /* ---------- Answer Dropdowns ---------- */
 
     details.answer {
       margin-top: 14px;
@@ -75,6 +117,10 @@
       font-weight: 800;
     }
 
+    details.answer summary:hover {
+      text-decoration: underline;
+    }
+
     details.answer[open] summary {
       margin-bottom: 10px;
     }
@@ -86,646 +132,1296 @@
       border-radius: 0 var(--radius) var(--radius) 0;
     }
 
-    .back-row {
-      margin: 0 0 16px;
-    }
+
+    /* ---------- Treatment Table ---------- */
 
     .treatment-table {
       max-width: 620px;
-      margin: 16px 0;
+      margin: 18px 0;
     }
 
+
+    /* ---------- Key Idea Box ---------- */
+
+    .key-idea {
+      border-left: 5px solid var(--kctcs-gold);
+    }
+
+
+    /* ---------- Footer ---------- */
+
+    .notes-footer {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid var(--rule);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+
+    /* ---------- Mobile ---------- */
+
+    @media (max-width: 760px) {
+
+      .notes-page {
+        padding: 20px 16px;
+      }
+
+      .back-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .back-row .btn {
+        justify-content: center;
+      }
+    }
+
+
+    /* ---------- Print ---------- */
+
     @media print {
+
+      .back-row {
+        display: none;
+      }
+
+      .notes-page {
+        max-width: none;
+        padding: 0;
+      }
+
+      .notes-content {
+        max-width: none;
+      }
+
       details.answer > * {
         display: block !important;
       }
     }
+
   </style>
 </head>
 
+
 <body>
-  <div class="wrap">
 
-    <!-- Shared BCTC / StatsLG sidebar -->
-    <aside class="sidebar"
-           aria-label="Site navigation"
-           data-include="/partials/sidebar.html"></aside>
+  <main class="notes-page">
 
-    <main>
-      <div class="notes-content">
+    <div class="notes-content">
 
-        <div class="back-row">
-          <a class="btn outline btn-sm" href="index.html">← Back to STA210U Notes</a>
-        </div>
 
-        <header class="header">
-          <h1>STA210U — Section 1A</h1>
-          <p>Introduction and Data Collection: Introduction to Statistics</p>
-        </header>
+      <!-- =====================================================
+           TOP NAVIGATION
+           ===================================================== -->
 
-        <div style="margin-bottom: 18px;">
-          <a class="btn" href="STA210U_Section_1A.docx" download>
-            Download Word Notes
-          </a>
-        </div>
+      <div class="back-row">
 
-        <section class="section panel pad toc">
-          <h2>In This Section</h2>
-          <ul>
-            <li><a href="#terminology">Basic Statistical Terminology</a></li>
-            <li><a href="#branches">Branches of Statistics</a></li>
-            <li><a href="#studies">Types of Studies</a></li>
-            <li><a href="#data">Types of Data</a></li>
-            <li><a href="#measurement">Levels of Measurement</a></li>
-          </ul>
-        </section>
+        <a
+          class="btn outline btn-sm"
+          href="index.html"
+        >
+          ← Back to STA210U Notes
+        </a>
 
-
-        <!-- ===================================================== -->
-        <!-- 1. BASIC STATISTICAL TERMINOLOGY -->
-        <!-- ===================================================== -->
-
-        <section id="terminology" class="section">
-          <h2>1. Basic Statistical Terminology</h2>
-
-          <div class="card soft">
-            <h3>How do you define statistics?</h3>
-            <p>What do you think of when you hear the term statistics?</p>
-            <p>Can you think of examples where you see statistics utilized?</p>
-          </div>
-
-          <p>
-            Statistics are commonly used in most fields of study and are regularly
-            seen in newspapers, on television, and in professional work.
-          </p>
-
-          <p>
-            Finding examples pertinent to your interests should be quite easy.
-            Below are a few of the many possible examples:
-          </p>
-
-          <div class="grid">
-            <article class="card">
-              <h3>Sports</h3>
-              <ul>
-                <li>Free throw percentage in basketball</li>
-                <li>Quarterback rating in football</li>
-                <li>RBIs in baseball</li>
-                <li>Assists in soccer</li>
-              </ul>
-            </article>
-
-            <article class="card">
-              <h3>Medical</h3>
-              <ul>
-                <li>The success rates and likelihood of side effects with a weight-loss drug</li>
-                <li>The percentage of people who go into remission with a type of cancer</li>
-                <li>The effect of a drug on blood pressure</li>
-              </ul>
-            </article>
-
-            <article class="card">
-              <h3>Education</h3>
-              <ul>
-                <li>Writing down material helps in comprehension</li>
-                <li>Reading test scores in 1st graders are different for males and females</li>
-                <li>Depression is more likely in a student with low academic achievement</li>
-              </ul>
-            </article>
-
-            <article class="card">
-              <h3>Politics</h3>
-              <ul>
-                <li>Prediction that the incumbent president will be re-elected</li>
-                <li>Approval rating of the Senate</li>
-                <li>Percentage of people in Kentucky who support a bill that just passed</li>
-              </ul>
-            </article>
-          </div>
-
-          <h3>Definition of Statistics</h3>
-
-          <div class="definition">
-            <strong>Statistics</strong> — study of how to collect, organize,
-            analyze, and interpret information.
-          </div>
-
-          <p>
-            The advantage of statistics is that it gives a process for estimation
-            and decision making when faced with uncertainties without prejudice
-            (bias). This ideal will be discussed throughout the material this semester.
-          </p>
-
-          <p>
-            In order to understand the statistical process, we will begin with
-            some basic statistical terminology.
-          </p>
-
-          <div class="definition">
-            <strong>Population</strong> — the collection of individuals or items of interest.
-          </div>
-
-          <p><strong>Examples</strong></p>
-          <ol>
-            <li>All residents of the United States</li>
-            <li>All admits to hospitals in Lexington, KY</li>
-          </ol>
-
-          <div class="definition">
-            <strong>Census</strong> — measurements from the entire population are used.
-          </div>
-
-          <h3>When do you see a census utilized?</h3>
-
-          <p>
-            A common response: every 10 years the U.S. Census Bureau conducts a census.
-            They attempt to reach every resident in the United States.
-          </p>
-
-          <div class="card soft">
-            <h3>Think About It</h3>
-            <p>Do you think reaching every resident is possible? What problems do you think they face?</p>
-            <ul>
-              <li>
-                One of the biggest problems is the homeless population in the U.S.
-                It is difficult to contact or even know how many are in this group.
-              </li>
-              <li>
-                The Census Bureau, unlike most organizations, has legal authority
-                which obligates people to fill out the census. Therefore, they come
-                very close to having a true census.
-              </li>
-            </ul>
-          </div>
-
-          <p>
-            Often, it is not feasible to study the entire population. The main reasons
-            are as follows:
-          </p>
-
-          <ul>
-            <li>
-              A census is rarely attempted because of the cost. It is very expensive
-              to conduct a census unless you are dealing with a very small population.
-            </li>
-            <li>
-              In statistical practice, it is not usually possible to get everyone
-              (or even close) to take part in a given study. Participants must agree
-              to take part in the study and obviously everyone will not agree.
-            </li>
-          </ul>
-
-          <div class="card soft">
-            <h3>So if we cannot take measurements from the entire population, what should we do?</h3>
-            <p>
-              We often take measurements from a subset or smaller group of individuals
-              instead of from the population.
-            </p>
-          </div>
-
-          <h3>Important Terminology</h3>
-
-          <div class="definition">
-            <strong>Sample</strong> — the subset of the population on which we make measurements.
-          </div>
-
-          <div class="definition">
-            <strong>Data</strong> — the measurements we collect.
-          </div>
-
-          <div class="definition">
-            <strong>Individuals</strong> — the objects described by a set of data.
-            Individuals can be people, animals, or things.
-          </div>
-
-          <div class="definition">
-            <strong>Variable</strong> — any characteristic of an individual that can
-            take different values for different individuals.
-          </div>
-
-          <div class="definition">
-            <strong>Statistic</strong> — a numerical characteristic of a sample.
-          </div>
-
-          <p>
-            This value is known when we take our sample, but it will change from sample to sample.
-          </p>
-
-          <div class="definition">
-            <strong>Parameter</strong> — a numerical characteristic of a population.
-          </div>
-
-          <p>
-            This value is a fixed number, but we could only know its value if we did a perfect census.
-            Since the population is often not available, we use statistics to estimate parameters.
-          </p>
-
-          <article class="card example">
-            <h3>Example</h3>
-
-            <p>
-              Suppose we are interested in estimating the average income for all residents
-              of the state of Kentucky and we select 1,000 people from the state and collect
-              their incomes. Answer the following questions based on this scenario.
-            </p>
-
-            <ol>
-              <li>What is the population?</li>
-              <li>What is the sample?</li>
-              <li>What is the data?</li>
-              <li>Who are the individuals?</li>
-              <li>What is the variable?</li>
-              <li>What is the parameter?</li>
-              <li>What is the statistic?</li>
-              <li>If we had taken measurements from all residents of Kentucky, this would be called what?</li>
-            </ol>
-
-            <details class="answer">
-              <summary>Show Answers</summary>
-              <div class="answer-body">
-                <ol>
-                  <li>All residents of the state of Kentucky</li>
-                  <li>The 1,000 people selected from the state</li>
-                  <li>The list of the 1,000 incomes collected from the sample</li>
-                  <li>Each person in the sample</li>
-                  <li>Income (it is different for each individual)</li>
-                  <li>The average income for all residents of the state of Kentucky</li>
-                  <li>The average income for the 1,000 people selected from the state</li>
-                  <li>A census</li>
-                </ol>
-              </div>
-            </details>
-          </article>
-        </section>
-
-
-        <!-- ===================================================== -->
-        <!-- 2. BRANCHES OF STATISTICS -->
-        <!-- ===================================================== -->
-
-        <section id="branches" class="section">
-          <h2>2. Branches of Statistics</h2>
-
-          <p>
-            We are now ready to look at the two main parts or branches in the science of statistics.
-          </p>
-
-          <div class="definition">
-            <strong>Descriptive Statistics</strong> — methods of summarizing a set of data.
-          </div>
-
-          <p>
-            There is no error here because you are summarizing the data you have.
-          </p>
-
-          <div class="definition">
-            <strong>Inferential Statistics</strong> — methods of making inference about
-            a population based on the information in a sample.
-          </div>
-
-          <p>
-            There is error here because you do not have all of your data; you have a subset
-            of the population and cannot expect to be exactly correct. We can control and
-            calculate this error with probability. Therefore, probability will be covered
-            before inferential statistics.
-          </p>
-
-          <article class="card example">
-            <h3>Examples</h3>
-            <p>Identify each of the following as descriptive or inferential:</p>
-
-            <ol>
-              <li>A basketball player's free throw percentage based on performance up to the midpoint of the season</li>
-              <li>The average GPA for all current students based on complete data from the records office</li>
-              <li>The president's current approval rating based on a group of 5,000 U.S. residents</li>
-              <li>A graph showing all sales this year for all major vehicle manufacturers</li>
-              <li>Suppose I collect data from this class and use it to calculate the percentage of students from the class who live in Lexington</li>
-              <li>Suppose I collect data from this class and use it to estimate the percentage of all BCTC students who live in Lexington</li>
-            </ol>
-
-            <details class="answer">
-              <summary>Show Answers</summary>
-              <div class="answer-body">
-                <ol>
-                  <li><strong>Descriptive</strong> — there is no error since we know exactly how many free throws the player has shot and made at this point in the season.</li>
-                  <li><strong>Descriptive</strong> — there is no error since we have the GPA of all current students.</li>
-                  <li><strong>Inferential</strong> — we do not have data from the entire group of interest; we are using a sample of 5,000 U.S. residents to estimate the approval rating for all U.S. residents.</li>
-                  <li><strong>Descriptive</strong> — there is no error because we have all sales figures for the major vehicle manufacturers. Almost all graphs and charts are descriptive.</li>
-                  <li><strong>Descriptive</strong> — there is no error because we have data from the entire group.</li>
-                  <li><strong>Inferential</strong> — there is error because we are estimating the population of all BCTC students with data from a sample, the students in this class.</li>
-                </ol>
-              </div>
-            </details>
-          </article>
-
-          <div class="card soft">
-            <h3>Key Idea</h3>
-            <p>
-              Notice that examples 5 and 6 yield the same data. However, the question is
-              different, which leads to the analysis being descriptive in one case and
-              inferential in the other. The group of interest is key to identifying if
-              there will be error.
-            </p>
-          </div>
-        </section>
-
-
-        <!-- ===================================================== -->
-        <!-- 3. TYPES OF STUDIES -->
-        <!-- ===================================================== -->
-
-        <section id="studies" class="section">
-          <h2>3. Types of Studies</h2>
-
-          <div class="definition">
-            <strong>Study</strong> — a method of collecting and processing data.
-          </div>
-
-          <p>There are three common types of studies which are introduced in this section.</p>
-
-          <div class="definition">
-            <strong>Observational Study</strong> — observes individuals and measures
-            variables of interest but does not attempt to influence responses.
-          </div>
-
-          <div class="definition">
-            <strong>Simulation</strong> — a numerical facsimile of real-world phenomena.
-            Simulations can fit real-world problems extremely well and can study things
-            that might be dangerous to human life. They are not used unless necessary
-            because they are very expensive in terms of human labor and computer resources.
-          </div>
-
-          <div class="definition">
-            <strong>Experiment</strong> — deliberately imposes some treatment on individuals
-            in order to observe their responses. The purpose is to study if the treatment
-            causes a change in the response.
-          </div>
-
-          <h3>Terminology Used When Conducting an Experiment</h3>
-
-          <div class="definition">
-            <strong>Subjects</strong> — the individuals studied in an experiment.
-          </div>
-
-          <div class="definition">
-            <strong>Treatment</strong> — one or a combination of treatment variables assigned by the experimenter.
-          </div>
-
-          <div class="definition">
-            <strong>Treatment Diagram</strong> — a table that is useful in determining all treatment combinations.
-          </div>
-
-          <article class="card example">
-            <h3>Example</h3>
-
-            <p>
-              Suppose we are conducting an experiment on weight loss and are interested
-              in testing the effect of diet (fat-free and Atkins) and exercise
-              (swimming, walking, and cycling).
-            </p>
-
-            <p>
-              In order to figure out the number of treatment combinations in an experiment,
-              take the number of categories from each of the treatment variables and multiply.
-              In this example:
-            </p>
-
-            <p><strong>2 diets × 3 exercise types = 6 treatment combinations</strong></p>
-
-            <table class="treatment-table">
-              <thead>
-                <tr>
-                  <th>Exercise</th>
-                  <th>Fat-Free</th>
-                  <th>Atkins</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Swimming</td>
-                  <td>1</td>
-                  <td>2</td>
-                </tr>
-                <tr>
-                  <td>Walking</td>
-                  <td>3</td>
-                  <td>4</td>
-                </tr>
-                <tr>
-                  <td>Cycling</td>
-                  <td>5</td>
-                  <td>6</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <p>
-              When conducting a study, subjects must be included in all treatment
-              combinations in order to run statistical tests on each of the treatment
-              variables. A test can also be conducted that will look at the relationship
-              among the treatment variables.
-            </p>
-          </article>
-
-          <article class="card example">
-            <h3>Examples</h3>
-
-            <p>
-              Identify each of the following studies as an observational study,
-              experiment, or simulation.
-            </p>
-
-            <ol>
-              <li>In a medical study, patients are given a drug at various dosage levels to study effectiveness.</li>
-              <li>Various vehicles are studied to see which are safest in a head-on collision.</li>
-              <li>The outcome of an upcoming presidential election is predicted by asking individuals over the telephone for who they plan to vote.</li>
-              <li>Change a container from Pepsi to Coke and calculate the percentage of people who notice the change.</li>
-            </ol>
-
-            <details class="answer">
-              <summary>Show Answers</summary>
-              <div class="answer-body">
-                <ol>
-                  <li><strong>Experiment</strong> — the drug is imposed and the point is to measure the effect of the drug at different dosages.</li>
-                  <li><strong>Simulation</strong> — car crash tests commonly use a simulation because conducting the experiment with people inside the vehicles would be unsafe.</li>
-                  <li><strong>Observational Study</strong> — this is a typical survey where we are not trying to influence responses.</li>
-                  <li><strong>Experiment</strong> — the change from Pepsi to Coke is imposed and researchers measure whether people notice the change.</li>
-                </ol>
-              </div>
-            </details>
-          </article>
-        </section>
-
-
-        <!-- ===================================================== -->
-        <!-- 4. TYPES OF DATA -->
-        <!-- ===================================================== -->
-
-        <section id="data" class="section">
-          <h2>4. Types of Data</h2>
-
-          <div class="definition">
-            <strong>Qualitative (Categorical) Variable</strong> — places responses
-            into categories and there is no numerical meaning to the outcomes
-            (non-numerical data).
-          </div>
-
-          <div class="definition">
-            <strong>Quantitative Variable</strong> — numeric values that have
-            numerical meaning (numerical data).
-          </div>
-
-          <ul>
-            <li><strong>Discrete Variable</strong> — things that can be counted.</li>
-            <li><strong>Continuous Variable</strong> — things that are measured.</li>
-          </ul>
-
-          <article class="card example">
-            <h3>Examples</h3>
-            <p>Identify the data type for each of the following:</p>
-
-            <ol>
-              <li>Gender</li>
-              <li>Time to run a mile</li>
-              <li>Number of soccer goals scored</li>
-              <li>Political preference</li>
-              <li>Distance to drive to work</li>
-              <li>Number of children</li>
-              <li>Social Security number</li>
-            </ol>
-
-            <details class="answer">
-              <summary>Show Answers</summary>
-              <div class="answer-body">
-                <ol>
-                  <li>Qualitative</li>
-                  <li>Quantitative (Continuous)</li>
-                  <li>Quantitative (Discrete)</li>
-                  <li>Qualitative</li>
-                  <li>Quantitative (Continuous)</li>
-                  <li>Quantitative (Discrete)</li>
-                  <li>Qualitative</li>
-                </ol>
-              </div>
-            </details>
-          </article>
-        </section>
-
-
-        <!-- ===================================================== -->
-        <!-- 5. LEVELS OF MEASUREMENT -->
-        <!-- ===================================================== -->
-
-        <section id="measurement" class="section">
-          <h2>5. Levels of Measurement</h2>
-
-          <div class="definition">
-            <strong>Nominal Level</strong> — identifies the individual or a
-            characteristic. These quantities have no implied criteria.
-          </div>
-
-          <div class="definition">
-            <strong>Ordinal Level</strong> — like nominal with the addition
-            of values being arranged in some order. Provides relative comparisons,
-            but actual differences between data values either cannot be determined
-            or are meaningless.
-          </div>
-
-          <div class="definition">
-            <strong>Interval Level</strong> — like ordinal, with the addition
-            of meaningful differences between data values. It does not have an
-            intrinsic zero or starting point, meaning differences are meaningful,
-            but ratios of data values are not.
-          </div>
-
-          <div class="definition">
-            <strong>Ratio Level</strong> — similar to interval, with the addition
-            of an intrinsic zero which forces both differences and ratios to be meaningful.
-          </div>
-
-          <article class="card example">
-            <h3>Examples</h3>
-
-            <p>Identify the level of measurement for each of the following:</p>
-
-            <ol>
-              <li>Gender</li>
-              <li>Time to run a mile</li>
-              <li>Number of soccer goals scored</li>
-              <li>Political preference</li>
-              <li>Distance to drive to work</li>
-              <li>Number of children</li>
-              <li>Social Security number</li>
-              <li>Ranking of all college football teams</li>
-              <li>Temperature measured in Fahrenheit</li>
-            </ol>
-
-            <details class="answer">
-              <summary>Show Answers</summary>
-              <div class="answer-body">
-                <ol>
-                  <li>Nominal</li>
-                  <li>Ratio</li>
-                  <li>Ratio</li>
-                  <li>Nominal</li>
-                  <li>Ratio</li>
-                  <li>Ratio</li>
-                  <li>Nominal</li>
-                  <li>Ordinal</li>
-                  <li>Interval</li>
-                </ol>
-              </div>
-            </details>
-          </article>
-        </section>
-
-        <footer class="site-footer">
-          Last updated: <span id="lastUpdated"></span>
-        </footer>
+        <a
+          class="btn btn-sm"
+          href="STA210U_Section_1A_Introduction_to_Statistics.docx"
+          download
+        >
+          Download Word Notes
+        </a>
 
       </div>
-    </main>
-  </div>
+
+
+      <!-- =====================================================
+           HEADER
+           ===================================================== -->
+
+      <header class="header">
+
+        <h1>STA210U — Section 1A</h1>
+
+        <p>
+          Introduction and Data Collection:
+          Introduction to Statistics
+        </p>
+
+      </header>
+
+
+      <!-- =====================================================
+           TABLE OF CONTENTS
+           ===================================================== -->
+
+      <section class="section panel pad toc">
+
+        <h2>In This Section</h2>
+
+        <ul>
+          <li><a href="#terminology">Basic Statistical Terminology</a></li>
+          <li><a href="#branches">Branches of Statistics</a></li>
+          <li><a href="#studies">Types of Studies</a></li>
+          <li><a href="#data-types">Types of Data</a></li>
+          <li><a href="#measurement">Levels of Measurement</a></li>
+        </ul>
+
+      </section>
+
+
+      <!-- =====================================================
+           1. BASIC STATISTICAL TERMINOLOGY
+           ===================================================== -->
+
+      <section id="terminology" class="section">
+
+        <h2>1. Basic Statistical Terminology</h2>
+
+
+        <div class="card soft">
+
+          <h3>How do you define statistics?</h3>
+
+          <p>
+            What do you think of when you hear the term statistics?
+          </p>
+
+          <p>
+            Can you think of examples where you see statistics utilized?
+          </p>
+
+        </div>
+
+
+        <p>
+          Statistics are commonly used in most fields of study
+          and are regularly seen in newspapers, on television,
+          and in professional work.
+        </p>
+
+        <p>
+          Finding examples pertinent to your interests should
+          be quite easy. Below are a few of the many possible examples:
+        </p>
+
+
+        <!-- Examples of Statistics -->
+
+        <div class="grid">
+
+          <article class="card">
+
+            <h3>Sports</h3>
+
+            <ul>
+              <li>Free throw percentage in basketball</li>
+              <li>Quarterback rating in football</li>
+              <li>RBIs in baseball</li>
+              <li>Assists in soccer</li>
+            </ul>
+
+          </article>
+
+
+          <article class="card">
+
+            <h3>Medical</h3>
+
+            <ul>
+              <li>
+                The success rates and likelihood of side effects
+                with a weight-loss drug
+              </li>
+
+              <li>
+                The percentage of people who go into remission
+                with a type of cancer
+              </li>
+
+              <li>
+                The effect of a drug on blood pressure
+              </li>
+            </ul>
+
+          </article>
+
+
+          <article class="card">
+
+            <h3>Education</h3>
+
+            <ul>
+              <li>
+                Writing down material helps in comprehension
+              </li>
+
+              <li>
+                Reading test scores in 1st graders are different
+                for males and females
+              </li>
+
+              <li>
+                Depression is more likely in a student with low
+                academic achievement
+              </li>
+            </ul>
+
+          </article>
+
+
+          <article class="card">
+
+            <h3>Politics</h3>
+
+            <ul>
+              <li>
+                Prediction that the incumbent president will
+                be re-elected
+              </li>
+
+              <li>
+                Approval rating of the Senate
+              </li>
+
+              <li>
+                Percentage of people in Kentucky who support
+                a bill that just passed
+              </li>
+            </ul>
+
+          </article>
+
+        </div>
+
+
+        <!-- Definition of Statistics -->
+
+        <h3>Definition of Statistics</h3>
+
+        <div class="definition">
+
+          <strong>Statistics</strong> — the study of how to
+          collect, organize, analyze, and interpret information.
+
+        </div>
+
+
+        <p>
+          The advantage of statistics is that it gives a process
+          for estimation and decision making when faced with
+          uncertainties without prejudice (bias).
+        </p>
+
+        <p>
+          This ideal will be discussed throughout the material
+          this semester.
+        </p>
+
+        <p>
+          In order to understand the statistical process, we
+          will begin with some basic statistical terminology.
+        </p>
+
+
+        <!-- Population -->
+
+        <div class="definition">
+
+          <strong>Population</strong> — the collection of
+          individuals or items of interest.
+
+        </div>
+
+
+        <p>
+          <strong>Examples:</strong>
+        </p>
+
+        <ol>
+          <li>All residents of the United States</li>
+          <li>All admits to hospitals in Lexington, KY</li>
+        </ol>
+
+
+        <!-- Census -->
+
+        <div class="definition">
+
+          <strong>Census</strong> — measurements from the
+          entire population are used.
+
+        </div>
+
+
+        <h3>When do you see a census utilized?</h3>
+
+
+        <p>
+          A common response: every 10 years the U.S. Census
+          Bureau conducts a census.
+        </p>
+
+        <ul>
+
+          <li>
+            They attempt to reach every resident in the United States.
+
+            <ul>
+
+              <li>
+                Do you think this is possible?
+                What problems do you think they face?
+              </li>
+
+              <li>
+                One of the biggest problems is the homeless
+                population in the U.S. It is difficult to contact
+                or even know how many are in this group.
+              </li>
+
+              <li>
+                The Census Bureau, unlike most organizations,
+                has legal authority which obligates people to
+                fill out the census. Therefore, they come very
+                close to having a true census.
+              </li>
+
+            </ul>
+
+          </li>
+
+        </ul>
+
+
+        <p>
+          Often, it is not feasible to study the entire population.
+          The main reasons are as follows:
+        </p>
+
+        <ul>
+
+          <li>
+            A census is rarely attempted because of the cost.
+            It is very expensive to conduct a census unless you
+            are dealing with a very small population.
+          </li>
+
+          <li>
+            In statistical practice, it is not usually possible
+            to get everyone (or even close) to take part in a
+            given study.
+          </li>
+
+          <li>
+            Participants must agree to take part in the study
+            and obviously everyone will not agree.
+          </li>
+
+        </ul>
+
+
+        <div class="card soft key-idea">
+
+          <h3>
+            So if we cannot take measurements from the entire
+            population, what should we do?
+          </h3>
+
+          <p>
+            We often take measurements from a subset or smaller
+            group of individuals instead of from the population.
+          </p>
+
+        </div>
+
+
+        <!-- Core Terms -->
+
+        <h3>Important Terminology</h3>
+
+
+        <div class="definition">
+
+          <strong>Sample</strong> — the subset of the population
+          on which we make measurements.
+
+        </div>
+
+
+        <div class="definition">
+
+          <strong>Data</strong> — the measurements we collect.
+
+        </div>
+
+
+        <div class="definition">
+
+          <strong>Individuals</strong> — the objects described
+          by a set of data. Individuals can be people, animals,
+          or things.
+
+        </div>
+
+
+        <div class="definition">
+
+          <strong>Variable</strong> — any characteristic of an
+          individual that can take different values for different
+          individuals.
+
+        </div>
+
+
+        <div class="definition">
+
+          <strong>Statistic</strong> — a numerical characteristic
+          of a sample.
+
+        </div>
+
+
+        <p>
+          This value is known when we take our sample, but it
+          will change from sample to sample.
+        </p>
+
+
+        <div class="definition">
+
+          <strong>Parameter</strong> — a numerical characteristic
+          of a population.
+
+        </div>
+
+
+        <p>
+          This value is a fixed number, but we could only know
+          its value if we did a perfect census.
+        </p>
+
+        <p>
+          Since the population is often not available, we use
+          statistics to estimate parameters.
+        </p>
+
+
+        <!-- Kentucky Income Example -->
+
+        <article class="card example">
+
+          <h3>Example</h3>
+
+          <p>
+            Suppose we are interested in estimating the average
+            income for all residents of the state of Kentucky
+            and we select 1,000 people from the state and collect
+            their incomes.
+          </p>
+
+          <p>
+            Answer the following questions based on this scenario.
+          </p>
+
+          <ol>
+
+            <li>What is the population?</li>
+
+            <li>What is the sample?</li>
+
+            <li>What is the data?</li>
+
+            <li>Who are the individuals?</li>
+
+            <li>What is the variable?</li>
+
+            <li>What is the parameter?</li>
+
+            <li>What is the statistic?</li>
+
+            <li>
+              If we had taken measurements from all residents
+              of Kentucky, this would be called what?
+            </li>
+
+          </ol>
+
+
+          <details class="answer">
+
+            <summary>Show Answers</summary>
+
+            <div class="answer-body">
+
+              <ol>
+
+                <li>
+                  All residents of the state of Kentucky
+                </li>
+
+                <li>
+                  The 1,000 people selected from the state
+                </li>
+
+                <li>
+                  The list of the 1,000 incomes collected
+                  from the sample
+                </li>
+
+                <li>
+                  Each person in the sample
+                </li>
+
+                <li>
+                  Income
+                </li>
+
+                <li>
+                  The average income for all residents of
+                  the state of Kentucky
+                </li>
+
+                <li>
+                  The average income for the 1,000 people
+                  selected from the state
+                </li>
+
+                <li>
+                  A census
+                </li>
+
+              </ol>
+
+            </div>
+
+          </details>
+
+        </article>
+
+      </section>
+
+
+      <!-- =====================================================
+           2. BRANCHES OF STATISTICS
+           ===================================================== -->
+
+      <section id="branches" class="section">
+
+        <h2>2. Branches of Statistics</h2>
+
+
+        <p>
+          We are now ready to look at the two main parts or
+          branches in the science of statistics.
+        </p>
+
+
+        <div class="definition">
+
+          <strong>Descriptive Statistics</strong> — methods of
+          summarizing a set of data.
+
+        </div>
+
+
+        <p>
+          There is no error here because you are summarizing
+          the data you have.
+        </p>
+
+
+        <div class="definition">
+
+          <strong>Inferential Statistics</strong> — methods of
+          making inference about a population based on the
+          information in a sample.
+
+        </div>
+
+
+        <p>
+          There is error here because you do not have all of your
+          data; you have a subset of the population and cannot
+          expect to be exactly correct.
+        </p>
+
+        <p>
+          We can control and calculate this error with probability.
+          Therefore, probability will be covered before inferential
+          statistics.
+        </p>
+
+
+        <!-- Descriptive vs Inferential -->
+
+        <article class="card example">
+
+          <h3>Examples</h3>
+
+          <p>
+            Identify each of the following as a descriptive or
+            inferential statistic:
+          </p>
+
+          <ol>
+
+            <li>
+              A basketball player's free throw percentage based
+              on their performance up to the midpoint of the season
+            </li>
+
+            <li>
+              The average GPA for all current students based on
+              complete data from the records office
+            </li>
+
+            <li>
+              The president's current approval rating based on
+              a group of 5,000 U.S. residents
+            </li>
+
+            <li>
+              A graph showing all sales this year for all major
+              vehicle manufacturers
+            </li>
+
+            <li>
+              Suppose I collect data from this class and use it
+              to calculate the percentage of students from the
+              class who live in Lexington
+            </li>
+
+            <li>
+              Suppose I collect data from this class and use it
+              to estimate the percentage of all BCTC students
+              who live in Lexington
+            </li>
+
+          </ol>
+
+
+          <details class="answer">
+
+            <summary>Show Answers</summary>
+
+            <div class="answer-body">
+
+              <ol>
+
+                <li>
+                  <strong>Descriptive statistic</strong> —
+                  there is no error since we know exactly how
+                  many free throws the player has shot and made
+                  at this point in the season.
+                </li>
+
+                <li>
+                  <strong>Descriptive statistic</strong> —
+                  there is no error since we have the GPA of all
+                  current students.
+                </li>
+
+                <li>
+                  <strong>Inferential statistic</strong> —
+                  there is error because we do not have data from
+                  the entire group of interest. We are using a
+                  sample of 5,000 U.S. residents to estimate the
+                  approval rating for the population of all U.S.
+                  residents.
+                </li>
+
+                <li>
+                  <strong>Descriptive statistic</strong> —
+                  there is no error because we have all sales
+                  figures for the major vehicle manufacturers.
+                  Almost all graphs and charts are descriptive.
+                </li>
+
+                <li>
+                  <strong>Descriptive statistic</strong> —
+                  there is no error because we have data from
+                  the entire group.
+                </li>
+
+                <li>
+                  <strong>Inferential statistic</strong> —
+                  there is error because we are estimating the
+                  population of all students at BCTC with data
+                  from a sample, the students in this class.
+                </li>
+
+              </ol>
+
+            </div>
+
+          </details>
+
+        </article>
+
+
+        <div class="card soft key-idea">
+
+          <h3>Key Idea</h3>
+
+          <p>
+            Notice that examples 5 and 6 above yield the same
+            data. However, the question is different which leads
+            to the analysis being descriptive in one case and
+            inferential in the other.
+          </p>
+
+          <p>
+            <strong>
+              The group of interest is key to identifying if
+              there will be error.
+            </strong>
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================================
+           3. TYPES OF STUDIES
+           ===================================================== -->
+
+      <section id="studies" class="section">
+
+        <h2>3. Types of Studies</h2>
+
+
+        <div class="definition">
+
+          <strong>Study</strong> — a method of collecting and
+          processing data.
+
+        </div>
+
+
+        <p>
+          There are three common types of studies which are
+          introduced in this section.
+        </p>
+
+
+        <!-- Observational -->
+
+        <div class="definition">
+
+          <strong>Observational Study</strong> — observes
+          individuals and measures variables of interest but
+          does not attempt to influence responses.
+
+        </div>
+
+
+        <!-- Simulation -->
+
+        <div class="definition">
+
+          <strong>Simulation</strong> — a numerical facsimile
+          of real-world phenomena.
+
+        </div>
+
+
+        <p>
+          Simulations can fit real-world problems extremely well
+          and can study things that might be dangerous to human life.
+        </p>
+
+        <p>
+          They are not used unless necessary because they are
+          very expensive with the man hours and computer resources
+          required.
+        </p>
+
+
+        <!-- Experiment -->
+
+        <div class="definition">
+
+          <strong>Experiment</strong> — deliberately imposes
+          some treatment on individuals in order to observe
+          their responses.
+
+        </div>
+
+
+        <p>
+          The purpose is to study if the treatment causes a
+          change in the response.
+        </p>
+
+
+        <!-- Experiment Terminology -->
+
+        <h3>Terminology Used When Conducting an Experiment</h3>
+
+
+        <div class="definition">
+
+          <strong>Subjects</strong> — the individuals studied
+          in an experiment.
+
+        </div>
+
+
+        <div class="definition">
+
+          <strong>Treatment</strong> — one or a combination
+          of treatment variables assigned by the experimenter.
+
+        </div>
+
+
+        <div class="definition">
+
+          <strong>Treatment Diagram</strong> — a table that is
+          useful in determining all treatment combinations.
+
+        </div>
+
+
+        <!-- Treatment Diagram Example -->
+
+        <article class="card example">
+
+          <h3>Example</h3>
+
+
+          <p>
+            Suppose we are conducting an experiment on weight loss
+            and are interested in testing the effect of:
+          </p>
+
+          <ul>
+
+            <li>
+              <strong>Diet:</strong>
+              Fat-free and Atkins
+            </li>
+
+            <li>
+              <strong>Exercise:</strong>
+              Swimming, walking, and cycling
+            </li>
+
+          </ul>
+
+
+          <p>
+            In order to figure out the number of treatment
+            combinations in an experiment, you must take the
+            number of categories from each of the treatment
+            variables and multiply.
+          </p>
+
+
+          <p>
+            <strong>
+              2 diets × 3 exercise types = 6 treatment combinations
+            </strong>
+          </p>
+
+
+          <table class="treatment-table">
+
+            <thead>
+
+              <tr>
+                <th>Exercise</th>
+                <th>Fat-Free</th>
+                <th>Atkins</th>
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              <tr>
+                <td>Swimming</td>
+                <td>1</td>
+                <td>2</td>
+              </tr>
+
+              <tr>
+                <td>Walking</td>
+                <td>3</td>
+                <td>4</td>
+              </tr>
+
+              <tr>
+                <td>Cycling</td>
+                <td>5</td>
+                <td>6</td>
+              </tr>
+
+            </tbody>
+
+          </table>
+
+
+          <p>
+            When conducting a study, subjects must be included
+            in all treatment combinations in order to run
+            statistical tests on each of the treatment variables.
+          </p>
+
+          <p>
+            A test can also be conducted that will look at the
+            relationship among the treatment variables.
+          </p>
+
+        </article>
+
+
+        <!-- Study Type Examples -->
+
+        <article class="card example">
+
+          <h3>Examples</h3>
+
+          <p>
+            Identify each of the following studies as an
+            observational study, experiment, or simulation.
+          </p>
+
+          <ol>
+
+            <li>
+              In a medical study, patients are given a drug at
+              various dosage levels to study effectiveness.
+            </li>
+
+            <li>
+              Various vehicles are studied to see which are
+              safest in a head-on collision.
+            </li>
+
+            <li>
+              The outcome of an upcoming presidential election
+              is predicted by asking individuals over the telephone
+              for who they plan to vote.
+            </li>
+
+            <li>
+              Change a container from Pepsi to Coke and calculate
+              the percentage of people who notice the change.
+            </li>
+
+          </ol>
+
+
+          <details class="answer">
+
+            <summary>Show Answers</summary>
+
+            <div class="answer-body">
+
+              <ol>
+
+                <li>
+                  <strong>Experiment</strong> —
+                  the drug is imposed and the point is to measure
+                  the effect of the drug at different dosages.
+                </li>
+
+                <li>
+                  <strong>Simulation</strong> —
+                  for car crash tests it is common to use a
+                  simulation. An experiment with people inside
+                  the vehicles would obviously be unsafe.
+                </li>
+
+                <li>
+                  <strong>Observational Study</strong> —
+                  this is a typical survey where we are not
+                  trying to influence responses.
+                </li>
+
+                <li>
+                  <strong>Experiment</strong> —
+                  the change from Pepsi to Coke is imposed and
+                  researchers measure whether people notice
+                  the change.
+                </li>
+
+              </ol>
+
+            </div>
+
+          </details>
+
+        </article>
+
+      </section>
+
+
+      <!-- =====================================================
+           4. TYPES OF DATA
+           ===================================================== -->
+
+      <section id="data-types" class="section">
+
+        <h2>4. Types of Data</h2>
+
+
+        <div class="definition">
+
+          <strong>Qualitative (Categorical) Variable</strong> —
+          places responses into categories and there is no
+          numerical meaning to the outcomes.
+
+        </div>
+
+
+        <div class="definition">
+
+          <strong>Quantitative Variable</strong> — numeric values
+          that have numerical meaning.
+
+        </div>
+
+
+        <ul>
+
+          <li>
+            <strong>Discrete Variable</strong> —
+            things that can be counted.
+          </li>
+
+          <li>
+            <strong>Continuous Variable</strong> —
+            things that are measured.
+          </li>
+
+        </ul>
+
+
+        <article class="card example">
+
+          <h3>Examples</h3>
+
+          <p>
+            Identify the data type for each of the following:
+          </p>
+
+          <ol>
+
+            <li>Gender</li>
+            <li>Time to run a mile</li>
+            <li>Number of soccer goals scored</li>
+            <li>Political preference</li>
+            <li>Distance to drive to work</li>
+            <li>Number of children</li>
+            <li>Social Security number</li>
+
+          </ol>
+
+
+          <details class="answer">
+
+            <summary>Show Answers</summary>
+
+            <div class="answer-body">
+
+              <ol>
+
+                <li>Qualitative</li>
+
+                <li>
+                  Quantitative — Continuous
+                </li>
+
+                <li>
+                  Quantitative — Discrete
+                </li>
+
+                <li>Qualitative</li>
+
+                <li>
+                  Quantitative — Continuous
+                </li>
+
+                <li>
+                  Quantitative — Discrete
+                </li>
+
+                <li>Qualitative</li>
+
+              </ol>
+
+            </div>
+
+          </details>
+
+        </article>
+
+      </section>
+
+
+      <!-- =====================================================
+           5. LEVELS OF MEASUREMENT
+           ===================================================== -->
+
+      <section id="measurement" class="section">
+
+        <h2>5. Levels of Measurement</h2>
+
+
+        <div class="definition">
+
+          <strong>Nominal Level</strong> — identifies the
+          individual or a characteristic. These quantities
+          have no implied criteria.
+
+        </div>
+
+
+        <div class="definition">
+
+          <strong>Ordinal Level</strong> — like nominal with
+          the addition of values being arranged in some order.
+
+          Provides relative comparisons but actual differences
+          between data values either cannot be determined or
+          are meaningless.
+
+        </div>
+
+
+        <div class="definition">
+
+          <strong>Interval Level</strong> — like ordinal, with
+          the addition of meaningful differences between data values.
+
+          It does not have an intrinsic zero or starting point,
+          meaning differences are meaningful, but ratios of data
+          values are not.
+
+        </div>
+
+
+        <div class="definition">
+
+          <strong>Ratio Level</strong> — similar to interval,
+          with the addition of an intrinsic zero which forces
+          both differences and ratios to be meaningful.
+
+        </div>
+
+
+        <article class="card example">
+
+          <h3>Examples</h3>
+
+          <p>
+            Identify the level of measurement for each of
+            the following:
+          </p>
+
+          <ol>
+
+            <li>Gender</li>
+            <li>Time to run a mile</li>
+            <li>Number of soccer goals scored</li>
+            <li>Political preference</li>
+            <li>Distance to drive to work</li>
+            <li>Number of children</li>
+            <li>Social Security number</li>
+            <li>Ranking of all college football teams</li>
+            <li>Temperature measured in Fahrenheit</li>
+
+          </ol>
+
+
+          <details class="answer">
+
+            <summary>Show Answers</summary>
+
+            <div class="answer-body">
+
+              <ol>
+
+                <li>Nominal</li>
+                <li>Ratio</li>
+                <li>Ratio</li>
+                <li>Nominal</li>
+                <li>Ratio</li>
+                <li>Ratio</li>
+                <li>Nominal</li>
+                <li>Ordinal</li>
+                <li>Interval</li>
+
+              </ol>
+
+            </div>
+
+          </details>
+
+        </article>
+
+      </section>
+
+
+      <!-- =====================================================
+           BOTTOM NAVIGATION
+           ===================================================== -->
+
+      <div
+        class="back-row"
+        style="margin-top: 36px;"
+      >
+
+        <a
+          class="btn outline btn-sm"
+          href="index.html"
+        >
+          ← Back to STA210U Notes
+        </a>
+
+        <a
+          class="btn btn-sm"
+          href="STA210U_Section_1A_Introduction_to_Statistics.docx"
+          download
+        >
+          Download Word Notes
+        </a>
+
+      </div>
+
+
+      <!-- =====================================================
+           FOOTER
+           ===================================================== -->
+
+      <footer class="notes-footer">
+
+        Last updated:
+        <span id="lastUpdated"></span>
+
+      </footer>
+
+
+    </div>
+
+  </main>
+
+
+  <!-- =========================================================
+       JAVASCRIPT
+       ========================================================= -->
 
   <script>
+
     document.getElementById('lastUpdated').textContent =
       new Date(document.lastModified).toLocaleString();
 
-    // Shared sidebar include loader
-    const BASE = '';
-
-    (async function injectSidebar(){
-      const el = document.querySelector('[data-include]');
-      if(!el) return;
-
-      let url = el.getAttribute('data-include') || '/partials/sidebar.html';
-      if (BASE && url.startsWith('/')) url = BASE + url;
-
-      try {
-        const resp = await fetch(url, { cache: 'no-cache' });
-        if(!resp.ok) throw new Error(resp.statusText);
-
-        el.innerHTML = await resp.text();
-
-        const yr = el.querySelector('#yr');
-        if (yr) yr.textContent = new Date().getFullYear();
-
-        const here = location.pathname.replace(/\/index\.html$/, '/');
-
-        el.querySelectorAll('.nav a[href]').forEach(a => {
-          const target = new URL(a.getAttribute('href'), location.origin).pathname
-            .replace(/\/index\.html$/, '/');
-
-          if (here === target || (here.startsWith(target) && target !== '/')) {
-            a.classList.add('active');
-          }
-        });
-
-      } catch(err) {
-        console.error('Sidebar include failed:', err);
-        el.innerHTML = '<div class="muted">Sidebar failed to load.</div>';
-      }
-    })();
   </script>
+
 </body>
 </html>
