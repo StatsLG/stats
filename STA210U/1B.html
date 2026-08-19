@@ -3,20 +3,80 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>STA210U — Section 1B | StatsLG</title>
-  <meta name="description" content="STA210U Section 1B — Sampling." />
+
+  <meta
+    name="description"
+    content="STA210U Section 1B — Sampling."
+  />
+
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css">
 
   <style>
-    .notes-content { max-width: 900px; }
-    .notes-content h2 { margin-top: 2rem; scroll-margin-top: 1rem; }
-    .notes-content h3 { margin-top: 1.5rem; color: var(--ink); }
-    .notes-content p, .notes-content li { line-height: 1.65; }
+    /* =========================================================
+       STA210U NOTES PAGE
+       ========================================================= */
 
-    .toc { margin-bottom: 1.5rem; }
-    .toc a { color: var(--kctcs-blue); font-weight: 700; }
-    .toc a:hover { text-decoration: underline; }
+    .notes-page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 40px;
+    }
+
+    .notes-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .notes-content h2 {
+      margin-top: 2rem;
+      scroll-margin-top: 1rem;
+    }
+
+    .notes-content h3 {
+      margin-top: 1.5rem;
+      color: var(--ink);
+    }
+
+    .notes-content p,
+    .notes-content li {
+      line-height: 1.65;
+    }
+
+
+    /* ---------- Top Buttons ---------- */
+
+    .back-row {
+      margin: 0 0 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+
+    /* ---------- Table of Contents ---------- */
+
+    .toc {
+      margin-bottom: 1.5rem;
+    }
+
+    .toc h2 {
+      margin-top: 0;
+    }
+
+    .toc a {
+      color: var(--kctcs-blue);
+      font-weight: 700;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+
+    /* ---------- Definitions ---------- */
 
     .definition {
       border-left: 5px solid var(--kctcs-blue);
@@ -25,22 +85,45 @@
       background: var(--panel);
       border-radius: 0 var(--radius) var(--radius) 0;
     }
-    .definition strong { color: var(--kctcs-blue); }
 
-    .example { margin: 18px 0; }
-    .example > h3, .example > h4 { margin-top: 0; }
+    .definition strong {
+      color: var(--kctcs-blue);
+    }
+
+
+    /* ---------- Examples ---------- */
+
+    .example {
+      margin: 18px 0;
+    }
+
+    .example > h3,
+    .example > h4 {
+      margin-top: 0;
+    }
+
+
+    /* ---------- Answer Dropdowns ---------- */
 
     details.answer {
       margin-top: 14px;
       border-top: 1px solid var(--rule);
       padding-top: 10px;
     }
+
     details.answer summary {
       cursor: pointer;
       color: var(--kctcs-blue);
       font-weight: 800;
     }
-    details.answer[open] summary { margin-bottom: 10px; }
+
+    details.answer summary:hover {
+      text-decoration: underline;
+    }
+
+    details.answer[open] summary {
+      margin-bottom: 10px;
+    }
 
     .answer-body {
       border-left: 5px solid var(--kctcs-gold);
@@ -49,521 +132,1047 @@
       border-radius: 0 var(--radius) var(--radius) 0;
     }
 
-    .back-row {
-      margin: 0 0 16px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+
+    /* ---------- Formula ---------- */
 
     .formula {
       font-size: 1.35rem;
       text-align: center;
       font-weight: 800;
       color: var(--kctcs-blue);
-      margin: 14px 0;
+      margin: 18px 0;
+      padding: 16px;
+      background: var(--panel);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
     }
+
+
+    /* ---------- Key Idea ---------- */
 
     .key-idea {
       border-left: 5px solid var(--kctcs-gold);
     }
 
-    @media print {
-      details.answer > * { display: block !important; }
+
+    /* ---------- Footer ---------- */
+
+    .notes-footer {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid var(--rule);
+      color: var(--muted);
+      font-size: 12px;
     }
+
+
+    /* ---------- Mobile ---------- */
+
+    @media (max-width: 760px) {
+
+      .notes-page {
+        padding: 20px 16px;
+      }
+
+      .back-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .back-row .btn {
+        justify-content: center;
+      }
+    }
+
+
+    /* ---------- Print ---------- */
+
+    @media print {
+
+      .back-row {
+        display: none;
+      }
+
+      .notes-page {
+        max-width: none;
+        padding: 0;
+      }
+
+      .notes-content {
+        max-width: none;
+      }
+
+      details.answer > * {
+        display: block !important;
+      }
+    }
+
   </style>
 </head>
 
+
 <body>
-  <div class="layout">
-    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
 
-    <main>
-      <div class="notes-content">
+  <main class="notes-page">
 
-        <div class="back-row">
-          <a class="btn outline btn-sm" href="index.html">← Back to STA210U Notes</a>
-          <a class="btn btn-sm"
-             href="STA210U_Section_1B.docx"
-             download>Download Word Notes</a>
+    <div class="notes-content">
+
+
+      <!-- =====================================================
+           TOP NAVIGATION
+           ===================================================== -->
+
+      <div class="back-row">
+
+        <a
+          class="btn outline btn-sm"
+          href="index.html"
+        >
+          ← Back to STA210U Notes
+        </a>
+
+        <a
+          class="btn btn-sm"
+          href="STA210U_Section_1B_Sampling.docx"
+          download
+        >
+          Download Word Notes
+        </a>
+
+      </div>
+
+
+      <!-- =====================================================
+           HEADER
+           ===================================================== -->
+
+      <header class="header">
+
+        <h1>STA210U — Section 1B</h1>
+
+        <p>
+          Introduction and Data Collection: Sampling
+        </p>
+
+      </header>
+
+
+      <!-- =====================================================
+           TABLE OF CONTENTS
+           ===================================================== -->
+
+      <section class="section panel pad toc">
+
+        <h2>In This Section</h2>
+
+        <ul>
+          <li><a href="#bias">Bias</a></li>
+          <li><a href="#random-sampling">Random Sampling</a></li>
+          <li><a href="#sampling-error">Sampling Error</a></li>
+        </ul>
+
+      </section>
+
+
+      <!-- =====================================================
+           1. BIAS
+           ===================================================== -->
+
+      <section id="bias" class="section">
+
+        <h2>1. Bias</h2>
+
+        <div class="definition">
+          <strong>Bias</strong> — a prejudice in one direction.
+          This occurs when the sample is selected in such a way
+          that favors the selection of elements with a particular
+          characteristic.
         </div>
 
-        <header class="header">
-          <h1>STA210U — Section 1B</h1>
-          <p>Introduction and Data Collection: Sampling</p>
-        </header>
+        <p>
+          If a statistic is biased it will tend to overestimate
+          or underestimate the value we are trying to predict.
+          We can eliminate (or at least minimize) bias by using
+          proper sampling techniques.
+        </p>
 
-        <section class="section panel pad toc">
-          <h2>In This Section</h2>
-          <ul>
-            <li><a href="#bias">Bias</a></li>
-            <li><a href="#random-sampling">Random Sampling</a></li>
-            <li><a href="#sampling-error">Sampling Error</a></li>
-          </ul>
-        </section>
 
-        <section id="bias" class="section">
-          <h2>1. Bias</h2>
+        <h3>Samples that Include Bias</h3>
 
-          <div class="definition">
-            <strong>Bias</strong> — a prejudice in one direction. This occurs when the sample
-            is selected in such a way that favors the selection of elements with a particular characteristic.
-          </div>
+        <div class="definition">
+          <strong>Convenience Sampling</strong> — uses results
+          or data that are conveniently and readily obtained.
+        </div>
 
-          <p>
-            If a statistic is biased it will tend to overestimate or underestimate the value
-            we are trying to predict. We can eliminate (or at least minimize) bias by using
-            proper sampling techniques.
-          </p>
+        <p>
+          Data from this type of sample runs the risk of being
+          severely biased and should not be generalized to the
+          overall population (cannot use to conduct inferential
+          statistics).
+        </p>
 
-          <h3>Samples that Include Bias</h3>
+        <p>
+          Descriptive statistics can be calculated for the data,
+          however, these numbers can only be used to describe the
+          sample. This summary of the data is not of much practical
+          use for making inference about a larger population.
+        </p>
 
-          <div class="definition">
-            <strong>Convenience Sampling</strong> — uses results or data that are conveniently
-            and readily obtained.
-          </div>
 
-          <p>
-            Data from this type of sample runs the risk of being severely biased and should not
-            be generalized to the overall population (cannot use to conduct inferential statistics).
-          </p>
+        <div class="definition">
+          <strong>Voluntary Response Sample</strong> — a common
+          convenience sample is letting subjects volunteer.
+          This kind of sample typically over-represents people
+          with strong opinions.
+        </div>
 
-          <p>
-            Descriptive statistics can be calculated for the data, however, these numbers can only
-            be used to describe the sample. This summary of the data is not of much practical use
-            for making inference about a larger population.
-          </p>
 
-          <div class="definition">
-            <strong>Voluntary Response Sample</strong> — a common convenience sample is letting
-            subjects volunteer. This kind of sample typically over-represents people with strong opinions.
-          </div>
+        <!-- Restaurant Example -->
 
-          <article class="card example">
-            <h3>Example 1: Restaurant Comment Cards</h3>
-            <p>
-              Who fills out restaurant comment cards? If a manager looks at the cards at the end
-              of the day, will the cards accurately portray the service that was provided at the
-              restaurant that day?
-            </p>
-            <p>
-              People will most likely fill out these cards if they are unhappy with their service.
-              They may fill them out if they were extremely happy with their service. It is not very
-              common for someone to fill one out and say they had average service.
-            </p>
-            <p>
-              As with most volunteer samples, people with strong opinions are much more likely to
-              be included in your sample. Therefore, this data should never be extended to the
-              population and used to determine the level of service at the restaurant.
-            </p>
-            <p>
-              This does not mean that the data is meaningless. More than anything, it gives a sense
-              of how many individuals were unhappy with their service. Obviously, 2 negative comment
-              cards is better than 20.
-            </p>
-          </article>
+        <article class="card example">
 
-          <article class="card example">
-            <h3>Example 2: Medical Volunteers</h3>
-            <p>
-              When testing a drug, it is very common to begin testing on volunteers because that is
-              the only ethical option. You cannot force people to take a drug.
-            </p>
-            <p>
-              To illustrate, suppose we have a new treatment for a certain type of cancer. Who do
-              you think is most likely to volunteer for this experimental drug?
-            </p>
-            <p>
-              The most likely volunteers are individuals with the most severe cases—individuals who
-              have already tried traditional treatments and are out of other options.
-            </p>
-            <p>
-              The fact that drugs are tested on a sample that is not representative of the population
-              is problematic. Using volunteer samples is partly the reason why drugs are sometimes
-              pulled back off the shelf after a couple years.
-            </p>
-          </article>
-        </section>
-
-        <section id="random-sampling" class="section">
-          <h2>2. Random Sampling</h2>
+          <h3>Example 1: Restaurant Comment Cards</h3>
 
           <p>
-            For a sample to be useful when conducting inferential statistics, it needs to be
-            <strong>representative of the population</strong>. This is the common terminology used
-            in identifying a sample as useful in extending the results to the population.
-          </p>
-
-          <div class="definition">
-            <strong>Random Sample</strong> — a sample determined completely by chance.
-            This is one way to get a representative sample.
-          </div>
-
-          <p>
-            With a random sample, the sample will typically be similar to our population with
-            respect to demographic and other variables. Also, we can control the probability
-            of making a mistake (or probability of error).
-          </p>
-
-          <article class="card example">
-            <h3>Example: Estimating Average Income in Kentucky</h3>
-            <p>
-              Suppose that we are interested in estimating the average income for residents in the
-              state of Kentucky. If we sample 1000 males from Lexington, would the sample be
-              representative of the population?
-            </p>
-            <p>
-              No. The sample would be biased and would tend to overestimate average income.
-              Males tend to make more on average than females and people from Lexington tend to
-              make more than what is average in the state.
-            </p>
-            <p>
-              What we would want is if 50% of our population is male, then 50% of our sample
-              should be male. Also, if 10% of the population is from Lexington, then 10% of our
-              sample should be from Lexington.
-            </p>
-            <p>
-              There are an uncountable number of other variables for which we would want the sample
-              to be similar to the population. A random sample will take care of all these variables
-              at once. Keep in mind this is not a guarantee.
-            </p>
-            <p>
-              However, if 10% of the population is from Lexington and we take a random sample,
-              then the probability is high that 10% of our sample will be from Lexington. In actuality,
-              we know that the probability is high that the sample is similar to the population in
-              terms of all demographic and other variables.
-            </p>
-            <p>
-              Just as important, we can calculate this probability of getting a good sample as compared
-              to a bad sample. We will look at these calculations later in the semester.
-            </p>
-            <p>
-              Finally, it should be understood that we can make this probability higher by taking a
-              larger sample size. It works kind of like flipping a coin. If you flip a coin 10 times,
-              what is the probability of getting tails about 50% of the time? If you flip a coin 50
-              times, what is the probability of getting tails about 50% of the time?
-            </p>
-            <p>
-              The important thing here is that if you flip the coin more times, you are more likely
-              to get a percentage close to the population value of 50%.
-            </p>
-          </article>
-
-          <h3>Types of Random Samples</h3>
-
-          <div class="definition">
-            <strong>1) Simple Random Sample</strong> — a sample of <em>n</em> measurements
-            from a population selected in such a manner that every sample of size <em>n</em>
-            from the population has equal probability of being selected.
-            (<em>n</em> is standard notation for sample size.)
-          </div>
-
-          <p>
-            Everything we do in this course will be based on a simple random sample.
-            This is the most common method used and is preferred in most cases.
-          </p>
-
-          <article class="card example">
-            <h3>Simple Random Sample Example</h3>
-            <p>
-              Suppose that the students in this class are my population. For illustration purposes,
-              assume we are in a classroom and there are 5 rows and 10 students in each row.
-              I want a sample of 10 students from the class, so I randomly select one row as my sample.
-              Is this a simple random sample?
-            </p>
-            <p>
-              This is a situation where you must be careful about how you think of the probability.
-              The mistake people tend to make is asking if each person has an equal chance of being selected.
-              For this scenario, the answer is yes. Every person has a one out of five chance of being
-              selected since 1 of the 5 rows is being selected.
-            </p>
-            <p>
-              The question that should be asked is: <strong>Does every sample of size 10 have an equal
-              chance of being selected?</strong> The answer here is no.
-            </p>
-            <p>
-              You can only be in a sample with the people in your row. There is no probability of you
-              being in a sample with someone from another row. Meaning every sample does not have equal
-              probability of being selected and this is not a simple random sample.
-            </p>
-            <p>
-              When you group individuals and select a group or groups, you no longer satisfy the definition
-              of a simple random sample. In order to actually get a simple random sample, something must
-              be done equivalent to drawing names out of a hat. This will mean all samples have an equal
-              probability of being selected.
-            </p>
-          </article>
-
-          <p>
-            I want to introduce some other methods of random sampling even though we will not analyze
-            data coming from these types of samples. I want you to understand that there are times when
-            a simple random sample is not the best choice.
-          </p>
-
-          <div class="definition">
-            <strong>2) Stratified Sampling</strong> — the population is divided into at least two
-            distinct strata or groups. Then, a (simple) random sample of a certain size is drawn from each stratum.
-          </div>
-
-          <article class="card example">
-            <h3>Stratified Sampling Example</h3>
-            <p>
-              Suppose we define our population as all surgeons in the United States. Also, assume that our
-              research question of interest deals with comparing male and female surgeons on their job satisfaction.
-            </p>
-            <p>
-              The problem with a simple random sample in this case comes from the makeup of the population.
-              We are interested in comparing males and females and about 75% of the population is male and
-              only 25% of the population is female.
-            </p>
-            <p>
-              Therefore, if we take a simple random sample of 100 surgeons, we would typically get about
-              75 males and 25 females. Since our purpose is to compare the groups, this is not ideal.
-              We would prefer to have an equal number of males and females in our sample.
-            </p>
-            <p>
-              This can be accomplished with a stratified sample. We would stratify on gender, which means
-              separate the males and females. We would then sample 50 male surgeons and 50 female surgeons.
-              This is a much better option.
-            </p>
-          </article>
-
-          <div class="definition">
-            <strong>3) Systematic Sampling</strong> — select a (random) starting point and then select
-            every (as an example) 4th person to be part of your sample.
-          </div>
-
-          <p>
-            This only really works if the data is in random order to start with. The data is almost always
-            in some order and if there is any pattern to that order, then your sample is no longer random.
-            You must be careful if using a systematic sample.
-          </p>
-
-          <article class="card example">
-            <h3>Systematic Sampling Example</h3>
-            <p>
-              This sampling technique is mainly used to save time and money. I once worked on a project
-              which studied inmates in the South Carolina prison system. There are three major prisons in
-              the state, so that was our population.
-            </p>
-            <p>
-              We could get information on inmates, but only in hard copy form as we were not given access
-              to the prisons data base. Therefore, we had lists of inmates in hard copy form.
-            </p>
-            <p>
-              To get the sample size needed, it was decided to take the 7th (a random number) person from
-              each page. Further information was then collected for those individuals in order to perform
-              the analysis for this study.
-            </p>
-            <p>
-              The one problem in this study is the names were in alphabetical order. This ordering could
-              put into question the randomness of the sample.
-            </p>
-          </article>
-
-          <div class="definition">
-            <strong>4) Cluster Sampling</strong> — divide the population into sections. Then, randomly
-            select the sections or clusters. Depending on the size of the cluster, every member or a random
-            sample of the members may be used.
-          </div>
-
-          <article class="card example">
-            <h3>Cluster Sampling Example</h3>
-            <p>
-              Suppose we were interested in the population of elementary school children in New York City.
-              This is a complicated situation because there are about 200 elementary schools in the city.
-            </p>
-            <p>
-              A simple random sample would probably mean having kids from all 200 schools, which would be
-              time consuming and expensive. This is the perfect situation to instead use a cluster sample.
-            </p>
-            <p>
-              In this case, the clusters are already set because each school can represent a cluster.
-              First, we would randomly select a certain number, say 30 of the schools.
-            </p>
-            <p>
-              Now we can go to each of those thirty schools and collect our data from either all students
-              or a sample of students within each school. In this case the time and money saved would be
-              worth dealing with a more complicated sample.
-            </p>
-            <p>
-              It is still a random sample and we can calculate the probability of error; the mathematics
-              of the analysis is just more difficult.
-            </p>
-          </article>
-        </section>
-
-        <section id="sampling-error" class="section">
-          <h2>3. Sampling Error</h2>
-
-          <p>
-            It should be noted that the value of a statistic depends on which items are selected for
-            the sample. When we take a random sample, a statistic is a random variable. We are randomly
-            selecting one value for the statistic out of all its possible values.
+            Who fills out restaurant comment cards? If a manager
+            looks at the cards at the end of the day, will the
+            cards accurately portray the service that was provided
+            at the restaurant that day?
           </p>
 
           <p>
-            This is what allows us to calculate probability. In this class we will look at the probability
-            of a random variable and then extend that to a statistic.
+            People will most likely fill out these cards if they
+            are unhappy with their service. They may fill them out
+            if they were extremely happy with their service.
+            It is not very common for someone to fill one out and
+            say they had average service.
           </p>
 
-          <div class="definition">
-            <strong>Variability</strong> — the spread of a set of values.
+          <p>
+            As with most volunteer samples, people with strong
+            opinions are much more likely to be included in your
+            sample. Therefore, this data should never be extended
+            to the population and used to determine the level of
+            service at the restaurant.
+          </p>
+
+          <p>
+            This does not mean that the data is meaningless.
+            More than anything, it gives a sense of how many
+            individuals were unhappy with their service.
+            Obviously, 2 negative comment cards is better than 20.
+          </p>
+
+        </article>
+
+
+        <!-- Medical Example -->
+
+        <article class="card example">
+
+          <h3>Example 2: Medical Volunteers</h3>
+
+          <p>
+            When testing a drug, it is very common to begin
+            testing on volunteers because that is the only
+            ethical option. You cannot force people to take a drug.
+          </p>
+
+          <p>
+            To illustrate, suppose we have a new treatment for
+            a certain type of cancer. Who do you think is most
+            likely to volunteer for this experimental drug?
+          </p>
+
+          <p>
+            The most likely volunteers are individuals with the
+            most severe cases — individuals who have already tried
+            traditional treatments and are out of other options.
+          </p>
+
+          <p>
+            The fact that drugs are tested on a sample that is
+            not representative of the population is problematic.
+            Using volunteer samples is partly the reason why drugs
+            are sometimes pulled back off the shelf after a couple
+            years.
+          </p>
+
+        </article>
+
+      </section>
+
+
+      <!-- =====================================================
+           2. RANDOM SAMPLING
+           ===================================================== -->
+
+      <section id="random-sampling" class="section">
+
+        <h2>2. Random Sampling</h2>
+
+        <p>
+          For a sample to be useful when conducting inferential
+          statistics, it needs to be
+          <strong>representative of the population</strong>.
+          This is the common terminology used in identifying a
+          sample as useful in extending the results to the population.
+        </p>
+
+
+        <div class="definition">
+          <strong>Random Sample</strong> — a sample determined
+          completely by chance. This is one way to get a
+          representative sample.
+        </div>
+
+
+        <p>
+          With a random sample, the sample will typically be
+          similar to our population with respect to demographic
+          and other variables. Also, we can control the probability
+          of making a mistake (or probability of error).
+        </p>
+
+
+        <!-- Kentucky Income Example -->
+
+        <article class="card example">
+
+          <h3>Example: Estimating Average Income in Kentucky</h3>
+
+          <p>
+            Suppose that we are interested in estimating the
+            average income for residents in the state of Kentucky.
+            If we sample 1000 males from Lexington, would the
+            sample be representative of the population?
+          </p>
+
+          <p>
+            No. The sample would be biased and would tend to
+            overestimate average income. Males tend to make more
+            on average than females and people from Lexington
+            tend to make more than what is average in the state.
+          </p>
+
+          <p>
+            What we would want is if 50% of our population is male,
+            then 50% of our sample should be male. Also, if 10% of
+            the population is from Lexington, then 10% of our
+            sample should be from Lexington.
+          </p>
+
+          <p>
+            There are an uncountable number of other variables
+            for which we would want the sample to be similar to
+            the population. A random sample will take care of all
+            these variables at once. Keep in mind this is not a
+            guarantee.
+          </p>
+
+          <p>
+            However, if 10% of the population is from Lexington
+            and we take a random sample, then the probability is
+            high that 10% of our sample will be from Lexington.
+          </p>
+
+          <p>
+            In actuality, we know that the probability is high
+            that the sample is similar to the population in terms
+            of all demographic and other variables.
+          </p>
+
+          <p>
+            Just as important, we can calculate this probability
+            of getting a good sample as compared to a bad sample.
+            We will look at these calculations later in the semester.
+          </p>
+
+          <p>
+            Finally, it should be understood that we can make this
+            probability higher by taking a larger sample size.
+            It works kind of like flipping a coin.
+          </p>
+
+          <div class="card soft">
+
+            <h3>Think About It</h3>
+
+            <ul>
+              <li>
+                If you flip a coin 10 times, what is the probability
+                of getting tails about 50% of the time?
+              </li>
+
+              <li>
+                If you flip a coin 50 times, what is the probability
+                of getting tails about 50% of the time?
+              </li>
+            </ul>
+
+            <p>
+              The important thing here is that if you flip the coin
+              more times, you are more likely to get a percentage
+              close to the population value of 50%.
+            </p>
+
           </div>
 
-          <div class="definition">
-            <strong>Sampling Variability</strong> — how much a statistic varies from sample to sample.
-          </div>
+        </article>
+
+
+        <!-- =====================================================
+             TYPES OF RANDOM SAMPLES
+             ===================================================== -->
+
+        <h3>Types of Random Samples</h3>
+
+
+        <!-- Simple Random -->
+
+        <div class="definition">
+
+          <strong>1) Simple Random Sample</strong> — a sample of
+          <em>n</em> measurements from a population selected in
+          such a manner that every sample of size <em>n</em> from
+          the population has equal probability of being selected.
+
+          <br><br>
+
+          <em>n</em> is standard notation for sample size.
+
+        </div>
+
+
+        <p>
+          Everything we do in this course will be based on a simple
+          random sample. This is the most common method used and is
+          preferred in most cases.
+        </p>
+
+
+        <article class="card example">
+
+          <h3>Simple Random Sample Example</h3>
+
+          <p>
+            Suppose that the students in this class are my population.
+            For illustration purposes, assume we are in a classroom
+            and there are 5 rows and 10 students in each row.
+          </p>
+
+          <p>
+            I want a sample of 10 students from the class, so I
+            randomly select one row as my sample.
+          </p>
+
+          <p>
+            <strong>Is this a simple random sample?</strong>
+          </p>
+
+          <p>
+            This is a situation where you must be careful about how
+            you think of the probability.
+          </p>
+
+          <p>
+            The mistake people tend to make is asking if each person
+            has an equal chance of being selected. For this scenario,
+            the answer is yes.
+          </p>
+
+          <p>
+            Every person has a one out of five chance of being
+            selected since 1 of the 5 rows is being selected.
+          </p>
 
           <div class="card soft key-idea">
-            <h3>Key Ideas</h3>
-            <ul>
-              <li>We want the possible values of a statistic to not include bias and have a small amount of variability.</li>
-              <li>To eliminate bias in a statistic we should use random sampling.</li>
-              <li>We can control the variability in a statistic since a larger sample will force less variation.</li>
-            </ul>
-          </div>
 
-          <h3>Margin of Error</h3>
-
-          <p>From the sampling variability we can calculate the margin of error.</p>
-
-          <p>
-            We can say with 95% confidence that the amount by which a proportion obtained
-            from a sample will differ from the population proportion will not exceed:
-          </p>
-
-          <div class="formula">
-            Margin of Error = 1 / √n
-          </div>
-
-          <article class="card example">
-            <h3>Example</h3>
+            <h3>The Important Question</h3>
 
             <p>
-              Suppose you take a random sample of 1600 adults and 800 enjoy amusement park rides.
+              Does every <strong>sample of size 10</strong> have an
+              equal chance of being selected?
             </p>
 
-            <ol>
-              <li>What is the sample proportion of adults who enjoy amusement park rides?</li>
-              <li>What is the margin of error?</li>
-              <li>Give a confidence statement for the proportion of all adults who enjoy amusement park rides.</li>
-            </ol>
+            <p>
+              <strong>No.</strong>
+            </p>
 
-            <details class="answer">
-              <summary>Show Answers</summary>
-              <div class="answer-body">
-                <ol>
-                  <li>
-                    <strong>Sample proportion:</strong><br>
+          </div>
+
+          <p>
+            You can only be in a sample with the people in your row.
+            There is no probability of you being in a sample with
+            someone from another row.
+          </p>
+
+          <p>
+            Meaning every sample does not have equal probability
+            of being selected and this is not a simple random sample.
+          </p>
+
+          <p>
+            When you group individuals and select a group or groups,
+            you no longer satisfy the definition of a simple random
+            sample.
+          </p>
+
+          <p>
+            In order to actually get a simple random sample,
+            something must be done equivalent to drawing names out
+            of a hat. This will mean all samples have an equal
+            probability of being selected.
+          </p>
+
+        </article>
+
+
+        <p>
+          I want to introduce some other methods of random sampling
+          even though we will not analyze data coming from these
+          types of samples.
+        </p>
+
+        <p>
+          I want you to understand that there are times when a
+          simple random sample is not the best choice.
+        </p>
+
+
+        <!-- Stratified -->
+
+        <div class="definition">
+
+          <strong>2) Stratified Sampling</strong> — the population
+          is divided into at least two distinct strata or groups.
+
+          Then, a (simple) random sample of a certain size is drawn
+          from each stratum.
+
+        </div>
+
+
+        <article class="card example">
+
+          <h3>Stratified Sampling Example</h3>
+
+          <p>
+            Suppose we define our population as all surgeons in
+            the United States.
+          </p>
+
+          <p>
+            Also, assume that our research question of interest
+            deals with comparing male and female surgeons on their
+            job satisfaction.
+          </p>
+
+          <p>
+            The problem with a simple random sample in this case
+            comes from the makeup of the population.
+          </p>
+
+          <p>
+            We are interested in comparing males and females and
+            about 75% of the population is male and only 25% of
+            the population is female.
+          </p>
+
+          <p>
+            Therefore, if we take a simple random sample of 100
+            surgeons, we would typically get about 75 males and
+            25 females.
+          </p>
+
+          <p>
+            Since our purpose is to compare the groups, this is
+            not ideal. We would prefer to have an equal number
+            of males and females in our sample.
+          </p>
+
+          <p>
+            This can be accomplished with a stratified sample.
+            We would stratify on gender, which means separate
+            the males and females.
+          </p>
+
+          <p>
+            We would then sample 50 male surgeons and 50 female
+            surgeons. This is a much better option.
+          </p>
+
+        </article>
+
+
+        <!-- Systematic -->
+
+        <div class="definition">
+
+          <strong>3) Systematic Sampling</strong> — select a
+          (random) starting point and then select every
+          (as an example) 4th person to be part of your sample.
+
+        </div>
+
+
+        <p>
+          This only really works if the data is in random order
+          to start with.
+        </p>
+
+        <p>
+          The data is almost always in some order and if there
+          is any pattern to that order then your sample is no
+          longer random.
+        </p>
+
+        <p>
+          You must be careful if using a systematic sample.
+        </p>
+
+
+        <article class="card example">
+
+          <h3>Systematic Sampling Example</h3>
+
+          <p>
+            This sampling technique is mainly used to save time
+            and money.
+          </p>
+
+          <p>
+            I once worked on a project which studied inmates in
+            the South Carolina prison system. There are three
+            major prisons in the state so that was our population.
+          </p>
+
+          <p>
+            We could get information on inmates, but only in hard
+            copy form as we were not given access to the prisons
+            data base.
+          </p>
+
+          <p>
+            Therefore, we had lists of inmates in hard copy form.
+          </p>
+
+          <p>
+            To get the sample size needed it was decided to take
+            the 7th (a random number) person from each page.
+          </p>
+
+          <p>
+            Further information was then collected for those
+            individuals in order to perform the analysis for
+            this study.
+          </p>
+
+          <p>
+            The one problem in this study is the names were in
+            alphabetical order. This ordering could put into
+            question the randomness of the sample.
+          </p>
+
+        </article>
+
+
+        <!-- Cluster -->
+
+        <div class="definition">
+
+          <strong>4) Cluster Sampling</strong> — divide the
+          population into sections. Then, randomly select the
+          sections or clusters.
+
+          Depending on the size of the cluster, every member or
+          a random sample of the members may be used.
+
+        </div>
+
+
+        <article class="card example">
+
+          <h3>Cluster Sampling Example</h3>
+
+          <p>
+            Suppose we were interested in the population of
+            elementary school children in New York City.
+          </p>
+
+          <p>
+            This is a complicated situation because there are
+            about 200 elementary schools in the city.
+          </p>
+
+          <p>
+            A simple random sample would probably mean having
+            kids from all 200 schools, which would be time
+            consuming and expensive.
+          </p>
+
+          <p>
+            This is the perfect situation to instead use a
+            cluster sample.
+          </p>
+
+          <p>
+            In this case, the clusters are already set because
+            each school can represent a cluster.
+          </p>
+
+          <p>
+            First, we would randomly select a certain number,
+            say 30 of the schools.
+          </p>
+
+          <p>
+            Now we can go to each of those thirty schools and
+            collect our data from either all students or a sample
+            of students within each school.
+          </p>
+
+          <p>
+            In this case the time and money saved would be worth
+            dealing with a more complicated sample.
+          </p>
+
+          <p>
+            It is still a random sample and we can calculate the
+            probability of error; the mathematics of the analysis
+            is just more difficult.
+          </p>
+
+        </article>
+
+      </section>
+
+
+      <!-- =====================================================
+           3. SAMPLING ERROR
+           ===================================================== -->
+
+      <section id="sampling-error" class="section">
+
+        <h2>3. Sampling Error</h2>
+
+        <p>
+          It should be noted that the value of a statistic depends
+          on which items are selected for the sample.
+        </p>
+
+        <p>
+          When we take a random sample, a statistic is a random
+          variable. We are randomly selecting one value for the
+          statistic out of all its possible values.
+        </p>
+
+        <p>
+          This is what allows us to calculate probability.
+          In this class we will look at the probability of a
+          random variable and then extend that to a statistic.
+        </p>
+
+
+        <div class="definition">
+          <strong>Variability</strong> — the spread of a set of values.
+        </div>
+
+
+        <div class="definition">
+          <strong>Sampling Variability</strong> — how much a
+          statistic varies from sample to sample.
+        </div>
+
+
+        <div class="card soft key-idea">
+
+          <h3>Key Ideas</h3>
+
+          <ul>
+
+            <li>
+              We want the possible values of a statistic to not
+              include bias and have a small amount of variability.
+            </li>
+
+            <li>
+              To eliminate bias in a statistic we should use
+              random sampling.
+            </li>
+
+            <li>
+              We can control the variability in a statistic since
+              a larger sample will force less variation.
+            </li>
+
+          </ul>
+
+        </div>
+
+
+        <!-- =====================================================
+             MARGIN OF ERROR
+             ===================================================== -->
+
+        <h3>Margin of Error</h3>
+
+        <p>
+          From the sampling variability we can calculate the
+          margin of error.
+        </p>
+
+        <p>
+          We can say with 95% confidence that the amount by which
+          a proportion obtained from a sample will differ from the
+          population proportion will not exceed:
+        </p>
+
+
+        <div class="formula">
+          Margin of Error = 1 / √n
+        </div>
+
+
+        <article class="card example">
+
+          <h3>Example</h3>
+
+          <p>
+            Suppose you take a random sample of 1600 adults and
+            800 enjoy amusement park rides.
+          </p>
+
+          <ol>
+
+            <li>
+              What is the sample proportion of adults who enjoy
+              amusement park rides?
+            </li>
+
+            <li>
+              What is the margin of error?
+            </li>
+
+            <li>
+              Give a confidence statement for the proportion of
+              all adults who enjoy amusement park rides.
+            </li>
+
+          </ol>
+
+
+          <details class="answer">
+
+            <summary>Show Answers</summary>
+
+            <div class="answer-body">
+
+              <ol>
+
+                <li>
+
+                  <strong>Sample proportion:</strong>
+
+                  <div class="formula">
                     800 / 1600 = 0.50 = 50%
-                  </li>
-                  <li>
-                    <strong>Margin of error:</strong><br>
+                  </div>
+
+                </li>
+
+
+                <li>
+
+                  <strong>Margin of error:</strong>
+
+                  <div class="formula">
                     1 / √1600 = 1 / 40 = 0.025 = 2.5%
-                  </li>
-                  <li>
-                    We are 95% confident that the population proportion of adults who enjoy
-                    amusement park rides is between 47.5% and 52.5%.
-                  </li>
-                </ol>
-              </div>
-            </details>
-          </article>
+                  </div>
+
+                </li>
+
+
+                <li>
+
+                  We are 95% confident that the population
+                  proportion of adults who enjoy amusement park
+                  rides is between
+
+                  <strong>47.5% and 52.5%</strong>.
+
+                </li>
+
+              </ol>
+
+            </div>
+
+          </details>
+
+        </article>
+
+
+        <p>
+          There are other factors besides sample size that affect
+          the margin of error.
+        </p>
+
+        <p>
+          However, these factors can always be dealt with by a
+          large enough sample size. The factors follow and will
+          be discussed in detail later in the course.
+        </p>
+
+        <ul>
+
+          <li>
+            How confident do we want to be in our conclusion?
+          </li>
+
+          <li>
+            How much variability is in our data?
+          </li>
+
+        </ul>
+
+
+        <!-- =====================================================
+             SAMPLING ERRORS
+             ===================================================== -->
+
+        <div class="definition">
+
+          <strong>Sampling Errors</strong> — errors that result
+          from sampling.
+
+        </div>
+
+
+        <div class="card soft">
+
+          <h3>Random Sampling Error</h3>
 
           <p>
-            There are other factors besides sample size that affect the margin of error.
-            However, these factors can always be dealt with by a large enough sample size.
-            The factors follow and will be discussed in detail later in the course.
+            This is the error that comes from taking a random sample.
+            We expect this error and can calculate it.
           </p>
 
-          <ul>
-            <li>How confident do we want to be in our conclusion</li>
-            <li>How much variability is in our data</li>
-          </ul>
+          <p>
+            Margin of error covers only random sampling error.
+            Other sources of error cause bias.
+          </p>
 
-          <div class="definition">
-            <strong>Sampling Errors</strong> — errors that result from sampling.
-          </div>
+        </div>
 
-          <ul>
-            <li>
-              <strong>Random Sampling Error</strong> — this is the error that comes from taking
-              a random sample. We expect this error and can calculate it. Margin of error covers
-              only random sampling error. Other sources of error cause bias.
-            </li>
-            <li>
-              <strong>Bad Sampling Methods</strong> — any deviation from a random sample is a bad
-              sampling method which causes bias and increases the error in our estimate.
-            </li>
-          </ul>
 
-          <div class="definition">
-            <strong>Sampling Frame</strong> — list of every individual in the population.
-          </div>
+        <div class="card soft">
 
-          <div class="definition">
-            <strong>Under-coverage</strong> — when some groups in the population are left out of the sample.
-          </div>
+          <h3>Bad Sampling Methods</h3>
 
-          <article class="card example">
-            <h3>Under-Coverage Example</h3>
-            <p>
-              Suppose your population is all Lexington residents and you are going to conduct phone surveys.
-              A list of all residents in Lexington would be your sampling frame.
-            </p>
-            <p>
-              If you use a phone book to make the calls, this would be under-coverage. Obviously,
-              all Lexington residents are not in the phone book. This would be an example of a bad sampling method.
-            </p>
-          </article>
-        </section>
+          <p>
+            Any deviation from a random sample is a bad sampling
+            method which causes bias and increases the error in
+            our estimate.
+          </p>
 
-        <footer class="site-footer">
-          Last updated: <span id="lastUpdated"></span>
-        </footer>
+        </div>
+
+
+        <div class="definition">
+
+          <strong>Sampling Frame</strong> — list of every
+          individual in the population.
+
+        </div>
+
+
+        <div class="definition">
+
+          <strong>Under-coverage</strong> — when some groups
+          in the population are left out of the sample.
+
+        </div>
+
+
+        <article class="card example">
+
+          <h3>Under-Coverage Example</h3>
+
+          <p>
+            Suppose your population is all Lexington residents
+            and you are going to conduct phone surveys.
+          </p>
+
+          <p>
+            A list of all residents in Lexington would be your
+            sampling frame.
+          </p>
+
+          <p>
+            If you use a phone book to make the calls this would
+            be under-coverage.
+          </p>
+
+          <p>
+            Obviously, all Lexington residents are not in the
+            phone book. This would be an example of a bad
+            sampling method.
+          </p>
+
+        </article>
+
+      </section>
+
+
+      <!-- =====================================================
+           BOTTOM NAVIGATION
+           ===================================================== -->
+
+      <div class="back-row" style="margin-top: 36px;">
+
+        <a
+          class="btn outline btn-sm"
+          href="index.html"
+        >
+          ← Back to STA210U Notes
+        </a>
+
+        <a
+          class="btn btn-sm"
+          href="STA210U_Section_1B_Sampling.docx"
+          download
+        >
+          Download Word Notes
+        </a>
+
       </div>
-    </main>
-  </div>
+
+
+      <!-- =====================================================
+           FOOTER
+           ===================================================== -->
+
+      <footer class="notes-footer">
+
+        Last updated:
+        <span id="lastUpdated"></span>
+
+      </footer>
+
+
+    </div>
+  </main>
+
+
+  <!-- =========================================================
+       JAVASCRIPT
+       ========================================================= -->
 
   <script>
+
     document.getElementById('lastUpdated').textContent =
       new Date(document.lastModified).toLocaleString();
 
-    const BASE = '';
-
-    (async function injectSidebar(){
-      const el = document.querySelector('[data-include]');
-      if(!el) return;
-
-      let url = el.getAttribute('data-include') || '/partials/sidebar.html';
-      if (BASE && url.startsWith('/')) url = BASE + url;
-
-      try {
-        const resp = await fetch(url, { cache: 'no-cache' });
-        if(!resp.ok) throw new Error(resp.statusText);
-
-        el.innerHTML = await resp.text();
-
-        const yr = el.querySelector('#yr');
-        if (yr) yr.textContent = new Date().getFullYear();
-
-        const here = location.pathname.replace(/\/index\.html$/, '/');
-
-        el.querySelectorAll('.nav a[href]').forEach(a => {
-          const target = new URL(a.getAttribute('href'), location.origin).pathname
-            .replace(/\/index\.html$/, '/');
-
-          if (here === target || (here.startsWith(target) && target !== '/')) {
-            a.classList.add('active');
-          }
-        });
-
-      } catch(err) {
-        console.error('Sidebar include failed:', err);
-        el.innerHTML = '<div class="muted">Sidebar failed to load.</div>';
-      }
-    })();
   </script>
+
 </body>
 </html>
