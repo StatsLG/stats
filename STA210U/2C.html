@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STA210U — Section 2C | StatsLG</title>
+<meta name="description" content="STA210U Section 2C — Bivariate Data.">
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/style/bctcstyle.css">
+<style>
+.notes-page{max-width:1100px;margin:0 auto;padding:32px 40px}
+.notes-content{max-width:900px;margin:0 auto}
+.notes-content h2{margin-top:2rem;scroll-margin-top:1rem}
+.notes-content h3{margin-top:1.5rem;color:var(--ink)}
+.notes-content p,.notes-content li{line-height:1.65}
+.back-row{margin:0 0 20px;display:flex;gap:10px;flex-wrap:wrap}
+.toc{margin-bottom:1.5rem} .toc h2{margin-top:0}
+.toc a{color:var(--kctcs-blue);font-weight:700} .toc a:hover{text-decoration:underline}
+.definition{border-left:5px solid var(--kctcs-blue);padding:12px 14px;margin:14px 0;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.definition strong{color:var(--kctcs-blue)}
+.example{margin:18px 0} .key-idea{border-left:5px solid var(--kctcs-gold)}
+.figure{margin:24px 0;text-align:center}
+.figure img{width:100%;max-width:820px;height:auto;border:1px solid var(--rule);border-radius:var(--radius);background:#fff;box-shadow:var(--shadow-1)}
+.figure figcaption{margin-top:8px;color:var(--muted);font-size:.92rem}
+.graph-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;margin:20px 0}
+.graph-grid .figure{margin:0} .graph-grid .figure img{box-shadow:none}
+.notes-footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted);font-size:12px}
+@media(max-width:760px){.notes-page{padding:20px 16px}.back-row{flex-direction:column;align-items:stretch}.back-row .btn{justify-content:center}}
+@media print{.back-row{display:none}.notes-page,.notes-content{max-width:none;padding:0}}
+</style>
+</head>
+<body>
+<main class="notes-page"><div class="notes-content">
+<div class="back-row">
+<a class="btn outline btn-sm" href="index.html">← Back to STA210U Notes</a>
+<a class="btn btn-sm" href="STA210U_Section_2C_Bivariate_Data.docx" download>Download Word Notes</a>
+</div>
+
+<header class="header"><h1>STA210U — Section 2C</h1><p>Descriptive Statistics: Bivariate Data</p></header>
+
+<section class="section panel pad toc"><h2>In This Section</h2><ul>
+<li><a href="#contingency">Contingency Table (Cross Tabulation Table)</a></li>
+<li><a href="#boxplots">Box and Whisker Plot</a></li>
+<li><a href="#line">Line Graph</a></li>
+<li><a href="#scatter">Scatter Plot</a></li>
+</ul></section>
+
+<section id="contingency" class="section">
+<h2>1. Contingency Table (Cross Tabulation Table)</h2>
+<div class="definition"><strong>Bivariate Data</strong> — two observations are made on each subject.</div>
+<h3>Examples</h3><ul><li>Religious Preference and Political Preference</li><li>Gender and Height</li><li>Unemployment Rate and Year</li><li>SAT Score and First Year College GPA</li></ul>
+<p>The decision of how to display the data depends on the number of variables—in this section, always two—and the type of those variables.</p>
+<div class="definition"><strong>Contingency Table or Cross Tabulation Table</strong> — typically used to study the responses of two qualitative variables. Rows represent categories of the first variable and columns represent categories of the second variable.</div>
+<p>With qualitative data, the cells can contain frequencies or percentages. The table below uses frequencies for Gender and Major. The first cell tells us that there are 5 male Liberal Arts majors.</p>
+<table><thead><tr><th>Gender</th><th>Liberal Arts</th><th>Business Ad.</th><th>Technology</th><th>Row Total</th></tr></thead><tbody>
+<tr><td>Male</td><td>5</td><td>6</td><td>7</td><td>18</td></tr>
+<tr><td>Female</td><td>6</td><td>4</td><td>2</td><td>12</td></tr>
+<tr><td>Column Totals</td><td>11</td><td>10</td><td>9</td><td>30</td></tr></tbody></table>
+
+<h3>Percentages Based on Row Totals</h3>
+<p>The first cell tells us that 28% (5/18) of males are Liberal Arts majors.</p>
+<table><thead><tr><th>Gender</th><th>Liberal Arts</th><th>Business Ad.</th><th>Technology</th><th>Row Total</th></tr></thead><tbody>
+<tr><td>Male</td><td>28%</td><td>33%</td><td>39%</td><td>100%</td></tr>
+<tr><td>Female</td><td>50%</td><td>33%</td><td>17%</td><td>100%</td></tr>
+<tr><td>Column Totals</td><td>37%</td><td>33%</td><td>30%</td><td>100%</td></tr></tbody></table>
+
+<h3>Percentages Based on Column Totals</h3>
+<p>The first cell tells us that 45% (5/11) of Liberal Arts majors are male.</p>
+<table><thead><tr><th>Gender</th><th>Liberal Arts</th><th>Business Ad.</th><th>Technology</th><th>Row Total</th></tr></thead><tbody>
+<tr><td>Male</td><td>45%</td><td>60%</td><td>78%</td><td>60%</td></tr>
+<tr><td>Female</td><td>55%</td><td>40%</td><td>22%</td><td>40%</td></tr>
+<tr><td>Column Totals</td><td>100%</td><td>100%</td><td>100%</td><td>100%</td></tr></tbody></table>
+
+<h3>Percentages Based on Grand Total</h3>
+<p>The first cell tells us that 17% (5/30) of the people in the sample are both male and a Liberal Arts major.</p>
+<table><thead><tr><th>Gender</th><th>Liberal Arts</th><th>Business Ad.</th><th>Technology</th><th>Row Total</th></tr></thead><tbody>
+<tr><td>Male</td><td>17%</td><td>20%</td><td>23%</td><td>60%</td></tr>
+<tr><td>Female</td><td>20%</td><td>13%</td><td>7%</td><td>40%</td></tr>
+<tr><td>Column Totals</td><td>37%</td><td>33%</td><td>30%</td><td>100%</td></tr></tbody></table>
+</section>
+
+<section id="boxplots" class="section">
+<h2>2. Box and Whisker Plot</h2>
+<p>Box and whisker plots, also called boxplots, are used for bivariate data when one variable is qualitative and one is quantitative.</p>
+<p>The first example compares the qualitative variable <strong>group</strong> (student/faculty) with the quantitative variable <strong>money</strong>.</p>
+<table><thead><tr><th>Group</th><th>Low</th><th>Q1</th><th>Q2 (Median)</th><th>Q3</th><th>High</th></tr></thead><tbody>
+<tr><td>Students</td><td>0</td><td>1</td><td>5</td><td>7</td><td>10</td></tr>
+<tr><td>Faculty</td><td>10</td><td>15</td><td>25</td><td>31</td><td>73</td></tr>
+</tbody></table>
+<figure class="figure"><img src="STA210U_2C_images/money_by_group_boxplot.png" alt="Boxplot comparing money for students and faculty"><figcaption>Boxplot of Money vs Group</figcaption></figure>
+
+<h3>Procedure for Creating a Box and Whisker Plot</h3>
+<ul>
+<li>Draw a scale to include the lowest and highest data value.</li>
+<li>Draw a box from Q1 to Q3.</li>
+<li>Include a solid line through the box at the median level.</li>
+<li>If there are extreme values, identify them with an asterisk or dot.</li>
+<li>Draw whiskers from Q1 to the lowest non-extreme value and from Q3 to the highest non-extreme value.</li>
+</ul>
+<p>For faculty, the box runs from Q1 = 15 to Q3 = 31, so it represents the middle 50% of the data. The median is Q2 = 25. The lower whisker reaches 10. Since 73 is an extreme value, it is plotted separately and the upper whisker reaches the next-highest value, 43.</p>
+
+<div class="card soft key-idea"><h3>Three Questions to Ask from a Boxplot</h3><ul>
+<li>Which group has the higher typical value?</li>
+<li>Which group has more or less variability?</li>
+<li>What is the shape of each distribution?</li>
+</ul></div>
+<p><strong>Typical value:</strong> Faculty tended to have more money because their box and median are positioned higher.</p>
+<p><strong>Variability:</strong> Students had more consistent values because their box is smaller and their whiskers are shorter.</p>
+
+<h3>Identifying Shape from Boxplots</h3>
+<figure class="figure"><img src="STA210U_2C_images/boxplot_shapes.png" alt="Examples of symmetric, left-skewed, and right-skewed boxplots"><figcaption>Identifying Shapes from Boxplots</figcaption></figure>
+<p>For a symmetric distribution, the median is near the center of the box and the whiskers are similar in length. Both bell-shaped and uniform distributions can be symmetric.</p>
+<p>For a left-skewed distribution, the median is toward the higher-value side of the box and the lower-value whisker is longer. For a right-skewed distribution, the opposite occurs.</p>
+<p>When interpreting vertical boxplots, it can help to mentally rotate them clockwise so the numerical scale increases from left to right.</p>
+
+<h3>Stopping Distance and Tread Design</h3>
+<p><strong>Qualitative variable:</strong> Tread Design (A, B, or C)<br><strong>Quantitative variable:</strong> Stopping Distance</p>
+<figure class="figure"><img src="STA210U_2C_images/stopping_distance_by_tread.png" alt="Illustrative boxplots for tread designs A, B, and C matching the comparisons in the notes"><figcaption>Boxplot of Stopping Distance vs Tread Design</figcaption></figure>
+<div class="card soft"><ul>
+<li><strong>Best based on stopping distance:</strong> Tread design B, because lower stopping distances are better and its box and median are lower.</li>
+<li><strong>Most consistent:</strong> Tread design C, because its box and whiskers are shortest.</li>
+<li><strong>Shape:</strong> All three distributions are right skewed: the median is left of center and the upper/right tail is longer.</li>
+</ul></div>
+</section>
+
+<section id="line" class="section">
+<h2>3. Line Graph</h2>
+<p>Line graphs, also called time plots, are typically used for bivariate data when one variable is quantitative and the other variable is time. The x-axis represents time and the y-axis represents the quantitative variable.</p>
+<h3>Example: Cell Phone Subscribers</h3>
+<table><thead><tr><th>Year</th><th>Cell Phone Subscribers (millions)</th></tr></thead><tbody>
+<tr><td>1990</td><td>0.9</td></tr><tr><td>1991</td><td>1.2</td></tr><tr><td>1992</td><td>2.1</td></tr><tr><td>1993</td><td>3.5</td></tr><tr><td>1994</td><td>5.3</td></tr><tr><td>1995</td><td>7.6</td></tr><tr><td>1996</td><td>11.0</td></tr><tr><td>1997</td><td>16.0</td></tr><tr><td>1998</td><td>24.1</td></tr><tr><td>1999</td><td>33.8</td></tr><tr><td>2000</td><td>44.0</td></tr>
+</tbody></table>
+<figure class="figure"><img src="STA210U_2C_images/cell_phone_subscribers_line.png" alt="Line graph of cell phone subscribers from 1990 through 2000"><figcaption>Line Graph for Cell Phone Subscribers</figcaption></figure>
+<p>The main thing we typically look for in a line graph is the pattern. In this example there is a clear increasing pattern over time; technically, the number of subscribers is increasing exponentially.</p>
+
+<div class="definition"><strong>Time Series</strong> — a record of a variable over time.</div>
+<div class="definition"><strong>Trend</strong> — a steady change over time. A graph with trend will be increasing or decreasing.</div>
+<div class="definition"><strong>Seasonal Component</strong> — a pattern in which a variable tends to be higher at certain recurring points in time and lower at others.</div>
+<div class="definition"><strong>Irregular Cycles</strong> — increases or decreases that can be explained but do not follow a recurring pattern.</div>
+<div class="definition"><strong>Random Fluctuation</strong> — fluctuation not accounted for by trend, seasonality, or irregular cycles.</div>
+<p>You will be expected to identify trend and seasonal variation from a graph. Random fluctuation can be assumed to be present in essentially every time series.</p>
+
+<div class="graph-grid">
+<figure class="figure"><img src="STA210U_2C_images/time_increasing_trend.png" alt="Increasing trend with random fluctuation"><figcaption>Increasing Trend and Random Fluctuation</figcaption></figure>
+<figure class="figure"><img src="STA210U_2C_images/time_decreasing_trend.png" alt="Decreasing trend with random fluctuation"><figcaption>Decreasing Trend and Random Fluctuation</figcaption></figure>
+<figure class="figure"><img src="STA210U_2C_images/time_seasonal.png" alt="Seasonal variation with random fluctuation"><figcaption>Seasonal Variation and Random Fluctuation</figcaption></figure>
+<figure class="figure"><img src="STA210U_2C_images/time_increasing_seasonal.png" alt="Increasing trend plus seasonal variation"><figcaption>Increasing Trend, Seasonal Variation and Random Fluctuation</figcaption></figure>
+<figure class="figure"><img src="STA210U_2C_images/time_decreasing_seasonal.png" alt="Decreasing trend plus seasonal variation"><figcaption>Decreasing Trend, Seasonal Variation and Random Fluctuation</figcaption></figure>
+<figure class="figure"><img src="STA210U_2C_images/time_random_only.png" alt="Random fluctuation without trend or seasonality"><figcaption>Only Random Fluctuation; No Trend and No Seasonal Variation</figcaption></figure>
+</div>
+</section>
+
+<section id="scatter" class="section">
+<h2>4. Scatter Plot</h2>
+<div class="definition"><strong>Scatter Plot or Scatter Diagram</strong> — displays the relationship between two quantitative variables.</div>
+<ul><li><strong>X-axis:</strong> independent variable or explanatory variable.</li><li><strong>Y-axis:</strong> dependent variable or response variable.</li></ul>
+<p>A scatter plot is set up similarly to graphing in algebra, but there is usually not a perfect pattern and the points should not be connected. We look for a pattern in the cloud of data points.</p>
+<div class="definition"><strong>Correlation</strong> — an association or relationship between two variables.</div>
+
+<h3>Example: Drug Dosage and Reduction in Blood Pressure</h3>
+<p>Reduction in blood pressure is the Y variable because it depends on the dosage of the drug. Dosage is the X variable.</p>
+<table><thead><tr><th>Dosage of Drug (X)</th><th>Reduction in Blood Pressure (Y)</th></tr></thead><tbody>
+<tr><td>100</td><td>10</td></tr><tr><td>200</td><td>18</td></tr><tr><td>300</td><td>32</td></tr><tr><td>400</td><td>44</td></tr><tr><td>500</td><td>56</td></tr>
+</tbody></table>
+<figure class="figure"><img src="STA210U_2C_images/drug_dosage_scatter.png" alt="Scatter plot of drug dosage and reduction in blood pressure"><figcaption>Dosage of Drug and Reduction in Blood Pressure</figcaption></figure>
+<p>As dosage increases, reduction in blood pressure also increases. This is a positive relationship.</p>
+
+<h3>Identifying Correlation Graphically</h3>
+<div class="graph-grid">
+<figure class="figure"><img src="STA210U_2C_images/perfect_positive_correlation.png" alt="All points exactly on a line with positive slope"><figcaption>Perfect Positive Linear Correlation</figcaption></figure>
+<figure class="figure"><img src="STA210U_2C_images/perfect_negative_correlation.png" alt="All points exactly on a line with negative slope"><figcaption>Perfect Negative Linear Correlation</figcaption></figure>
+<figure class="figure"><img src="STA210U_2C_images/positive_correlation.png" alt="Points clustered around a line with positive slope"><figcaption>Positive Linear Correlation</figcaption></figure>
+<figure class="figure"><img src="STA210U_2C_images/negative_correlation.png" alt="Points clustered around a line with negative slope"><figcaption>Negative Linear Correlation</figcaption></figure>
+<figure class="figure"><img src="STA210U_2C_images/nonlinear_correlation.png" alt="Points following a curved non-linear pattern"><figcaption>Non-Linear Correlation</figcaption></figure>
+<figure class="figure"><img src="STA210U_2C_images/none_correlation.png" alt="Points with no visible pattern"><figcaption>No Correlation</figcaption></figure>
+</div>
+<div class="card soft"><ul>
+<li><strong>Perfect positive linear correlation:</strong> all points lie exactly on a line with positive slope.</li>
+<li><strong>Perfect negative linear correlation:</strong> all points lie exactly on a line with negative slope.</li>
+<li><strong>Positive linear correlation:</strong> points follow an approximate line with positive slope.</li>
+<li><strong>Negative linear correlation:</strong> points follow an approximate line with negative slope.</li>
+<li><strong>Non-linear correlation:</strong> there is a pattern, but it is not linear.</li>
+<li><strong>No correlation:</strong> there is no visible pattern or relationship.</li>
+</ul></div>
+</section>
+
+<div class="back-row" style="margin-top:36px">
+<a class="btn outline btn-sm" href="index.html">← Back to STA210U Notes</a>
+<a class="btn btn-sm" href="STA210U_Section_2C_Bivariate_Data.docx" download>Download Word Notes</a>
+</div>
+<footer class="notes-footer">Last updated: <span id="lastUpdated"></span></footer>
+</div></main>
+<script>document.getElementById('lastUpdated').textContent=new Date(document.lastModified).toLocaleString();</script>
+</body></html>
