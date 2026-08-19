@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STA210U — Section 2D | StatsLG</title>
+<meta name="description" content="STA210U Section 2D — Linear Correlation and Regression.">
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/style/bctcstyle.css">
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+.notes-page{max-width:1100px;margin:0 auto;padding:32px 40px}
+.notes-content{max-width:900px;margin:0 auto}
+.notes-content h2{margin-top:2rem;scroll-margin-top:1rem}
+.notes-content h3{margin-top:1.5rem;color:var(--ink)}
+.notes-content p,.notes-content li{line-height:1.65}
+.back-row{margin:0 0 20px;display:flex;gap:10px;flex-wrap:wrap}
+.toc{margin-bottom:1.5rem}.toc h2{margin-top:0}
+.toc a{color:var(--kctcs-blue);font-weight:700}.toc a:hover{text-decoration:underline}
+.definition{border-left:5px solid var(--kctcs-blue);padding:12px 14px;margin:14px 0;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.definition strong{color:var(--kctcs-blue)}
+.formula{font-size:1.15rem;text-align:center;color:var(--kctcs-blue);margin:16px 0;padding:14px;background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius);overflow-x:auto}
+.example{margin:18px 0}.key-idea{border-left:5px solid var(--kctcs-gold)}
+details.answer{margin-top:14px;border-top:1px solid var(--rule);padding-top:10px}
+details.answer summary{cursor:pointer;color:var(--kctcs-blue);font-weight:800}
+.answer-body{border-left:5px solid var(--kctcs-gold);padding:10px 14px;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.figure{margin:24px 0;text-align:center}
+.figure img{width:100%;max-width:820px;height:auto;border:1px solid var(--rule);border-radius:var(--radius);background:#fff;box-shadow:var(--shadow-1)}
+.figure figcaption{margin-top:8px;color:var(--muted);font-size:.92rem}
+.graph-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;margin:20px 0}
+.graph-grid .figure{margin:0}
+.notes-footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted);font-size:12px}
+@media(max-width:760px){.notes-page{padding:20px 16px}.back-row{flex-direction:column;align-items:stretch}.back-row .btn{justify-content:center}}
+@media print{.back-row{display:none}.notes-page,.notes-content{max-width:none;padding:0}details.answer>*{display:block!important}}
+</style>
+</head>
+<body><main class="notes-page"><div class="notes-content">
+
+<div class="back-row">
+<a class="btn outline btn-sm" href="index.html">← Back to STA210U Notes</a>
+<a class="btn btn-sm" href="STA210U_Section_2D_Linear_Correlation_and_Regression.docx" download>Download Word Notes</a>
+</div>
+
+<header class="header"><h1>STA210U — Section 2D</h1><p>Descriptive Statistics: Linear Correlation and Regression</p></header>
+
+<section class="section panel pad toc"><h2>In This Section</h2><ul>
+<li><a href="#correlation">Linear Correlation</a></li>
+<li><a href="#causation">Cause and Effect</a></li>
+<li><a href="#regression">Linear Regression</a></li>
+</ul></section>
+
+<section id="correlation" class="section">
+<h2>1. Linear Correlation</h2>
+<h3>Quantifying Linear Correlation</h3>
+<div class="definition"><strong>Pearson Product-Moment Correlation Coefficient, \(r\)</strong> — describes the direction and strength of a linear relationship between two quantitative variables.</div>
+<p>It is important to notice that \(r\) only indicates the <strong>linear</strong> relationship. Another kind of relationship could still be present in the data.</p>
+<p>You will not need to calculate \(r\) by hand, but the formula is:</p>
+<div class="formula">\[r=\frac{SXY}{\sqrt{SSX\,SSY}}\]</div>
+<div class="formula">\[SSX=\sum(x-\bar{x})^2=\sum x^2-\frac{(\sum x)^2}{n}\]</div>
+<div class="formula">\[SSY=\sum(y-\bar{y})^2=\sum y^2-\frac{(\sum y)^2}{n}\]</div>
+<div class="formula">\[SXY=\sum(x-\bar{x})(y-\bar{y})=\sum xy-\frac{(\sum x)(\sum y)}{n}\]</div>
+
+<h3>Direction and Strength</h3>
+<p><strong>Positive \(r\)</strong> means larger X values tend to occur with larger Y values. <strong>Negative \(r\)</strong> means larger values of one variable tend to occur with smaller values of the other.</p>
+<p>Strength describes how close the points are to a line.</p>
+<div class="formula">\[-1\le r\le1\]</div>
+<ul>
+<li>\(r=1\): perfect positive linear correlation.</li>
+<li>\(r=-1\): perfect negative linear correlation.</li>
+<li>\(r=0\): no linear relationship, although another kind of relationship may exist.</li>
+<li>In this course, a relationship is generally considered strong when \(|r|\ge .75\).</li>
+</ul>
+<figure class="figure"><img src="STA210U_2D_images/correlation_strength_direction.png" alt="Examples of correlation direction and strength"><figcaption>Direction and Strength of Linear Correlation</figcaption></figure>
+
+<h3>Drug Dosage Example</h3>
+<table><thead><tr><th>Dosage of Drug, X</th><th>Reduction in Blood Pressure, Y</th></tr></thead><tbody>
+<tr><td>100</td><td>10</td></tr><tr><td>200</td><td>18</td></tr><tr><td>300</td><td>32</td></tr><tr><td>400</td><td>44</td></tr><tr><td>500</td><td>56</td></tr>
+</tbody></table>
+<p>The scatterplot indicates a very strong positive linear relationship:</p>
+<div class="formula">\[r=.99728\]</div>
+
+<h3>R-Squared</h3>
+<div class="definition"><strong>\(R^2\)</strong> — the percent of variation in Y explained by the model. In simple linear regression, \(R^2=r^2\).</div>
+<div class="formula">\[0\%\le R^2\le100\%\]</div>
+<div class="formula">\[R^2=(.99728)^2\approx.995=99.5\%\]</div>
+</section>
+
+<section id="causation" class="section">
+<h2>2. Cause and Effect</h2>
+<div class="definition"><strong>“Causal” Research</strong> — research whose objective is to determine whether one variable causes changes in another.</div>
+<div class="card soft key-idea"><h3>Correlation Does Not Imply Causation</h3><p>It is never possible to prove causality just from the relationship between two variables.</p></div>
+<h3>Ice Cream and Assaults</h3>
+<p>The notes give an example of a strong correlation between ice cream consumption and assaults over the months of the year. That does not mean ice cream causes crime. Hot summer temperatures can increase both variables.</p>
+<h3>Criteria for Establishing a Causal Relationship</h3>
+<ol>
+<li><strong>Time order:</strong> the cause must occur before the effect.</li>
+<li><strong>Co-variation:</strong> the graph and correlation coefficient must show a strong relationship.</li>
+<li><strong>Rationale:</strong> there must be a logical and compelling explanation for the causal mechanism.</li>
+<li><strong>Non-spuriousness:</strong> rival explanations must be ruled out.</li>
+</ol>
+<p>The fourth criterion is especially difficult. Repeating studies under differing conditions can help rule out rival explanations.</p>
+</section>
+
+<section id="regression" class="section">
+<h2>3. Linear Regression</h2>
+<div class="definition"><strong>Deterministic View</strong> — once X is known, the exact value of Y is known.</div>
+<div class="definition"><strong>Regression</strong> — a technique used to predict variables based on other variables.</div>
+<div class="definition"><strong>Linear Regression</strong> — predicts Y, the response variable, from X, the explanatory variable, using a linear equation.</div>
+<p>Prediction is not exact. The error is represented by the vertical distance between a point and the regression line.</p>
+<div class="formula">\[\hat{Y}=b_0+b_1X\]</div>
+<ul><li>\(b_0\) is the y-intercept.</li><li>\(b_1\) is the slope.</li></ul>
+<p>Before fitting a line, the scatterplot and \(r\) should indicate that a linear model is reasonable.</p>
+
+<h3>Method of Least Squares</h3>
+<div class="definition"><strong>Method of Least Squares</strong> — minimizes the sum of the squared vertical distances from the observed points to the regression line.</div>
+<div class="formula">\[b_1=\frac{SXY}{SSX}\]</div>
+<div class="formula">\[b_0=\bar{y}-b_1\bar{x}\]</div>
+
+<h3>Drug Dosage Regression</h3>
+<div class="formula">\[b_1=.118\qquad b_0=-3.4\]</div>
+<div class="formula">\[\hat{Y}=-3.4+.118X\]</div>
+<figure class="figure"><img src="STA210U_2D_images/drug_regression_plot.png" alt="Regression plot of drug dosage and reduction in blood pressure"><figcaption>Regression Plot for Drug Dosage and Reduction in Blood Pressure</figcaption></figure>
+<p>If \(R^2\) is provided instead of \(r\), take the square root of \(R^2\) and use the sign of the slope to determine whether \(r\) is positive or negative.</p>
+
+<article class="card example"><h3>Prediction Example</h3><p>Predict reduction in blood pressure if dosage is 250.</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body">
+<div class="formula">\[\hat{Y}=-3.4+.118(250)=26.1\]</div>
+</div></details></article>
+
+<h3>Automobile Weight and Gas Mileage</h3>
+<table><thead><tr><th>Weight, X (1000 lb)</th><th>Gas Mileage, Y (mpg)</th></tr></thead><tbody><tr><td>2.5</td><td>40.0</td></tr><tr><td>3.0</td><td>43.0</td></tr><tr><td>4.0</td><td>30.0</td></tr><tr><td>3.5</td><td>35.0</td></tr><tr><td>2.7</td><td>42.0</td></tr><tr><td>4.5</td><td>19.0</td></tr><tr><td>3.8</td><td>32.0</td></tr><tr><td>2.9</td><td>39.0</td></tr><tr><td>5.0</td><td>15.0</td></tr><tr><td>2.2</td><td>44.0</td></tr></tbody></table>
+<figure class="figure"><img src="STA210U_2D_images/automobile_regression_plot.png" alt="Regression plot of automobile weight and gas mileage"><figcaption>Regression Plot: Automobile Weight vs. Gas Mileage</figcaption></figure>
+<div class="formula">\[R^2=92.0\%\qquad \hat{Y}=70.1058-10.6175X\]</div>
+<article class="card example"><h3>Questions</h3><ol>
+<li>Calculate \(r\).</li>
+<li>Based on \(r\) and the scatterplot, is linear regression justified?</li>
+<li>Predict the gas mileage for a car weighing 4.2 (4,200) pounds.</li>
+</ol>
+<details class="answer"><summary>Show Answers</summary><div class="answer-body">
+<p><strong>1.</strong> The slope is negative, so:</p>
+<div class="formula">\[r=-\sqrt{.92}\approx-.959\]</div>
+<p><strong>2.</strong> Yes. \(|r|\ge.75\) and the scatterplot is reasonably linear.</p>
+<p><strong>3.</strong></p>
+<div class="formula">\[\hat{Y}=70.1058-10.6175(4.2)\approx25.512\]</div>
+</div></details></article>
+
+<h3>Cautions with Regression</h3>
+<div class="definition"><strong>Interpolation</strong> — predicting Y for X values within the observed range.</div>
+<div class="definition"><strong>Extrapolation</strong> — predicting Y for X values beyond the observed range. This should not be done with a basic regression model.</div>
+<figure class="figure"><img src="STA210U_2D_images/interpolation_extrapolation.png" alt="Illustration of interpolation and extrapolation"><figcaption>Interpolation vs. Extrapolation</figcaption></figure>
+<p>In the drug example, X ranges from 100 to 500. Predicting within that range is reasonable. Predicting at X = 1000 assumes the relationship continues beyond the observed data.</p>
+
+<h3>Extreme Values Can Distort Regression</h3>
+<p>The least-squares line and \(r\) can be affected greatly by extreme data points.</p>
+<div class="graph-grid"><figure class="figure"><img src="STA210U_2D_images/extreme_value_before.png" alt="Scatterplot with no linear relationship before adding an extreme point"><figcaption>Before Adding an Extreme Value</figcaption></figure><figure class="figure"><img src="STA210U_2D_images/extreme_value_after.png" alt="Scatterplot after adding an influential extreme point"><figcaption>After Adding One Extreme Value</figcaption></figure></div>
+<p><em>These two graphs recreate the teaching point from the notes because the original raw coordinates for the final extreme-value example were not included in the extracted text.</em></p>
+<p>An influential extreme point can make the remaining observations look compressed and artificially close to a line. Remove an extreme value temporarily and check whether the relationship still exists before trusting the regression.</p>
+</section>
+
+<div class="back-row" style="margin-top:36px">
+<a class="btn outline btn-sm" href="index.html">← Back to STA210U Notes</a>
+<a class="btn btn-sm" href="STA210U_Section_2D_Linear_Correlation_and_Regression.docx" download>Download Word Notes</a>
+</div>
+<footer class="notes-footer">Last updated: <span id="lastUpdated"></span></footer>
+</div></main>
+<script>document.getElementById('lastUpdated').textContent=new Date(document.lastModified).toLocaleString();</script>
+</body></html>
