@@ -9,75 +9,140 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <style>
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.75;
+    }
+
+    .primary-action {
+      margin-top: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+      width: 100%;
+    }
+
+    .back-btn {
+      width: 100%;
+    }
+
+    .control-note {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 6px;
+    }
+
+    .group-color-controls {
+      display: none;
+    }
+
+    .group-color-controls.active {
+      display: block;
+    }
+
+    .single-color-controls.hidden {
+      display: none;
+    }
+  </style>
 </head>
 
 <body>
-  <div class="wrap">
 
-    <aside class="panel left">
+<div class="wrap">
 
-      <div class="card">
-        <button class="btn" onclick="history.back()">← Go Back</button>
-      </div>
+  <aside class="panel left">
 
-      <div class="card">
-        <label>Upload data (CSV / Excel)</label>
-        <input id="file" type="file" accept=".csv, .xlsx" />
+    <!-- NAVIGATION -->
+    <div class="card">
+      <button class="btn back-btn" onclick="history.back()">
+        ← Go Back
+      </button>
+    </div>
 
-        <button class="btn" id="loadBtn">Load File</button>
-        <button class="btn" id="sampleBtn">Load Sample</button>
-      </div>
+    <!-- DATA -->
+    <div class="card">
 
-      <div class="card">
+      <div class="section-title">Data</div>
 
-        <label>Column</label>
-        <select id="colSelect">
-          <option value="">—</option>
-        </select>
+      <label>Upload data (CSV / Excel)</label>
+      <input id="file" type="file" accept=".csv,.xlsx" />
 
-        <label>Group by</label>
-        <select id="groupSelect">
-          <option value="">None</option>
-        </select>
+      <button class="btn" id="loadBtn">
+        Load File
+      </button>
 
-        <label>Summarize by</label>
-        <select id="summary">
-          <option value="count">Count</option>
-          <option value="percent">Percent</option>
-        </select>
+      <button class="btn" id="sampleBtn">
+        Load Sample
+      </button>
 
-        <label>Chart Title</label>
-        <input
-          id="titleInput"
-          type="text"
-          placeholder="Chart Title"
-        />
+    </div>
 
-        <label>X-Axis Label</label>
-        <input
-          id="xlabelInput"
-          type="text"
-          placeholder="X Axis Label"
-        />
+    <!-- VARIABLES -->
+    <div class="card">
 
-        <label>Y-Axis Label</label>
-        <input
-          id="ylabelInput"
-          type="text"
-          placeholder="Y Axis Label"
-        />
+      <div class="section-title">Variables</div>
 
-        <button class="btn" id="drawBarBtn">
-          Draw Bar Chart
-        </button>
+      <label>Column</label>
+      <select id="colSelect">
+        <option value="">—</option>
+      </select>
 
-        <button class="btn" id="downloadPNGBtn">
-          Download PNG
-        </button>
+      <label>Group by</label>
+      <select id="groupSelect">
+        <option value="">None</option>
+      </select>
 
-      </div>
+      <label>Summarize by</label>
+      <select id="summary">
+        <option value="count">Count</option>
+        <option value="percent">Percent</option>
+      </select>
 
-      <div class="card">
+      <button class="btn primary-action" id="drawBarBtn">
+        Draw Bar Chart
+      </button>
+
+    </div>
+
+    <!-- LABELS -->
+    <div class="card">
+
+      <div class="section-title">Labels</div>
+
+      <label>Chart Title</label>
+      <input
+        id="titleInput"
+        type="text"
+        placeholder="Chart Title"
+      />
+
+      <label>X-Axis Label</label>
+      <input
+        id="xlabelInput"
+        type="text"
+        placeholder="X Axis Label"
+      />
+
+      <label>Y-Axis Label</label>
+      <input
+        id="ylabelInput"
+        type="text"
+        placeholder="Y Axis Label"
+      />
+
+    </div>
+
+    <!-- APPEARANCE -->
+    <div class="card">
+
+      <div class="section-title">Appearance</div>
+
+      <div id="singleColorControls" class="single-color-controls">
 
         <label>Bar Fill</label>
         <input
@@ -86,85 +151,159 @@
           value="#60a5fa"
         />
 
-        <label>Bar Border</label>
-        <input
-          id="borderColor"
-          type="color"
-          value="#1f2937"
-        />
-
-        <label>Fill Opacity</label>
-        <input
-          id="opacity"
-          type="number"
-          min="0"
-          max="1"
-          step="0.1"
-          value="0.8"
-        />
-
-        <label>Graph Background</label>
-        <input
-          id="bgColor"
-          type="color"
-          value="#ffffff"
-        />
-
-        <label>Chart Height (px)</label>
-        <input
-          id="chartH"
-          type="number"
-          value="520"
-        />
-
-        <label>Chart Width (px)</label>
-        <input
-          id="chartW"
-          type="number"
-          value="800"
-        />
-
-        <button class="btn" id="applySizeBtn">
-          Apply Size
-        </button>
-
       </div>
 
-      <div class="card">
+      <div id="groupColorControls" class="group-color-controls">
 
-        <label>Font Family</label>
+        <label>Grouped Bar Palette</label>
 
-        <select id="fontFamily">
-          <option value="sans-serif">Sans-serif</option>
-          <option value="serif">Serif</option>
-          <option value="monospace">Monospace</option>
-          <option value="cursive">Cursive</option>
+        <select id="paletteSelect">
+
+          <option value="bctc">
+            BCTC
+          </option>
+
+          <option value="classic">
+            Classic
+          </option>
+
+          <option value="bright">
+            Bright
+          </option>
+
+          <option value="pastel">
+            Pastel
+          </option>
+
+          <option value="colorblind">
+            Colorblind Friendly
+          </option>
+
         </select>
 
-        <label>Font Size (px)</label>
-
-        <input
-          id="fontSize"
-          type="number"
-          value="12"
-        />
+        <div class="control-note">
+          Each group will receive a different color.
+        </div>
 
       </div>
 
-      <div class="card">
-        <strong>Dataset Preview</strong>
-        <div id="preview" class="preview"></div>
+      <label>Bar Border</label>
+      <input
+        id="borderColor"
+        type="color"
+        value="#1f2937"
+      />
+
+      <label>Fill Opacity</label>
+      <input
+        id="opacity"
+        type="number"
+        min="0"
+        max="1"
+        step="0.1"
+        value="0.8"
+      />
+
+      <label>Graph Background</label>
+      <input
+        id="bgColor"
+        type="color"
+        value="#ffffff"
+      />
+
+      <label>Font Family</label>
+
+      <select id="fontFamily">
+        <option value="sans-serif">
+          Sans-serif
+        </option>
+
+        <option value="serif">
+          Serif
+        </option>
+
+        <option value="monospace">
+          Monospace
+        </option>
+
+        <option value="cursive">
+          Cursive
+        </option>
+      </select>
+
+      <label>Font Size (px)</label>
+      <input
+        id="fontSize"
+        type="number"
+        value="12"
+      />
+
+    </div>
+
+    <!-- SIZE & EXPORT -->
+    <div class="card">
+
+      <div class="section-title">
+        Size & Export
       </div>
 
-    </aside>
+      <label>Chart Width (px)</label>
+      <input
+        id="chartW"
+        type="number"
+        value="800"
+      />
 
-    <main class="panel">
-      <div class="chart-wrap">
-        <canvas id="chart"></canvas>
+      <label>Chart Height (px)</label>
+      <input
+        id="chartH"
+        type="number"
+        value="520"
+      />
+
+      <button
+        class="btn"
+        id="applySizeBtn"
+      >
+        Apply Size
+      </button>
+
+      <button
+        class="btn"
+        id="downloadPNGBtn"
+      >
+        Download PNG
+      </button>
+
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="card">
+
+      <div class="section-title">
+        Dataset Preview
       </div>
-    </main>
 
-  </div>
+      <div
+        id="preview"
+        class="preview"
+      ></div>
+
+    </div>
+
+  </aside>
+
+
+  <!-- CHART -->
+  <main class="panel">
+
+    <div class="chart-wrap">
+      <canvas id="chart"></canvas>
+    </div>
+
+  </main>
+
+</div>
 
 
 <script>
@@ -175,17 +314,88 @@ let currentChart = null;
 
 
 /* =========================================================
-   COLOR HELPERS
+   COLOR PALETTES
+   ========================================================= */
+
+const PALETTES = {
+
+  bctc: [
+    '#00467f',
+    '#e7a614',
+    '#5b9bd5',
+    '#a5a5a5',
+    '#4472c4',
+    '#ffc000',
+    '#70ad47',
+    '#264478'
+  ],
+
+  classic: [
+    '#2563eb',
+    '#dc2626',
+    '#16a34a',
+    '#9333ea',
+    '#ea580c',
+    '#0891b2',
+    '#db2777',
+    '#65a30d'
+  ],
+
+  bright: [
+    '#ff3b30',
+    '#007aff',
+    '#34c759',
+    '#ff9500',
+    '#af52de',
+    '#00c7be',
+    '#ff2d55',
+    '#5856d6'
+  ],
+
+  pastel: [
+    '#93c5fd',
+    '#fca5a5',
+    '#86efac',
+    '#d8b4fe',
+    '#fdba74',
+    '#67e8f9',
+    '#f9a8d4',
+    '#bef264'
+  ],
+
+  colorblind: [
+    '#0072B2',
+    '#E69F00',
+    '#009E73',
+    '#CC79A7',
+    '#56B4E9',
+    '#D55E00',
+    '#F0E442',
+    '#000000'
+  ]
+
+};
+
+
+/* =========================================================
+   HELPERS
    ========================================================= */
 
 function validAlpha(a){
 
   let x = parseFloat(a);
 
-  if(isNaN(x)) x = 0.8;
+  if(isNaN(x)){
+    x = 0.8;
+  }
 
-  if(x < 0) x = 0;
-  if(x > 1) x = 1;
+  if(x < 0){
+    x = 0;
+  }
+
+  if(x > 1){
+    x = 1;
+  }
 
   return x;
 }
@@ -195,7 +405,7 @@ function hexToRgba(hex, alpha = 1){
 
   const m =
     /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i
-    .exec(hex || '#60a5fa');
+      .exec(hex || '#60a5fa');
 
   const a = validAlpha(alpha);
 
@@ -211,31 +421,8 @@ function hexToRgba(hex, alpha = 1){
 }
 
 
-/*
-  Palette used when Group By is selected.
-  We use distinct colors so each group is easy to identify.
-*/
-
-const GROUP_COLORS = [
-
-  '#2563eb',
-  '#dc2626',
-  '#16a34a',
-  '#9333ea',
-  '#ea580c',
-  '#0891b2',
-  '#db2777',
-  '#65a30d',
-  '#4f46e5',
-  '#ca8a04',
-  '#0f766e',
-  '#7c3aed'
-
-];
-
-
 /* =========================================================
-   DATA TABLE PREVIEW
+   DATA PREVIEW
    ========================================================= */
 
 function buildTable(rows){
@@ -244,23 +431,26 @@ function buildTable(rows){
     return '<div>No data loaded</div>';
   }
 
-  const headers = Object.keys(rows[0]);
+  const headers =
+    Object.keys(rows[0]);
 
   let html =
     '<table><thead><tr>' +
-    headers.map(h => `<th>${h}</th>`).join('') +
+    headers
+      .map(h => `<th>${h}</th>`)
+      .join('') +
     '</tr></thead><tbody>';
-
 
   for(const r of rows.slice(0,20)){
 
     html +=
       '<tr>' +
-      headers.map(h => `<td>${r[h]}</td>`).join('') +
+      headers
+        .map(h => `<td>${r[h]}</td>`)
+        .join('') +
       '</tr>';
 
   }
-
 
   html += '</tbody></table>';
 
@@ -269,17 +459,19 @@ function buildTable(rows){
 
 
 /* =========================================================
-   FILE LOADING
+   LOAD DATA
    ========================================================= */
 
 async function loadFile(file){
 
-  const buf = await file.arrayBuffer();
+  const buf =
+    await file.arrayBuffer();
 
-  const wb = XLSX.read(
-    buf,
-    {type:'array'}
-  );
+  const wb =
+    XLSX.read(
+      buf,
+      {type:'array'}
+    );
 
   const ws =
     wb.Sheets[
@@ -296,10 +488,6 @@ async function loadFile(file){
 }
 
 
-/* =========================================================
-   DATA SETUP
-   ========================================================= */
-
 function setData(rows){
 
   DATA = rows;
@@ -309,52 +497,41 @@ function setData(rows){
       ? Object.keys(rows[0])
       : [];
 
-
-  const columnOptions =
+  const options =
     HEADERS
       .map(
-        h => `<option value="${h}">${h}</option>`
+        h =>
+          `<option value="${h}">${h}</option>`
       )
       .join('');
 
-
-  /*
-    Populate primary variable.
-  */
-
-  document.getElementById('colSelect').innerHTML =
+  document.getElementById(
+    'colSelect'
+  ).innerHTML =
     '<option value="">—</option>' +
-    columnOptions;
+    options;
 
-
-  /*
-    Populate Group By selector.
-  */
-
-  document.getElementById('groupSelect').innerHTML =
+  document.getElementById(
+    'groupSelect'
+  ).innerHTML =
     '<option value="">None</option>' +
-    columnOptions;
+    options;
 
-
-  /*
-    Show preview.
-  */
-
-  document.getElementById('preview').innerHTML =
+  document.getElementById(
+    'preview'
+  ).innerHTML =
     buildTable(DATA);
 }
 
 
 /* =========================================================
-   NORMAL BAR CHART SUMMARY
+   SINGLE VARIABLE SUMMARY
    ========================================================= */
 
 function summarizeCategorical(col){
 
   const counts = {};
-
   let total = 0;
-
 
   for(const r of DATA){
 
@@ -364,11 +541,9 @@ function summarizeCategorical(col){
         ? String(r[col]).trim()
         : '';
 
-
     if(v === ''){
       continue;
     }
-
 
     counts[v] =
       (counts[v] || 0) + 1;
@@ -377,91 +552,55 @@ function summarizeCategorical(col){
 
   }
 
-
-  /*
-    Sort categories by frequency.
-  */
-
   const entries =
     Object.entries(counts)
       .sort(
-        (a,b) => b[1] - a[1]
+        (a,b) =>
+          b[1] - a[1]
       );
 
-
-  const labels =
-    entries.map(
-      e => e[0]
-    );
-
-
-  const values =
-    entries.map(
-      e => e[1]
-    );
-
-
   return {
-    labels,
-    values,
+
+    labels:
+      entries.map(e => e[0]),
+
+    values:
+      entries.map(e => e[1]),
+
     total
+
   };
 }
 
 
 /* =========================================================
-   GROUPED BAR CHART SUMMARY
+   GROUPED SUMMARY
    ========================================================= */
 
-function summarizeGrouped(categoryCol, groupCol){
-
-  /*
-    Structure created:
-
-    counts = {
-
-      Chips: {
-        A: 4,
-        B: 2
-      },
-
-      Fruit: {
-        A: 3,
-        B: 5
-      }
-
-    }
-  */
+function summarizeGrouped(
+  categoryCol,
+  groupCol
+){
 
   const counts = {};
-
   const categoryTotals = {};
-
   const groupSet = new Set();
 
   let total = 0;
 
-
   for(const row of DATA){
 
-    let category =
+    const category =
       row[categoryCol] !== undefined &&
       row[categoryCol] !== null
         ? String(row[categoryCol]).trim()
         : '';
 
-
-    let group =
+    const group =
       row[groupCol] !== undefined &&
       row[groupCol] !== null
         ? String(row[groupCol]).trim()
         : '';
-
-
-    /*
-      Ignore rows with a missing category
-      or missing grouping value.
-    */
 
     if(
       category === '' ||
@@ -470,22 +609,17 @@ function summarizeGrouped(categoryCol, groupCol){
       continue;
     }
 
-
     groupSet.add(group);
-
 
     if(!counts[category]){
 
       counts[category] = {};
-
       categoryTotals[category] = 0;
 
     }
 
-
     counts[category][group] =
       (counts[category][group] || 0) + 1;
-
 
     categoryTotals[category]++;
 
@@ -493,10 +627,6 @@ function summarizeGrouped(categoryCol, groupCol){
 
   }
 
-
-  /*
-    Sort x-axis categories by total frequency.
-  */
 
   const categories =
     Object.keys(counts)
@@ -506,10 +636,6 @@ function summarizeGrouped(categoryCol, groupCol){
           categoryTotals[a]
       );
 
-
-  /*
-    Sort groups alphabetically.
-  */
 
   const groups =
     Array.from(groupSet)
@@ -538,7 +664,7 @@ function summarizeGrouped(categoryCol, groupCol){
 
 
 /* =========================================================
-   SIZE CONTROL
+   SIZE
    ========================================================= */
 
 function applySize(){
@@ -548,87 +674,36 @@ function applySize(){
       '.chart-wrap'
     );
 
-
   const h =
     parseInt(
-      document.getElementById('chartH').value,
+      document.getElementById(
+        'chartH'
+      ).value,
+      10
+    );
+
+  const w =
+    parseInt(
+      document.getElementById(
+        'chartW'
+      ).value,
       10
     );
 
 
   if(!isNaN(h)){
-
     wrap.style.height =
       h + 'px';
-
   }
 
 
-  const w =
-    document.getElementById('chartW').value;
-
-
-  if(w){
-
+  if(!isNaN(w)){
     wrap.style.width =
       w + 'px';
-
   }else{
-
     wrap.style.width =
       '100%';
-
   }
-}
-
-
-/* =========================================================
-   COLOR SETTINGS
-   ========================================================= */
-
-function computeColors(){
-
-  const fillHex =
-    document.getElementById(
-      'fillColor'
-    ).value;
-
-
-  const borderHex =
-    document.getElementById(
-      'borderColor'
-    ).value;
-
-
-  const alpha =
-    validAlpha(
-      document.getElementById(
-        'opacity'
-      ).value
-    );
-
-
-  const bgHex =
-    document.getElementById(
-      'bgColor'
-    ).value || '#ffffff';
-
-
-  return {
-
-    fill:
-      hexToRgba(
-        fillHex,
-        alpha
-      ),
-
-    border:
-      borderHex,
-
-    bg:
-      bgHex
-
-  };
 }
 
 
@@ -645,13 +720,10 @@ const backgroundPlugin = {
     const ctx =
       chart.ctx;
 
-
     const bg =
       document.getElementById(
         'bgColor'
-      )?.value ||
-      '#ffffff';
-
+      ).value || '#ffffff';
 
     ctx.save();
 
@@ -672,6 +744,34 @@ const backgroundPlugin = {
 
 
 /* =========================================================
+   GROUP COLOR UI
+   ========================================================= */
+
+function updateColorControls(){
+
+  const grouped =
+    document.getElementById(
+      'groupSelect'
+    ).value !== '';
+
+  document.getElementById(
+    'singleColorControls'
+  ).classList.toggle(
+    'hidden',
+    grouped
+  );
+
+  document.getElementById(
+    'groupColorControls'
+  ).classList.toggle(
+    'active',
+    grouped
+  );
+
+}
+
+
+/* =========================================================
    DRAW CHART
    ========================================================= */
 
@@ -682,10 +782,14 @@ function drawBar(){
       'colSelect'
     ).value;
 
-
   const groupCol =
     document.getElementById(
       'groupSelect'
+    ).value;
+
+  const summary =
+    document.getElementById(
+      'summary'
     ).value;
 
 
@@ -697,11 +801,6 @@ function drawBar(){
 
   }
 
-
-  /*
-    Prevent using the same variable
-    as both category and group.
-  */
 
   if(
     groupCol &&
@@ -717,17 +816,18 @@ function drawBar(){
   }
 
 
-  const summary =
-    document.getElementById(
-      'summary'
-    ).value;
+  applySize();
+
+
+  if(currentChart){
+    currentChart.destroy();
+  }
 
 
   const fontFamily =
     document.getElementById(
       'fontFamily'
     ).value;
-
 
   const fontSize =
     parseInt(
@@ -768,42 +868,41 @@ function drawBar(){
     );
 
 
-  applySize();
+  const borderColor =
+    document.getElementById(
+      'borderColor'
+    ).value;
 
 
-  if(currentChart){
+  const alpha =
+    validAlpha(
+      document.getElementById(
+        'opacity'
+      ).value
+    );
 
-    currentChart.destroy();
 
-  }
+  let labels;
+  let datasets;
 
 
-  /*
-    =====================================================
-    GROUPED BAR CHART
-    =====================================================
-  */
+  /* =====================================================
+     GROUPED BAR CHART
+     ===================================================== */
 
   if(groupCol){
 
-    const {
-
-      counts,
-      categories,
-      groups,
-      total
-
-    } =
+    const grouped =
       summarizeGrouped(
         col,
         groupCol
       );
 
 
-    if(total === 0){
+    if(grouped.total === 0){
 
       alert(
-        'No usable data were found for these variables.'
+        'No usable observations were found.'
       );
 
       return;
@@ -811,50 +910,50 @@ function drawBar(){
     }
 
 
-    const alpha =
-      validAlpha(
-        document.getElementById(
-          'opacity'
-        ).value
-      );
+    labels =
+      grouped.categories;
 
 
-    const borderColor =
+    const paletteName =
       document.getElementById(
-        'borderColor'
+        'paletteSelect'
       ).value;
 
 
-    const datasets =
-      groups.map(
+    const palette =
+      PALETTES[paletteName] ||
+      PALETTES.bctc;
+
+
+    datasets =
+      grouped.groups.map(
         (group,index)=>{
 
-          const color =
-            GROUP_COLORS[
-              index %
-              GROUP_COLORS.length
-            ];
-
-
           const rawValues =
-            categories.map(
+            grouped.categories.map(
               category =>
-                counts[category][group] || 0
+                grouped.counts[category][group] || 0
             );
 
-
-          /*
-            Percent of all valid observations.
-          */
 
           const values =
             summary === 'percent'
 
               ? rawValues.map(
-                  n => 100 * n / total
+                  n =>
+                    100 *
+                    n /
+                    grouped.total
                 )
 
               : rawValues;
+
+
+          const color =
+            palette[
+              index %
+              palette.length
+            ];
 
 
           return {
@@ -879,270 +978,72 @@ function drawBar(){
         }
       );
 
+  }
 
-    currentChart =
-      new Chart(
-        document.getElementById(
-          'chart'
-        ),
-        {
 
-          type:'bar',
+  /* =====================================================
+     NORMAL BAR CHART
+     ===================================================== */
 
-          data:{
+  else{
 
-            labels:categories,
+    const result =
+      summarizeCategorical(col);
 
-            datasets:datasets
 
-          },
+    labels =
+      result.labels;
 
-          options:{
 
-            responsive:true,
+    const values =
+      summary === 'percent' &&
+      result.total > 0
 
-            maintainAspectRatio:false,
+        ? result.values.map(
+            n =>
+              100 *
+              n /
+              result.total
+          )
 
+        : result.values;
 
-            plugins:{
 
-              legend:{
+    const fillColor =
+      document.getElementById(
+        'fillColor'
+      ).value;
 
-                display:true,
 
-                title:{
+    datasets = [
 
-                  display:true,
+      {
 
-                  text:groupCol,
+        label:col,
 
-                  font:{
+        data:values,
 
-                    family:fontFamily,
+        backgroundColor:
+          hexToRgba(
+            fillColor,
+            alpha
+          ),
 
-                    size:fontSize
+        borderColor:
+          borderColor,
 
-                  }
+        borderWidth:1
 
-                },
+      }
 
-                labels:{
-
-                  font:{
-
-                    family:fontFamily,
-
-                    size:fontSize
-
-                  }
-
-                }
-
-              },
-
-
-              title:{
-
-                display:true,
-
-                text:chartTitle,
-
-                font:{
-
-                  family:fontFamily,
-
-                  size:fontSize + 2
-
-                }
-
-              },
-
-
-              tooltip:{
-
-                callbacks:{
-
-                  label:(ctx)=>{
-
-                    const value =
-                      ctx.parsed.y;
-
-
-                    if(
-                      summary ===
-                      'percent'
-                    ){
-
-                      return (
-                        ctx.dataset.label +
-                        ': ' +
-                        value.toFixed(1) +
-                        '%'
-                      );
-
-                    }
-
-
-                    return (
-                      ctx.dataset.label +
-                      ': ' +
-                      value
-                    );
-
-                  }
-
-                },
-
-
-                bodyFont:{
-
-                  family:fontFamily,
-
-                  size:fontSize
-
-                }
-
-              }
-
-            },
-
-
-            scales:{
-
-              x:{
-
-                stacked:false,
-
-                title:{
-
-                  display:!!xlabel,
-
-                  text:xlabel,
-
-                  font:{
-
-                    family:fontFamily,
-
-                    size:fontSize
-
-                  }
-
-                },
-
-                ticks:{
-
-                  font:{
-
-                    family:fontFamily,
-
-                    size:fontSize
-
-                  }
-
-                }
-
-              },
-
-
-              y:{
-
-                stacked:false,
-
-                beginAtZero:true,
-
-                title:{
-
-                  display:!!ylabel,
-
-                  text:ylabel,
-
-                  font:{
-
-                    family:fontFamily,
-
-                    size:fontSize
-
-                  }
-
-                },
-
-                ticks:{
-
-                  font:{
-
-                    family:fontFamily,
-
-                    size:fontSize
-
-                  },
-
-                  callback:(v)=>
-
-                    summary ===
-                    'percent'
-
-                      ? v + '%'
-
-                      : v
-
-                }
-
-              }
-
-            }
-
-          },
-
-
-          plugins:[
-            backgroundPlugin
-          ]
-
-        }
-      );
-
-
-    return;
+    ];
 
   }
 
 
-  /*
-    =====================================================
-    STANDARD BAR CHART
-    =====================================================
-  */
-
-  const {
-
-    labels,
-    values,
-    total
-
-  } =
-    summarizeCategorical(col);
-
-
-  const yvals =
-
-    summary === 'percent' &&
-    total > 0
-
-      ? values.map(
-          n => 100 * n / total
-        )
-
-      : values;
-
-
-  const {
-
-    fill,
-    border
-
-  } =
-    computeColors();
-
+  /* =====================================================
+     CREATE CHART
+     ===================================================== */
 
   currentChart =
     new Chart(
@@ -1155,26 +1056,10 @@ function drawBar(){
 
         data:{
 
-          labels:labels,
-
-          datasets:[
-            {
-
-              label:col,
-
-              data:yvals,
-
-              backgroundColor:fill,
-
-              borderColor:border,
-
-              borderWidth:1
-
-            }
-          ]
+          labels,
+          datasets
 
         },
-
 
         options:{
 
@@ -1182,17 +1067,18 @@ function drawBar(){
 
           maintainAspectRatio:false,
 
-
           plugins:{
 
             legend:{
+
+              display:
+                !!groupCol,
 
               labels:{
 
                 font:{
 
                   family:fontFamily,
-
                   size:fontSize
 
                 }
@@ -1211,7 +1097,6 @@ function drawBar(){
               font:{
 
                 family:fontFamily,
-
                 size:fontSize + 2
 
               }
@@ -1223,24 +1108,32 @@ function drawBar(){
 
               callbacks:{
 
-                label:(ctx)=>
+                label:(ctx)=>{
 
-                  summary ===
-                  'percent'
+                  const value =
+                    ctx.parsed.y;
 
-                    ? ctx.parsed.y
-                        .toFixed(1) +
-                      '%'
+                  const prefix =
+                    groupCol
+                      ? ctx.dataset.label + ': '
+                      : '';
 
-                    : ctx.parsed.y
+                  return (
+                    prefix +
+                    (
+                      summary === 'percent'
+                        ? value.toFixed(1) + '%'
+                        : value
+                    )
+                  );
+
+                }
 
               },
-
 
               bodyFont:{
 
                 family:fontFamily,
-
                 size:fontSize
 
               }
@@ -1263,7 +1156,6 @@ function drawBar(){
                 font:{
 
                   family:fontFamily,
-
                   size:fontSize
 
                 }
@@ -1275,7 +1167,6 @@ function drawBar(){
                 font:{
 
                   family:fontFamily,
-
                   size:fontSize
 
                 }
@@ -1298,7 +1189,6 @@ function drawBar(){
                 font:{
 
                   family:fontFamily,
-
                   size:fontSize
 
                 }
@@ -1310,18 +1200,13 @@ function drawBar(){
                 font:{
 
                   family:fontFamily,
-
                   size:fontSize
 
                 },
 
                 callback:(v)=>
-
-                  summary ===
-                  'percent'
-
+                  summary === 'percent'
                     ? v + '%'
-
                     : v
 
               }
@@ -1331,7 +1216,6 @@ function drawBar(){
           }
 
         },
-
 
         plugins:[
           backgroundPlugin
@@ -1344,106 +1228,19 @@ function drawBar(){
 
 
 /* =========================================================
-   LIVE COLOR REFRESH
+   LIVE APPEARANCE UPDATE
    ========================================================= */
 
-function refreshColors(){
+function refreshChartAppearance(){
 
   if(!currentChart){
     return;
   }
 
+  drawBar();
 
-  const groupCol =
-    document.getElementById(
-      'groupSelect'
-    ).value;
-
-
-  const alpha =
-    validAlpha(
-      document.getElementById(
-        'opacity'
-      ).value
-    );
-
-
-  const border =
-    document.getElementById(
-      'borderColor'
-    ).value;
-
-
-  /*
-    GROUPED CHART
-  */
-
-  if(groupCol){
-
-    currentChart.data.datasets
-      .forEach(
-        (ds,index)=>{
-
-          const color =
-            GROUP_COLORS[
-              index %
-              GROUP_COLORS.length
-            ];
-
-
-          ds.backgroundColor =
-            hexToRgba(
-              color,
-              alpha
-            );
-
-
-          ds.borderColor =
-            border;
-
-        }
-      );
-
-  }
-
-
-  /*
-    STANDARD CHART
-  */
-
-  else{
-
-    const fillHex =
-      document.getElementById(
-        'fillColor'
-      ).value;
-
-
-    const ds =
-      currentChart.data
-        .datasets[0];
-
-
-    ds.backgroundColor =
-      hexToRgba(
-        fillHex,
-        alpha
-      );
-
-
-    ds.borderColor =
-      border;
-
-  }
-
-
-  currentChart.update();
 }
 
-
-/* =========================================================
-   BACKGROUND REFRESH
-   ========================================================= */
 
 function refreshBg(){
 
@@ -1457,7 +1254,7 @@ function refreshBg(){
 
 
 /* =========================================================
-   DOWNLOAD PNG
+   DOWNLOAD
    ========================================================= */
 
 function downloadPNG(){
@@ -1466,20 +1263,16 @@ function downloadPNG(){
     return;
   }
 
-
   const a =
     document.createElement(
       'a'
     );
 
-
   a.href =
     currentChart.toBase64Image();
 
-
   a.download =
     'bar-chart.png';
-
 
   a.click();
 
@@ -1492,71 +1285,22 @@ function downloadPNG(){
 
 const SAMPLE = [
 
-  {
-    Snack:"Chips",
-    Class:"A",
-    Day:"Mon"
-  },
-
-  {
-    Snack:"Cookies",
-    Class:"A",
-    Day:"Mon"
-  },
-
-  {
-    Snack:"Fruit",
-    Class:"A",
-    Day:"Tue"
-  },
-
-  {
-    Snack:"Fruit",
-    Class:"B",
-    Day:"Tue"
-  },
-
-  {
-    Snack:"Chips",
-    Class:"B",
-    Day:"Wed"
-  },
-
-  {
-    Snack:"Fruit",
-    Class:"B",
-    Day:"Wed"
-  },
-
-  {
-    Snack:"Cookies",
-    Class:"C",
-    Day:"Thu"
-  },
-
-  {
-    Snack:"Chips",
-    Class:"C",
-    Day:"Thu"
-  },
-
-  {
-    Snack:"Fruit",
-    Class:"C",
-    Day:"Fri"
-  },
-
-  {
-    Snack:"Cookies",
-    Class:"C",
-    Day:"Fri"
-  }
+  {Snack:"Chips",Class:"A",Day:"Mon"},
+  {Snack:"Cookies",Class:"A",Day:"Mon"},
+  {Snack:"Fruit",Class:"A",Day:"Tue"},
+  {Snack:"Fruit",Class:"B",Day:"Tue"},
+  {Snack:"Chips",Class:"B",Day:"Wed"},
+  {Snack:"Fruit",Class:"B",Day:"Wed"},
+  {Snack:"Cookies",Class:"C",Day:"Thu"},
+  {Snack:"Chips",Class:"C",Day:"Thu"},
+  {Snack:"Fruit",Class:"C",Day:"Fri"},
+  {Snack:"",Class:"C",Day:"Fri"}
 
 ];
 
 
 /* =========================================================
-   EVENT LISTENERS
+   EVENTS
    ========================================================= */
 
 window.addEventListener(
@@ -1585,9 +1329,7 @@ window.addEventListener(
       'sampleBtn'
     ).onclick =
       ()=>{
-
         setData(SAMPLE);
-
       };
 
 
@@ -1609,41 +1351,34 @@ window.addEventListener(
       applySize;
 
 
-    /*
-      Live color updates
-    */
+    document.getElementById(
+      'groupSelect'
+    ).addEventListener(
+      'change',
+      updateColorControls
+    );
+
 
     [
       'fillColor',
       'borderColor',
-      'opacity'
+      'opacity',
+      'paletteSelect',
+      'fontFamily',
+      'fontSize'
     ].forEach(
       id=>{
 
-        const el =
-          document.getElementById(
-            id
-          );
-
-
-        el.addEventListener(
-          'input',
-          refreshColors
-        );
-
-
-        el.addEventListener(
+        document.getElementById(
+          id
+        ).addEventListener(
           'change',
-          refreshColors
+          refreshChartAppearance
         );
 
       }
     );
 
-
-    /*
-      Background update
-    */
 
     document.getElementById(
       'bgColor'
@@ -1659,6 +1394,9 @@ window.addEventListener(
       'change',
       refreshBg
     );
+
+
+    updateColorControls();
 
   }
 );
