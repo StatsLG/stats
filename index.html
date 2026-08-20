@@ -3,163 +3,477 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>StatsLG</title>
-  <meta name="description" content="StatsLG: notes, graphing tools, and analysis labs for learning statistics at BCTC." />
+
+  <meta
+    name="description"
+    content="StatsLG: course notes, graphing tools, analysis modules, and interactive resources for learning statistics at BCTC."
+  />
+
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css">
 </head>
-<body>
-  <div class="wrap">
-    <!-- ===== LEFT PANEL (BRAND SIDEBAR) ===== -->
-    <!-- One-line placeholder. The HTML from /partials/sidebar.html will be injected here. -->
-    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
 
-    <!-- ===== MAIN CONTENT ===== -->
+<body>
+
+  <div class="wrap">
+
+    <!-- =====================================================
+         LEFT SIDEBAR
+         Loaded from /partials/sidebar.html
+    ====================================================== -->
+
+    <aside
+      class="sidebar"
+      aria-label="Site navigation"
+      data-include="/partials/sidebar.html">
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
     <main>
+
+      <!-- ================= HEADER ================= -->
+
       <header>
+
         <div class="site-banner">
           <img src="/images/Statslg.png" alt="StatsLG">
         </div>
+
         <h1>Welcome to StatsLG</h1>
-        <p>Use the left panel to jump straight to graphing tools, analysis modules, or class notes.</p>
+
+        <p>
+          Course notes, interactive statistics tools,
+          graphing modules, and analysis resources.
+        </p>
+
       </header>
 
+
+      <!-- =====================================================
+           CLASS PAGES
+      ====================================================== -->
+
+      <section class="section class-section">
+
+        <h2>Class Pages</h2>
+
+        <div class="grid">
+
+          <!-- STA210U -->
+          <article class="card class-card">
+
+            <h3>STA210U</h3>
+
+            <p>
+              Course notes, examples, demos, and
+              interactive tools for STA210U.
+            </p>
+
+            <div class="btns">
+              <a class="btn" href="/STA210U/index.html">
+                Go to STA210U
+              </a>
+            </div>
+
+          </article>
+
+
+          <!-- STA220 -->
+          <article class="card class-card">
+
+            <h3>STA220 — Statistics</h3>
+
+            <p>
+              Course notes, examples, demos, and
+              interactive tools for STA220.
+            </p>
+
+            <div class="btns">
+              <a class="btn" href="/STA220/index.html">
+                Go to STA220
+              </a>
+            </div>
+
+          </article>
+
+
+          <!-- STA296U -->
+          <article class="card class-card">
+
+            <h3>STA296U</h3>
+
+            <p>
+              Course notes, examples, demos, and
+              interactive tools for STA296U.
+            </p>
+
+            <div class="btns">
+              <a class="btn" href="/STA296U/index.html">
+                Go to STA296U
+              </a>
+            </div>
+
+          </article>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================================
+           GRAPHING MODULES
+      ====================================================== -->
+
       <section class="section">
+
         <h2>Graphing Modules</h2>
+
         <div class="grid">
+
+          <!-- Bar Chart -->
           <article class="card">
+
             <h3>Bar Chart</h3>
-            <p>Create and export a bar chart.</p>
-            <div class="btns"><a class="btn" href="/graphing/barchart.html">Open</a></div>
+
+            <p>
+              Create bar charts from categorical data
+              and export your graph.
+            </p>
+
+            <div class="btns">
+              <a class="btn" href="/graphing/barchart.html">
+                Bar Chart
+              </a>
+            </div>
+
           </article>
+
+
+          <!-- Pie Chart -->
           <article class="card">
+
             <h3>Pie Chart</h3>
-            <p>Slice labels, legend control, PNG export.</p>
-            <div class="btns"><a class="btn" href="/graphing/piechart.html">Open</a></div>
+
+            <p>
+              Create pie charts with customizable labels,
+              legends, and export options.
+            </p>
+
+            <div class="btns">
+              <a class="btn" href="/graphing/piechart.html">
+                Pie Chart
+              </a>
+            </div>
+
           </article>
+
+
+          <!-- Histogram -->
           <article class="card">
+
             <h3>Histogram</h3>
-            <p>Auto binning + manual bins/bin width.</p>
-            <div class="btns"><a class="btn" href="/graphing/histogram.html">Open</a></div>
+
+            <p>
+              Explore quantitative data using automatic
+              or custom bin widths.
+            </p>
+
+            <div class="btns">
+              <a class="btn" href="/graphing/histogram.html">
+                Histogram
+              </a>
+            </div>
+
           </article>
+
+
+          <!-- Boxplot -->
           <article class="card">
+
             <h3>Box &amp; Whisker</h3>
-            <p>Grouped or overall, outliers, PNG export.</p>
-            <div class="btns"><a class="btn" href="/graphing/boxplot.html">Open</a></div>
+
+            <p>
+              Create overall or grouped boxplots and
+              examine possible outliers.
+            </p>
+
+            <div class="btns">
+              <a class="btn" href="/graphing/boxplot.html">
+                Boxplot
+              </a>
+            </div>
+
           </article>
+
+
+          <!-- Scatterplot -->
           <article class="card">
+
             <h3>Scatter + Regression</h3>
-            <p>Best-fit line, equation, r.</p>
-            <div class="btns"><a class="btn" href="/graphing/scatterplot.html">Open</a></div>
+
+            <p>
+              Create scatterplots and explore the
+              least-squares regression line and correlation.
+            </p>
+
+            <div class="btns">
+              <a class="btn" href="/graphing/scatterplot.html">
+                Scatterplot
+              </a>
+            </div>
+
           </article>
+
+
+          <!-- Grouped Bar -->
           <article class="card">
+
             <h3>Grouped Bar</h3>
-            <p>Count/Percent, grouped or stacked.</p>
-            <div class="btns"><a class="btn" href="/graphing/barchart2way.html">Open</a></div>
+
+            <p>
+              Compare two categorical variables using
+              grouped or stacked bar charts.
+            </p>
+
+            <div class="btns">
+              <a class="btn" href="/graphing/barchart2way.html">
+                Grouped Bar
+              </a>
+            </div>
+
           </article>
+
         </div>
+
       </section>
 
+
+      <!-- =====================================================
+           ANALYSIS MODULES
+      ====================================================== -->
+
       <section class="section">
+
         <h2>Analysis Modules</h2>
+
         <div class="grid">
+
+          <!-- Descriptive -->
           <article class="card">
+
             <h3>Descriptive Summary</h3>
-            <p>Numerical &amp; categorical summaries, CSV export.</p>
-            <div class="btns"><a class="btn" href="/descriptive/summary.html">Open</a></div>
+
+            <p>
+              Generate numerical and categorical summaries
+              with export options.
+            </p>
+
+            <div class="btns">
+              <a class="btn" href="/descriptive/summary.html">
+                Descriptive Summary
+              </a>
+            </div>
+
           </article>
+
+
+          <!-- One Mean -->
           <article class="card">
+
             <h3>One-Sample Mean Test</h3>
-            <p>t/z test for a mean with CI.</p>
-            <div class="btns"><a class="btn" href="/inference/onemean.html">Open</a></div>
+
+            <p>
+              Perform a one-sample t or z test for a
+              population mean with confidence intervals.
+            </p>
+
+            <div class="btns">
+              <a class="btn" href="/inference/onemean.html">
+                One-Sample Mean
+              </a>
+            </div>
+
           </article>
+
+
+          <!-- Two Means -->
           <article class="card">
+
             <h3>Two-Sample Mean Test</h3>
-            <p>Two Sample t-test with CI.</p>
-            <div class="btns"><a class="btn" href="/inference/twomeans.html">Open</a></div>
+
+            <p>
+              Compare two population means using a
+              two-sample t-test and confidence interval.
+            </p>
+
+            <div class="btns">
+              <a class="btn" href="/inference/twomeans.html">
+                Two-Sample Means
+              </a>
+            </div>
+
           </article>
+
         </div>
+
       </section>
 
-      <section class="section">
-  <h2>Class Pages</h2>
-  <div class="grid">
-    <article class="card">
-      <h3>STA210U</h3>
-      <p>Notes, demos, and interactive tools for STA210U.</p>
-      <div class="btns"><a class="btn" href="/STA210U/index.html">Open</a></div>
-    </article>
-    <article class="card">
-      <h3>STA220 — Statistics</h3>
-      <p>Notes, demos, and interactive tools for STA220.</p>
-      <div class="btns"><a class="btn" href="/STA220/index.html">Open</a></div>
-    </article>
-    <article class="card">
-      <h3>STA296U</h3>
-      <p>Notes, demos, and interactive tools for STA296U.</p>
-      <div class="btns"><a class="btn" href="/STA296U/index.html">Open</a></div>
-    </article>
-  </div>
-</section>
 
-<section class="section">
-  <h2>More</h2>
-  <div class="grid">
-    <article class="card">
-      <h3>Acknowledgements</h3>
-      <p>Recognizing tools, inspirations, and collaborators.</p>
-      <div class="btns"><a class="btn" href="/acknowledgements.html">Open</a></div>
-    </article>
-  </div>
-</section>
+      <!-- =====================================================
+           MORE
+      ====================================================== -->
+
+      <section class="section">
+
+        <h2>More</h2>
+
+        <div class="grid">
+
+          <article class="card">
+
+            <h3>Acknowledgements</h3>
+
+            <p>
+              Tools, resources, inspirations, and
+              collaborators that helped make StatsLG possible.
+            </p>
+
+            <div class="btns">
+              <a class="btn" href="/acknowledgements.html">
+                View Acknowledgements
+              </a>
+            </div>
+
+          </article>
+
+        </div>
+
+      </section>
+
+
+      <!-- ================= FOOTER ================= -->
 
       <footer>
-        Last updated: <span id="lastUpdated"></span>
+        Last updated:
+        <span id="lastUpdated"></span>
       </footer>
+
     </main>
+
   </div>
 
+
+  <!-- =====================================================
+       LAST UPDATED
+  ====================================================== -->
+
   <script>
-    // Footer year + last updated
-    // (Also handled in the sidebar include for the sidebar year)
     document.getElementById('lastUpdated').textContent =
       new Date(document.lastModified).toLocaleString();
   </script>
 
-  <!-- Load the include helper (injects /partials/sidebar.html into the <aside>) -->
+
+  <!-- =====================================================
+       SIDEBAR INCLUDE
+  ====================================================== -->
+
   <script>
-  (function () {
-    async function injectIncludes() {
-      const nodes = document.querySelectorAll('[data-include]');
-      await Promise.all(Array.from(nodes).map(async (el) => {
-        let url = el.getAttribute('data-include');
+    (function () {
 
-        // If your site is a GitHub *project* site (username.github.io/REPO),
-        // change "/partials/..." to "/REPO/partials/..." or handle base here:
-        // const base = location.pathname.split('/').filter(Boolean)[0] ? '/' + location.pathname.split('/')[1] : '';
-        // if (url.startsWith('/')) url = base + url;
+      async function injectIncludes() {
 
-        const resp = await fetch(url, { cache: 'no-cache' });
-        el.innerHTML = await resp.text();
+        const nodes = document.querySelectorAll('[data-include]');
 
-        // Sidebar: set year & mark active link
-        const yr = el.querySelector('#yr'); if (yr) yr.textContent = new Date().getFullYear();
-        const here = location.pathname.replace(/\/index\.html$/, '/');
-        el.querySelectorAll('a[href]').forEach(a => {
-          const target = new URL(a.getAttribute('href'), location.origin).pathname
-            .replace(/\/index\.html$/, '/');
-          if (here === target || (here.startsWith(target) && target !== '/')) {
-            a.classList.add('active');
-          }
-        });
-      }));
-    }
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', injectIncludes);
-    } else {
-      injectIncludes();
-    }
-  })();
+        await Promise.all(
+          Array.from(nodes).map(async (el) => {
+
+            const url = el.getAttribute('data-include');
+
+            try {
+
+              const resp = await fetch(url, {
+                cache: 'no-cache'
+              });
+
+              if (!resp.ok) {
+                throw new Error(
+                  `Could not load ${url}: ${resp.status}`
+                );
+              }
+
+              el.innerHTML = await resp.text();
+
+
+              /* Sidebar year */
+
+              const yr = el.querySelector('#yr');
+
+              if (yr) {
+                yr.textContent = new Date().getFullYear();
+              }
+
+
+              /* Highlight current page */
+
+              const here = location.pathname.replace(
+                /\/index\.html$/,
+                '/'
+              );
+
+              el.querySelectorAll('a[href]').forEach((a) => {
+
+                const target = new URL(
+                  a.getAttribute('href'),
+                  location.origin
+                )
+                .pathname
+                .replace(/\/index\.html$/, '/');
+
+                if (
+                  here === target ||
+                  (here.startsWith(target) && target !== '/')
+                ) {
+                  a.classList.add('active');
+                }
+
+              });
+
+            } catch (error) {
+
+              console.error(error);
+
+              el.innerHTML =
+                '<p>Navigation could not be loaded.</p>';
+
+            }
+
+          })
+        );
+
+      }
+
+
+      if (document.readyState === 'loading') {
+
+        document.addEventListener(
+          'DOMContentLoaded',
+          injectIncludes
+        );
+
+      } else {
+
+        injectIncludes();
+
+      }
+
+    })();
   </script>
+
 </body>
 </html>
