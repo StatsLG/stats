@@ -1,314 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>STA220 — Section 1 | StatsLG</title>
-  <meta name="description" content="Section 1: Introduction to Statistics and Data Collection — STA220 notes on StatsLG." />
-  <link rel="icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="/style/bctcstyle.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STA220 — Section 1 | StatsLG</title>
+<meta name="description" content="STA220 Section 1 — Introduction to Statistics and Data Collection.">
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/style/bctcstyle.css">
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+.notes-page{max-width:1100px;margin:0 auto;padding:32px 40px}
+.notes-content{max-width:900px;margin:0 auto}
+.notes-content h2{margin-top:2rem;scroll-margin-top:1rem}
+.notes-content h3{margin-top:1.5rem}
+.notes-content p,.notes-content li{line-height:1.65}
+.back-row{margin:0 0 20px;display:flex;gap:10px;flex-wrap:wrap}
+.toc{margin-bottom:1.5rem}.toc h2{margin-top:0}
+.toc a{color:var(--kctcs-blue);font-weight:700}.toc a:hover{text-decoration:underline}
+.definition{border-left:5px solid var(--kctcs-blue);padding:12px 14px;margin:14px 0;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.definition strong{color:var(--kctcs-blue)}
+.key-idea{border-left:5px solid var(--kctcs-gold)}
+.example{margin:18px 0}
+details.answer{margin-top:14px;border-top:1px solid var(--rule);padding-top:10px}
+details.answer summary{cursor:pointer;color:var(--kctcs-blue);font-weight:800}
+.answer-body{border-left:5px solid var(--kctcs-gold);padding:10px 14px;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin:18px 0}
+.flow{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:22px 0}
+.flow-box{padding:16px 20px;border:2px solid var(--kctcs-blue);border-radius:var(--radius);background:var(--panel);text-align:center;min-width:170px}
+.flow-arrow{font-size:1.7rem;color:var(--kctcs-gold);font-weight:900}
+.data-tree{margin:20px 0;padding:18px;background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.data-tree .root{text-align:center;font-weight:800;color:var(--kctcs-blue);margin-bottom:12px}
+.data-tree .branches{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.data-tree .branch{padding:14px;border:1px solid var(--rule);border-radius:var(--radius);background:#fff}
+.notes-footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted);font-size:12px}
+@media(max-width:760px){.notes-page{padding:20px 16px}.back-row{flex-direction:column;align-items:stretch}.back-row .btn{justify-content:center}.data-tree .branches{grid-template-columns:1fr}}
+@media print{.back-row{display:none}.notes-page,.notes-content{max-width:none;padding:0}details.answer>*{display:block!important}}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <!-- ===== LEFT PANEL (BRAND SIDEBAR) — loaded from one shared file ===== -->
-    <aside class="sidebar" aria-label="Site navigation" data-include="/partials/sidebar.html"></aside>
+<main class="notes-page"><div class="notes-content">
 
-    <!-- ===== MAIN CONTENT ===== -->
-    <main>
-      <header>
-        <h1>Section 1 — Introduction to Statistics and Data Collection</h1>
-        <p>What statistics is, why we use it, essential vocabulary (population, sample, statistic, parameter), descriptive vs. inferential work, and sources of error.</p>
-      </header>
+<div class="back-row">
+<a class="btn outline btn-sm" href="index.html">← Back to STA220 Notes</a>
+<a class="btn btn-sm" href="STA220_Section_1_Introduction_to_Statistics_and_Data_Collection.docx" download>Download Word Notes</a>
+</div>
 
-      <!-- Quick navigation -->
-      <section class="section">
-        <h2>On this page</h2>
-        <div class="grid">
-          <article class="card"><a href="#science"><strong>1.</strong> The Science of Statistics</a></article>
-          <article class="card"><a href="#fundamentals"><strong>2.</strong> Fundamental Elements</a></article>
-          <article class="card"><a href="#branches"><strong>3.</strong> Branches of Statistical Applications</a></article>
-          <article class="card"><a href="#reasoning"><strong>4.</strong> Types of Mathematical Reasoning</a></article>
-          <article class="card"><a href="#types"><strong>5.</strong> Types of Data</a></article>
-          <article class="card"><a href="#collection"><strong>6.</strong> Data Collection</a></article>
-          <article class="card"><a href="#error"><strong>7.</strong> Error in the Statistical Process</a></article>
-        </div>
-      </section>
+<header class="header">
+<h1>STA220 — Section 1</h1>
+<p>Introduction to Statistics and Data Collection</p>
+</header>
 
-      <!-- 1. The Science of Statistics -->
-      <section id="science" class="section">
-        <h2>The Science of Statistics</h2>
-        <p><strong>Statistics</strong> — study of how to collect, organize, analyze, and interpret information.</p>
-        <p><strong>Advantage:</strong> gives a process for estimation and decision making under uncertainty without prejudice (bias).</p>
+<section class="section panel pad toc">
+<h2>In This Section</h2>
+<ul>
+<li><a href="#science">The Science of Statistics</a></li>
+<li><a href="#elements">Fundamental Elements of Statistics</a></li>
+<li><a href="#branches">Branches of Statistical Applications</a></li>
+<li><a href="#reasoning">Types of Mathematical Reasoning</a></li>
+<li><a href="#data-types">Types of Data</a></li>
+<li><a href="#collection">Data Collection</a></li>
+</ul>
+</section>
 
-        <article class="card soft">
-          <h3 style="margin:0 0 .4rem">Warm-ups</h3>
-          <ul style="margin:0">
-            <li>How do you define statistics?</li>
-            <li>What do you think of when you hear the term statistics?</li>
-            <li>Where do you see statistics utilized?</li>
-          </ul>
-        </article>
+<section id="science" class="section">
+<h2>The Science of Statistics</h2>
+<p>How do you define statistics? What do you think of when you hear the term statistics? Can you think of examples where you see statistics utilized?</p>
+<p>Statistics are commonly used in most fields of study and are regularly seen in newspapers, on television, and in professional work. Finding examples pertinent to your interests should be quite easy.</p>
 
-        <p>Statistics are commonly used in most fields of study and are regularly seen in newspapers, on television, and in professional work.</p>
-        <p>Examples you might see:</p>
-        <ul>
-          <li><strong>Sports</strong>
-            <ul>
-              <li>Free throw percentage (Basketball)</li>
-              <li>Quarterback rating (Football)</li>
-              <li>RBIs (Baseball)</li>
-              <li>Assists (Soccer)</li>
-            </ul>
-          </li>
-          <li><strong>Medical</strong>
-            <ul>
-              <li>Success rates and likelihood of side effects for a weight-loss drug</li>
-              <li>Percentage of people who go into remission for a cancer type</li>
-              <li>Effect of a drug on blood pressure</li>
-            </ul>
-          </li>
-          <li><strong>Education</strong>
-            <ul>
-              <li>Writing down material helps comprehension</li>
-              <li>Reading test scores in 1st graders differ for males and females</li>
-              <li>Depression more likely with low academic achievement</li>
-            </ul>
-          </li>
-          <li><strong>Politics</strong>
-            <ul>
-              <li>Prediction that the incumbent president will be re-elected</li>
-              <li>Approval rating of the senate</li>
-              <li>Percentage of people in Kentucky who support a newly passed bill</li>
-            </ul>
-          </li>
-        </ul>
-      </section>
+<div class="compare-grid">
+<article class="card"><h3>Sports</h3><ul><li>Free throw percentage in basketball</li><li>Quarterback rating in football</li><li>RBIs in baseball</li><li>Assists in soccer</li></ul></article>
+<article class="card"><h3>Medical</h3><ul><li>Success rates and side effects of a weight-loss drug</li><li>Percentage of people who go into remission with a type of cancer</li><li>Effect of a drug on blood pressure</li></ul></article>
+<article class="card"><h3>Education</h3><ul><li>Whether writing down material helps comprehension</li><li>Differences in reading test scores for first-grade males and females</li><li>Relationship between low academic achievement and depression</li></ul></article>
+<article class="card"><h3>Politics</h3><ul><li>Prediction that an incumbent president will be re-elected</li><li>Senate approval rating</li><li>Percentage of Kentuckians who support a bill</li></ul></article>
+</div>
 
-      <!-- 2. Fundamentals -->
-      <section id="fundamentals" class="section">
-        <h2>Fundamental Elements of Statistics</h2>
-        <article class="card soft"><strong>Population:</strong> the collection of individuals or items of interest.</article>
-        <article class="card soft"><strong>Census:</strong> measurements taken from the entire population.</article>
+<div class="definition"><strong>Statistics</strong> — the study of how to collect, organize, analyze, and interpret information.</div>
+<p>The advantage of statistics is that it gives us a process for estimation and decision making when faced with uncertainty without prejudice or bias. This ideal will be discussed throughout the semester.</p>
+</section>
 
-        <article class="card soft">
-          <h3 style="margin:0 0 .4rem">Census notes</h3>
-          <ul style="margin:0">
-            <li>U.S. Census Bureau attempts a census every 10 years.</li>
-            <li>Challenges include hard-to-reach groups (e.g., homelessness).</li>
-            <li>Censuses are rare in practice due to cost and feasibility.</li>
-          </ul>
-        </article>
+<section id="elements" class="section">
+<h2>Fundamental Elements of Statistics</h2>
+<p>To understand the statistical process, we begin with some basic terminology.</p>
 
-        <p>When a full census isn’t feasible, we use a subset:</p>
-        <ul>
-          <li><strong>Sample:</strong> subset of the population we measure.</li>
-          <li><strong>Data:</strong> the measurements collected.</li>
-          <li><strong>Variable:</strong> any characteristic that can take different values across individuals.</li>
-          <li><strong>Statistic:</strong> numerical characteristic of a sample (changes from sample to sample).</li>
-          <li><strong>Parameter:</strong> numerical characteristic of a population (fixed, but only known with a perfect census).</li>
-        </ul>
+<div class="definition"><strong>Population</strong> — the collection of individuals or items of interest.</div>
+<p><strong>Examples:</strong> all residents of the United States; all admissions to hospitals in Lexington, Kentucky.</p>
 
-        <article class="card soft">
-          <h3 style="margin:0 0 .4rem">Example — Estimating income in Kentucky</h3>
-          <p>Suppose we want the average income for all Kentucky residents, and we collect incomes for a sample of 1,000 residents.</p>
-          <details class="panel pad" style="margin-top:.5rem;">
-            <summary><strong>Questions</strong> (click to expand)</summary>
-            <ol style="margin:.5rem 0 0;">
-              <li>What is the population?</li>
-              <li>What is the sample?</li>
-              <li>What is the data?</li>
-              <li>What is the variable?</li>
-              <li>What is the parameter?</li>
-              <li>What is the statistic?</li>
-              <li>If we measured all residents of Kentucky, what would that be called?</li>
-            </ol>
-          </details>
-          <details class="panel pad" style="margin-top:.5rem;">
-            <summary><strong>Answers</strong> (click to expand)</summary>
-            <ol style="margin:.5rem 0 0;">
-              <li>All residents of the state of Kentucky.</li>
-              <li>The 1,000 residents selected.</li>
-              <li>The list of the 1,000 incomes collected.</li>
-              <li>Income.</li>
-              <li>The true mean income of all KY residents (a parameter).</li>
-              <li>The sample mean income (a statistic).</li>
-              <li>A <em>census</em>.</li>
-            </ol>
-          </details>
-        </article>
-      </section>
+<div class="definition"><strong>Census</strong> — measurements are taken from the entire population.</div>
+<p>A familiar example is the U.S. Census, conducted every ten years. The Census Bureau attempts to reach every resident, although reaching every individual is difficult.</p>
+<p>A census is rarely attempted in ordinary statistical work because it can be expensive and because it is often impossible to get everyone in a population to participate.</p>
 
-      <!-- 3. Branches -->
-      <section id="branches" class="section">
-        <h2>Branches of Statistical Applications</h2>
-        <ul>
-          <li><strong>Descriptive Statistics:</strong> methods of summarizing a set of data. (No inference error—summarizing the data you actually have.)</li>
-          <li><strong>Inferential Statistics:</strong> using a sample to make statements about a population. (There is error; we quantify it using probability.)</li>
-        </ul>
+<div class="flow">
+<div class="flow-box"><strong>Population</strong><br>Entire group of interest</div>
+<div class="flow-arrow">→</div>
+<div class="flow-box"><strong>Sample</strong><br>Subset measured</div>
+<div class="flow-arrow">→</div>
+<div class="flow-box"><strong>Data</strong><br>Measurements collected</div>
+</div>
 
-        <article class="card soft">
-          <h3 style="margin:0 0 .4rem">Examples — classify as descriptive or inferential</h3>
-          <ol style="margin:0">
-            <li>A basketball player’s free-throw percentage up to mid-season</li>
-            <li>Average GPA for <em>all</em> current students from the records office</li>
-            <li>President’s approval rating from a sample of 5,000 U.S. residents</li>
-            <li>Graph of this year’s sales for all major vehicle manufacturers</li>
-            <li>% of students in this class who live in Lexington</li>
-            <li>Estimate of % of <em>all BCTC students</em> who live in Lexington using this class’s data</li>
-          </ol>
+<div class="definition"><strong>Sample</strong> — the subset of the population on which we make measurements.</div>
+<div class="definition"><strong>Data</strong> — the measurements we collect.</div>
+<div class="definition"><strong>Variable</strong> — any characteristic of an individual that can take different values for different individuals.</div>
+<div class="definition"><strong>Statistic</strong> — a numerical characteristic of a sample. It is known after the sample is taken, but it can change from sample to sample.</div>
+<div class="definition"><strong>Parameter</strong> — a numerical characteristic of a population. It is fixed, but its exact value could only be known from a perfect census.</div>
 
-          <details class="panel pad" style="margin-top:.5rem;">
-            <summary><strong>Answers</strong> (click to expand)</summary>
-            <ol style="margin:.5rem 0 0;">
-              <li>Descriptive</li>
-              <li>Descriptive</li>
-              <li>Inferential</li>
-              <li>Descriptive</li>
-              <li>Descriptive</li>
-              <li>Inferential</li>
-            </ol>
-            <p class="muted" style="margin:.4rem 0 0;">Note: #5 and #6 can use the <em>same</em> data but ask different questions. The <strong>group of interest</strong> determines whether it’s descriptive or inferential.</p>
-          </details>
-        </article>
-      </section>
+<div class="card soft key-idea">
+<h3>Statistic vs. Parameter</h3>
+<p>Because the entire population is often unavailable, we use a <strong>statistic from a sample</strong> to estimate a <strong>parameter of the population</strong>.</p>
+</div>
 
-      <!-- 4. Reasoning -->
-      <section id="reasoning" class="section">
-        <h2>Types of Mathematical Reasoning</h2>
-        <ul>
-          <li><strong>Inductive reasoning:</strong> inferential statistics; bottom-up reasoning from samples.</li>
-          <li><strong>Deductive reasoning (probability theory):</strong> top-down; properties of samples from a known population.</li>
-        </ul>
-        <p><em>Course order:</em> 1) Descriptive Statistics → 2) Deductive Reasoning (probability) → 3) Inferential Statistics (inductive).</p>
-      </section>
+<article class="card example">
+<h3>Example: Kentucky Income</h3>
+<p>Suppose we want to estimate the average income for all residents of Kentucky. We select 1,000 people from the state and collect their incomes.</p>
+<ol>
+<li>What is the population?</li><li>What is the sample?</li><li>What is the data?</li><li>What is the variable?</li><li>What is the parameter?</li><li>What is the statistic?</li><li>If we measured all Kentucky residents, what would this be called?</li>
+</ol>
+<details class="answer"><summary>Show Answers</summary><div class="answer-body">
+<ol>
+<li>All residents of Kentucky.</li>
+<li>The 1,000 people selected.</li>
+<li>The list of the 1,000 incomes collected.</li>
+<li>Income.</li>
+<li>The average income for all residents of Kentucky.</li>
+<li>The average income for the 1,000 people selected.</li>
+<li>A census.</li>
+</ol>
+</div></details>
+</article>
+</section>
 
-      <!-- 5. Types of Data -->
-      <section id="types" class="section">
-        <h2>Types of Data</h2>
-        <ul>
-          <li><strong>Qualitative (categorical):</strong> responses placed into categories; outcomes are non-numeric.</li>
-          <li><strong>Quantitative (numeric):</strong> values with numerical meaning
-            <ul>
-              <li><strong>Discrete:</strong> things that can be counted.</li>
-              <li><strong>Continuous:</strong> things that are measured.</li>
-            </ul>
-          </li>
-        </ul>
+<section id="branches" class="section">
+<h2>Branches of Statistical Applications</h2>
+<div class="compare-grid">
+<article class="card"><h3>Descriptive Statistics</h3><p>Methods of summarizing a set of data.</p><p>There is no sampling error here because you are summarizing the data you actually have.</p></article>
+<article class="card"><h3>Inferential Statistics</h3><p>Methods of making an inference about a population based on information from a sample.</p><p>There is error because the entire population is not observed. Probability allows us to calculate and control this error.</p></article>
+</div>
 
-        <article class="card soft">
-          <h3 style="margin:0 0 .4rem">Examples — identify the data type</h3>
-          <ol style="margin:0">
-            <li>Gender</li>
-            <li>Time to run a mile</li>
-            <li>Number of soccer goals scored</li>
-            <li>Religious preference</li>
-            <li>Distance to drive to work</li>
-            <li>Number correct on a test</li>
-            <li>Social security number</li>
-          </ol>
+<article class="card example">
+<h3>Descriptive or Inferential?</h3>
+<ol>
+<li>A basketball player's free throw percentage based on performance through the midpoint of the season.</li>
+<li>The average GPA for all current students based on complete records-office data.</li>
+<li>The president's current approval rating based on a group of 5,000 U.S. residents.</li>
+<li>A graph showing all sales this year for all major vehicle manufacturers.</li>
+<li>Using data from this class to calculate the percentage of students in this class who live in Lexington.</li>
+<li>Using data from this class to estimate the percentage of all BCTC students who live in Lexington.</li>
+</ol>
+<details class="answer"><summary>Show Answers</summary><div class="answer-body">
+<ol>
+<li><strong>Descriptive</strong> — the player's observed performance is being summarized.</li>
+<li><strong>Descriptive</strong> — complete data for the group of interest are available.</li>
+<li><strong>Inferential</strong> — a sample of 5,000 residents is used to estimate the population approval rating.</li>
+<li><strong>Descriptive</strong> — the available sales figures are being summarized.</li>
+<li><strong>Descriptive</strong> — the class itself is the group of interest.</li>
+<li><strong>Inferential</strong> — the class is being used as a sample to estimate a characteristic of all BCTC students.</li>
+</ol>
+</div></details>
+</article>
 
-          <details class="panel pad" style="margin-top:.5rem;">
-            <summary><strong>Answers</strong> (click to expand)</summary>
-            <ol style="margin:.5rem 0 0;">
-              <li>Qualitative</li>
-              <li>Quantitative (Continuous)</li>
-              <li>Quantitative (Discrete)</li>
-              <li>Qualitative</li>
-              <li>Quantitative (Continuous)</li>
-              <li>Quantitative (Discrete)</li>
-              <li>Qualitative</li>
-            </ol>
-          </details>
-        </article>
-      </section>
+<div class="card soft key-idea"><p>Questions 5 and 6 can use the <strong>same data</strong> but lead to different analyses. The key is the <strong>group of interest</strong>.</p></div>
+</section>
 
-      <!-- 6. Data Collection -->
-      <section id="collection" class="section">
-        <h2>Data Collection</h2>
-        <p><strong>Bias:</strong> a prejudice in one direction—occurs when the sample selection favors elements with a particular characteristic.</p>
-        <p>For inferential statistics, your sample must be <strong>representative</strong> of the population. Proper random sampling minimizes bias and lets us quantify error.</p>
-        <p><strong>Random sample:</strong> determined completely by chance; typically mirrors the population on key variables and allows error control via probability.</p>
+<section id="reasoning" class="section">
+<h2>Types of Mathematical Reasoning</h2>
+<div class="compare-grid">
+<article class="card"><h3>Inductive Reasoning</h3><p>Used in inferential statistics. It is reasoning by consistency, or <strong>bottom-up reasoning</strong>: use information from a sample to learn about a population.</p></article>
+<article class="card"><h3>Deductive Reasoning</h3><p>Probability theory. It is reasoning by certainty, or <strong>top-down reasoning</strong>: begin with a known population and determine properties of samples.</p></article>
+</div>
+<p>The course proceeds in this order: <strong>1) Descriptive Statistics, 2) Deductive Reasoning (Probability Theory), and 3) Inferential Statistics (Inductive Reasoning).</strong></p>
+</section>
 
-        <article class="card soft">
-          <h3 style="margin:0 0 .4rem">Example — Kentucky incomes</h3>
-          <p>Sampling 1,000 males from Lexington would likely <em>overestimate</em> statewide average income (males and Lexington residents tend to earn more). A good random sample reflects population composition (e.g., 50% male if population is 50% male; ≈10% from Lexington if population is ≈10%).</p>
-          <p>Like coin flips: with larger sample sizes, the sample proportion is more likely to be close to the population value.</p>
-        </article>
+<section id="data-types" class="section">
+<h2>Types of Data</h2>
+<div class="data-tree">
+<div class="root">Variables</div>
+<div class="branches">
+<div class="branch"><strong>Qualitative (Categorical)</strong><p>Places responses into categories. The outcomes have no numerical meaning.</p></div>
+<div class="branch"><strong>Quantitative</strong><p>Numeric values with numerical meaning.</p><ul><li><strong>Discrete:</strong> things that can be counted.</li><li><strong>Continuous:</strong> things that are measured.</li></ul></div>
+</div>
+</div>
 
-        <article class="card soft">
-          <h3 style="margin:0 0 .4rem">Simple Random Sample (SRS)</h3>
-          <p>A simple random sample of size <em>n</em> is selected so that <strong>every sample of size <em>n</em></strong> has an equal probability of being chosen.</p>
-          <p><em>Classroom example:</em> 5 rows × 10 students each; selecting one entire row of 10 is <strong>not</strong> an SRS. While each individual may have a 1/5 chance, not <em>every</em> possible group of 10 can be selected (you can only be with your row), so samples do not have equal probability.</p>
-          <p><em>Note:</em> In this course we assume data come from an SRS unless stated otherwise.</p>
-        </article>
+<article class="card example">
+<h3>Identify the Data Type</h3>
+<ol>
+<li>Gender</li><li>Time to run a mile</li><li>Number of soccer goals scored</li><li>Religious preference</li><li>Distance to drive to work</li><li>Number of correct answers on a test</li><li>Social Security number</li>
+</ol>
+<details class="answer"><summary>Show Answers</summary><div class="answer-body">
+<ol>
+<li>Qualitative</li><li>Quantitative — Continuous</li><li>Quantitative — Discrete</li><li>Qualitative</li><li>Quantitative — Continuous</li><li>Quantitative — Discrete</li><li>Qualitative</li>
+</ol>
+<p>A Social Security number uses digits, but the digits are labels rather than numerical measurements.</p>
+</div></details>
+</article>
+</section>
 
-        <article class="card soft">
-          <h3 style="margin:0 0 .4rem">Statistics as Random Variables</h3>
-          <p>The value of a statistic depends on which individuals are sampled; under random sampling, the statistic itself is a random variable. This is the foundation for the probability calculations we study next.</p>
-        </article>
-      </section>
+<section id="collection" class="section">
+<h2>Data Collection</h2>
+<div class="definition"><strong>Bias</strong> — a prejudice in one direction. In sampling, this occurs when the sample is selected in a way that favors elements with a particular characteristic.</div>
+<p>In inferential statistics, a statistic is used to estimate a parameter. A biased statistic will tend to overestimate or underestimate the value we are trying to predict. Proper sampling techniques can eliminate or at least minimize bias.</p>
+<div class="card soft key-idea"><h3>A Useful Sample Must Be Representative</h3><p>For inferential statistics, the sample should resemble the population well enough that results from the sample can reasonably be extended to the population.</p></div>
+<div class="definition"><strong>Random Sample</strong> — a sample determined completely by chance.</div>
 
-      <!-- 7. Error -->
-      <section id="error" class="section">
-        <h2>Error in the Statistical Process</h2>
-        <p><strong>Error:</strong> distance between a statistic and the corresponding parameter.</p>
-        <ul>
-          <li><strong>Random sampling error:</strong> arises when using a random sample to estimate a population. <em>This is the only type of error we can calculate.</em></li>
-          <li><strong>Non-sampling error:</strong> errors not due to the sampling process (e.g., measurement issues, nonresponse, processing).</li>
-        </ul>
-        <p>Unless otherwise noted, when we refer to “error” in this course we mean random sampling error under a good (representative) sample.</p>
-      </section>
+<article class="card example">
+<h3>Example: A Biased Kentucky Income Sample</h3>
+<p>Suppose we want to estimate average income for Kentucky residents but sample 1,000 males from Lexington. The notes identify this sample as biased and not representative of the state population.</p>
+<p>The goal is for the sample to be similar to the population across relevant characteristics. Random sampling helps accomplish this across many variables at once, although it does not guarantee a perfectly representative sample.</p>
+</article>
 
-      <footer class="site-footer">
-        Last updated: <span id="lastUpdated"></span>
-      </footer>
-    </main>
-  </div>
+<h3>Sample Size and Random Variation</h3>
+<p>Larger random samples are more likely to resemble the population closely. Think about flipping a fair coin: with more flips, the percentage of tails is more likely to be close to the population value of 50%.</p>
 
-  <script>
-    // Page footer "last updated"
-    document.getElementById('lastUpdated').textContent =
-      new Date(document.lastModified).toLocaleString();
+<div class="definition"><strong>Simple Random Sample (SRS)</strong> — a sample of \(n\) measurements selected so that every sample of size \(n\) from the population has an equal probability of being selected.</div>
+<p>The notation \(n\) is standard notation for sample size. Everything in this course will be based on a simple random sample.</p>
+</section>
 
-    // Shared sidebar include loader
-    const BASE = ''; // set to '/REPO_NAME' for GitHub project sites
-
-    (async function injectSidebar(){
-      const el = document.querySelector('[data-include]');
-      if(!el) return;
-      let url = el.getAttribute('data-include') || '/partials/sidebar.html';
-      if (BASE && url.startsWith('/')) url = BASE + url;
-
-      try{
-        const resp = await fetch(url, {cache:'no-cache'});
-        if(!resp.ok) throw new Error(resp.statusText);
-        el.innerHTML = await resp.text();
-
-        // (Project sites) prefix absolute links inside the injected sidebar
-        if (BASE) {
-          el.querySelectorAll('a[href^="/"]').forEach(a => {
-            a.setAttribute('href', BASE + a.getAttribute('href'));
-          });
-        }
-
-        // Set year inside the injected sidebar
-        const yr = el.querySelector('#yr');
-        if (yr) yr.textContent = new Date().getFullYear();
-
-        // Mark active nav link (only nav links, not the brand)
-        const here = location.pathname.replace(/\/index\.html$/, '/');
-        el.querySelectorAll('.nav a[href]').forEach(a=>{
-          const target = new URL(a.getAttribute('href'), location.origin).pathname
-            .replace(/\/index\.html$/, '/');
-          if (here === target || (here.startsWith(target) && target !== '/')) {
-            a.classList.add('active');
-          }
-        });
-      }catch(err){
-        console.error('Sidebar include failed:', err);
-        el.innerHTML = '<div class="muted">Sidebar failed to load.</div>';
-      }
-    })();
-  </script>
-</body>
-</html>
+<div class="back-row" style="margin-top:36px">
+<a class="btn outline btn-sm" href="index.html">← Back to STA220 Notes</a>
+<a class="btn btn-sm" href="STA220_Section_1_Introduction_to_Statistics_and_Data_Collection.docx" download>Download Word Notes</a>
+</div>
+<footer class="notes-footer">Last updated: <span id="lastUpdated"></span></footer>
+</div></main>
+<script>document.getElementById('lastUpdated').textContent=new Date(document.lastModified).toLocaleString();</script>
+</body></html>
