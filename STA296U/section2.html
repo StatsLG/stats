@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STA296U - Section 2 | StatsLG</title>
+<meta name="description" content="STA296U Section 2 - Methods for Describing Sets of Data.">
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/style/bctcstyle.css">
+<style>
+.notes-page{max-width:1100px;margin:0 auto;padding:32px 40px}.notes-content{max-width:900px;margin:0 auto}
+.notes-content h2{margin-top:2rem;scroll-margin-top:1rem}.notes-content h3{margin-top:1.5rem;color:var(--ink)}
+.notes-content p,.notes-content li{line-height:1.65}.back-row{margin:0 0 20px;display:flex;gap:10px;flex-wrap:wrap}
+.toc{margin-bottom:1.5rem}.toc h2{margin-top:0}.toc a{color:var(--kctcs-blue);font-weight:700}.toc a:hover{text-decoration:underline}
+.definition{border-left:5px solid var(--kctcs-blue);padding:12px 14px;margin:14px 0;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.definition strong{color:var(--kctcs-blue)}.example{margin:18px 0}.example>h3,.example>h4{margin-top:0}
+details.answer{margin-top:14px;border-top:1px solid var(--rule);padding-top:10px}details.answer summary{cursor:pointer;color:var(--kctcs-blue);font-weight:800}
+.answer-body{border-left:5px solid var(--kctcs-gold);padding:10px 14px;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.key-idea{border-left:5px solid var(--kctcs-gold)}.figure{text-align:center;margin:22px 0}.figure img{max-width:100%;height:auto;border-radius:8px}
+.figure.small img{max-width:460px}.stem{font-family:monospace;white-space:pre;display:inline-block;text-align:left;font-size:1.05rem}
+.math{font-size:1.15rem;text-align:center;margin:14px 0}.notes-footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted);font-size:12px}
+@media(max-width:760px){.notes-page{padding:20px 16px}.back-row{flex-direction:column;align-items:stretch}.back-row .btn{justify-content:center}}
+@media print{.back-row{display:none}.notes-page,.notes-content{max-width:none;padding:0}details.answer>*{display:block!important}}
+</style>
+</head>
+<body><main class="notes-page"><div class="notes-content">
+<div class="back-row"><a class="btn outline btn-sm" href="index.html">← Back to STA296U Notes</a>
+<a class="btn btn-sm" href="STA296U_Section_2_Methods_for_Describing_Sets_of_Data.docx" download>Download Word Notes</a></div>
+<header class="header"><h1>STA296U — Section 2</h1><p>Methods for Describing Sets of Data</p></header>
+<section class="section panel pad toc"><h2>In This Section</h2><ul>
+<li><a href="#qualitative">Graphing Qualitative Data</a></li><li><a href="#quantitative">Graphing Quantitative Data</a></li>
+<li><a href="#shapes">Shapes of Distributions</a></li><li><a href="#summation">Summation Notation</a></li>
+<li><a href="#center">Numerical Measures of Central Tendency</a></li></ul></section>
+
+<p>We are now to the point in the class where we will begin looking at descriptive statistics. Remember that descriptive statistics are methods of summarizing a set of data. One way to do that is graphically. The main reason statisticians use graphs is to look at the distribution of data.</p>
+<div class="definition"><strong>Distribution</strong> – all outcomes for a variable along with how often each outcome occurs</div>
+
+<section id="qualitative" class="section"><h2>1. Graphing Qualitative Data</h2>
+<p>The following qualitative data set will be utilized in order to illustrate a bar chart. The variable of interest in this illustration is type of operation (data is non-numerical and was collected for a one year period from a single hospital). Qualitative data is commonly summarized with either frequencies or percentages which are both identified in the following table.</p>
+<table><thead><tr><th>Type of operation</th><th>Frequency</th><th>Percentage</th></tr></thead><tbody>
+<tr><td>Abdominal</td><td>115</td><td>23.1</td></tr><tr><td>Bones and joints</td><td>45</td><td>9.0</td></tr>
+<tr><td>Eye, ear, nose, and throat</td><td>58</td><td>11.6</td></tr><tr><td>General</td><td>98</td><td>19.7</td></tr>
+<tr><td>Neurosurgery</td><td>23</td><td>4.6</td></tr><tr><td>Other</td><td>65</td><td>13.1</td></tr>
+<tr><td>Thoracic</td><td>20</td><td>4.0</td></tr><tr><td>Urologic</td><td>74</td><td>14.9</td></tr><tr><td>Total</td><td>498</td><td>100.0</td></tr>
+</tbody></table>
+<div class="figure"><img src="images/section2/operations_bar_chart.png" alt="Bar chart for operations"></div>
+<h3>Important characteristics of a Bar Graph</h3><ul>
+<li>Used only for qualitative data (This is a common mistake that I see with this graph. These are very easy to make in Excel and sometimes they are made with quantitative data. That should never be done because the x-axis is not numerical in a bar graph. It does not matter in what order the bars are displayed. All horizontal dimensions in the graph are based on the idea that there is no numerical meaning to this axis.)</li>
+<li>The length of a bar represents the quantity we wish to compare</li><li>Users tend to notice the tallest bars</li>
+<li>The bars should be of uniform width and uniformly spaced (This goes back to the x-axis being non-numerical. The width of the bars and spacing has no numerical meaning)</li></ul></section>
+
+<section id="quantitative" class="section"><h2>2. Graphing Quantitative Data</h2>
+<p>The goal with these graphs is to look at the distribution for a single quantitative variable. When looking at the graphs presented, it is important to identify if there are extreme values in the data and the shape of the distribution.</p>
+<div class="definition"><strong>Extreme value (or Outlier)</strong> – observations that are separated from the rest of the data set by some margin</div>
+<article class="card example"><h3>Example</h3><p>Identify the extreme value in the following data.</p><p>14, 15, 17, 21, 60, 23, 25</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>The extreme value is 60.</p></div></details></article>
+<p>The impact of an extreme value can be great. Suppose we want to estimate the average income for this class. If a billionaire was in the class, then their income would be an extreme value. That would make the average appear very high simply because of one observation.</p>
+<div class="definition"><strong>Shape</strong> – the pattern displayed when the graph is created (The most common shapes of distributions will be introduced after the graphs.)</div>
+<h3>Important characteristics of a Stem-and-Leaf</h3><ul><li>Separates data entries into “leading digits” or “stems” and “trailing digits” or “leaves”</li><li>Organizes and groups data but allows us to recover the original data if desired</li><li>Good for spotting extreme values and identifying shape</li></ul>
+<article class="card example"><h3>Example</h3><p>14 male weights in pounds: 139,153,179,201,163,168,157,170,172,165,145,155,161,151</p>
+<p>In this case the first two digits of each number represent the stems and the last digit represents the leaves. The stem-and-leaf follows.</p>
+<div class="stem">13 | 9
+14 | 5
+15 | 1 3 5 7
+16 | 1 3 5 8
+17 | 0 2 9
+18 |
+19 |
+20 | 1</div></article>
+<p>Notice in the stem-and-leaf plot it is easy to identify the one extreme value of 201. If a data point is separated from the rest of the data by at least on empty class (in this case two) then it is considered an extreme value. The shape is identified by looking at the pattern created with the numbers. This will be discussed later in this section.</p>
+<h3>Important characteristics of a Frequency Distribution</h3><ul><li>A summary table in which quantitative data are arranged into conveniently established class groupings (the groups must satisfy the following criteria)<ul><li>Should have between 5 and 15 classes</li><li>Each class grouping should be of equal width</li><li>Overlapping the classes must be avoided</li></ul></li><li>Useful when dealing with very large data sets</li><li>Through the grouping process the original data is lost</li><li>Class midpoint – the point halfway between the boundaries of each class</li></ul>
+<table><thead><tr><th>Weight</th><th>Frequency</th></tr></thead><tbody><tr><td>130 but less than 140</td><td>1</td></tr><tr><td>140 but less than 150</td><td>1</td></tr><tr><td>150 but less than 160</td><td>4</td></tr><tr><td>160 but less than 170</td><td>4</td></tr><tr><td>170 but less than 180</td><td>3</td></tr><tr><td>180 but less than 190</td><td>0</td></tr><tr><td>190 but less than 200</td><td>0</td></tr><tr><td>200 but less than 210</td><td>1</td></tr><tr><td>Total</td><td>14</td></tr></tbody></table>
+<h3>Important characteristics of a Histogram</h3><ul><li>The variable (x-axis) in a histogram is quantitative (different than a bar chart). Since the variable is quantitative, the width of the bars has numerical meaning and the bars always touch. The bars represent the classes identified in the frequency distribution.</li><li>A picture of a frequency distribution</li><li>The actual values identified on the x-axis are the class midpoints</li><li>The y-axis represents the frequency for each class</li></ul>
+<div class="figure"><img src="images/section2/weight_histogram.png" alt="Histogram for weight"></div>
+<p>It is important to understand how the above histogram was created based on the frequency distribution. It is also important to see how it is similar to the stem-and-leaf. Notice the same extreme and shape would be identified if the graph is turned as can be seen below.</p>
+<div class="figure small"><img src="images/section2/weight_histogram_rotated.png" alt="Rotated histogram for weight"></div></section>
+
+<section id="shapes" class="section"><h2>3. Shapes of Distributions</h2>
+<div class="definition"><strong>Symmetrical</strong> – both sides are the same when the graph is folded vertically in the center</div><div class="figure small"><img src="images/section2/shape_symmetric.png" alt="Symmetrical distribution"></div>
+<div class="definition"><strong>Uniform</strong> – every class has equal frequency (bars are the same height)</div><div class="figure small"><img src="images/section2/shape_uniform.png" alt="Uniform distribution"></div>
+<div class="definition"><strong>Skewed</strong> – one tail is stretched longer than the other (not symmetric). The direction of the skewness is on the side of the longer tail. We start at the highest frequency class (highest bar) and from there the graph tails to the right and to the left.</div>
+<div class="definition"><strong>Skewed Right</strong> – tail to the right is stretched longer than the tail to the left</div><div class="figure small"><img src="images/section2/shape_skewed_right.png" alt="Right skewed distribution"></div>
+<div class="definition"><strong>Skewed Left</strong> – tail to the left is stretched longer than the tail to the right</div><div class="figure small"><img src="images/section2/shape_skewed_left.png" alt="Left skewed distribution"></div>
+<div class="definition"><strong>Bimodal</strong> – there are two distinct peaks (the peaks are often the two classes with largest frequencies, but not always)</div><div class="figure small"><img src="images/section2/shape_bimodal.png" alt="Bimodal distribution"></div></section>
+
+<section id="summation" class="section"><h2>4. Summation Notation</h2>
+<p>The sum of values, x₁ + x₂ + ⋯ + xₙ, can be denoted as</p><div class="math">∑<sub>i=1</sub><sup>n</sup> x<sub>i</sub></div>
+<ul><li>Read ‘sum of x sub i for i equals 1 to n’</li><li>x represents the data</li><li>n represents the number of items being summed (sample size)</li><li>i is and index that represents the observation number (x₁ is the first data point, x₂ is the second data point, and so on)</li></ul>
+<article class="card example"><h3>Example</h3><p>Select 4 students and ask “how many brothers and sisters do you have?”</p><p>Data: 2,3,1,3</p><p>x₁ = 2 &nbsp; x₂ = 3 &nbsp; x₃ = 1 &nbsp; x₄ = 3</p><div class="math">∑<sub>i=1</sub><sup>4</sup>x<sub>i</sub> = x₁ + x₂ + x₃ + x₄ = 2 + 3 + 1 + 3 = 9</div></article>
+<p>In statistics many times we leave off the index in the summation notation. This is because the sum is almost always taken over the entire sample (1 to n). Therefore, when you see a sum written without the index, you should assume it is 1 to n. For this class all sums will be over the sample size. This means that the above sum will commonly be written as:</p><div class="math">∑x = 9</div>
+<h3>Properties of sums (c is a constant)</h3>
+<div class="definition"><strong>∑cx = c∑x</strong><br>A constant can be pulled out of a sum. If there is a c in every term of the sum then we know that it can be pulled out as in: cx + cy + cz = c(x + y + z).</div>
+<div class="definition"><strong>∑c = nc</strong><br>If you sum a constant n times then you get the product of n and the constant. Keep in mind that multiplication is nothing more than repeated addition. If you sum 5 values of 10, you get: 10 + 10 + 10 + 10 + 10 = 5(10) = 50.</div>
+<div class="definition"><strong>∑(x + c) = ∑x + ∑c = ∑x + nc</strong><br>When multiple terms are included in the sum, you can separate those out and sum each part. This is because of the commutative property of addition (a + b = b + a). It does not matter what order you add numbers, the sum will be the same. Therefore, it does not matter if you add the terms first and then do the sum or if you do the sum for each term first and then add.</div>
+<article class="card example"><h3>Example</h3><p>Solve the following</p><ol type="a"><li>∑4x</li><li>∑(x + 3)</li><li>∑(4x + 3)</li><li>∑(4x + 3)²</li></ol>
+<details class="answer"><summary>Show Answers</summary><div class="answer-body"><p>a. ∑4x = 4∑x = 4(9) = 36</p><p>b. ∑(x + 3) = ∑x + ∑3 = 9 + 4(3) = 21</p><p>c. ∑(4x + 3) = 4∑x + ∑3 = 4(9) + 4(3) = 48</p><p>d. ∑(4x + 3)² = ∑(16x² + 24x + 9) = 16∑x² + 24∑x + ∑9 = 16(23) + 24(9) + 4(9) = 620</p></div></details></article></section>
+
+<section id="center" class="section"><h2>5. Numerical Measures of Central Tendency</h2>
+<p>We will now begin calculating statistics. Remember a statistic is a numerical characteristic of a sample. These are descriptive statistics since they will summarize the data in the sample.</p><p>A measure of central tendency is a measure of average or typical value. The three most common measures of central tendency are the mean, median, and mode which you have probably seen before. We will discuss these values along with the midrange.</p>
+<div class="definition"><strong>Sample Mean</strong> – when most people use the word average, they are talking about the mean</div><div class="math">x̄ = ∑x / n</div>
+<article class="card example"><h3>Example</h3><p>Back to number of siblings Data: 2,3,1,3</p><p>Calculate the mean.</p><p>Do you think the mean is a good measure of center for this data?</p><details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>x̄ = (2 + 3 + 1 + 3) / 4 = 9 / 4 = 2.25</p><p>Seems like a reasonable measure of center in this case. With a value of 1, a value of 2, and two values of 3, we would expect the center to be between 1 and 3. Since there are two values of 3 we would expect it to be a little closer to 3 than 1. Also, there are two data values below the mean and two above the mean.</p></div></details></article>
+<article class="card example"><h3>Example</h3><p>Suppose we had selected a 5th person for our sample which had 10 siblings.</p><p>New Data: 2,3,1,3,10</p><p>Calculate the mean.</p><p>Do you think the mean is a good measure of center for this data?</p><details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>x̄ = (2 + 3 + 1 + 3 + 10) / 5 = 19 / 5 = 3.8</p><p>In this case it does not seem like a reasonable measure. Notice the mean is above every data point except for the value of 10. This value would be identified as extreme since it is not typical to have 10 sibling. The mean is not a good measure of center when extreme values are present in the data set.</p></div></details></article>
+<div class="definition"><strong>Sample Median</strong> - the middle score</div><ul><li>rank data from smallest to largest</li><li>if n is odd, median is the middle score</li><li>if n is even, median is the mean of the two middle scores</li></ul>
+<article class="card example"><h3>Example</h3><p>Back to number of siblings Data: 2,3,1,3</p><p>Solve for the median.</p><details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>1,2,3,3</p><p>x̃ = (2 + 3) / 2 = 2.5</p></div></details></article>
+<article class="card example"><h3>Example</h3><p>New Data: 2,3,1,3,10</p><p>Solve for the median.</p><details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>1,2,3,3,10</p><p>x̃ = 3</p></div></details></article>
+<p>Because of the characteristics of the mean and median, if extreme scores exist in a data set the median is a better measure of central tendency.</p><p>If extreme scores are unlikely, the mean varies less from sample to sample than the median and is a better measure of center.</p>
+<ul><li>If x̄ &gt; x̃ then the distribution is right skewed</li><li>If x̄ &lt; x̃ then the distribution is left skewed</li><li>If x̄ = x̃ then the distribution is symmetric</li></ul>
+<div class="definition"><strong>Sample Mode</strong> - the most frequent score</div>
+<article class="card example"><h3>Example</h3><p>Data: 2,3,1,3</p><p>New Data: 2,3,1,3,10</p><p>Calculate the mode for the above data sets.</p><details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>Mode = 3 (for both the Data and New Data)</p></div></details></article>
+<p>The one advantage of using the mode is it can be used for qualitative data and that is when it should be used. For example if I say the average student in this class is female, what does that tell you? It just means that there are more females than males or the mode is female. The mean or median cannot be used for qualitative data.</p>
+<div class="definition"><strong>Sample Midrange</strong> – the average of the lowest and highest observation in the data set</div><div class="math">(Low + High) / 2</div>
+<article class="card example"><h3>Example</h3><p>Data: 2,3,1,3</p><p>New Data: 2,3,1,3,10</p><p>Calculate the midrange for the above data sets.</p><details class="answer"><summary>Show Answers</summary><div class="answer-body"><p>For Data: Midrange = (1 + 3) / 2 = 2</p><p>For New Data: Midrange = (1 + 10) / 2 = 5.5</p></div></details></article>
+<p>The midrange is utilized to illustrate that there are many statistics available to choose from, but some are much better than others. The midrange is not a very good measure of center for most data sets. Think about it. You may have 1000 data points. You only select two of those data points to calculate the midrange and the two you pick are the most extreme data points. The midrange is totally dependent on extreme scores. The only time it is a good measure is when the data is perfectly symmetric. In practice, perfect symmetry is very rare.</p></section>
+
+<div class="back-row" style="margin-top:36px"><a class="btn outline btn-sm" href="index.html">← Back to STA296U Notes</a><a class="btn btn-sm" href="STA296U_Section_2_Methods_for_Describing_Sets_of_Data.docx" download>Download Word Notes</a></div>
+<footer class="notes-footer">Last updated: <span id="lastUpdated"></span></footer>
+</div></main><script>document.getElementById('lastUpdated').textContent=new Date(document.lastModified).toLocaleString();</script></body></html>
