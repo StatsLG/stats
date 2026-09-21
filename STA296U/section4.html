@@ -1,42 +1,1761 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>STA296U - Section 4 | StatsLG</title><link rel="stylesheet" href="/style/bctcstyle.css">
-<style>
-.notes-page{max-width:1100px;margin:auto;padding:28px 20px 50px}.notes-content{max-width:900px;margin:auto}.back-row{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-bottom:22px}
-.header{text-align:center}.header h1{color:#00467f}.gold-rule{height:5px;background:#e7a614;border-radius:4px;margin:20px 0}.section{margin:34px 0}.section>h2{color:#00467f;border-bottom:3px solid #e7a614;padding-bottom:7px}
-.definition{background:#f2f7fb;border-left:5px solid #00467f;padding:14px 17px;margin:18px 0}.definition strong{color:#00467f}.example{border:1px solid #d7dee5;border-top:5px solid #e7a614;border-radius:10px;padding:20px;margin:22px 0}
-.answer{margin-top:14px;background:#fff9e9;border-left:5px solid #e7a614;padding:14px}.figure{text-align:center;margin:22px 0}.figure img{max-width:100%;height:auto}
-.math{text-align:center;font-size:1.12rem;margin:14px}.toc{background:#f7f9fb;border-top:5px solid #e7a614;padding:18px;border-radius:10px}.toc a{color:#00467f;font-weight:700}
-table{border-collapse:collapse;width:100%;margin:18px 0}th,td{border:1px solid #aaa;padding:7px;text-align:center}th{background:#f2f7fb}
-details summary{cursor:pointer;color:#00467f;font-weight:700}@media(max-width:700px){.notes-page{padding:16px 12px}}
-</style></head><body><main class="notes-page"><div class="notes-content">
-<div class="back-row"><a class="btn outline btn-sm" href="index.html">← Back to STA296U Notes</a><a class="btn btn-sm" href="STA296U_Section_4_Probability.docx" download>Download Word Notes</a></div>
-<header class="header"><h1>STA296U — Section 4</h1><p>Probability</p><div class="gold-rule"></div></header>
-<div class="toc"><h2>In This Section</h2><ul><li><a href="#counting">Counting Rules</a></li><li><a href="#events">Events, Sample Spaces, and Probability</a></li><li><a href="#types">Types of Probability</a></li><li><a href="#independence">Independent and Dependent Events</a></li></ul></div>
-<section class="section" id="counting"><h2>Counting Rules</h2>
-<p>Before we discuss probability, some basic counting principles and the idea of factorials will be introduced. These concepts are useful at times when identifying the number of outcomes in an experiment and when probabilities are calculated.</p>
-<div class="example"><h3>Example</h3><p>a. How many different ways are there to arrange the 6 letters in the word SUNDAY?</p><p>b. Suppose you have a lock with a three digit code. Each digit is a number 0 through 9. How many possible codes are there?</p><details><summary>Show Answers</summary><div class="answer"><p>a. In this case we have 6 distinct letters. First, create a space for each letter (6 spaces). Next, fill in the spaces with the number of options from left to right. The first space has 6 options since any letter can go in that space. The second space has 5 options since one letter is already in the first space. Continue this pattern and then multiply to get the number of arrangements as seen below.</p><div class="math">6 · 5 · 4 · 3 · 2 · 1 = 720</div><p>b. In this case we will have three spaces, one for each digit of the code. The first space has 10 options since it can be any number 0 to 9. Here, the second digit of the code can be the same as the first so the second space also has 10 options. Once the spaces are filled, multiply to get the number of possible codes.</p><div class="math">10 · 10 · 10 = 10³ = 1000</div></div></details></div>
-<div class="definition"><strong>Factorial</strong> - the product of an integer and all the integers below it</div><p>The symbol n!, read as “n factorial” is computed as follows:</p><div class="math">0! = 1<br>1! = 1<br>2! = 2 · 1 = 2<br>3! = 3 · 2 · 1 = 6<br>4! = 4 · 3 · 2 · 1 = 24<br>and so on</div>
-<div class="definition"><strong>Permutation</strong> - Ordered arrangements of distinct objects are called permutations. (order matters)</div><div class="math">nP<sub>r</sub> = n! / (n-r)!</div>
-<div class="example"><h3>Example</h3><p>In how many ways can you select a president, vice president, treasurer, and secretary from a group of 10?</p><details><summary>Show Answer</summary><div class="answer"><p>Notice here that order matters because person A being president and person B being vice-president is different</p><div class="math">10P<sub>4</sub> = 10! / 6! = 10 · 9 · 8 · 7 = 5040</div></div></details></div>
-<div class="definition"><strong>Combination</strong> - Unordered selections of distinct objects are called combinations. (order does not matter)</div><div class="math">nC<sub>r</sub> = n! / [r!(n-r)!]</div>
-<div class="example"><h3>Example</h3><p>In how many ways can a committee of 5 senators be selected from a group of 8 senators?</p><details><summary>Show Answer</summary><div class="answer"><p>Here order does not matter because it is a committee. It does not matter what order people are selected, it just matters which 5 people are on the committee</p><div class="math">8C<sub>5</sub> = 8!/[5!3!] = 56</div></div></details></div></section>
-<section class="section" id="events"><h2>Events, Sample Spaces, and Probability</h2>
-<div class="definition"><strong>Sample Space</strong> – the set of all possible outcomes from an experiment</div>
-<div class="example"><h3>Example</h3><p>Identify the sample space for each of the following</p><p>a. Flip a coin<br>b. Roll a die<br>c. Measure heights of random people</p><details><summary>Show Answers</summary><div class="answer"><p>a. sample space = {H, T}<br>b. sample space = {1, 2, 3, 4, 5, 6}<br>c. sample space = {height of shortest person to height of tallest person}</p></div></details></div>
-<p>The above example illustrates a common way to denote a sample space. Notice that when you flip a coin you get a qualitative variable and when you roll a die you get a discrete quantitative variable. These are the types of variables we will deal with to introduce the basic ideas of probability in this section. In these cases, each outcome of the experiment can be listed using set notation as seen above. Feel free to abbreviate when appropriate as I did for the coin flip (H for head and T for tails). Notice when you measure the heights of random people, you get a continuous quantitative variable. In the case of continuous variables the outcomes cannot be listed because there is an infinite number of possible outcomes. Therefore, the sample space is represented as an interval. Probability for continuous random variables will be dealt with in later sections.</p>
-<div class="definition"><strong>Event</strong> – a subset of the sample space</div><div class="definition"><strong>Probability (of an event A)</strong> – denoted P(A), is the expected proportion of occurrences of A if the experiment were performed a large number of times (keep in mind A is just an example, we could call the event whatever we wanted)</div><div class="math">Probability of an event = # of outcomes in the event / Total # of outcomes</div>
-<div class="definition"><strong>Tree diagram</strong> – useful for determining a sample space when there is a series of operations</div>
-<div class="example"><h3>Example: Flip a Penny, Nickel, and a Dime</h3><p>a. How many possible outcomes are there?<br>b. Identify the sample space.<br>c. Suppose A is the event of getting all three tails. Identify A. What is P(A)?<br>d. Suppose B is the event of getting exactly two tails. Identify B. What is P(B)?<br>e. Suppose C is the event of getting exactly one tail. Identify C. What is P(C)?<br>f. Suppose D is the event of getting no tails. Identify D. What is P(D)?</p><details><summary>Show Answers</summary><div class="answer"><p>a. 2 · 2 · 2 = 8 possible outcomes</p><div class="figure"><img src="images/section4/three_coin_tree.png" alt="Tree diagram for three coin flips"></div><p>sample space = {HHH, HHT, HTH, HTT, THH, THT, TTH, TTT}<br>c. A = {TTT}, P(A)=1/8=0.125<br>d. B = {HTT, THT, TTH}, P(B)=3/8=0.375<br>e. C = {HHT, HTH, THH}, P(C)=3/8=0.375<br>f. D = {HHH}, P(D)=1/8=0.125</p></div></details></div></section>
-<section class="section" id="types"><h2>Types of Probability</h2>
-<div class="definition"><strong>Simple Probability</strong> – the probability of an event</div><div class="definition"><strong>Joint Probability</strong> – an event that has two or more characteristics (event is created with a union or intersection)</div>
-<p>The intersection of two events, denoted A ∩ B, is the event composed of outcomes from A and B. In other words, if both A and B occur, then it is said that A ∩ B occurred.</p><p>We say the events A and B are mutually exclusive or disjoint if they cannot occur together. When P(A ∩ B) = 0</p><p>The union of two events, denoted A ∪ B, is the event composed of outcomes from A or B. In other words, if A occurs, B occurs, or both A and B occur, then it is said that A ∪ B occurred.</p><div class="math">P(A ∪ B) = P(A) + P(B) - P(A ∩ B)</div>
-<div class="definition"><strong>Complement (of an event A)</strong> – denoted A̅, Aᶜ, or A′, is all sample points not in A</div><div class="math">P(A̅) = 1 - P(A)</div>
-<div class="definition"><strong>Conditional Probability (A conditioned on B)</strong> – denoted P(A|B), is when we are interested in knowing if event A occurred given that we know event B occurred</div><div class="math">P(A|B) = P(A ∩ B) / P(B)</div>
-<div class="example"><h3>Two Dice Example</h3><p>A = {sum of the dice is 7}<br>B = {both numbers ≤ 4}<br>C = {green die is 1}</p><div class="figure"><img src="images/section4/dice_event_A.png" alt="Dice sample space event A"></div><div class="figure"><img src="images/section4/dice_event_B.png" alt="Dice sample space event B"></div><div class="figure"><img src="images/section4/dice_event_C.png" alt="Dice sample space event C"></div>
-<p><strong>Simple Probabilities:</strong> P(A)=6/36=0.167, P(B)=16/36=0.444, P(C)=6/36=0.167</p><p><strong>Intersections:</strong> P(A∩B)=2/36=0.056, P(A∩C)=1/36=0.028, P(B∩C)=4/36=0.111</p><p><strong>Unions:</strong> P(A∪B)=20/36=0.556, P(A∪C)=11/36=0.306, P(B∪C)=18/36=0.5</p><p><strong>Complements:</strong> P(A̅)=0.833, P(B̅)=0.556, P(C̅)=0.833</p><p><strong>Conditional Probabilities:</strong> P(A|B)=0.125, P(B|A)=0.333, P(A|C)=0.167, P(C|A)=0.167, P(B|C)=0.667, P(C|B)=0.25</p></div>
-<div class="example"><h3>Traffic Tickets Example</h3><table><tr><th></th><th>0 tickets</th><th>1 ticket</th><th>2 tickets</th><th>3 or more tickets</th><th>Total</th></tr><tr><td>Female</td><td>1192</td><td>321</td><td>72</td><td>15</td><td>1600</td></tr><tr><td>Male</td><td>695</td><td>487</td><td>141</td><td>77</td><td>1400</td></tr><tr><td>Total</td><td>1887</td><td>808</td><td>213</td><td>92</td><td>3000</td></tr></table><p>A = {selected driver is female}<br>B = {selected driver has at least 2 tickets}</p><details><summary>Show Answers</summary><div class="answer"><p>P(A)=0.53333<br>P(B)=0.10167<br>P(A∩B)=0.029<br>P(A∪B)=0.606<br>P(A̅)=0.46667<br>P(A|B)=0.28524</p></div></details></div></section>
-<section class="section" id="independence"><h2>Independent and Dependent Events</h2><div class="definition"><strong>Independent</strong> – two events are said to be independent if the occurrence (or nonoccurrence) of one does not affect the probability of occurrence of the other</div><div class="math">If P(A) = P(A|B) then A and B are independent.</div><div class="definition"><strong>Dependent</strong> – events that are not independent</div><div class="math">If P(A) ≠ P(A|B) then A and B are dependent</div><div class="definition"><strong>Multiplication rule</strong> – P(A ∩ B) = P(A)P(B|A)</div>
-<div class="example"><h3>Card Example</h3><p>Suppose we are dealing with a standard deck of cards (52 cards and 4 aces). We will draw two cards without replacement (meaning after the first card is drawn, it will not be put back in the deck before drawing the second card).</p><p>A = {first card is an ace} B = {second card is an ace}</p><details><summary>Show Answers</summary><div class="answer"><p>Without replacement, A and B are dependent and P(A ∩ B) = (4/52)(3/51) = 0.004525.</p><p>With replacement, A and B are independent and P(A ∩ B) = (4/52)(4/52) = 0.00591.</p></div></details></div>
-<div class="example"><h3>City/County Government Example</h3><table><tr><th></th><th>Favor (F)</th><th>Oppose</th><th>Total</th></tr><tr><td>City (C)</td><td>80</td><td>40</td><td>120</td></tr><tr><td>Outside</td><td>20</td><td>10</td><td>30</td></tr><tr><td>Total</td><td>100</td><td>50</td><td>150</td></tr></table><details><summary>Show Answers</summary><div class="answer"><p>P(F)=0.667; P(C)=0.8; P(F∩C)=0.533; P(F∪C)=0.933; P(F̅)=0.333; P(C̅)=0.2; P(F|C)=0.667.</p><p>No, living in the city does not have an effect on whether someone favors combining city and county government. We know that F and C are independent because P(F|C) = P(F). In these types of problems make sure you check to see if the probabilities are equal. If the numbers were different in the table here, the answer to this question could change.</p></div></details></div></section>
-<div class="back-row"><a class="btn outline btn-sm" href="index.html">← Back to STA296U Notes</a><a class="btn btn-sm" href="STA296U_Section_4_Probability.docx" download>Download Word Notes</a></div>
-</div></main></body></html>
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <title>
+   STA296U - Section 4 | StatsLG
+  </title>
+  <link href="/favicon.ico" rel="icon"/>
+  <link href="/style/bctcstyle.css" rel="stylesheet"/>
+  <style>
+   .notes-page{max-width:1100px;margin:0 auto;padding:32px 40px}.notes-content{max-width:900px;margin:0 auto}
+.notes-content h2{margin-top:2rem;scroll-margin-top:1rem}.notes-content h3{margin-top:1.5rem;color:var(--ink)}.notes-content p,.notes-content li{line-height:1.65}
+.back-row{margin:0 0 20px;display:flex;gap:10px;flex-wrap:wrap}.toc{margin-bottom:1.5rem}.toc h2{margin-top:0}.toc a{color:var(--kctcs-blue);font-weight:700}
+.definition{border-left:5px solid var(--kctcs-blue);padding:12px 14px;margin:14px 0;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.definition strong{color:var(--kctcs-blue)}.example{margin:18px 0}.example>h3,.example>h4{margin-top:0}
+details.answer{margin-top:14px;border-top:1px solid var(--rule);padding-top:10px}details.answer summary{cursor:pointer;color:var(--kctcs-blue);font-weight:800}
+details.answer summary:hover{text-decoration:underline}details.answer[open] summary{margin-bottom:10px}
+.answer-body{border-left:5px solid var(--kctcs-gold);padding:10px 14px;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.key-idea{border-left:5px solid var(--kctcs-gold)}
+.formula{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;font-size:1.18rem;text-align:center;font-weight:600;color:var(--kctcs-blue);margin:16px 0;padding:14px;background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius);overflow-x:auto;line-height:1.8}
+.frac{display:inline-flex;vertical-align:middle;flex-direction:column;text-align:center;line-height:1.1;margin:0 .16em}
+.frac>.top{border-bottom:1.5px solid currentColor;padding:0 .25em .08em}.frac>.bottom{padding:.08em .25em 0}
+.math-line{display:block;margin:5px 0}
+.dice-event{margin:22px 0}.dice-event h4{color:var(--kctcs-blue);margin-bottom:8px}
+.dice-grid{width:100%;border-collapse:collapse;table-layout:fixed;font-size:.94rem}
+.dice-grid th,.dice-grid td{border:1px solid var(--rule);padding:9px 4px;text-align:center;vertical-align:middle}
+.dice-grid thead th,.dice-grid tbody th{background:var(--panel);color:var(--kctcs-blue);font-weight:800}
+.dice-grid .corner{font-size:.82rem;line-height:1.2}.dice-grid td.hit{background:#fff1bf;font-weight:800;box-shadow:inset 0 0 0 2px var(--kctcs-gold)}
+.data-table{width:100%;border-collapse:collapse;margin:18px 0}.data-table th,.data-table td{border:1px solid var(--rule);padding:8px;text-align:center}.data-table th{background:var(--panel);color:var(--kctcs-blue)}
+.notes-footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted);font-size:12px}
+@media(max-width:760px){.notes-page{padding:20px 16px}.back-row{flex-direction:column;align-items:stretch}.back-row .btn{justify-content:center}.dice-grid{font-size:.78rem}.dice-grid th,.dice-grid td{padding:7px 2px}}
+@media print{.back-row{display:none}.notes-page{max-width:none;padding:0}.notes-content{max-width:none}details.answer>*{display:block!important}}
+  </style>
+ </head>
+ <body>
+  <main class="notes-page">
+   <div class="notes-content">
+    <div class="back-row">
+     <a class="btn outline btn-sm" href="index.html">
+      ← Back to STA296U Notes
+     </a>
+     <a class="btn btn-sm" download="" href="STA296U_Section_4_Probability.docx">
+      Download Word Notes
+     </a>
+    </div>
+    <header class="header">
+     <h1>
+      STA296U — Section 4
+     </h1>
+     <p>
+      Probability
+     </p>
+    </header>
+    <section class="section panel pad toc">
+     <h2>
+      In This Section
+     </h2>
+     <ul>
+      <li>
+       <a href="#counting">
+        Counting Rules
+       </a>
+      </li>
+      <li>
+       <a href="#events">
+        Events, Sample Spaces, and Probability
+       </a>
+      </li>
+      <li>
+       <a href="#types">
+        Types of Probability
+       </a>
+      </li>
+      <li>
+       <a href="#dice">
+        Two-Dice Probability Example
+       </a>
+      </li>
+      <li>
+       <a href="#independence">
+        Independent and Dependent Events
+       </a>
+      </li>
+     </ul>
+    </section>
+    <section class="section" id="counting">
+     <h2>
+      Counting Rules
+     </h2>
+     <p>
+      Before we discuss probability, some basic counting principles and the idea of factorials will be introduced. These concepts are useful at times when identifying the number of outcomes in an experiment and when probabilities are calculated.
+     </p>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       a. How many different ways are there to arrange the 6 letters in the word SUNDAY?
+      </p>
+      <p>
+       b. Suppose you have a lock with a three digit code. Each digit is a number 0 through 9. How many possible codes are there?
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answers
+       </summary>
+       <div class="answer-body">
+        <p>
+         a. In this case we have 6 distinct letters. First, create a space for each letter (6 spaces). Next, fill in the spaces with the number of options from left to right. The first space has 6 options since any letter can go in that space. The second space has 5 options since one letter is already in the first space. Continue this pattern and then multiply to get the number of arrangements as seen below.
+        </p>
+        <div class="formula">
+         6 · 5 · 4 · 3 · 2 · 1 = 720
+        </div>
+        <p>
+         b. In this case we will have three spaces, one for each digit of the code. The first space has 10 options since it can be any number 0 to 9. Here, the second digit of the code can be the same as the first so the second space also has 10 options. Once the spaces are filled, multiply to get the number of possible codes.
+        </p>
+        <div class="formula">
+         10 · 10 · 10 = 10
+         <sup>
+          3
+         </sup>
+         = 1000
+        </div>
+       </div>
+      </details>
+     </article>
+     <div class="definition">
+      <strong>
+       Factorial
+      </strong>
+      - the product of an integer and all the integers below it
+     </div>
+     <p>
+      The symbol
+      <em>
+       n
+      </em>
+      !, read as “n factorial” is computed as follows:
+     </p>
+     <div class="formula">
+      0! = 1
+      <br/>
+      1! = 1
+      <br/>
+      2! = 2 · 1 = 2
+      <br/>
+      3! = 3 · 2 · 1 = 6
+      <br/>
+      4! = 4 · 3 · 2 · 1 = 24
+      <br/>
+      and so on
+     </div>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       Evaluate each expression
+      </p>
+      <div class="formula">
+       a.
+       <span class="frac">
+        <span class="top">
+         5!
+        </span>
+        <span class="bottom">
+         2!
+        </span>
+       </span>
+       b.
+       <span class="frac">
+        <span class="top">
+         9!
+        </span>
+        <span class="bottom">
+         8!
+        </span>
+       </span>
+       c.
+       <span class="frac">
+        <span class="top">
+         8!
+        </span>
+        <span class="bottom">
+         2! · 6!
+        </span>
+       </span>
+      </div>
+      <details class="answer">
+       <summary>
+        Show Answers
+       </summary>
+       <div class="answer-body">
+        <div class="formula">
+         <span class="math-line">
+          a.
+          <span class="frac">
+           <span class="top">
+            5!
+           </span>
+           <span class="bottom">
+            2!
+           </span>
+          </span>
+          =
+          <span class="frac">
+           <span class="top">
+            5 · 4 · 3 · 2!
+           </span>
+           <span class="bottom">
+            2!
+           </span>
+          </span>
+          = 5 · 4 · 3 = 60
+         </span>
+         <span class="math-line">
+          b.
+          <span class="frac">
+           <span class="top">
+            9!
+           </span>
+           <span class="bottom">
+            8!
+           </span>
+          </span>
+          =
+          <span class="frac">
+           <span class="top">
+            9 · 8!
+           </span>
+           <span class="bottom">
+            8!
+           </span>
+          </span>
+          = 9
+         </span>
+         <span class="math-line">
+          c.
+          <span class="frac">
+           <span class="top">
+            8!
+           </span>
+           <span class="bottom">
+            2! · 6!
+           </span>
+          </span>
+          =
+          <span class="frac">
+           <span class="top">
+            8 · 7 · 6!
+           </span>
+           <span class="bottom">
+            2 · 1 · 6!
+           </span>
+          </span>
+          =
+          <span class="frac">
+           <span class="top">
+            8 · 7
+           </span>
+           <span class="bottom">
+            2 · 1
+           </span>
+          </span>
+          = 4 · 7 = 28
+         </span>
+        </div>
+       </div>
+      </details>
+     </article>
+     <div class="definition">
+      <strong>
+       Permutation
+      </strong>
+      — Ordered arrangements of distinct objects are called permutations. (order matters)
+     </div>
+     <div class="formula">
+      <sub>
+       n
+      </sub>
+      P
+      <sub>
+       r
+      </sub>
+      =
+      <span class="frac">
+       <span class="top">
+        n!
+       </span>
+       <span class="bottom">
+        (n − r)!
+       </span>
+      </span>
+     </div>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       In how many ways can you select a president, vice president, treasurer, and secretary from a group of 10?
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answer
+       </summary>
+       <div class="answer-body">
+        <p>
+         Notice here that order matters because person A being president and person B being vice-president is different
+        </p>
+        <div class="formula">
+         <sub>
+          10
+         </sub>
+         P
+         <sub>
+          4
+         </sub>
+         =
+         <span class="frac">
+          <span class="top">
+           10!
+          </span>
+          <span class="bottom">
+           (10 − 4)!
+          </span>
+         </span>
+         =
+         <span class="frac">
+          <span class="top">
+           10!
+          </span>
+          <span class="bottom">
+           6!
+          </span>
+         </span>
+         = 10 · 9 · 8 · 7 = 5040
+        </div>
+       </div>
+      </details>
+     </article>
+     <div class="definition">
+      <strong>
+       Combination
+      </strong>
+      — Unordered selections of distinct objects are called combinations. (order does not matter)
+     </div>
+     <div class="formula">
+      <sub>
+       n
+      </sub>
+      C
+      <sub>
+       r
+      </sub>
+      =
+      <span class="frac">
+       <span class="top">
+        n!
+       </span>
+       <span class="bottom">
+        r!(n − r)!
+       </span>
+      </span>
+     </div>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       In how many ways can a committee of 5 senators be selected from a group of 8 senators?
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answer
+       </summary>
+       <div class="answer-body">
+        <p>
+         Here order does not matter because it is a committee. It does not matter what order people are selected, it just matters which 5 people are on the committee
+        </p>
+        <div class="formula">
+         <sub>
+          8
+         </sub>
+         C
+         <sub>
+          5
+         </sub>
+         =
+         <span class="frac">
+          <span class="top">
+           8!
+          </span>
+          <span class="bottom">
+           5!(8 − 5)!
+          </span>
+         </span>
+         =
+         <span class="frac">
+          <span class="top">
+           8!
+          </span>
+          <span class="bottom">
+           5!3!
+          </span>
+         </span>
+         =
+         <span class="frac">
+          <span class="top">
+           8 · 7 · 6
+          </span>
+          <span class="bottom">
+           3 · 2
+          </span>
+         </span>
+         = 8 · 7 = 56
+        </div>
+       </div>
+      </details>
+     </article>
+    </section>
+    <section class="section" id="events">
+     <h2>
+      Events, Sample Spaces, and Probability
+     </h2>
+     <div class="definition">
+      <strong>
+       Sample Space
+      </strong>
+      – the set of all possible outcomes from an experiment
+     </div>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       Identify the sample space for each of the following
+      </p>
+      <p>
+       a. Flip a coin
+       <br/>
+       b. Roll a die
+       <br/>
+       c. Measure heights of random people
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answers
+       </summary>
+       <div class="answer-body">
+        <p>
+         a. sample space = {H, T}
+         <br/>
+         b. sample space = {1, 2, 3, 4, 5, 6}
+         <br/>
+         c. sample space = {height of shortest person to height of tallest person}
+        </p>
+       </div>
+      </details>
+     </article>
+     <div class="definition">
+      <strong>
+       Event
+      </strong>
+      – a subset of the sample space
+     </div>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       Suppose you roll a die and event A is defined by getting an even number. We would represent this event as:
+      </p>
+      <div class="formula">
+       A = {2, 4, 6}
+      </div>
+      <p>
+       An event is said to occur when any outcome in the event occurs. Thus, if the Die is a 2 (or 4 or 6) in the example above, then event A has occurred.
+      </p>
+     </article>
+     <div class="definition">
+      <strong>
+       Probability (of an event A)
+      </strong>
+      – denoted P(A), is the expected proportion of occurrences of A if the experiment were performed a large number of times (keep in mind A is just an example, we could call the event whatever we wanted)
+     </div>
+     <div class="formula">
+      Probability of an event =
+      <span class="frac">
+       <span class="top">
+        # of outcomes in the event
+       </span>
+       <span class="bottom">
+        Total # of outcomes
+       </span>
+      </span>
+     </div>
+     <div class="definition">
+      <strong>
+       Tree diagram
+      </strong>
+      – useful for determining a sample space when there is a series of operations
+     </div>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       Flip a Penny, Nickel, and a Dime
+      </p>
+      <p>
+       a. How many possible outcomes are there?
+       <br/>
+       b. Identify the sample space.
+       <br/>
+       c. Suppose A is the event of getting all three tails. Identify A. What is P(A)?
+       <br/>
+       d. Suppose B is the event of getting exactly two tails. Identify B. What is P(B)?
+       <br/>
+       e. Suppose C is the event of getting exactly one tail. Identify C. What is P(C)?
+       <br/>
+       f. Suppose D is the event of getting no tails. Identify D. What is P(D)?
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answers
+       </summary>
+       <div class="answer-body">
+        <p>
+         a. 2 · 2 · 2 = 8 possible outcomes
+        </p>
+        <p>
+         b. Tree diagram
+        </p>
+        <div class="figure">
+         <img alt="Tree diagram for three coin flips" src="images/section4/three_coin_tree.png" style="max-width:100%;height:auto"/>
+        </div>
+        <p>
+         sample space = {HHH, HHT, HTH, HTT, THH, THT, TTH, TTT}
+        </p>
+        <div class="formula">
+         P(A) =
+         <span class="frac">
+          <span class="top">
+           1
+          </span>
+          <span class="bottom">
+           8
+          </span>
+         </span>
+         = 0.125
+         <br/>
+         P(B) =
+         <span class="frac">
+          <span class="top">
+           3
+          </span>
+          <span class="bottom">
+           8
+          </span>
+         </span>
+         = 0.375
+         <br/>
+         P(C) =
+         <span class="frac">
+          <span class="top">
+           3
+          </span>
+          <span class="bottom">
+           8
+          </span>
+         </span>
+         = 0.375
+         <br/>
+         P(D) =
+         <span class="frac">
+          <span class="top">
+           1
+          </span>
+          <span class="bottom">
+           8
+          </span>
+         </span>
+         = 0.125
+        </div>
+       </div>
+      </details>
+     </article>
+     <div class="key-idea card soft pad">
+      <strong>
+       Characteristics of probability
+      </strong>
+      <ul>
+       <li>
+        0 ≤ P(A) ≤ 1 for any event A (all probabilities must be between 0 and 1)
+       </li>
+       <li>
+        P(sample space) = 1 (the probability of getting an element from the sample space is always 1)
+       </li>
+       <li>
+        The higher a probability (closer to 1), the more likely the event
+       </li>
+      </ul>
+     </div>
+    </section>
+    <section class="section" id="types">
+     <h2>
+      Types of Probability
+     </h2>
+     <div class="definition">
+      <strong>
+       Simple Probability
+      </strong>
+      – the probability of an event
+     </div>
+     <div class="definition">
+      <strong>
+       Joint Probability
+      </strong>
+      – an event that has two or more characteristics (event is created with a union or intersection)
+     </div>
+     <p>
+      The intersection of two events, denoted A ∩ B, is the event composed of outcomes from A and B. In other words, if both A and B occur, then it is said that A ∩ B occurred.
+     </p>
+     <p>
+      We say the events A and B are mutually exclusive or disjoint if they cannot occur together. When P(A ∩ B) = 0
+     </p>
+     <p>
+      The union of two events, denoted A ∪ B, is the event composed of outcomes from A or B. In other words, if A occurs, B occurs, or both A and B occur, then it is said that A ∪ B occurred.
+     </p>
+     <div class="formula">
+      P(A ∪ B) = P(A) + P(B) − P(A ∩ B)
+     </div>
+     <div class="definition">
+      <strong>
+       Complement (of an event A)
+      </strong>
+      – denoted A̅, A
+      <sup>
+       c
+      </sup>
+      , or A′, is all sample points not in A
+     </div>
+     <div class="formula">
+      P(A̅) = 1 − P(A)
+     </div>
+     <div class="definition">
+      <strong>
+       Conditional Probability (A conditioned on B)
+      </strong>
+      – denoted P(A|B), is when we are interested in knowing if event A occurred given that we know event B occurred
+     </div>
+     <div class="formula">
+      P(A|B) =
+      <span class="frac">
+       <span class="top">
+        P(A ∩ B)
+       </span>
+       <span class="bottom">
+        P(B)
+       </span>
+      </span>
+     </div>
+    </section>
+    <section class="section" id="dice">
+     <h2>
+      Two-Dice Probability Example
+     </h2>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       Roll a balanced green die and red die. Three events are defined below. Find the identified probabilities.
+      </p>
+      <p>
+       A = {sum of the dice is 7}
+       <br/>
+       B = {both numbers ≤ 4}
+       <br/>
+       C = {green die is 1}
+      </p>
+      <p>
+       We will look at the sample space in table form to illustrate the different types of probabilities introduced in this section. Also, the reasoning and application of the rules above will be demonstrated. We will first identify each event which is done in the three tables below. Notice when looking at the table, the outcomes are denoted as ordered pairs, (Green die, Red die). The highlights match each event.
+      </p>
+      <div class="figure" style="text-align:center;margin:22px 0">
+       <img alt="Sample space for two dice with highlighted events" src="images/section4/dice_sample_space.png" style="max-width:100%;height:auto"/>
+      </div>
+      <div class="dice-event">
+       <h4>
+        A = {sum of the dice is 7}
+       </h4>
+       <table class="dice-grid">
+        <thead>
+         <tr>
+          <th class="corner">
+           Red ↓
+           <br/>
+           Green →
+          </th>
+          <th>
+           1
+          </th>
+          <th>
+           2
+          </th>
+          <th>
+           3
+          </th>
+          <th>
+           4
+          </th>
+          <th>
+           5
+          </th>
+          <th>
+           6
+          </th>
+         </tr>
+        </thead>
+        <tbody>
+         <tr>
+          <th>
+           1
+          </th>
+          <td>
+           (1,1)
+          </td>
+          <td>
+           (2,1)
+          </td>
+          <td>
+           (3,1)
+          </td>
+          <td>
+           (4,1)
+          </td>
+          <td>
+           (5,1)
+          </td>
+          <td class="hit">
+           (6,1)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           2
+          </th>
+          <td>
+           (1,2)
+          </td>
+          <td>
+           (2,2)
+          </td>
+          <td>
+           (3,2)
+          </td>
+          <td>
+           (4,2)
+          </td>
+          <td class="hit">
+           (5,2)
+          </td>
+          <td>
+           (6,2)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           3
+          </th>
+          <td>
+           (1,3)
+          </td>
+          <td>
+           (2,3)
+          </td>
+          <td>
+           (3,3)
+          </td>
+          <td class="hit">
+           (4,3)
+          </td>
+          <td>
+           (5,3)
+          </td>
+          <td>
+           (6,3)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           4
+          </th>
+          <td>
+           (1,4)
+          </td>
+          <td>
+           (2,4)
+          </td>
+          <td class="hit">
+           (3,4)
+          </td>
+          <td>
+           (4,4)
+          </td>
+          <td>
+           (5,4)
+          </td>
+          <td>
+           (6,4)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           5
+          </th>
+          <td>
+           (1,5)
+          </td>
+          <td class="hit">
+           (2,5)
+          </td>
+          <td>
+           (3,5)
+          </td>
+          <td>
+           (4,5)
+          </td>
+          <td>
+           (5,5)
+          </td>
+          <td>
+           (6,5)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           6
+          </th>
+          <td class="hit">
+           (1,6)
+          </td>
+          <td>
+           (2,6)
+          </td>
+          <td>
+           (3,6)
+          </td>
+          <td>
+           (4,6)
+          </td>
+          <td>
+           (5,6)
+          </td>
+          <td>
+           (6,6)
+          </td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+      <div class="dice-event">
+       <h4>
+        B = {both numbers ≤ 4}
+       </h4>
+       <table class="dice-grid">
+        <thead>
+         <tr>
+          <th class="corner">
+           Red ↓
+           <br/>
+           Green →
+          </th>
+          <th>
+           1
+          </th>
+          <th>
+           2
+          </th>
+          <th>
+           3
+          </th>
+          <th>
+           4
+          </th>
+          <th>
+           5
+          </th>
+          <th>
+           6
+          </th>
+         </tr>
+        </thead>
+        <tbody>
+         <tr>
+          <th>
+           1
+          </th>
+          <td class="hit">
+           (1,1)
+          </td>
+          <td class="hit">
+           (2,1)
+          </td>
+          <td class="hit">
+           (3,1)
+          </td>
+          <td class="hit">
+           (4,1)
+          </td>
+          <td>
+           (5,1)
+          </td>
+          <td>
+           (6,1)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           2
+          </th>
+          <td class="hit">
+           (1,2)
+          </td>
+          <td class="hit">
+           (2,2)
+          </td>
+          <td class="hit">
+           (3,2)
+          </td>
+          <td class="hit">
+           (4,2)
+          </td>
+          <td>
+           (5,2)
+          </td>
+          <td>
+           (6,2)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           3
+          </th>
+          <td class="hit">
+           (1,3)
+          </td>
+          <td class="hit">
+           (2,3)
+          </td>
+          <td class="hit">
+           (3,3)
+          </td>
+          <td class="hit">
+           (4,3)
+          </td>
+          <td>
+           (5,3)
+          </td>
+          <td>
+           (6,3)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           4
+          </th>
+          <td class="hit">
+           (1,4)
+          </td>
+          <td class="hit">
+           (2,4)
+          </td>
+          <td class="hit">
+           (3,4)
+          </td>
+          <td class="hit">
+           (4,4)
+          </td>
+          <td>
+           (5,4)
+          </td>
+          <td>
+           (6,4)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           5
+          </th>
+          <td>
+           (1,5)
+          </td>
+          <td>
+           (2,5)
+          </td>
+          <td>
+           (3,5)
+          </td>
+          <td>
+           (4,5)
+          </td>
+          <td>
+           (5,5)
+          </td>
+          <td>
+           (6,5)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           6
+          </th>
+          <td>
+           (1,6)
+          </td>
+          <td>
+           (2,6)
+          </td>
+          <td>
+           (3,6)
+          </td>
+          <td>
+           (4,6)
+          </td>
+          <td>
+           (5,6)
+          </td>
+          <td>
+           (6,6)
+          </td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+      <div class="dice-event">
+       <h4>
+        C = {green die is 1}
+       </h4>
+       <table class="dice-grid">
+        <thead>
+         <tr>
+          <th class="corner">
+           Red ↓
+           <br/>
+           Green →
+          </th>
+          <th>
+           1
+          </th>
+          <th>
+           2
+          </th>
+          <th>
+           3
+          </th>
+          <th>
+           4
+          </th>
+          <th>
+           5
+          </th>
+          <th>
+           6
+          </th>
+         </tr>
+        </thead>
+        <tbody>
+         <tr>
+          <th>
+           1
+          </th>
+          <td class="hit">
+           (1,1)
+          </td>
+          <td>
+           (2,1)
+          </td>
+          <td>
+           (3,1)
+          </td>
+          <td>
+           (4,1)
+          </td>
+          <td>
+           (5,1)
+          </td>
+          <td>
+           (6,1)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           2
+          </th>
+          <td class="hit">
+           (1,2)
+          </td>
+          <td>
+           (2,2)
+          </td>
+          <td>
+           (3,2)
+          </td>
+          <td>
+           (4,2)
+          </td>
+          <td>
+           (5,2)
+          </td>
+          <td>
+           (6,2)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           3
+          </th>
+          <td class="hit">
+           (1,3)
+          </td>
+          <td>
+           (2,3)
+          </td>
+          <td>
+           (3,3)
+          </td>
+          <td>
+           (4,3)
+          </td>
+          <td>
+           (5,3)
+          </td>
+          <td>
+           (6,3)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           4
+          </th>
+          <td class="hit">
+           (1,4)
+          </td>
+          <td>
+           (2,4)
+          </td>
+          <td>
+           (3,4)
+          </td>
+          <td>
+           (4,4)
+          </td>
+          <td>
+           (5,4)
+          </td>
+          <td>
+           (6,4)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           5
+          </th>
+          <td class="hit">
+           (1,5)
+          </td>
+          <td>
+           (2,5)
+          </td>
+          <td>
+           (3,5)
+          </td>
+          <td>
+           (4,5)
+          </td>
+          <td>
+           (5,5)
+          </td>
+          <td>
+           (6,5)
+          </td>
+         </tr>
+         <tr>
+          <th>
+           6
+          </th>
+          <td class="hit">
+           (1,6)
+          </td>
+          <td>
+           (2,6)
+          </td>
+          <td>
+           (3,6)
+          </td>
+          <td>
+           (4,6)
+          </td>
+          <td>
+           (5,6)
+          </td>
+          <td>
+           (6,6)
+          </td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </article>
+     <h3>
+      Simple Probabilities
+     </h3>
+     <div class="formula">
+      P(A) =
+      <span class="frac">
+       <span class="top">
+        6
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      = 0.167
+      <br/>
+      P(B) =
+      <span class="frac">
+       <span class="top">
+        16
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      = 0.444
+      <br/>
+      P(C) =
+      <span class="frac">
+       <span class="top">
+        6
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      = 0.167
+     </div>
+     <h3>
+      Intersections
+     </h3>
+     <div class="formula">
+      P(A ∩ B) =
+      <span class="frac">
+       <span class="top">
+        2
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      = 0.056
+      <br/>
+      P(A ∩ C) =
+      <span class="frac">
+       <span class="top">
+        1
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      = 0.028
+      <br/>
+      P(B ∩ C) =
+      <span class="frac">
+       <span class="top">
+        4
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      = 0.111
+     </div>
+     <h3>
+      Unions
+     </h3>
+     <div class="formula">
+      P(A ∪ B) = P(A) + P(B) − P(A ∩ B) =
+      <span class="frac">
+       <span class="top">
+        6
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      +
+      <span class="frac">
+       <span class="top">
+        16
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      −
+      <span class="frac">
+       <span class="top">
+        2
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        20
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      = 0.556
+      <br/>
+      P(A ∪ C) = P(A) + P(C) − P(A ∩ C) =
+      <span class="frac">
+       <span class="top">
+        6
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      +
+      <span class="frac">
+       <span class="top">
+        6
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      −
+      <span class="frac">
+       <span class="top">
+        1
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        11
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      = 0.306
+      <br/>
+      P(B ∪ C) = P(B) + P(C) − P(B ∩ C) =
+      <span class="frac">
+       <span class="top">
+        16
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      +
+      <span class="frac">
+       <span class="top">
+        6
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      −
+      <span class="frac">
+       <span class="top">
+        4
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        18
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      = 0.5
+     </div>
+     <h3>
+      Complements
+     </h3>
+     <div class="formula">
+      P(A̅) = 1 − P(A) = 1 −
+      <span class="frac">
+       <span class="top">
+        6
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        30
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      = 0.833
+      <br/>
+      P(B̅) = 1 − P(B) = 1 −
+      <span class="frac">
+       <span class="top">
+        16
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        20
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      = 0.556
+      <br/>
+      P(C̅) = 1 − P(C) = 1 −
+      <span class="frac">
+       <span class="top">
+        6
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        30
+       </span>
+       <span class="bottom">
+        36
+       </span>
+      </span>
+      = 0.833
+     </div>
+     <h3>
+      Conditional Probabilities
+     </h3>
+     <div class="formula">
+      P(A|B) =
+      <span class="frac">
+       <span class="top">
+        P(A ∩ B)
+       </span>
+       <span class="bottom">
+        P(B)
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        2/36
+       </span>
+       <span class="bottom">
+        16/36
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        2
+       </span>
+       <span class="bottom">
+        16
+       </span>
+      </span>
+      = 0.125
+      <br/>
+      P(B|A) =
+      <span class="frac">
+       <span class="top">
+        P(A ∩ B)
+       </span>
+       <span class="bottom">
+        P(A)
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        2/36
+       </span>
+       <span class="bottom">
+        6/36
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        2
+       </span>
+       <span class="bottom">
+        6
+       </span>
+      </span>
+      = 0.333
+      <br/>
+      P(A|C) =
+      <span class="frac">
+       <span class="top">
+        P(A ∩ C)
+       </span>
+       <span class="bottom">
+        P(C)
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        1/36
+       </span>
+       <span class="bottom">
+        6/36
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        1
+       </span>
+       <span class="bottom">
+        6
+       </span>
+      </span>
+      = 0.167
+      <br/>
+      P(C|A) =
+      <span class="frac">
+       <span class="top">
+        P(A ∩ C)
+       </span>
+       <span class="bottom">
+        P(A)
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        1/36
+       </span>
+       <span class="bottom">
+        6/36
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        1
+       </span>
+       <span class="bottom">
+        6
+       </span>
+      </span>
+      = 0.167
+      <br/>
+      P(B|C) =
+      <span class="frac">
+       <span class="top">
+        P(B ∩ C)
+       </span>
+       <span class="bottom">
+        P(C)
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        4/36
+       </span>
+       <span class="bottom">
+        6/36
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        4
+       </span>
+       <span class="bottom">
+        6
+       </span>
+      </span>
+      = 0.667
+      <br/>
+      P(C|B) =
+      <span class="frac">
+       <span class="top">
+        P(B ∩ C)
+       </span>
+       <span class="bottom">
+        P(B)
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        4/36
+       </span>
+       <span class="bottom">
+        16/36
+       </span>
+      </span>
+      =
+      <span class="frac">
+       <span class="top">
+        4
+       </span>
+       <span class="bottom">
+        16
+       </span>
+      </span>
+      = 0.25
+     </div>
+    </section>
+    <section class="section" id="independence">
+     <h2>
+      Independent and Dependent Events
+     </h2>
+     <div class="definition">
+      <strong>
+       Independent
+      </strong>
+      - two events are said to be independent if the occurrence (or nonoccurrence) of one does not affect the probability of occurrence of the other
+     </div>
+     <div class="formula">
+      If P(A) = P(A|B) then A and B are independent.
+     </div>
+     <div class="definition">
+      <strong>
+       Dependent
+      </strong>
+      - events that are not independent
+     </div>
+     <div class="formula">
+      If P(A) ≠ P(A|B) then A and B are dependent
+     </div>
+     <div class="definition">
+      <strong>
+       Multiplication rule
+      </strong>
+      – P(A ∩ B) = P(A)P(B|A)
+     </div>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       Suppose we are dealing with a standard deck of cards (52 cards and 4 aces). We will draw two cards without replacement (meaning after the first card is drawn, it will not be put back in the deck before drawing the second card).
+      </p>
+      <p>
+       A = {first card is an ace}   B = {second card is an ace}
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answers
+       </summary>
+       <div class="answer-body">
+        <p>
+         a. A and B are dependent.
+        </p>
+        <div class="formula">
+         P(A ∩ B) = P(A) · P(B|A) =
+         <span class="frac">
+          <span class="top">
+           4
+          </span>
+          <span class="bottom">
+           52
+          </span>
+         </span>
+         ·
+         <span class="frac">
+          <span class="top">
+           3
+          </span>
+          <span class="bottom">
+           51
+          </span>
+         </span>
+         = 0.004525
+        </div>
+        <p>
+         With replacement, A and B are independent.
+        </p>
+        <div class="formula">
+         P(A ∩ B) = P(A) · P(B|A) =
+         <span class="frac">
+          <span class="top">
+           4
+          </span>
+          <span class="bottom">
+           52
+          </span>
+         </span>
+         ·
+         <span class="frac">
+          <span class="top">
+           4
+          </span>
+          <span class="bottom">
+           52
+          </span>
+         </span>
+         = 0.00591
+        </div>
+       </div>
+      </details>
+     </article>
+    </section>
+    <div class="back-row" style="margin-top:36px">
+     <a class="btn outline btn-sm" href="index.html">
+      ← Back to STA296U Notes
+     </a>
+     <a class="btn btn-sm" download="" href="STA296U_Section_4_Probability.docx">
+      Download Word Notes
+     </a>
+    </div>
+    <footer class="notes-footer">
+     Last updated:
+     <span id="lastUpdated">
+     </span>
+    </footer>
+   </div>
+  </main>
+  <script>
+   document.getElementById('lastUpdated').textContent=new Date(document.lastModified).toLocaleString();
+  </script>
+ </body>
+</html>
