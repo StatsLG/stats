@@ -1,0 +1,428 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>STA296U — Notes | StatsLG</title>
+
+  <meta
+    name="description"
+    content="STA296U section notes index - StatsLG."
+  />
+
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+</head>
+
+<body>
+
+  <div class="wrap">
+
+    <!-- ===== LEFT PANEL (BRAND SIDEBAR) ===== -->
+    <aside
+      class="sidebar"
+      aria-label="Site navigation"
+      data-include="/partials/sidebar.html">
+    </aside>
+
+
+    <!-- ===== RIGHT PANEL (MAIN CONTENT) ===== -->
+    <main>
+
+      <header>
+
+        <div class="site-banner">
+          <img src="/images/STA296U.png" alt="STA296U">
+        </div>
+
+        <h1>STA296U — Statistics</h1>
+        <p class="subtitle">NOTES</p>
+
+      </header>
+
+
+      <!-- ===== SEARCH / FILTER ===== -->
+
+      <section class="section">
+
+        <div class="row">
+
+          <div>
+
+            <label for="search">Filter sections</label>
+
+            <input
+              id="search"
+              type="text"
+              placeholder="e.g., Section 3, probability, regression…"
+            />
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===== SECTION CARDS ===== -->
+
+      <section class="section">
+
+        <div id="cards" class="grid"></div>
+
+      </section>
+
+
+      <!-- ===== FOOTER ===== -->
+
+      <footer>
+
+        Last updated:
+        <span id="lastUpdated"></span>
+
+      </footer>
+
+    </main>
+
+  </div>
+
+
+  <script>
+
+    // =========================================================
+    // PAGE LAST UPDATED
+    // =========================================================
+
+    document.getElementById('lastUpdated').textContent =
+      new Date(document.lastModified).toLocaleString();
+
+
+
+    // =========================================================
+    // SHARED SIDEBAR INCLUDE
+    // =========================================================
+
+    // Set BASE = '/REPO_NAME' for GitHub project sites.
+    // Leave blank for a normal domain such as statslg.com.
+
+    const BASE = '';
+
+
+    (async function injectSidebar() {
+
+      const el = document.querySelector('[data-include]');
+
+      if (!el) return;
+
+
+      let url =
+        el.getAttribute('data-include') ||
+        '/partials/sidebar.html';
+
+
+      if (BASE && url.startsWith('/')) {
+        url = BASE + url;
+      }
+
+
+      try {
+
+        const resp = await fetch(
+          url,
+          { cache: 'no-cache' }
+        );
+
+
+        if (!resp.ok) {
+          throw new Error(resp.statusText);
+        }
+
+
+        el.innerHTML = await resp.text();
+
+
+        // Set year inside injected sidebar
+
+        const yr = el.querySelector('#yr');
+
+        if (yr) {
+          yr.textContent =
+            new Date().getFullYear();
+        }
+
+
+        // Mark active navigation link
+
+        const here =
+          location.pathname.replace(
+            /\/index\.html$/,
+            '/'
+          );
+
+
+        el.querySelectorAll('.nav a[href]')
+          .forEach(a => {
+
+            const target =
+              new URL(
+                a.getAttribute('href'),
+                location.origin
+              )
+              .pathname
+              .replace(
+                /\/index\.html$/,
+                '/'
+              );
+
+
+            if (
+              here === target ||
+              (
+                here.startsWith(target) &&
+                target !== '/'
+              )
+            ) {
+
+              a.classList.add('active');
+
+            }
+
+          });
+
+
+      } catch (err) {
+
+        console.error(
+          'Sidebar include failed:',
+          err
+        );
+
+
+        el.innerHTML =
+          '<div class="muted">' +
+          'Sidebar failed to load.' +
+          '</div>';
+
+      }
+
+    })();
+
+
+
+    // =========================================================
+    // STA296U SECTIONS
+    // =========================================================
+
+    /*
+      As we convert each section, we can replace the
+      description with the actual topic for that section.
+    */
+
+    const sections = [
+
+      {
+        id: "1",
+        title: "Section 1",
+        desc: "",
+        file: "section1.html"
+      },
+
+      {
+        id: "2",
+        title: "Section 2",
+        desc: "",
+        file: "section2.html"
+      },
+
+      {
+        id: "3",
+        title: "Section 3",
+        desc: "",
+        file: "section3.html"
+      },
+
+      {
+        id: "4",
+        title: "Section 4",
+        desc: "",
+        file: "section4.html"
+      },
+
+      {
+        id: "5",
+        title: "Section 5",
+        desc: "",
+        file: "section5.html"
+      },
+
+      {
+        id: "6",
+        title: "Section 6",
+        desc: "",
+        file: "section6.html"
+      },
+
+      {
+        id: "7",
+        title: "Section 7",
+        desc: "",
+        file: "section7.html"
+      },
+
+      {
+        id: "8",
+        title: "Section 8",
+        desc: "",
+        file: "section8.html"
+      },
+
+      {
+        id: "9",
+        title: "Section 9",
+        desc: "",
+        file: "section9.html"
+      },
+
+      {
+        id: "10",
+        title: "Section 10",
+        desc: "",
+        file: "section10.html"
+      },
+
+      {
+        id: "11",
+        title: "Section 11",
+        desc: "",
+        file: "section11.html"
+      }
+
+    ];
+
+
+
+    // =========================================================
+    // RENDER SECTION CARDS
+    // =========================================================
+
+    const cards =
+      document.getElementById('cards');
+
+
+    function render(list) {
+
+      cards.innerHTML = "";
+
+
+      list.forEach(s => {
+
+        const card =
+          document.createElement('article');
+
+
+        card.className = "card";
+
+
+        card.innerHTML = `
+
+          <h3>${s.title}</h3>
+
+          ${
+            s.desc
+              ? `<p class="muted">${s.desc}</p>`
+              : ''
+          }
+
+          <div class="btns">
+
+            <a
+              class="btn"
+              href="${s.file}">
+              Open
+            </a>
+
+          </div>
+
+        `;
+
+
+        cards.appendChild(card);
+
+      });
+
+    }
+
+
+    render(sections);
+
+
+
+    // =========================================================
+    // SECTION FILTER
+    // =========================================================
+
+    document
+      .getElementById('search')
+      .addEventListener(
+        'input',
+        (e) => {
+
+          const q =
+            e.target.value
+              .toLowerCase()
+              .trim();
+
+
+          if (!q) {
+
+            render(sections);
+            return;
+
+          }
+
+
+          const filtered =
+            sections.filter(s =>
+
+              (
+                s.title &&
+                s.title
+                  .toLowerCase()
+                  .includes(q)
+              )
+
+              ||
+
+              (
+                s.desc &&
+                s.desc
+                  .toLowerCase()
+                  .includes(q)
+              )
+
+              ||
+
+              (
+                s.id &&
+                s.id
+                  .toLowerCase()
+                  .includes(q)
+              )
+
+            );
+
+
+          render(filtered);
+
+        }
+      );
+
+  </script>
+
+</body>
+
+</html>
+```
