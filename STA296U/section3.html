@@ -1,27 +1,448 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>STA296U - Section 3 | StatsLG</title><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/style/bctcstyle.css"><style>.notes-page{max-width:1100px;margin:0 auto;padding:32px 40px}.notes-content{max-width:900px;margin:0 auto}.notes-content h2{margin-top:2rem;scroll-margin-top:1rem}.notes-content p,.notes-content li{line-height:1.65}.back-row{margin:0 0 20px;display:flex;gap:10px;flex-wrap:wrap}.toc a{color:var(--kctcs-blue);font-weight:700}.figure{text-align:center;margin:22px 0}.figure img{max-width:100%;height:auto;margin:8px}.figure.small img{max-width:420px}.notes-footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted);font-size:12px}@media(max-width:760px){.notes-page{padding:20px 16px}.back-row{flex-direction:column}}</style></head><body><main class="notes-page"><div class="notes-content"><div class="back-row"><a class="btn outline btn-sm" href="index.html">← Back to STA296U Notes</a><a class="btn btn-sm" href="STA296U_Section_3_Variability_and_Relative_Standing.docx" download>Download Word Notes</a></div><header class="header"><h1>STA296U — Section 3</h1><p>Variability and Relative Standing</p></header><section class="section panel pad toc"><h2>In This Section</h2><ul><li><a href="#dispersion">Numerical Measures of Dispersion</a></li><li><a href="#sdunit">Standard Deviation as a Unit of Measure</a></li><li><a href="#position">Numerical Measures of Position</a></li><li><a href="#boxplot">Box and Whisker Plot</a></li><li><a href="#shapes">Identifying Shapes from Boxplots</a></li></ul></section><p>A measure of dispersion is a measure of the spread of the data points or we can also say a measure of how much variability there is in the data set. I will start with a scenario to illustrate the importance of a measure of dispersion descriptively.</p><p>Calculate the mean, median, and mode for distribution #1 and then distribution #2. Compare these two distributions based on the measures of center. What you should conclude is that all measures of center for the two distributions are the same. The solutions for the measures of center follow:</p><p>If you compare just the measures of center it appears the two distributions are the same, but are they? They are not the same. Distribution #2 has more variability than distribution #1. This can be reported with a measure of dispersion. That is why the most common way to numerically describe a data set is with a measure of center and a measure of dispersion.</p><p>Range = High - Low</p><p>Example</p><p>The years of experience for five faculty members will be utilized to illustrate the calculation of the measures of dispersion.
-The data are as follows: 1, 30, 22, 10, 5
-Calculate the range.</p><p>Answer</p><p>Sample Range = High - Low = 30 - 1 = 29</p><p>Important characteristics of the range are:</p><ul><li>easy to compute</li></ul><ul><li>totally sensitive to extreme scores</li></ul><p>The range is not a good measure of variability in most cases. It has the same issue as the midrange, it is based only on the high and low value in a data set.</p><p>Conceptual formula:   s² = Σ(x - x̄)² / (n - 1)</p><p>Computational formula:   s² = [nΣx² - (Σx)²] / [n(n - 1)]</p><p>where s² is the sample variance, Σ is the sum, x is the data values, x̄ is the sample mean, and n is the sample size.</p><p>Notice there are two ways to calculate the variance, s². The first way, s² = Σ(x - x̄)²/(n - 1), is the conceptual formula and you can see that this equation comes straight from the definition. The numerator of this formula, ∑(x − x̄)², is called the sum of squared x and is often abbreviated by SSX. The quantity SSX along with the general idea of sum of squares is very common in statistics and you will see this quantity in multiple formulas this semester. The second equation, s² = [nΣx² - (Σx)²]/[n(n - 1)], is the algebraic equivalent of the first and is the one I suggest you use when calculating variance. This equation is much easier to deal with when doing the math by hand. Below is the algebraic steps required to prove these formulas are equivalent. This is your first opportunity to see how the summation properties are used when data is not provided. Make sure you understand the algebraic manipulation.</p><h2>SSX Manipulation and Variance Formula</h2><p>SSX = Σ(x - x̄)²</p><p>= Σ(x² - 2xx̄ + x̄²)</p><p>= Σx² - 2x̄Σx + Σx̄²</p><p>= Σx² - 2x̄Σx + nx̄²</p><p>= Σx² - (Σx)²/n</p><p>s² = SSX/(n - 1)</p><p>= [Σx² - (Σx)²/n]/(n - 1)</p><p>= [nΣx² - (Σx)²]/[n(n - 1)]</p><p>A common question with variance is why do we calculate the average squared distance and not the average distance directly? The answer to this question comes from the definition of the mean. Think about Σ(x - x̄). Notice all I did was take the squared off the numerator of the conceptual formula for the variance. If you do this sum it will always be equal to zero. The reason is because some of the x values will be above the mean and some below the mean because the mean is the center. When you subtract from a x value bigger than the mean you will get a positive and when you subtract from a x value smaller than the mean you will get a negative. When these are all added together, since the mean is the center, the positives and negatives will balance out and you will get a sum of zero. This can also be shown algebraically.</p><p>Example</p><p>Prove that Σ(x - x̄) is equal to 0 (show algebraic steps).</p><p>Answer</p><p>Σ(x - x̄) = Σx - Σx̄ = Σx - nx̄ = Σx - n(Σx/n) = Σx - Σx = 0</p><p>Important characteristics of the variance are:</p><ul><li>all the data points are directly involved in the calculation</li></ul><ul><li>variance is in squared units which makes it hard to interpret</li></ul><ul><li>can never be negative since it is a squared value</li></ul><ul><li>larger values suggest more variability</li></ul><p>Example</p><p>Back to the years of experience of faculty data: 1, 30, 22, 10, 5
-Calculate the variance.</p><p>Answer</p><p>To use the computational formula for variance, you first need to calculate ∑x and ∑x². I recommend you create two columns in order to get these quantities as given below.</p><p>s² = [5(1510) - (68)²] / [5(4)] = (7550 - 4624) / 20 = 2926 / 20 = 146.3</p><p>s = √s²</p><p>When we calculate variance which is the average squared distance the data values are from the mean, we really would like to get rid of the squared because the outcome is not in the same units as the original data. So how do we get rid of a squared? We simply take the square root. Therefore, the square root of the variance gives us standard deviation.</p><p>Example</p><p>Data: 1, 30, 22, 10, 5
-Calculate the standard deviation.</p><p>Answer</p><p>s = √146.3 = 12.095</p><p>Important characteristics of the standard deviation are:</p><ul><li>standard deviation uses the same units as the data</li></ul><ul><li>standard deviation is the most common measure of dispersion</li></ul><section id="sdunit" class="section"><h2>Standard Deviation as a Unit of Measure</h2><p>Standard deviation is not only our most common measure of variability, it is also regularly utilized as a unit of measure. Here we will look at how this is done descriptively.</p><p>z = (x - x̄) / s</p><p>where z is the z-score, x is a data value, x̄ is the sample mean, and s is the standard deviation.</p><p>Example</p><p>Suppose a group of test scores have x̄ = 79 and s = 9
-a. For a test score of 88, find the z-score.
-b. What does the z-score for 88 mean?
-c. For a test score of 63, find the z-score.
-d. What does the z-score for 63 mean?</p><p>Answers</p><p>a. z = (88 - 79)/9 = 9/9 = 1
-b. The score of 88 is 1 standard deviation above the mean.
-c. z = (63 - 79)/9 = -16/9 = -1.778
-d. The score of 63 is 1.778 standard deviations below the mean.</p><ul><li>Approximately 68% of the data fall within 1 standard deviation of the mean (x̄ - s, x̄ + s)</li></ul><ul><li>Approximately 95% of the data fall within 2 standard deviations of the mean (x̄ - 2s, x̄ + 2s)</li></ul><ul><li>Approximately 99.7% of the data fall within 3 standard deviations of the mean (x̄ - 3s, x̄ + 3s)</li></ul><p>Example</p><p>Suppose that the amount of liquid in “12 oz.” Pepsi cans is a mound shaped distribution with x̄ = 12 oz. and s = 0.1 oz.
-a. About 68% of the data will fall within what interval?
-b. About 95% of the data will fall within what interval?
-c. About 99.7% of the data will fall within what interval?</p><p>Answers</p><p>a. (x̄ - s, x̄ + s) = (12 - 0.1, 12 + 0.1) = (11.9, 12.1)
-b. (x̄ - 2s, x̄ + 2s) = (12 - 2(0.1), 12 + 2(0.1)) = (11.8, 12.2)
-c. (x̄ - 3s, x̄ + 3s) = (12 - 3(0.1), 12 + 3(0.1)) = (11.7, 12.3)</p><section id="position" class="section"><h2>Numerical Measures of Position</h2><p>There are many measures of position (also known as rank statistics) that can be calculated. We will focus on the quartiles. Let me first mention the idea of a percentile which is also a measure of position. A common place that you will see percentiles are when school children take standardized tests. The students will get scores as percentiles. For example, suppose John scores in the 95th percentile in math. Do you know what this means? Technically, it means that John scored better than 95% of people who took the test. Does this say how well he did on the test? Not really, he could have done poorly as long as 95% of his peers did worse. This is a measure of position because it tells where his score is relative to everyone else.</p><p>Procedure for calculating Q1, Q2, and Q3:</p><ul><li>Order the data from smallest to largest</li></ul><ul><li>Find x̃. This is Q2</li></ul><ul><li>Q1 is the median of the lower half of the data; that is, it is the median of the data falling below Q2 (not including Q2)</li></ul><ul><li>Q3 is the median of the upper half of the data (same as above)</li></ul><p>Example</p><p>Find the quartiles for the following data sets
-a. Data set #1: 1, 2, 3, 4, 5, 6
-b. Data set #2: 1, 2, 3, 4, 5, 6, 7
-c. Data set #3: 1, 2, 3, 4, 5, 6, 7, 8
-d. Data set #4: 1, 2, 3, 4, 5, 6, 7, 8, 9</p><p>Answers</p><p>a. Q1 = 2, Q2 = 3.5, Q3 = 5
-b. Q1 = 2, Q2 = 4, Q3 = 6
-c. Q1 = 2.5, Q2 = 4.5, Q3 = 6.5
-d. Q1 = 2.5, Q2 = 5, Q3 = 7.5</p><p>IQR = Q3 - Q1</p><p>Important characteristics of IQR are:</p><ul><li>better than a typical range because it is not based on extreme values</li></ul><ul><li>still not as good as the standard deviation in most cases</li></ul><p>Below in the form of a stem-and-leaf plot is data that I obtained when I was in graduate school. There was a group of faculty and graduate students in a meeting and everyone was asked how much money they had in their pockets. The data along with the five number summary and IQR for each group follows. Make sure you understand how to get the five number summary and IQR from the data. Also, it is important to note that the value of 73 in the faculty data would be considered extreme.</p><section id="boxplot" class="section"><h2>Box and Whisker Plot</h2><p>Box and Whisker Plots, also commonly referred to as Boxplots, are graphs based on the five number summary. They are used for bivariate data when one variable is qualitative and one is quantitative. The example we will start with uses the data presented above. We have two variables one being qualitative (student/faculty) and the other being quantitative (money). The boxplot for this data is below.</p><p>In order to understand how the box and whisker plot is created and to better understand the interpretation of the graph it is important to go over the procedure for creating a box and whisker plot. You will not have to create the graph by hand. We will let software actually create the graph, but you do need to understand how to interpret the information presented in the graph.</p><p>Procedure for creating a box and whisker plot:</p><ul><li>Draw a scale to include the lowest and highest data value (this will be the y-axis)</li></ul><ul><li>To the right of the scale draw a box from Q1 to Q3</li></ul><ul><li>Include a solid line through the box at the median level</li></ul><ul><li>If there are any extreme values identify them with an asterisk or dot</li></ul><ul><li>Draw solid lines, called whiskers, from Q1 to the lowest value and from Q3 to the highest value (if there are extremes, go to the next lowest or highest value)</li></ul><p>If you compare the box and whisker plot to the five number summary in the previous example, you should see how it was created. Just look at the faculty category. Start with the box, the bottom lines up with Q1 = 15 and the top lines up with Q3 = 31. The box represents the middle 50% of the data (IQR). The line that goes through the box lines up with Q2 = 25. This line represents the median. Finally, look at the whiskers which are the lines that extend from the box. If you look at the lower whisker it goes from the bottom of the box to the low value in the data set, Low = 10. The top whisker is a little different, because the High = 73 was identified as an extreme value. Therefore, this value is identified by an asterisk and the whisker goes to the next highest value which you can see from the data is 43.</p><p>There are three kinds of questions you should be able to answer from a box-and-whisker plot. You should be able to compare the groups based on a typical value, compare the groups based on variability, and identify the shape of the distribution for each group.</p><p>Based on the box and whisker plot in the previous example which group tended to have the most money in their pockets, students or faculty? Faculty, we can tell this because of the positioning of the box and the median on the y-axis. The faculty box and median is positioned higher.</p><p>Based on the box and whisker plot in the previous example which group tended to have more consistent values (less variability)? Students, we can tell this because of the size of the box and the length of the whiskers. The student box is smaller and has shorter whiskers.</p><section id="shapes" class="section"><h2>Identifying Shapes from Boxplots</h2><p>The above graphs are smooth curves, but the shape is determined the same way as with a histogram. This is a common way to represent populations and we will look at these graphs later in the course. What I want you to be able to identify from a box-and-whisker plot is if the graph is symmetric or skewed. If it is skewed, you should be able to identify the direction, either right or left. In the above graphs there are two that are symmetric. The Bell-Shaped Distribution and the Uniform (Rectangular) Distribution are both symmetric. The most telling sign of shape based on a box and whisker plot is where the median is in the box. Notice that in a symmetric distribution, the median is in the center of the box. The secondary sign of symmetry is the whiskers being the same length. If a distribution is skewed, then the median will not be in the center. The median being to the right indicates a left skewed distribution. This is because the data to the left is more spread out than the data to the right indicating a longer tail to the left. The secondary characteristic is the whisker to the left is longer than the whisker to the right. This also indicates a longer tail to the left. The right skewed distribution is just the opposite. In order to determine the shape when looking at the box and whisker plots I will give you, most people turn them 90 degrees at least mentally so they look like the ones above. When doing this make sure you turn them clockwise. This will ensure that the y-axis is increasing from left to right.</p><p>Now let us look at another situation. How does tread design affect an automobiles stopping distance?
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STA296U - Section 3 | StatsLG</title>
+<meta name="description" content="STA296U Section 3 - Variability and Relative Standing.">
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/style/bctcstyle.css">
 
-Qualitative variable: Tread Design (A, B, or C)
-Quantitative variable: Stopping Distance</p><p>You should be able to answer the following questions.</p><p>If you were to select a tread design just based on stopping distance, which one is the best choice? Tread design B is the best choice because we want a quick stopping distance (low numbers) and the box for B is lower. Also, the median is much lower indicating that the lower 50% of stopping distances for tread design B is much better than that for the other two tread designs.</p><p>Which tread design produces the most consistent stopping distances (least variability)? Tread design C has the least variability. We can tell this because the box is smaller than that for the other two designs. Also, the whiskers are short. Notice in this case the stopping distances are consistently bad. We would like to have a choice that is consistently good, but in this situation that is not an option.</p><p>What is the shape of the distribution for each tread design? All the distributions are right skewed. This is because for each plot, the median is left of center. For each tread design the secondary characteristic of a longer whisker to the right is also satisfied. The important thing with shape is these characteristics. Notice the plots look different but they are all right skewed because they all satisfy the criteria.</p><section class="section"><h2>Recreated Section 3 Graphics</h2><div class="figure"><img src="images/section3/money_boxplot.png" alt="Boxplot of Money vs Group"></div><div class="figure small"><img src="images/section3/boxplot_bell.png" alt="Bell-shaped boxplot"><img src="images/section3/boxplot_left_skew.png" alt="Left-skewed boxplot"><img src="images/section3/boxplot_right_skew.png" alt="Right-skewed boxplot"><img src="images/section3/boxplot_uniform.png" alt="Uniform boxplot"></div><div class="figure"><img src="images/section3/tread_design_boxplot.png" alt="Boxplot of Stopping Distance vs Tread Design"></div></section><div class="back-row" style="margin-top:36px"><a class="btn outline btn-sm" href="index.html">← Back to STA296U Notes</a><a class="btn btn-sm" href="STA296U_Section_3_Variability_and_Relative_Standing.docx" download>Download Word Notes</a></div><footer class="notes-footer">Last updated: <span id="lastUpdated"></span></footer></div></main><script>document.getElementById('lastUpdated').textContent=new Date(document.lastModified).toLocaleString();</script></body></html>
+<style>
+:root{
+  --kctcs-blue:#00467f;
+  --kctcs-gold:#e7a614;
+  --panel:#f7f9fb;
+  --rule:#d7dee5;
+  --radius:10px;
+}
+.notes-page{max-width:1100px;margin:0 auto;padding:24px 20px 50px}
+.notes-content{max-width:900px;margin:0 auto}
+.notes-nav{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin-bottom:22px}
+.notes-nav .right{display:flex;flex-wrap:wrap;gap:10px}
+.btn-sm{padding:8px 14px;font-size:.95rem}
+.btn.outline{background:#fff;color:var(--kctcs-blue);border:2px solid var(--kctcs-blue)}
+.btn.outline:hover{background:var(--kctcs-blue);color:#fff}
+.header{text-align:center;margin-bottom:28px}
+.header h1{color:var(--kctcs-blue);margin-bottom:8px;line-height:1.2}
+.header p{margin:0;font-size:1.1rem;color:#555}
+.gold-rule{width:100%;height:5px;background:var(--kctcs-gold);border-radius:4px;margin:22px 0 0}
+.section{margin:34px 0;scroll-margin-top:20px}
+.section>h2{color:var(--kctcs-blue);border-bottom:3px solid var(--kctcs-gold);padding-bottom:7px;margin-bottom:18px}
+.section h3{color:var(--kctcs-blue);margin-top:1.5rem}
+.section p,.section li{line-height:1.65}
+.panel{background:#fff;border:1px solid var(--rule);border-radius:var(--radius)}
+.pad{padding:20px 22px}
+.toc{border-top:5px solid var(--kctcs-gold);background:var(--panel);margin-bottom:34px}
+.toc h2{color:var(--kctcs-blue);margin-top:0;margin-bottom:12px;border:0;padding:0}
+.toc ul{margin:0;padding-left:22px;columns:2;column-gap:40px}
+.toc li{break-inside:avoid;margin-bottom:8px}
+.toc a{color:var(--kctcs-blue);text-decoration:none;font-weight:600}
+.toc a:hover{text-decoration:underline}
+.definition{background:#f2f7fb;border-left:5px solid var(--kctcs-blue);padding:14px 17px;margin:18px 0;border-radius:0 var(--radius) var(--radius) 0;line-height:1.6}
+.definition strong{color:var(--kctcs-blue)}
+.example{border:1px solid var(--rule);border-top:5px solid var(--kctcs-gold);border-radius:var(--radius);padding:20px 22px;margin:24px 0;background:#fff}
+.example h3{color:var(--kctcs-blue);margin-top:0;margin-bottom:12px}
+.answer{margin-top:16px;border-top:1px solid var(--rule);padding-top:12px}
+.answer summary{cursor:pointer;color:var(--kctcs-blue);font-weight:800}
+.answer-body{margin-top:12px;background:#fff9e9;border-left:5px solid var(--kctcs-gold);border-radius:0 var(--radius) var(--radius) 0;padding:16px 18px}
+.key-idea{background:#fff9e9;border:1px solid #ecd79b;border-left:5px solid var(--kctcs-gold);border-radius:0 var(--radius) var(--radius) 0;padding:16px 18px;margin:20px 0}
+.figure{text-align:center;margin:24px 0}
+.figure img{max-width:100%;height:auto;border-radius:8px}
+.figure.small img{max-width:420px;margin:8px}
+.math{display:block;text-align:center;font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;font-size:1.18rem;margin:16px auto;line-height:1.8}
+.math-line{display:block;margin:5px 0}
+.frac{display:inline-flex;vertical-align:middle;flex-direction:column;text-align:center;line-height:1.15;margin:0 .15em}
+.frac>.top{border-bottom:1.5px solid currentColor;padding:0 .25em .08em}
+.frac>.bottom{padding:.08em .25em 0}
+.overbar{text-decoration:overline;text-decoration-thickness:1px}
+.data-table{width:100%;border-collapse:collapse;margin:18px 0}
+.data-table th,.data-table td{border:1px solid var(--rule);padding:8px 10px;text-align:center}
+.data-table th{background:#f2f7fb;color:var(--kctcs-blue)}
+.notes-bottom-nav{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-top:40px;padding-top:20px;border-top:1px solid var(--rule)}
+.notes-footer{text-align:center;margin-top:28px;font-size:.9rem;color:#666}
+@media(max-width:700px){
+  .notes-page{padding:16px 12px 40px}
+  .toc ul{columns:1}
+  .notes-nav,.notes-bottom-nav{align-items:stretch;flex-direction:column}
+  .notes-nav .right{flex-direction:column}
+  .notes-nav .btn,.notes-bottom-nav .btn{text-align:center;width:100%}
+  .math{font-size:1.05rem;overflow-x:auto}
+}
+@media print{
+  .notes-nav,.notes-bottom-nav,.toc{display:none!important}
+  .notes-page,.notes-content{max-width:none;padding:0}
+  .definition,.example,.answer-body,.key-idea,.figure{break-inside:avoid}
+  details.answer>*{display:block!important}
+}
+</style>
+</head>
+
+<body>
+<main class="notes-page">
+<div class="notes-content" id="top">
+
+<div class="notes-nav">
+  <a class="btn outline btn-sm" href="index.html">← Back to STA296U Notes</a>
+  <div class="right">
+    <a class="btn btn-sm" href="STA296U_Section_3_Variability_and_Relative_Standing.docx" download>Download Word Notes</a>
+  </div>
+</div>
+
+<header class="header">
+  <h1>STA296U — Section 3</h1>
+  <p>Variability and Relative Standing</p>
+  <div class="gold-rule"></div>
+</header>
+
+<section class="section panel pad toc">
+<h2>In This Section</h2>
+<ul>
+<li><a href="#dispersion">Numerical Measures of Dispersion</a></li>
+<li><a href="#sdunit">Standard Deviation as a Unit of Measure</a></li>
+<li><a href="#position">Numerical Measures of Position</a></li>
+<li><a href="#boxplot">Box and Whisker Plot</a></li>
+<li><a href="#shapes">Identifying Shapes from Boxplots</a></li>
+</ul>
+</section>
+
+<section id="dispersion" class="section">
+<h2>Numerical Measures of Dispersion</h2>
+
+<p>A measure of dispersion is a measure of the spread of the data points or we can also say a measure of how much variability there is in the data set. I will start with a scenario to illustrate the importance of a measure of dispersion descriptively.</p>
+
+<p>Calculate the mean, median, and mode for distribution #1 and then distribution #2. Compare these two distributions based on the measures of center. What you should conclude is that all measures of center for the two distributions are the same. The solutions for the measures of center follow:</p>
+
+<p>If you compare just the measures of center it appears the two distributions are the same, but are they? They are not the same. Distribution #2 has more variability than distribution #1. This can be reported with a measure of dispersion. That is why the most common way to numerically describe a data set is with a measure of center and a measure of dispersion.</p>
+
+<div class="definition"><strong>Sample Range</strong> – the difference between the highest and lowest values in a data set.</div>
+<div class="math">Range = High − Low</div>
+
+<article class="example">
+<h3>Example</h3>
+<p>The years of experience for five faculty members will be utilized to illustrate the calculation of the measures of dispersion.</p>
+<p>The data are as follows: 1, 30, 22, 10, 5</p>
+<p>Calculate the range.</p>
+<details class="answer">
+<summary>Show Answer</summary>
+<div class="answer-body">
+<div class="math">Sample Range = High − Low = 30 − 1 = 29</div>
+</div>
+</details>
+</article>
+
+<h3>Important characteristics of the range are:</h3>
+<ul>
+<li>easy to compute</li>
+<li>totally sensitive to extreme scores</li>
+</ul>
+
+<p>The range is not a good measure of variability in most cases. It has the same issue as the midrange, it is based only on the high and low value in a data set.</p>
+
+<div class="definition"><strong>Sample Variance</strong> – a measure of variability based on the average squared distance the data values are from the mean.</div>
+
+<p><strong>Conceptual formula:</strong></p>
+<div class="math">
+s<sup>2</sup> =
+<span class="frac">
+  <span class="top">Σ(x − x̄)<sup>2</sup></span>
+  <span class="bottom">n − 1</span>
+</span>
+</div>
+
+<p><strong>Computational formula:</strong></p>
+<div class="math">
+s<sup>2</sup> =
+<span class="frac">
+  <span class="top">nΣx<sup>2</sup> − (Σx)<sup>2</sup></span>
+  <span class="bottom">n(n − 1)</span>
+</span>
+</div>
+
+<p>where s² is the sample variance, Σ is the sum, x is the data values, x̄ is the sample mean, and n is the sample size.</p>
+
+<p>Notice there are two ways to calculate the variance, s². The first way, s² = Σ(x - x̄)²/(n - 1), is the conceptual formula and you can see that this equation comes straight from the definition. The numerator of this formula, ∑(x − x̄)², is called the sum of squared x and is often abbreviated by SSX. The quantity SSX along with the general idea of sum of squares is very common in statistics and you will see this quantity in multiple formulas this semester. The second equation, s² = [nΣx² - (Σx)²]/[n(n - 1)], is the algebraic equivalent of the first and is the one I suggest you use when calculating variance. This equation is much easier to deal with when doing the math by hand. Below is the algebraic steps required to prove these formulas are equivalent. This is your first opportunity to see how the summation properties are used when data is not provided. Make sure you understand the algebraic manipulation.</p>
+
+<div class="key-idea">
+<h3>SSX Manipulation and Variance Formula</h3>
+<div class="math">
+<span class="math-line">SSX = Σ(x − x̄)<sup>2</sup></span>
+<span class="math-line">= Σ(x<sup>2</sup> − 2xx̄ + x̄<sup>2</sup>)</span>
+<span class="math-line">= Σx<sup>2</sup> − 2x̄Σx + Σx̄<sup>2</sup></span>
+<span class="math-line">= Σx<sup>2</sup> − 2x̄Σx + nx̄<sup>2</sup></span>
+<span class="math-line">= Σx<sup>2</sup> − <span class="frac"><span class="top">(Σx)<sup>2</sup></span><span class="bottom">n</span></span></span>
+</div>
+
+<div class="math">
+<span class="math-line">s<sup>2</sup> = <span class="frac"><span class="top">SSX</span><span class="bottom">n − 1</span></span></span>
+<span class="math-line">= <span class="frac"><span class="top">Σx<sup>2</sup> − (Σx)<sup>2</sup>/n</span><span class="bottom">n − 1</span></span></span>
+<span class="math-line">= <span class="frac"><span class="top">nΣx<sup>2</sup> − (Σx)<sup>2</sup></span><span class="bottom">n(n − 1)</span></span></span>
+</div>
+</div>
+
+<p>A common question with variance is why do we calculate the average squared distance and not the average distance directly? The answer to this question comes from the definition of the mean. Think about Σ(x - x̄). Notice all I did was take the squared off the numerator of the conceptual formula for the variance. If you do this sum it will always be equal to zero. The reason is because some of the x values will be above the mean and some below the mean because the mean is the center. When you subtract from a x value bigger than the mean you will get a positive and when you subtract from a x value smaller than the mean you will get a negative. When these are all added together, since the mean is the center, the positives and negatives will balance out and you will get a sum of zero. This can also be shown algebraically.</p>
+
+<article class="example">
+<h3>Example</h3>
+<p>Prove that Σ(x - x̄) is equal to 0 (show algebraic steps).</p>
+<details class="answer">
+<summary>Show Answer</summary>
+<div class="answer-body">
+<div class="math">
+Σ(x − x̄) = Σx − Σx̄ = Σx − nx̄ =
+Σx − n<span class="frac"><span class="top">Σx</span><span class="bottom">n</span></span>
+= Σx − Σx = 0
+</div>
+</div>
+</details>
+</article>
+
+<h3>Important characteristics of the variance are:</h3>
+<ul>
+<li>all the data points are directly involved in the calculation</li>
+<li>variance is in squared units which makes it hard to interpret</li>
+<li>can never be negative since it is a squared value</li>
+<li>larger values suggest more variability</li>
+</ul>
+
+<article class="example">
+<h3>Example</h3>
+<p>Back to the years of experience of faculty data: 1, 30, 22, 10, 5</p>
+<p>Calculate the variance.</p>
+<details class="answer">
+<summary>Show Answer</summary>
+<div class="answer-body">
+<p>To use the computational formula for variance, you first need to calculate ∑x and ∑x². I recommend you create two columns in order to get these quantities as given below.</p>
+<table class="data-table">
+<thead><tr><th>x</th><th>x²</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>1</td></tr>
+<tr><td>30</td><td>900</td></tr>
+<tr><td>22</td><td>484</td></tr>
+<tr><td>10</td><td>100</td></tr>
+<tr><td>5</td><td>25</td></tr>
+<tr><th>Σx = 68</th><th>Σx² = 1510</th></tr>
+</tbody>
+</table>
+<div class="math">
+s<sup>2</sup> =
+<span class="frac"><span class="top">5(1510) − (68)<sup>2</sup></span><span class="bottom">5(4)</span></span>
+=
+<span class="frac"><span class="top">7550 − 4624</span><span class="bottom">20</span></span>
+=
+<span class="frac"><span class="top">2926</span><span class="bottom">20</span></span>
+= 146.3
+</div>
+</div>
+</details>
+</article>
+
+<div class="definition"><strong>Sample Standard Deviation</strong> – the square root of the sample variance.</div>
+<div class="math">s = √s<sup>2</sup></div>
+
+<p>When we calculate variance which is the average squared distance the data values are from the mean, we really would like to get rid of the squared because the outcome is not in the same units as the original data. So how do we get rid of a squared? We simply take the square root. Therefore, the square root of the variance gives us standard deviation.</p>
+
+<article class="example">
+<h3>Example</h3>
+<p>Data: 1, 30, 22, 10, 5</p>
+<p>Calculate the standard deviation.</p>
+<details class="answer">
+<summary>Show Answer</summary>
+<div class="answer-body"><div class="math">s = √146.3 = 12.095</div></div>
+</details>
+</article>
+
+<h3>Important characteristics of the standard deviation are:</h3>
+<ul>
+<li>standard deviation uses the same units as the data</li>
+<li>standard deviation is the most common measure of dispersion</li>
+</ul>
+</section>
+
+<section id="sdunit" class="section">
+<h2>Standard Deviation as a Unit of Measure</h2>
+<p>Standard deviation is not only our most common measure of variability, it is also regularly utilized as a unit of measure. Here we will look at how this is done descriptively.</p>
+
+<div class="definition"><strong>z-score</strong> – measures how many standard deviations a data value is above or below the mean.</div>
+<div class="math">
+z =
+<span class="frac"><span class="top">x − x̄</span><span class="bottom">s</span></span>
+</div>
+<p>where z is the z-score, x is a data value, x̄ is the sample mean, and s is the standard deviation.</p>
+
+<article class="example">
+<h3>Example</h3>
+<p>Suppose a group of test scores have x̄ = 79 and s = 9</p>
+<p>a. For a test score of 88, find the z-score.<br>
+b. What does the z-score for 88 mean?<br>
+c. For a test score of 63, find the z-score.<br>
+d. What does the z-score for 63 mean?</p>
+<details class="answer">
+<summary>Show Answers</summary>
+<div class="answer-body">
+<p>a.</p><div class="math">z = <span class="frac"><span class="top">88 − 79</span><span class="bottom">9</span></span> = <span class="frac"><span class="top">9</span><span class="bottom">9</span></span> = 1</div>
+<p>b. The score of 88 is 1 standard deviation above the mean.</p>
+<p>c.</p><div class="math">z = <span class="frac"><span class="top">63 − 79</span><span class="bottom">9</span></span> = <span class="frac"><span class="top">−16</span><span class="bottom">9</span></span> = −1.778</div>
+<p>d. The score of 63 is 1.778 standard deviations below the mean.</p>
+</div>
+</details>
+</article>
+
+<div class="key-idea">
+<h3>Empirical Rule</h3>
+<ul>
+<li>Approximately 68% of the data fall within 1 standard deviation of the mean (x̄ - s, x̄ + s)</li>
+<li>Approximately 95% of the data fall within 2 standard deviations of the mean (x̄ - 2s, x̄ + 2s)</li>
+<li>Approximately 99.7% of the data fall within 3 standard deviations of the mean (x̄ - 3s, x̄ + 3s)</li>
+</ul>
+</div>
+
+<article class="example">
+<h3>Example</h3>
+<p>Suppose that the amount of liquid in “12 oz.” Pepsi cans is a mound shaped distribution with x̄ = 12 oz. and s = 0.1 oz.</p>
+<p>a. About 68% of the data will fall within what interval?<br>
+b. About 95% of the data will fall within what interval?<br>
+c. About 99.7% of the data will fall within what interval?</p>
+<details class="answer">
+<summary>Show Answers</summary>
+<div class="answer-body">
+<p>a. (x̄ - s, x̄ + s) = (12 - 0.1, 12 + 0.1) = (11.9, 12.1)</p>
+<p>b. (x̄ - 2s, x̄ + 2s) = (12 - 2(0.1), 12 + 2(0.1)) = (11.8, 12.2)</p>
+<p>c. (x̄ - 3s, x̄ + 3s) = (12 - 3(0.1), 12 + 3(0.1)) = (11.7, 12.3)</p>
+</div>
+</details>
+</article>
+</section>
+
+<section id="position" class="section">
+<h2>Numerical Measures of Position</h2>
+<p>There are many measures of position (also known as rank statistics) that can be calculated. We will focus on the quartiles. Let me first mention the idea of a percentile which is also a measure of position. A common place that you will see percentiles are when school children take standardized tests. The students will get scores as percentiles. For example, suppose John scores in the 95th percentile in math. Do you know what this means? Technically, it means that John scored better than 95% of people who took the test. Does this say how well he did on the test? Not really, he could have done poorly as long as 95% of his peers did worse. This is a measure of position because it tells where his score is relative to everyone else.</p>
+
+<h3>Procedure for calculating Q1, Q2, and Q3:</h3>
+<ul>
+<li>Order the data from smallest to largest</li>
+<li>Find x̃. This is Q2</li>
+<li>Q1 is the median of the lower half of the data; that is, it is the median of the data falling below Q2 (not including Q2)</li>
+<li>Q3 is the median of the upper half of the data (same as above)</li>
+</ul>
+
+<article class="example">
+<h3>Example</h3>
+<p>Find the quartiles for the following data sets</p>
+<p>a. Data set #1: 1, 2, 3, 4, 5, 6<br>
+b. Data set #2: 1, 2, 3, 4, 5, 6, 7<br>
+c. Data set #3: 1, 2, 3, 4, 5, 6, 7, 8<br>
+d. Data set #4: 1, 2, 3, 4, 5, 6, 7, 8, 9</p>
+<details class="answer">
+<summary>Show Answers</summary>
+<div class="answer-body">
+<p>a. Q1 = 2, Q2 = 3.5, Q3 = 5<br>
+b. Q1 = 2, Q2 = 4, Q3 = 6<br>
+c. Q1 = 2.5, Q2 = 4.5, Q3 = 6.5<br>
+d. Q1 = 2.5, Q2 = 5, Q3 = 7.5</p>
+</div>
+</details>
+</article>
+
+<div class="definition"><strong>Interquartile Range (IQR)</strong> – the distance between Q1 and Q3.</div>
+<div class="math">IQR = Q<sub>3</sub> − Q<sub>1</sub></div>
+
+<h3>Important characteristics of IQR are:</h3>
+<ul>
+<li>better than a typical range because it is not based on extreme values</li>
+<li>still not as good as the standard deviation in most cases</li>
+</ul>
+
+<p>Below in the form of a stem-and-leaf plot is data that I obtained when I was in graduate school. There was a group of faculty and graduate students in a meeting and everyone was asked how much money they had in their pockets. The data along with the five number summary and IQR for each group follows. Make sure you understand how to get the five number summary and IQR from the data. Also, it is important to note that the value of 73 in the faculty data would be considered extreme.</p>
+</section>
+
+<section id="boxplot" class="section">
+<h2>Box and Whisker Plot</h2>
+
+<p>Box and Whisker Plots, also commonly referred to as Boxplots, are graphs based on the five number summary. They are used for bivariate data when one variable is qualitative and one is quantitative. The example we will start with uses the data presented above. We have two variables one being qualitative (student/faculty) and the other being quantitative (money). The boxplot for this data is below.</p>
+
+<div class="figure"><img src="images/section3/money_boxplot.png" alt="Boxplot of Money vs Group"></div>
+
+<p>In order to understand how the box and whisker plot is created and to better understand the interpretation of the graph it is important to go over the procedure for creating a box and whisker plot. You will not have to create the graph by hand. We will let software actually create the graph, but you do need to understand how to interpret the information presented in the graph.</p>
+
+<h3>Procedure for creating a box and whisker plot:</h3>
+<ul>
+<li>Draw a scale to include the lowest and highest data value (this will be the y-axis)</li>
+<li>To the right of the scale draw a box from Q1 to Q3</li>
+<li>Include a solid line through the box at the median level</li>
+<li>If there are any extreme values identify them with an asterisk or dot</li>
+<li>Draw solid lines, called whiskers, from Q1 to the lowest value and from Q3 to the highest value (if there are extremes, go to the next lowest or highest value)</li>
+</ul>
+
+<p>If you compare the box and whisker plot to the five number summary in the previous example, you should see how it was created. Just look at the faculty category. Start with the box, the bottom lines up with Q1 = 15 and the top lines up with Q3 = 31. The box represents the middle 50% of the data (IQR). The line that goes through the box lines up with Q2 = 25. This line represents the median. Finally, look at the whiskers which are the lines that extend from the box. If you look at the lower whisker it goes from the bottom of the box to the low value in the data set, Low = 10. The top whisker is a little different, because the High = 73 was identified as an extreme value. Therefore, this value is identified by an asterisk and the whisker goes to the next highest value which you can see from the data is 43.</p>
+
+<div class="key-idea">
+<p>There are three kinds of questions you should be able to answer from a box-and-whisker plot. You should be able to compare the groups based on a typical value, compare the groups based on variability, and identify the shape of the distribution for each group.</p>
+</div>
+
+<article class="example">
+<h3>Example</h3>
+<p>Based on the box and whisker plot in the previous example which group tended to have the most money in their pockets, students or faculty?</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>Faculty, we can tell this because of the positioning of the box and the median on the y-axis. The faculty box and median is positioned higher.</p></div></details>
+</article>
+
+<article class="example">
+<h3>Example</h3>
+<p>Based on the box and whisker plot in the previous example which group tended to have more consistent values (less variability)?</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>Students, we can tell this because of the size of the box and the length of the whiskers. The student box is smaller and has shorter whiskers.</p></div></details>
+</article>
+</section>
+
+<section id="shapes" class="section">
+<h2>Identifying Shapes from Boxplots</h2>
+
+<div class="figure small">
+<img src="images/section3/boxplot_bell.png" alt="Bell-shaped boxplot">
+<img src="images/section3/boxplot_left_skew.png" alt="Left-skewed boxplot">
+<img src="images/section3/boxplot_right_skew.png" alt="Right-skewed boxplot">
+<img src="images/section3/boxplot_uniform.png" alt="Uniform boxplot">
+</div>
+
+<p>The above graphs are smooth curves, but the shape is determined the same way as with a histogram. This is a common way to represent populations and we will look at these graphs later in the course. What I want you to be able to identify from a box-and-whisker plot is if the graph is symmetric or skewed. If it is skewed, you should be able to identify the direction, either right or left. In the above graphs there are two that are symmetric. The Bell-Shaped Distribution and the Uniform (Rectangular) Distribution are both symmetric. The most telling sign of shape based on a box and whisker plot is where the median is in the box. Notice that in a symmetric distribution, the median is in the center of the box. The secondary sign of symmetry is the whiskers being the same length. If a distribution is skewed, then the median will not be in the center. The median being to the right indicates a left skewed distribution. This is because the data to the left is more spread out than the data to the right indicating a longer tail to the left. The secondary characteristic is the whisker to the left is longer than the whisker to the right. This also indicates a longer tail to the left. The right skewed distribution is just the opposite. In order to determine the shape when looking at the box and whisker plots I will give you, most people turn them 90 degrees at least mentally so they look like the ones above. When doing this make sure you turn them clockwise. This will ensure that the y-axis is increasing from left to right.</p>
+
+<h3>Stopping Distance Example</h3>
+<p>Now let us look at another situation. How does tread design affect an automobiles stopping distance?</p>
+<p><strong>Qualitative variable:</strong> Tread Design (A, B, or C)<br>
+<strong>Quantitative variable:</strong> Stopping Distance</p>
+
+<div class="figure"><img src="images/section3/tread_design_boxplot.png" alt="Boxplot of Stopping Distance vs Tread Design"></div>
+
+<article class="example">
+<h3>Example</h3>
+<p>If you were to select a tread design just based on stopping distance, which one is the best choice?</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>Tread design B is the best choice because we want a quick stopping distance (low numbers) and the box for B is lower. Also, the median is much lower indicating that the lower 50% of stopping distances for tread design B is much better than that for the other two tread designs.</p></div></details>
+</article>
+
+<article class="example">
+<h3>Example</h3>
+<p>Which tread design produces the most consistent stopping distances (least variability)?</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>Tread design C has the least variability. We can tell this because the box is smaller than that for the other two designs. Also, the whiskers are short. Notice in this case the stopping distances are consistently bad. We would like to have a choice that is consistently good, but in this situation that is not an option.</p></div></details>
+</article>
+
+<article class="example">
+<h3>Example</h3>
+<p>What is the shape of the distribution for each tread design?</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>All the distributions are right skewed. This is because for each plot, the median is left of center. For each tread design the secondary characteristic of a longer whisker to the right is also satisfied. The important thing with shape is these characteristics. Notice the plots look different but they are all right skewed because they all satisfy the criteria.</p></div></details>
+</article>
+</section>
+
+<div class="notes-bottom-nav">
+<a class="btn outline btn-sm" href="index.html">← Back to STA296U Notes</a>
+<a class="btn btn-sm" href="STA296U_Section_3_Variability_and_Relative_Standing.docx" download>Download Word Notes</a>
+</div>
+
+<footer class="notes-footer">Last updated: <span id="lastUpdated"></span></footer>
+</div>
+</main>
+
+<script>
+document.getElementById("lastUpdated").textContent =
+  new Date(document.lastModified).toLocaleDateString();
+</script>
+</body>
+</html>
