@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>STA296U - Section 7 | StatsLG</title>
+  <meta name="description" content="STA296U Section 7 - The Normal Distribution and Sampling Distributions.">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <style>
+    .notes-page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 40px;
+    }
+
+    .notes-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .notes-content h2 {
+      margin-top: 2rem;
+      scroll-margin-top: 1rem;
+    }
+
+    .notes-content h3 {
+      margin-top: 1.5rem;
+      color: var(--ink);
+    }
+
+    .notes-content p,
+    .notes-content li {
+      line-height: 1.65;
+    }
+
+    .back-row {
+      margin: 0 0 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toc {
+      margin-bottom: 1.5rem;
+    }
+
+    .toc h2 {
+      margin-top: 0;
+    }
+
+    .toc a {
+      color: var(--kctcs-blue);
+      font-weight: 700;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+    .definition {
+      border-left: 5px solid var(--kctcs-blue);
+      padding: 12px 14px;
+      margin: 14px 0;
+      background: var(--panel);
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+
+    .definition strong {
+      color: var(--kctcs-blue);
+    }
+
+    .example {
+      margin: 18px 0;
+    }
+
+    .example > h3,
+    .example > h4 {
+      margin-top: 0;
+    }
+
+    details.answer {
+      margin-top: 14px;
+      border-top: 1px solid var(--rule);
+      padding-top: 10px;
+    }
+
+    details.answer summary {
+      cursor: pointer;
+      color: var(--kctcs-blue);
+      font-weight: 800;
+    }
+
+    details.answer summary:hover {
+      text-decoration: underline;
+    }
+
+    details.answer[open] summary {
+      margin-bottom: 10px;
+    }
+
+    .answer-body {
+      border-left: 5px solid var(--kctcs-gold);
+      padding: 10px 14px;
+      background: var(--panel);
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+
+    .key-idea {
+      border-left: 5px solid var(--kctcs-gold);
+    }
+
+    .formula {
+      text-align: center;
+      margin: 16px 0;
+      padding: 8px 10px;
+      overflow-x: auto;
+      font-size: 1.12rem;
+    }
+
+    .formula math {
+      font-size: 1.18em;
+    }
+
+    .work {
+      display: grid;
+      gap: 5px;
+      margin: 12px 0;
+    }
+
+    .work p {
+      margin: 0;
+      font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif;
+      font-size: 1.08rem;
+    }
+
+    .figure {
+      text-align: center;
+      margin: 22px 0;
+    }
+
+    .figure img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+    }
+
+    .data-table th,
+    .data-table td {
+      border: 1px solid var(--rule);
+      padding: 8px 10px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .data-table th {
+      background: var(--panel);
+      color: var(--kctcs-blue);
+    }
+
+    .notes-footer {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid var(--rule);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 760px) {
+      .notes-page {
+        padding: 20px 16px;
+      }
+
+      .back-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .back-row .btn {
+        justify-content: center;
+      }
+    }
+
+    @media print {
+      .back-row {
+        display: none;
+      }
+
+      .notes-page,
+      .notes-content {
+        max-width: none;
+        padding: 0;
+      }
+
+      details.answer > * {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="notes-page">
+    <div class="notes-content">
+
+      <div class="back-row">
+        <a class="btn outline btn-sm" href="index.html">
+          ← Back to STA296U Notes
+        </a>
+
+        <a
+          class="btn btn-sm"
+          href="STA296U_Section_7_The_Normal_Distribution_and_Sampling_Distributions.docx"
+          download
+        >
+          Download Word Notes
+        </a>
+      </div>
+
+      <header class="header">
+        <h1>STA296U — Section 7</h1>
+        <p>The Normal Distribution and Sampling Distributions</p>
+      </header>
+
+      <section class="section panel pad toc">
+        <h2>In This Section</h2>
+        <ul>
+          <li><a href="#normal">The Normal Distribution</a></li>
+          <li><a href="#standard-normal">The Standard Normal Distribution</a></li>
+          <li><a href="#normal-probabilities">Probabilities for Any Normal Distribution</a></li>
+          <li><a href="#sampling">The Concept of a Sampling Distribution</a></li>
+          <li><a href="#xbar">Facts about the Sampling Distribution of x̄</a></li>
+          <li><a href="#clt">Central Limit Theorem</a></li>
+          <li><a href="#phat">Facts about the Sampling Distribution p̂</a></li>
+        </ul>
+      </section>
+
+      <section id="normal" class="section">
+        <h2>The Normal Distribution</h2>
+
+        <p>The normal distribution (also called Gaussian distribution) is a common type of continuous probability distribution. It is a bell shaped curve.</p>
+
+        <ul>
+          <li>The bell is symmetric about the mean of the random variable, μ.</li>
+          <li>The standard deviation of the random variable, σ, measures the spread of the bell. The larger σ is, the more spread out the bell.</li>
+        </ul>
+
+        <p>For the normal distribution the mean, median, and mode are all equal. This should make since because the distribution is symmetric with the point of symmetry being at the peak of the distribution.</p>
+
+        <p>The density function for the normal distribution is as follows:</p>
+
+        <div class="formula">
+          <math display="block">
+            <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo>
+            <mfrac><mn>1</mn><msqrt><mrow><mn>2</mn><mi>π</mi><msup><mi>σ</mi><mn>2</mn></msup></mrow></msqrt></mfrac>
+            <mo>·</mo>
+            <msup><mi>e</mi><mrow><mo>−</mo><mfrac><msup><mrow><mo>(</mo><mi>x</mi><mo>−</mo><mi>μ</mi><mo>)</mo></mrow><mn>2</mn></msup><mrow><mn>2</mn><msup><mi>σ</mi><mn>2</mn></msup></mrow></mfrac></mrow></msup>
+          </math>
+        </div>
+
+        <p>As can be seen in the density function, the values for μ and σ determine which normal distribution we are dealing with. The values μ and σ are the parameters of the normal distribution just like a and b are the parameters of the uniform distribution. There are an infinite number of normal distributions since μ can be any real number and σ can be any positive real number (σ cannot be 0 because all the points would have to be the same which would not give a bell shaped curve). The mathematical ideas of a continuous probability distribution introduced in the last section with the uniform distribution work the same with the normal distribution. However, the density function for the normal distribution is more complicated so we will not deal with all of the math. We will focus on probability and will use a table to help us find the area under the curve. You will not need to know the density function for the normal distribution.</p>
+
+        <p>We will start by concentrating on the normal distribution with μ = 0 and σ = 1. This distribution is called the standard normal distribution, denoted by z (z is used to calculate probabilities for all normal distributions). It is important to distinguish when we are talking about the normal distribution and when we are talking about the standard normal distribution. The normal distribution is any bell shaped curve while the standard normal distribution specifically has a mean of 0 and standard deviation of 1. In addition, when talking about most variables in statistics, they are denoted by x. However, some common distributions use different notations. The standard normal is denoted by z. So any time you see z, you must know that you are dealing with the standard normal distribution.</p>
+
+        <p>To calculate probabilities for the standard normal distribution, you will need to use the Standard Normal Distribution table. This table is located on the STA 296 website in the ‘tables’ link. You should print this table and keep it readily accessible.</p>
+      </section>
+
+      <section id="standard-normal" class="section">
+        <h2>The Standard Normal Distribution</h2>
+
+        <div class="key-idea card soft pad">
+          <p><strong>When finding probabilities for any normal distribution, I highly recommend that you draw a picture of the desired area!!!</strong> You will notice with all the examples I do, there is a picture. Some are simple to see, but this is a good habit to get into because we will continue to draw these pictures and they will get more complex as we move through the material.</p>
+        </div>
+
+        <p>Look at your printed Standard Normal Distribution table. The table gives the area between 0 and the z value you look up. In other words, the table gives P(0 ≤ Z ≤ z).</p>
+
+        <article class="card example">
+          <h3>Examples</h3>
+          <p>a. P(0 ≤ Z ≤ 1.55)</p>
+          <p>b. P(0 ≤ Z ≤ 1.96)</p>
+
+          <details class="answer">
+            <summary>Show Solutions</summary>
+            <div class="answer-body">
+              <p>a. P(0 ≤ Z ≤ 1.55) = 0.4394</p>
+              <p>All you have to do when finding the area between 0 and a z value is look up the z. In this case 1.55. So look up 1.5 in the first column and then look up .05 in the first row.</p>
+
+              <p>b. P(0 ≤ Z ≤ 1.96) = 0.4750</p>
+              <p>Again, look up 1.9 in the first column and .06 in the first row. These meet at 0.4750 which is the area/probability.</p>
+
+              <div class="figure">
+                <img src="images/section7/standard_normal_lookup.png" alt="Standard normal lookup examples for z equals 1.55 and 1.96">
+              </div>
+            </div>
+          </details>
+        </article>
+
+        <p>Combining the facts below with the table allows us to compute any probability for the standard normal distribution.</p>
+
+        <h3>Facts:</h3>
+        <ul>
+          <li>The total area under the standard normal curve is 1 (this is true for any density function as discussed in the last section of notes)</li>
+          <li>The standard normal curve is symmetric about 0 (remember 0 is the mean of the standard normal distribution)</li>
+          <li>P(Z &lt; 0) = 0.5 and P(Z &gt; 0) = 0.5 (This comes directly from the two facts above. If the total area is 1 and the distribution is symmetric about 0, then half of the area must be on each side of 0.)</li>
+        </ul>
+
+        <article class="card example">
+          <h3>Examples</h3>
+          <p>a. P(Z ≤ 1.64)</p>
+          <p>b. P(Z ≥ 1.64)</p>
+          <p>c. P(Z ≤ −1.64)</p>
+          <p>d. P(−2.32 ≤ Z ≤ 0)</p>
+          <p>e. P(−2 ≤ Z ≤ 2)</p>
+          <p>f. P(1.41 ≤ Z ≤ 2.18)</p>
+          <p>g. P(Z ≥ 12.31)</p>
+
+          <details class="answer">
+            <summary>Show Solutions</summary>
+            <div class="answer-body">
+              <p><strong>a.</strong> P(Z ≤ 1.64) = 0.5 + .4495 = 0.9495</p>
+              <p>Take the area to the left of 0 (which is 0.5) and add the area between 0 and 1.64 (from table).</p>
+
+              <p><strong>b.</strong> P(Z ≥ 1.64) = 0.5 - .4495 = 0.0505</p>
+              <p>Take the area to the right of 0 and subtract the area we don’t want between 0 and 1.64.</p>
+
+              <p><strong>c.</strong> P(Z ≤ −1.64) = 0.5 - .4495 = 0.0505</p>
+              <p>Compare this one to part b. By symmetry, you can see that it must be the same.</p>
+
+              <p><strong>d.</strong> P(−2.32 ≤ Z ≤ 0) = 0.4898</p>
+              <p>When dealing with values below 0, you must use the fact that the distribution is symmetric. The area between 0 and -2.32 is the same as the area between 0 and 2.32.</p>
+
+              <div class="figure">
+                <img src="images/section7/standard_normal_examples_a_d.png" alt="Standard normal probability examples a through d">
+              </div>
+
+              <p><strong>e.</strong> P(−2 ≤ Z ≤ 2) = 2(.4772) = 0.9544</p>
+              <p>Here the area between 0 and -2 and the area between 0 and 2 is the same. We can just look this up and double it. This solution should make since because the Empirical Rule says approximately 95% of data is within two standard deviations. The Empirical Rule percentages actually come from the normal distribution.</p>
+
+              <p><strong>f.</strong> P(1.41 ≤ Z ≤ 2.18) = .4854 - .4207 = 0.0647</p>
+              <p>Here we want the area between two values above 0. We take the area between 0 and 2.18 and then subtract the area we don’t want between 0 and 1.41.</p>
+
+              <p><strong>g.</strong> P(Z ≥ 12.31) = 0</p>
+              <p>Sometimes we will get Z values that are off the chart and you must know what to do with these. Notice the chart only goes to 3.9, but at this value the area is 0.5. This is not really all of the area to the right of 0, but it does round to 0.5. Therefore, the area between 0 and any value greater than 3.9 is 0.5 when rounded to four decimal places. So here that leaves no area above 12.31. It is almost impossible to get a Z value of 12.31.</p>
+
+              <div class="figure">
+                <img src="images/section7/standard_normal_examples_e_g.png" alt="Standard normal probability examples e through g">
+              </div>
+            </div>
+          </details>
+        </article>
+      </section>
+
+      <section id="normal-probabilities" class="section">
+        <h2>Probabilities for Any Normal Distribution</h2>
+
+        <p>We have learned how to compute probabilities for the standard normal distribution. We will now compute probabilities for any normal distribution.</p>
+
+        <p>First, we need to look at the z-score. Descriptively, the z-score (standardized score) gives the number of standard deviations an observation is above or below the mean. More importantly, it allows us to transform any normal distribution into a standard normal distribution.</p>
+
+        <div class="formula">
+          <math display="block">
+            <mi>Z</mi><mo>=</mo>
+            <mfrac><mrow><mi>x</mi><mo>−</mo><mi>μ</mi></mrow><mi>σ</mi></mfrac>
+          </math>
+        </div>
+
+        <p>If x is normal with mean μ and standard deviation σ, then Z = (x − μ)/σ is standard normal.</p>
+
+        <h3>Illustration of transforming and normal distribution to a standard normal distribution</h3>
+        <p>Suppose we have a normal distribution with μ = 40 and σ = 5.</p>
+
+        <div class="figure">
+          <img src="images/section7/normal_to_standard.png" alt="Normal distribution with mean 40 and standard deviation 5 transformed to z values">
+        </div>
+
+        <p>The picture above began with a drawing of a normal distribution, x. The mean of 40 was identified as the point of symmetry. Next, the standard deviation of 5 was used as our unit of measure (very common in upcoming material). Adding and subtracting a standard deviation we get the 35 and 45 values. By the empirical rule we know about 68% of the x values are within this interval. Also, by the empirical rule we know about 95% is between 30 and 50 and about 99.7% is between 25 and 55. This gives a good picture of what the random variable x looks like. The final step is to transform the x values into z values. Notice we are not changing the picture. It is still the same bell shaped curve with the axis being rescaled. You can plug all the x values in the z formula and you will see they are all correct. You can also just think about the meaning of the z values. The x value of 40 is the mean so it is 0 standard deviations from the mean, z = 0. The value of 45 is 1 standard deviation above the mean, 40 + 5. Each z value can be thought of in this same way. The key here is notice when looking at x, the mean is 40 and the standard deviation is 5. Now look at z. You should see that the mean is 0 and the standard deviation is 1. This means it is a standard normal distribution. Any normal distribution can be transformed to standard normal in this same way. Now, if we want to find the area between 40 and 45 for x, it is the same as the area between 0 and 1 for z. All normal distributions are the same shape so the area is distributed in the same way.</p>
+
+        <div class="key-idea card soft pad">
+          <p><strong>To calculate probabilities for a normal distribution, x</strong></p>
+          <ul>
+            <li>Write probability statement (and draw picture) for x</li>
+            <li>Rewrite in terms of z</li>
+          </ul>
+        </div>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>The distribution of IQ scores for the general population is approximately normal with μ = 100 and σ = 10. The random variable of interest, x, is the IQ score of a randomly selected person. Find the following probabilities.</p>
+          <p>a. P(100 ≤ x ≤ 120)</p>
+          <p>b. P(x ≥ 130)</p>
+
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <p>a. P(100 ≤ x ≤ 120) = P(0 ≤ z ≤ 2) = 0.4772</p>
+              <p>The first step is to convert the x values into z values using the z transformation formula. Then you use the table just as before.</p>
+
+              <p>b. P(x ≥ 130) = P(z ≥ 3) = 0.5 - .4987 = 0.0013</p>
+              <p>Again, transform x to z and then use the table to calculate the probability.</p>
+
+              <div class="figure">
+                <img src="images/section7/normal_x_examples.png" alt="Normal distribution probability examples for IQ and Pepsi">
+              </div>
+            </div>
+          </details>
+        </article>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>Suppose the amount of Pepsi in a “12 oz” can has a normal distribution with μ = 12 and σ = 0.1. The random variable of interest, x, is the amount of Pepsi in a randomly selected can. Find P(x ≤ 11.83).</p>
+
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <p>P(x ≤ 11.83) = P(z ≤ −1.7) = 0.5 - .4554 = 0.0446</p>
+            </div>
+          </details>
+        </article>
+      </section>
+
+      <section id="sampling" class="section">
+        <h2>The Concept of a Sampling Distribution</h2>
+
+        <h3>Review of important terms</h3>
+        <ul>
+          <li>population – the set of all possible measurements (group of interest)</li>
+          <li>sample – a subset of the population</li>
+          <li>parameter – a numerical characteristic of a population</li>
+          <li>statistic – a numerical characteristic of a sample</li>
+        </ul>
+
+        <p>Since it is typically unrealistic to do a census, we use a statistic to estimate a parameter.</p>
+
+        <p>In statistical application, we take a random sample from the population. We compute a statistic, say x̄(the sample mean). The value of the statistic x̄depends on which items are randomly selected for the sample. Different samples yield different values of x̄(we randomly get a value of x̄out of all its possible values). Therefore, x̄is a random variable. Taking a random sample and calculating x̄is equivalent to randomly selecting a value for x̄out of all its possible values.</p>
+
+        <p>The sample mean, x̄estimates the population mean μ. We want x̄to be very close to μ (cannot expect x̄to be exactly equal to μ). In order to evaluate how good x̄is at estimating μ, we need to know the probability distribution of x̄.</p>
+
+        <div class="definition">
+          <strong>Sampling error</strong> – The distance between a statistic and the parameter it is estimating
+        </div>
+
+        <div class="definition">
+          <strong>Sampling distribution</strong> – The probability of a statistic over all possible samples is known as its sampling distribution. (This is the same as a probability distribution except the random variable is a statistic rather than an observation.)
+        </div>
+
+        <p>In order to be confident that our statistic will give a good estimate of the parameter, we need the sampling distribution to have two characteristics.</p>
+        <ol type="a">
+          <li>sampling distribution should be centered at the value of the parameter (means statistic is unbiased)</li>
+          <li>sampling distribution should have a small amount of variation (means there is a small amount of error in the statistic)</li>
+        </ol>
+
+        <p>We want the sampling distribution to be centered at the value of the parameter and to have little variation. Consider the graph below. In the graph there are three statistics that could be used to estimate the parameter, θ. Which one is best?</p>
+
+        <div class="figure">
+          <img src="images/section7/estimator_comparison.png" alt="Comparison of three sampling distributions used to estimate theta">
+        </div>
+
+        <p>Statistic 3 is the best choice in the graph above. The worst choice is statistic 1 which tends to always overestimate the parameter (the center of the distribution is right of the parameter). This is what a sampling distribution could look like for a biased statistic. The way we prevent a statistic from being biased is to take a random sample. A random sample will give a sampling distribution centered over the parameter of interest. When looking at statistic 2 you see there is a lot of variability. This is not good because the spread means there is a reasonable chance of getting a value far from the parameter. Notice with statistic 3 most of the outcomes are very close to the parameter we are estimating. This means that when using the statistic to estimate the parameter you can expect a small amount of error in the estimate. Hopefully, you remember that we can decrease this error by increasing the sample size. How this really works mathematically is that increasing your sample size decreases the variability in the sampling distribution of the statistic.</p>
+
+        <div class="definition">
+          <strong>Unbiased estimator</strong> – The statistic is an unbiased estimator if it is centered about the parameter of interest. Otherwise, the estimator has bias.
+        </div>
+
+        <div class="definition">
+          <strong>Minimum variance unbiased estimator</strong> – A statistic is a minimum variance unbiased estimator if it is an unbiased estimator and has less variance than all other unbiased estimators.
+        </div>
+      </section>
+
+      <section id="xbar" class="section">
+        <h2>Facts about the Sampling Distribution of x̄</h2>
+
+        <p>The statistic x̄(sample mean) estimates μ (population mean). It should be noted that in this class we will only look at good statistics. This means that with proper techniques the sampling distribution will be centered at the parameter and will have a small amount of variability. With the knowledge that these characteristics hold when looking at the sampling distribution for x̄, we can understand some facts.</p>
+
+        <div class="formula">μ<sub>x̄</sub> = μ</div>
+        <p>The average value of x̄across all possible samples is μ, the population mean. This should make since because we just said the sampling distribution of x̄is centered about the parameter it estimates which is μ. (The mean of any good statistic is the parameter it estimates)</p>
+
+        <div class="formula">σ²<sub>x̄</sub> = σ²/n</div>
+        <p>The variance of the sampling distribution of x̄is the population variance σ² divided by the sample size n.</p>
+
+        <div class="formula">σ<sub>x̄</sub> = √σ²<sub>x̄</sub> = √(σ²/n) = σ/√n</div>
+        <p>The standard deviation of the sampling distribution of x̄is the population standard deviation σ divided by √n. Notice that as n increases the sample to sample variability in x̄decreases (if you increase the denominator, the overall quantity decreases). Therefore, as has been stated previously, increasing sample size decreases the error when using a statistic to estimate a parameter. Also notice that a larger σ results in a larger σ<sub>x̄</sub>. More variability in your data will mean more variability in your statistic.</p>
+
+        <div class="definition">
+          <strong>Standard Error</strong> – is the standard deviation of the sampling distribution (σ/√n is the standard error of x̄)
+        </div>
+
+        <h3>Illustration of the mean and standard deviation of a sampling distribution</h3>
+        <p>Suppose we have a population x that consists of the values: 1, 2, 3, 4. A sample of size 2 is taken. This is not realistic of a true population but illustrates the mathematics.</p>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Population, x</th>
+              <th>Possible Samples<br>When n = 2</th>
+              <th>Probability</th>
+              <th>x̄</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>1, 2</td><td>1/6</td><td>1.5</td></tr>
+            <tr><td>2</td><td>1, 3</td><td>1/6</td><td>2</td></tr>
+            <tr><td>3</td><td>1, 4</td><td>1/6</td><td>2.5</td></tr>
+            <tr><td>4</td><td>2, 3</td><td>1/6</td><td>2.5</td></tr>
+            <tr><td></td><td>2, 4</td><td>1/6</td><td>3</td></tr>
+            <tr><td></td><td>3, 4</td><td>1/6</td><td>3.5</td></tr>
+            <tr><th>μ = 10/4 = 2.5</th><td></td><td></td><th>μ<sub>x̄</sub> = 15/6 = 2.5</th></tr>
+          </tbody>
+        </table>
+
+        <p>Notice that μ<sub>x̄</sub> = μ = 2.5.</p>
+
+        <p>If we sample without replacement from a finite population containing N elements, then we must use the finite population correction factor (FPC) when calculating the variance of the sampling distribution.</p>
+
+        <div class="formula">FPC = (N − n)/(N − 1)</div>
+        <div class="formula">Therefore, σ²<sub>x̄</sub> = (σ²/n) · ((N − n)/(N − 1))</div>
+
+        <p>You are not required to do this for class, but for this illustration to work we must use the FPC. For class, we will only deal with populations large enough to assume they are infinite. For large populations, you do not need to use the FPC as it will basically be 1.</p>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>x</th><th>x²</th><th>P(x)</th><th>x² · P(x)</th>
+              <th>x̄</th><th>x̄²</th><th>P(x̄)</th><th>x̄² · P(x̄)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>1</td><td>1/4</td><td>1/4</td><td>1.5</td><td>2.25</td><td>1/6</td><td>2.25/6</td></tr>
+            <tr><td>2</td><td>4</td><td>1/4</td><td>4/4</td><td>2</td><td>4</td><td>1/6</td><td>4/6</td></tr>
+            <tr><td>3</td><td>9</td><td>1/4</td><td>9/4</td><td>2.5</td><td>6.25</td><td>1/6</td><td>6.25/6</td></tr>
+            <tr><td>4</td><td>16</td><td>1/4</td><td>16/4</td><td>2.5</td><td>6.25</td><td>1/6</td><td>6.25/6</td></tr>
+            <tr><td></td><td></td><td></td><th>∑x² · P(x) = 30/4</th><td>3</td><td>9</td><td>1/6</td><td>9/6</td></tr>
+            <tr><td colspan="4">σ² = ∑x² · P(x) − μ² = 30/4 − (10/4)² = 5/4 = 1.25</td><td>3.5</td><td>12.25</td><td>1/6</td><td>12.25/6</td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><th>∑x̄² · P(x̄) = 40/6</th></tr>
+          </tbody>
+        </table>
+
+        <div class="work">
+          <p>σ²<sub>x̄</sub> = ∑x̄² · P(x̄) − μ² = 40/6 − (10/4)² = 5/12 = 0.417</p>
+          <p>And</p>
+          <p>σ²<sub>x̄</sub> = (σ²/n) · ((N − n)/(N − 1)) = (1.25/2) · ((4 − 2)/(4 − 1)) = 5/12 = 0.417</p>
+          <p>σ<sub>x̄</sub> = √0.417 = 0.645</p>
+        </div>
+
+        <p>The sampling distribution of x̄with a sample size of 2 has a mean of 2.5 and a standard deviation of 0.645.</p>
+      </section>
+
+      <section id="clt" class="section">
+        <h2>Central Limit Theorem</h2>
+
+        <p>Remember that if we have a normal distribution and we know the mean and standard deviation, then we can find probability using the transformation Z = (x − μ)/σ. The important part here is that we take an observation and subtract the mean and divide by the standard deviation. We can use the same format for the sampling distribution.</p>
+
+        <div class="formula">If our sample comes from a normal distribution with mean μ and standard deviation σ then Z = (x̄ − μ)/(σ/√n) has a standard normal distribution.</div>
+
+        <p>Notice that in the transformation above we know the population is normally distributed. In reality when collecting data it is rare that this would ever be the case. So what can be done when the population is not normally distributed? This has been thoroughly researched by statisticians. The research has led to one of the most important theorems in statistics.</p>
+
+        <div class="definition">
+          <strong>Central Limit Theorem</strong> – If we sample from a population with mean μ and standard deviation σ then Z = (x̄ − μ)/(σ/√n) is approximately standard normal for large n.
+        </div>
+
+        <p>Notice that the central limit theorem works when we do not have a normal distribution. Of course the question here becomes how large does n have to be in order for the central limit theorem to work? The answer is if n = 30 or larger, the central limit theorem will apply in almost all cases. So for class purposes, this is the general rule we will use.</p>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>A population of soft drink cans has amounts of liquid following a normal distribution with μ = 12 and σ = 0.2 oz.</p>
+          <p>a. What is the probability that a single can, x, is between 11.9 and 12.1 oz.?</p>
+          <p>b. What is the probability that x̄is between 11.9 and 12.1 for n = 16 cans?</p>
+
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <p>a. P(11.9 &lt; X &lt; 12.1) = P(−0.5 &lt; Z &lt; 0.5) = 2(.1915) = 0.3830</p>
+              <p>To transform x values into z value you use the tranformation Z = (x − μ)/σ.</p>
+
+              <p>b. P(11.9 &lt; x̄&lt; 12.1) = P(−2 &lt; Z &lt; 2) = 2(.4772) = 0.9544</p>
+              <p>Notice that in this case we are dealing with x̄instead of x. The problem works the same other than our transformation is Z = (x̄ − μ)/(σ/√n).</p>
+
+              <div class="figure">
+                <img src="images/section7/sampling_cans.png" alt="Single-can and sample-mean normal probability examples">
+              </div>
+            </div>
+          </details>
+        </article>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>A population of trees have heights that have a mean of 110 feet and a standard deviation of 20 feet. A sample of 100 trees is selected. Find the following.</p>
+          <p>a. μ<sub>x̄</sub></p>
+          <p>b. σ<sub>x̄</sub></p>
+          <p>c. P(x̄&gt; 108)</p>
+          <p>d. What about P(X &gt; 108)?</p>
+
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <p>a. μ<sub>x̄</sub> = μ = 110</p>
+              <p>b. σ<sub>x̄</sub> = σ/√n = 20/√100 = 2</p>
+              <p>c. P(x̄&gt; 108) = P(Z &gt; −1) = 0.5 + .3413 = 0.8413</p>
+              <p>d. Cannot find the probability because we do not know the distribution of x. We know the distribution of x̄is normal because of the central limit theorem which is why we can do part c.</p>
+
+              <div class="figure">
+                <img src="images/section7/sampling_trees.png" alt="Sampling distribution probability for mean tree height above 108 feet">
+              </div>
+            </div>
+          </details>
+        </article>
+      </section>
+
+      <section id="phat" class="section">
+        <h2>Facts about the Sampling Distribution p̂</h2>
+
+        <div class="formula">Population Proportion = p = (number in population with characteristic)/(number in population)</div>
+        <div class="formula">Sample Proportion = p̂ = (number in sample with characteristic)/(Number in Sample)</div>
+
+        <p>p̂is a point estimate of p (just like x̄is a point estimate of μ)</p>
+
+        <div class="formula">μ<sub>p̂</sub> = p</div>
+        <p>The average value of p̂across all possible samples is p, the population proportion. Once again this should make since because the sampling distribution of p̂is centered at the parameter it estimates which is p.</p>
+
+        <div class="formula">σ²<sub>p̂</sub> = (p · q)/n</div>
+        <p>The variance of p̂is the population variance (which is p · q) divided by n.</p>
+
+        <div class="formula">σ<sub>p̂</sub> = √((p · q)/n)</div>
+        <p>The standard deviation of p̂, also called the standard error, is the square root of the variance of p̂.</p>
+
+        <div class="formula">If we sample from a population with a proportion of p, then Z = (p̂ − p)/√((p · q)/n) is approximately standard normal for large n.</div>
+      </section>
+
+      <div class="back-row" style="margin-top:36px">
+        <a class="btn outline btn-sm" href="index.html">
+          ← Back to STA296U Notes
+        </a>
+
+        <a
+          class="btn btn-sm"
+          href="STA296U_Section_7_The_Normal_Distribution_and_Sampling_Distributions.docx"
+          download
+        >
+          Download Word Notes
+        </a>
+      </div>
+
+      <footer class="notes-footer">
+        Last updated:
+        <span id="lastUpdated"></span>
+      </footer>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById("lastUpdated").textContent =
+      new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>
