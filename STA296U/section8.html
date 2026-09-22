@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>STA296U - Section 8 | StatsLG</title>
+  <meta name="description" content="STA296U Section 8 - Confidence Intervals Based on a Single Sample.">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <style>
+    .notes-page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 40px;
+    }
+
+    .notes-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .notes-content h2 {
+      margin-top: 2rem;
+      scroll-margin-top: 1rem;
+    }
+
+    .notes-content h3 {
+      margin-top: 1.5rem;
+      color: var(--ink);
+    }
+
+    .notes-content p,
+    .notes-content li {
+      line-height: 1.65;
+    }
+
+    .back-row {
+      margin: 0 0 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toc {
+      margin-bottom: 1.5rem;
+    }
+
+    .toc h2 {
+      margin-top: 0;
+    }
+
+    .toc a {
+      color: var(--kctcs-blue);
+      font-weight: 700;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+    .definition {
+      border-left: 5px solid var(--kctcs-blue);
+      padding: 12px 14px;
+      margin: 14px 0;
+      background: var(--panel);
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+
+    .definition strong {
+      color: var(--kctcs-blue);
+    }
+
+    .example {
+      margin: 18px 0;
+    }
+
+    .example > h3,
+    .example > h4 {
+      margin-top: 0;
+    }
+
+    details.answer {
+      margin-top: 14px;
+      border-top: 1px solid var(--rule);
+      padding-top: 10px;
+    }
+
+    details.answer summary {
+      cursor: pointer;
+      color: var(--kctcs-blue);
+      font-weight: 800;
+    }
+
+    details.answer summary:hover {
+      text-decoration: underline;
+    }
+
+    details.answer[open] summary {
+      margin-bottom: 10px;
+    }
+
+    .answer-body {
+      border-left: 5px solid var(--kctcs-gold);
+      padding: 10px 14px;
+      background: var(--panel);
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+
+    .key-idea {
+      border-left: 5px solid var(--kctcs-gold);
+    }
+
+    .formula {
+      text-align: center;
+      margin: 16px 0;
+      padding: 8px 10px;
+      overflow-x: auto;
+      font-size: 1.12rem;
+    }
+
+    .formula math {
+      font-size: 1.18em;
+    }
+
+    .work {
+      display: grid;
+      gap: 7px;
+      margin: 12px 0;
+      padding-left: 4%;
+    }
+
+    .work p {
+      margin: 0;
+      font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif;
+      font-size: 1.08rem;
+    }
+
+    .figure {
+      text-align: center;
+      margin: 22px 0;
+    }
+
+    .figure img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .critical-values {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+    }
+
+    .critical-values th,
+    .critical-values td {
+      border: 1px solid var(--rule);
+      padding: 9px 12px;
+      text-align: center;
+    }
+
+    .critical-values th {
+      background: var(--panel);
+      color: var(--kctcs-blue);
+    }
+
+    .notes-footer {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid var(--rule);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 760px) {
+      .notes-page {
+        padding: 20px 16px;
+      }
+
+      .back-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .back-row .btn {
+        justify-content: center;
+      }
+
+      .work {
+        padding-left: 0;
+      }
+    }
+
+    @media print {
+      .back-row {
+        display: none;
+      }
+
+      .notes-page,
+      .notes-content {
+        max-width: none;
+        padding: 0;
+      }
+
+      details.answer > * {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="notes-page">
+    <div class="notes-content">
+
+      <div class="back-row">
+        <a class="btn outline btn-sm" href="index.html">
+          ← Back to STA296U Notes
+        </a>
+
+        <a
+          class="btn btn-sm"
+          href="STA296U_Section_8_Confidence_Intervals_Based_on_a_Single_Sample.docx"
+          download
+        >
+          Download Word Notes
+        </a>
+      </div>
+
+      <header class="header">
+        <h1>STA296U — Section 8</h1>
+        <p>Confidence Intervals Based on a Single Sample</p>
+      </header>
+
+      <section class="section panel pad toc">
+        <h2>In This Section</h2>
+        <ul>
+          <li><a href="#confidence">Confidence in Inferential Statistics</a></li>
+          <li><a href="#parameter">Identifying and Estimating the Parameter</a></li>
+          <li><a href="#known-sigma">Confidence Interval for μ with known σ</a></li>
+          <li><a href="#unknown-sigma">Confidence Interval for μ with unknown σ</a></li>
+          <li><a href="#proportion">Confidence Interval for p when n is Large</a></li>
+          <li><a href="#sample-size">Determining the Sample Size</a></li>
+        </ul>
+      </section>
+
+      <section id="confidence" class="section">
+        <h2>Confidence in Inferential Statistics</h2>
+
+        <p>When conducting inferential statistics, analysis will be either one-tailed or two-tailed. A one-tailed test means that the error is in one tail of the sampling distribution and two-tailed means that half of the error is in each tail of the sampling distribution. Since we have already discussed the central limit theorem, we know that our sampling distribution is normal in certain instances. We will start our discussion of confidence intervals in these situations where the sampling distribution is normal.</p>
+
+        <p>In inferential statistics, the quantity α, known as <strong>level of significance</strong>, is the likelihood of being wrong. The complement of α, 1 − α, is known as our <strong>level of confidence</strong>. For example if we want to be 95% confident in our conclusion then α = .05 (or 5%). There is a 95% chance that we are correct and a 5% chance we are wrong. As you will see, these values come from probability we can calculate using the sampling distribution.</p>
+
+        <p>If we conduct a one-tailed test and the sampling distribution is normal then we will need to find the value z<sub>α</sub>. The z<sub>α</sub> value is the z from the standard normal table with the area in the tail being α. Also, the remaining area is 1 − α, the confidence level. Below is a drawing of what this looks like.</p>
+
+        <div class="figure">
+          <img src="images/section8/one_tailed_alpha.png" alt="One-tailed normal curve showing alpha in one tail">
+        </div>
+
+        <p>If we conduct a two-tailed test and the sampling distribution is normal then we will need to find the value z<sub>α/2</sub>. The z<sub>α/2</sub> value is the z from the standard normal table with the area in the tail being α/2. Since this is a two tailed test, half of α is in each tail. As before, the remaining area is 1 − α, the confidence level. <u>All confidence intervals are two-tailed.</u> This is because when you have an interval there is a chance the actual value is below the interval and a chance that the actual value is above the interval (there is a possible error on both sides of the interval). Below is a drawing of what this looks like.</p>
+
+        <div class="figure">
+          <img src="images/section8/two_tailed_alpha.png" alt="Two-tailed normal curve showing alpha over two in each tail">
+        </div>
+
+        <p>The confidence level is something a researcher can choose. Obviously, we do not want to choose a 50% confidence level. This would mean there is a 50% chance of being right and a 50% chance of being wrong. A confidence level this low does not give useful information about the parameter being estimated. We want to pick a high confidence level. Common confidence levels used in statistical analysis are 90%, 95%, and 99%. The z<sub>α/2</sub> values for these confidence levels are identified below.</p>
+
+        <table class="critical-values">
+          <thead>
+            <tr><th>Confidence Level</th><th>Critical Value</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>90%</td><td>z<sub>α/2</sub> = z<sub>.05</sub> = 1.645</td></tr>
+            <tr><td>95%</td><td>z<sub>α/2</sub> = z<sub>.025</sub> = 1.96</td></tr>
+            <tr><td>99%</td><td>z<sub>α/2</sub> = z<sub>.005</sub> = 2.576</td></tr>
+          </tbody>
+        </table>
+
+        <p>These z<sub>α/2</sub> values come from the standard normal distribution as seen in the picture presented earlier. To give a specific example we will look at 95% confidence. For 95% confidence, α = .05, α/2 = .025, and 1 − α = .95 as seen in the graph below. For the standard normal distribution 95% of observations are between -1.96 and 1.96. Therefore, z<sub>α/2</sub> = 1.96. To see where this value comes from, look at the standard normal distribution table and find the area between -1.96 and 1.96. If you look up 1.96, you will see the area is .4750 which is half the area we want. Double this value and you get .95 or 95%. All other z<sub>α/2</sub> values are calculated in the same way. I will only ask you to do 90%, 95% and 99% confidence intervals, but if you wanted to choose a different confidence level, you can figure out the z<sub>α/2</sub> value in this way.</p>
+
+        <div class="figure">
+          <img src="images/section8/confidence_95.png" alt="Standard normal curve showing 95 percent confidence between negative 1.96 and positive 1.96">
+        </div>
+
+        <div class="key-idea card soft pad">
+          <p>Ultimately, the above graph illustrates that when our sampling distribution is normal, 95% of statistics are within 1.96 standard deviations of the parameter they estimate.</p>
+        </div>
+
+        <p>A common question: Can we do a 100% confidence interval? The answer is technically yes, but the interval is of no use. To get 100% of the area, z<sub>α/2</sub> = ∞. This should make since with the x-axis being an asymptote for the normal distribution. Therefore, a 100% confidence interval is always just −∞ to ∞ (the entire real number line). We knew the parameter was somewhere on the real number line before we ever collected any data. In order to narrow down where the parameter is, the confidence level must be something less than 100%.</p>
+      </section>
+
+      <section id="parameter" class="section">
+        <h2>Identifying and Estimating the Parameter</h2>
+
+        <p>Why not simply use a statistic to estimate a parameter? Is interval estimation really necessary? The mean will be utilized in order illustrate the importance of interval estimation.</p>
+
+        <p>When doing inferential statistics, the population mean, μ, is an unknown parameter. We wish to estimate μ based on a sample. The statistic x̄ estimates the parameter μ. We call x̄ a <strong>point estimate</strong> because its value is a specific point on the real number line. Unfortunately, if we sample from a continuous probability distribution, P(x̄ = μ) = 0 (the probability for any single point in a continuous distribution is 0). Therefore, we are sure the estimate is wrong if we just use a point estimate. Thus, statisticians prefer interval estimates which are referred to as confidence intervals.</p>
+
+        <p>To create a confidence interval, we must calculate the <strong>error tolerance</strong>, denoted E. Error tolerance (also known as margin of error) is calculated from the standard error (standard deviation of the sampling distribution). The number of standard deviations we need depends on how confident we want to be as presented earlier. This means that error tolerance depends on three quantities: sample size, confidence level, and the amount of variability in the population.</p>
+      </section>
+
+      <section id="known-sigma" class="section">
+        <h2>Derivation of Confidence Interval for μ with known σ</h2>
+
+        <p>A confidence interval is derived from the underlying sampling distribution. In this case, we know the underlying sampling distribution is normal because of the following transformation.</p>
+
+        <div class="formula">
+          <math display="block">
+            <mi>Z</mi><mo>=</mo>
+            <mfrac>
+              <mrow><mover><mi>x</mi><mo>¯</mo></mover><mo>−</mo><mi>μ</mi></mrow>
+              <mrow><mi>σ</mi><mo>/</mo><msqrt><mi>n</mi></msqrt></mrow>
+            </mfrac>
+          </math>
+        </div>
+
+        <p>When σ is known Z = (x̄ − μ)/(σ/√n) is approximately a standard normal distribution.</p>
+
+        <p>Combining this fact with the picture below, we can see where confidence intervals come from.</p>
+
+        <div class="figure">
+          <img src="images/section8/two_tailed_alpha.png" alt="Two-tailed confidence interval diagram">
+        </div>
+
+        <p>From this picture we can write the following probability statement:</p>
+
+        <div class="formula">
+          <math display="block">
+            <mi>P</mi><mo>(</mo><mo>−</mo><msub><mi>z</mi><mrow><mi>α</mi><mo>/</mo><mn>2</mn></mrow></msub><mo>&lt;</mo><mi>Z</mi><mo>&lt;</mo><msub><mi>z</mi><mrow><mi>α</mi><mo>/</mo><mn>2</mn></mrow></msub><mo>)</mo><mo>=</mo><mn>1</mn><mo>−</mo><mi>α</mi>
+          </math>
+        </div>
+
+        <p>Next we plug in for Z using the transformation presented above and solve so that the parameter, μ, is isolated in the center of the inequality. The algebraic steps follow.</p>
+
+        <div class="work">
+          <p>P(−z<sub>α/2</sub> &lt; Z &lt; z<sub>α/2</sub>) = 1 − α</p>
+          <p>P(−z<sub>α/2</sub> &lt; (x̄ − μ)/(σ/√n) &lt; z<sub>α/2</sub>) = 1 − α</p>
+          <p>P(−z<sub>α/2</sub> · σ/√n &lt; x̄ − μ &lt; z<sub>α/2</sub> · σ/√n) = 1 − α</p>
+          <p>P(−x̄ − z<sub>α/2</sub> · σ/√n &lt; −μ &lt; −x̄ + z<sub>α/2</sub> · σ/√n) = 1 − α</p>
+          <p>P(x̄ + z<sub>α/2</sub> · σ/√n &gt; μ &gt; x̄ − z<sub>α/2</sub> · σ/√n) = 1 − α</p>
+          <p>P(x̄ − z<sub>α/2</sub> · σ/√n &lt; μ &lt; x̄ + z<sub>α/2</sub> · σ/√n) = 1 − α</p>
+        </div>
+
+        <p>We know that the population mean, μ, will be between x̄ − z<sub>α/2</sub> · σ/√n and x̄ + z<sub>α/2</sub> · σ/√n with a confidence level of 1 − α. Notice that to get this interval, the same quantity is being subtracted and added to x̄. This quantity is E, the error tolerance.</p>
+
+        <div class="key-idea card soft pad">
+          <h3>Confidence Interval Formula for μ with known σ</h3>
+          <div class="formula">E = z<sub>α/2</sub>(σ/√n) = z(σ/√n)</div>
+          <div class="formula">x̄ ± E</div>
+        </div>
+
+        <p>It is common to not write the α/2 when writing the formula for E.</p>
+
+        <p>Looking at the formula, you should understand the following relationships:</p>
+        <ul>
+          <li>As the sample size increases, the error tolerance decreases giving a narrower interval. (Taking a larger sample means we get more information and less error. Thus, we are narrowing down the possible values of the parameter. Mathematically, increasing the denominator of the standard error makes the error tolerance smaller.)</li>
+          <li>As the confidence level increases, the error tolerance increases giving a wider interval. (If there is more room in the interval, wider interval, then naturally you would be more confident. There is an important relationship to notice here. In confidence intervals there are really two kinds of error, α and E. If you increase the confidence level then you are decreasing α. That error must go somewhere, so it is just moved to E. Basically, in inferential statistics there are always two types of error. If you decrease one, then the other will increase. Mathematically, increasing the confidence level will increase z and give a wider interval.)</li>
+          <li>In situations where the variability in the population is higher the error tolerance will also be higher if other factors are held constant. (More variability means more error so E increases which gives a wider interval. Mathematically, increasing the numerator of the standard error makes the error tolerance larger.)</li>
+        </ul>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>A sample of 100 visa accounts were studied for the amount of unpaid balance.</p>
+          <p>n = 100<br>x̄ = 645<br>σ = 132</p>
+          <p>a. Construct a 95% confidence interval for μ.<br>b. Interpret the 95% confidence interval for μ.<br>c. Construct a 99% confidence interval for μ.<br>d. Interpret the 99% confidence interval for μ.</p>
+
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <div class="work">
+                <p>a. E = z(σ/√n) = 1.96(132/√100) = 25.87</p>
+                <p>x̄ ± E</p>
+                <p>645 ± 25.87</p>
+                <p>(619.13, 670.87)</p>
+              </div>
+              <p>b. We are 95% confident that the population mean unpaid balance of visa accounts is between $619.13 and $670.87.</p>
+              <div class="work">
+                <p>c. E = z(σ/√n) = 2.576(132/√100) = 34.00</p>
+                <p>x̄ ± E</p>
+                <p>645 ± 34.00</p>
+                <p>(611.00, 679.00)</p>
+              </div>
+              <p>d. We are 99% confident that the population mean unpaid balance of visa accounts is between $611.00 and $679.00.</p>
+            </div>
+          </details>
+        </article>
+      </section>
+
+      <section id="unknown-sigma" class="section">
+        <h2>Confidence Interval for μ with unknown σ</h2>
+
+        <p>You may have noticed a problem with using E = z(σ/√n). The issue is when we are estimating the population mean, μ, we will not know the population standard deviation, σ (the only way to know this quantity would be to have the population, and if we had the population we could just calculate the mean). In statistics, when we do not know a value, we estimate it. So, in this case we can estimate the population standard deviation, σ, with the sample standard deviation,s. The ramification of replacing σ by s is the sampling distribution is no longer standard normal. The sampling distribution will instead be a t-distribution.</p>
+
+        <div class="formula">If we sample from a normal distribution, t = (x̄ − μ)/(s/√n) has a t-distribution with n − 1 degrees of freedom.</div>
+
+        <p>The assumption that we sample from a normal population is important for small n but not for large n.</p>
+
+        <p>The t-distribution is still continuous and symmetric about 0, but it is more variable and a slightly different shape than the standard normal distribution. Basically, we are estimating another quantity so there is more error in the estimate. The confidence interval formula for μ using the t-distribution follows:</p>
+
+        <div class="key-idea card soft pad">
+          <div class="formula">E = t(s/√n)</div>
+          <div class="formula">x̄ ± E</div>
+        </div>
+
+        <p>As you can see the only change in the formula is σ being replaced by s which means the z becomes a t. Another important thing to recognize here is the relationship between the t and the z. Notice that as n becomes large, the t-distribution can be approximated by the standard normal distribution. This is because the larger n becomes, the better s is at estimating σ. When n approaches ∞, s becomes σ so the t becomes a z. (The bottom row of the t-distribution table is z. If you need to look up a z for a confidence interval, this is the best place to look. The t-distribution table is on the webpage under tables.)</p>
+
+        <p>We use two subscripts to write t values. The first represents the area in the tail of the distribution (just like with the z) and the second represents the degrees of freedom (abbreviated df). We write t<sub>α,df</sub> for a one-tailed value and t<sub>α/2,df</sub> for a two-tailed value.</p>
+
+        <p>The degrees of freedom is an index that identifies how much variability is in the distribution. As mentioned above this changes when n increases because s becomes a better estimate for σ.</p>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>Find the two-tailed t value with a sample size of 11 and a confidence level of 95%.</p>
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <div class="work">
+                <p>α/2 = .05/2 = .025</p>
+                <p>df = n − 1 = 11 − 1 = 10</p>
+                <p>t<sub>.025,10</sub> = 2.228</p>
+              </div>
+              <p>For a t-distribution with 10 degrees of freedom, 95% of the area is between -2.228 and 2.228.</p>
+              <p>Make sure you understand how to find the value above in the t-distribution table. This table is laid out differently than the standard normal distribution table. Also, you should notice that the degrees of freedom go from 1 to 30 and then skip numbers. If your degrees of freedom are between 30 and 120, pick the closest value to estimate the t. If your degrees of freedom is above 120 then use the bottom row of the table. Finally, you should notice that the bottom row of the table, df = ∞, are z values.</p>
+            </div>
+          </details>
+        </article>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>Mileage of tires in 1000’s of miles</p>
+          <p>Sample: 42, 36, 46, 43, 41, 35, 43, 45, 40, 39</p>
+          <p>Compute and interpret a 95% confidence interval for μ.</p>
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <div class="work">
+                <p>n = 10</p>
+                <p>x̄ = 41</p>
+                <p>s = 3.590</p>
+                <p>α/2 = .05/2 = .025</p>
+                <p>df = n − 1 = 10 − 1 = 9</p>
+                <p>t<sub>.025,9</sub> = 2.262</p>
+                <p>E = t(s/√n) = 2.262(3.590/√10) = 2.568</p>
+                <p>x̄ ± E</p>
+                <p>41 ± 2.568</p>
+                <p>(38.432, 43.568)</p>
+              </div>
+              <p>We are 95% confident that the population mean mileage of tires is between 38,432 and 43,568 miles.</p>
+            </div>
+          </details>
+        </article>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>A random sample of n = 20 apples yields x̄ = 9.2 oz. and s = 1.1 oz.</p>
+          <p>Find and interpret a 99% confidence interval for μ.</p>
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <div class="work">
+                <p>α/2 = .01/2 = .005</p>
+                <p>df = n − 1 = 20 − 1 = 19</p>
+                <p>t<sub>.005,19</sub> = 2.861</p>
+                <p>E = t(s/√n) = 2.861(1.1/√20) = .704</p>
+                <p>x̄ ± E</p>
+                <p>9.2 ± .704</p>
+                <p>(8.496, 9.904)</p>
+              </div>
+              <p>We are 99% confident that the population mean weight of apples is between 8.496 and 9.904 oz.</p>
+            </div>
+          </details>
+        </article>
+      </section>
+
+      <section id="proportion" class="section">
+        <h2>Confidence Interval for p when n is Large</h2>
+
+        <p>For large n, Z = (p̂ − p)/√(p·q/n) is approximately standard normal.</p>
+
+        <p>Using the same principles as we did with the mean, the error tolerance is a z value times the standard error. We then add and subtract this from the statistic, p̂, in order to create the interval. This is the basic form of all confidence intervals. We do have one issue here. The standard error is √(p·q/n) and we do not know p. Therefore, we have to estimate p with p̂ (and estimate q with q̂). This only works when our sample size is large because then we know the sampling distribution is approximately normal. The sampling distribution for small samples is not known.</p>
+
+        <div class="key-idea card soft pad">
+          <div class="formula">E = z√(p̂·q̂/n)</div>
+          <div class="formula">p̂ ± E</div>
+        </div>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>A survey of 1,200 registered voters yields 540 plan to vote for the republican candidate.</p>
+          <p>p = percentage of all registered voters who plan to vote for the republican candidate</p>
+          <p>Find a 95% confidence interval for p.</p>
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <div class="work">
+                <p>p̂ = 540/1200 = 0.45 = 45%</p>
+                <p>q̂ = 1 − p̂ = 1 − .45 = .55 = 55%</p>
+                <p>α/2 = .05/2 = .025</p>
+                <p>z<sub>α</sub> = 1.96</p>
+                <p>E = z√(p̂·q̂/n) = 1.96√((.45)(.55)/1200) = .028 = 2.8%</p>
+                <p>p̂ ± E</p>
+                <p>45% ± 2.8%</p>
+                <p>(42.2%, 47.8%)</p>
+              </div>
+              <p>We are 95% confident that the population percentage of voters who plan to vote for the republican candidate is between 42.2% and 47.8%.</p>
+            </div>
+          </details>
+        </article>
+      </section>
+
+      <section id="sample-size" class="section">
+        <h2>Determining the Sample Size</h2>
+
+        <p>In the design stages of statistical research, it is good to decide the confidence level you wish to use and to select the error tolerance you want for the project. This will allow you to decide how big the sample needs to be. In calculating sample size, we will only deal with the scenario of estimating μ with known σ. If you can do this one, the others work the same way.</p>
+
+        <p>To get the formula for sample size, all you have to do is solve the error tolerance formula for n. So in the case of estimating μ with known σ, the formula is as follows:</p>
+
+        <div class="work">
+          <p>E = z(σ/√n)</p>
+          <p>√n · E = z(σ/√n) · √n</p>
+          <p>(√n · E)/E = (z · σ)/E</p>
+          <p>√n = (z · σ)/E</p>
+          <p>n = ((z · σ)/E)²</p>
+        </div>
+
+        <p>Notice that in the above equation we will have to estimate σ. This is commonly done with a pilot study or preliminary sampling. Once we have an estimate for σ, we can figure out how large a sample to take.</p>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>We wish to estimate the number of patient-visit hours per week physicians in solo practice spent. How large a sample is needed if we want to be 99% confident that our point estimate is within 1 hour of the population mean? Assume a standard deviation of 11.97 hours.</p>
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <div class="work">
+                <p>z<sub>.005</sub> = 2.576</p>
+                <p>n = ((z · σ)/E)²</p>
+                <p>= (((2.576)(11.97))/1)²</p>
+                <p>= 950.779 ≈ 951</p>
+              </div>
+              <p>With sample size, any fractional part of the answer may be needed to get the error tolerance we want. Since we cannot sample part of an observation, it is important to always round up to the next whole number.</p>
+            </div>
+          </details>
+        </article>
+      </section>
+
+      <div class="back-row" style="margin-top:36px">
+        <a class="btn outline btn-sm" href="index.html">
+          ← Back to STA296U Notes
+        </a>
+
+        <a
+          class="btn btn-sm"
+          href="STA296U_Section_8_Confidence_Intervals_Based_on_a_Single_Sample.docx"
+          download
+        >
+          Download Word Notes
+        </a>
+      </div>
+
+      <footer class="notes-footer">
+        Last updated:
+        <span id="lastUpdated"></span>
+      </footer>
+
+    </div>
+  </main>
+
+  <script>
+    document.getElementById("lastUpdated").textContent =
+      new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>

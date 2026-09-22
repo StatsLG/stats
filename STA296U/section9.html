@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>STA296U - Section 9 | StatsLG</title>
+  <meta name="description" content="STA296U Section 9 - Hypothesis Tests Based on a Single Sample.">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <style>
+    .notes-page { max-width:1100px; margin:0 auto; padding:32px 40px; }
+    .notes-content { max-width:900px; margin:0 auto; }
+    .notes-content h2 { margin-top:2rem; scroll-margin-top:1rem; }
+    .notes-content h3 { margin-top:1.5rem; color:var(--ink); }
+    .notes-content p, .notes-content li { line-height:1.65; }
+    .back-row { margin:0 0 20px; display:flex; gap:10px; flex-wrap:wrap; }
+    .toc { margin-bottom:1.5rem; }
+    .toc h2 { margin-top:0; }
+    .toc a { color:var(--kctcs-blue); font-weight:700; }
+    .toc a:hover { text-decoration:underline; }
+    .definition { border-left:5px solid var(--kctcs-blue); padding:12px 14px; margin:14px 0; background:var(--panel); border-radius:0 var(--radius) var(--radius) 0; }
+    .definition strong { color:var(--kctcs-blue); }
+    .example { margin:18px 0; }
+    .example > h3, .example > h4 { margin-top:0; }
+    details.answer { margin-top:14px; border-top:1px solid var(--rule); padding-top:10px; }
+    details.answer summary { cursor:pointer; color:var(--kctcs-blue); font-weight:800; }
+    details.answer summary:hover { text-decoration:underline; }
+    details.answer[open] summary { margin-bottom:10px; }
+    .answer-body { border-left:5px solid var(--kctcs-gold); padding:10px 14px; background:var(--panel); border-radius:0 var(--radius) var(--radius) 0; }
+    .key-idea { border-left:5px solid var(--kctcs-gold); }
+    .formula { font-family:"Cambria Math","STIX Two Math","Times New Roman",serif; font-size:1.16rem; text-align:center; margin:14px 0; padding:10px 12px; overflow-x:auto; line-height:1.8; }
+    .frac { display:inline-flex; vertical-align:middle; flex-direction:column; text-align:center; line-height:1.08; margin:0 .2em; }
+    .frac>.top { border-bottom:1.5px solid currentColor; padding:0 .25em .08em; }
+    .frac>.bottom { padding:.08em .25em 0; }
+    .work { display:grid; gap:6px; margin:12px 0; padding-left:3%; }
+    .work p { margin:0; font-family:"Cambria Math","STIX Two Math","Times New Roman",serif; font-size:1.06rem; }
+    .figure { text-align:center; margin:20px 0; }
+    .figure img { max-width:700px; width:100%; height:auto; }
+    .decision-table { width:100%; border-collapse:collapse; margin:18px 0; }
+    .decision-table th, .decision-table td { border:1px solid var(--rule); padding:9px 10px; text-align:center; vertical-align:middle; }
+    .decision-table th { background:var(--panel); color:var(--kctcs-blue); }
+    .notes-footer { margin-top:40px; padding-top:16px; border-top:1px solid var(--rule); color:var(--muted); font-size:12px; }
+    @media(max-width:760px) {
+      .notes-page { padding:20px 16px; }
+      .back-row { flex-direction:column; align-items:stretch; }
+      .back-row .btn { justify-content:center; }
+      .work { padding-left:0; }
+    }
+    @media print {
+      .back-row { display:none; }
+      .notes-page, .notes-content { max-width:none; padding:0; }
+      details.answer > * { display:block !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="notes-page">
+    <div class="notes-content">
+      <div class="back-row">
+        <a class="btn outline btn-sm" href="index.html">← Back to STA296U Notes</a>
+        <a class="btn btn-sm" href="STA296U_Section_9_Hypothesis_Tests_Based_on_a_Single_Sample.docx" download>Download Word Notes</a>
+      </div>
+
+      <header class="header">
+        <h1>STA296U — Section 9</h1>
+        <p>Hypothesis Tests Based on a Single Sample</p>
+      </header>
+
+      <section class="section panel pad toc">
+        <h2>In This Section</h2>
+        <ul>
+          <li><a href="#setup">General Setup of a Hypothesis Test</a></li>
+          <li><a href="#known-sigma">Test of Hypothesis for μ with known σ</a></li>
+          <li><a href="#pvalue">The p-value Approach to a Test of Hypothesis</a></li>
+          <li><a href="#unknown-sigma">Test of Hypothesis for μ with unknown σ</a></li>
+          <li><a href="#proportion">Test of Hypothesis for p (when n is large)</a></li>
+        </ul>
+      </section>
+
+      <section id="setup" class="section">
+        <h2>General Setup of a Hypothesis Test</h2>
+
+        <div class="definition"><strong>Statistical Hypotheses</strong> – statements about population parameters</div>
+        <h3>Examples</h3>
+        <ul>
+          <li>Mean weight of adult males is greater than 160 (μ &gt; 160)</li>
+          <li>Proportion of students with a 4.0 GPA is less than .01 (μ &lt; .01)</li>
+        </ul>
+
+        <p>In statistics, we test one hypothesis against another</p>
+        <div class="definition"><strong>Alternative Hypothesis</strong> – the hypothesis that we want to prove, denoted H<sub>a</sub> (sometimes denoted as H<sub>1</sub>)</div>
+        <div class="definition"><strong>Null Hypothesis</strong> – the hypothesis formed that contradicts H<sub>a</sub>, denoted H<sub>0</sub></div>
+
+        <p>In a hypothesis test we actually test the null hypothesis. We try and prove the null hypothesis false with a high level of confidence. After taking the sample, we must make one of the following decisions:</p>
+        <ol>
+          <li>Reject H<sub>0</sub> (and believe H<sub>a</sub>)</li>
+          <li>Fail to Reject H<sub>0</sub> (there was not sufficient evidence to reject H<sub>0</sub> and conclude H<sub>a</sub>)</li>
+        </ol>
+
+        <p>There are two types of error that can occur in a hypothesis test.</p>
+        <div class="definition"><strong>Type I Error</strong> – the decision is Reject H<sub>0</sub> when H<sub>0</sub> is true</div>
+        <div class="definition"><strong>Type II Error</strong> – the decision is Fail to Reject H<sub>0</sub> when H<sub>0</sub> is false</div>
+        <div class="definition"><strong>Level of Significance</strong> – the probability with which we are willing to risk a type I error, denoted α (alpha), P(Reject H<sub>0</sub> | H<sub>0</sub> is true) = α</div>
+
+        <p>In a hypothesis test α represents the same quantity as it did in a confidence interval. If α = .05 and we can conclude H<sub>a</sub>, then we are 95% confident in our conclusion (the quantity 1 − α is the <strong>Level of Confidence</strong>)</p>
+        <p>The probability of making a type II error is denoted β (beta), P(Fail to Reject H<sub>0</sub> | H<sub>0</sub> is false) = β</p>
+        <div class="definition"><strong>Power</strong> – the quantity 1 − β which represents the probability of rejecting H<sub>0</sub> when in fact it is false (or proving H<sub>a</sub> when it is true)</div>
+        <p>Power is difficult to calculate and is beyond what we will do in this class. However, I do want you to understand the relationship between the two errors in hypothesis testing along with how they relate to power and level of confidence.</p>
+
+        <p>The table below identifies when the correct decision is made along with the types of error. Also, the probability of each decision is included in parentheses.</p>
+        <table class="decision-table">
+          <thead>
+            <tr><th rowspan="2">Decision from the Hypothesis Test</th><th colspan="2">Decision with a perfect census (actual truth about H<sub>0</sub>)</th></tr>
+            <tr><th>H<sub>0</sub> is false</th><th>H<sub>0</sub> is true</th></tr>
+          </thead>
+          <tbody>
+            <tr><th>Reject H<sub>0</sub></th><td>Correct Decision<br>(Power, 1 − β)</td><td>Type I Error<br>(Level of Significance, α)</td></tr>
+            <tr><th>Fail to Reject H<sub>0</sub></th><td>Type II Error<br>(β)</td><td>Correct Decision<br>(Confidence Level, 1 − α)</td></tr>
+          </tbody>
+        </table>
+
+        <p>In inferential statistics we obviously always want a small amount of error. For hypothesis testing we desire α and β to be small.</p>
+        <p>Decreasing α increases β if all other quantities are held constant (it is always the case in inferential statistics that if you decrease one type of error and hold everything else constant, you will increase the other type of error)</p>
+        <p>Increasing the sample size is the way to ensure that both α and β are small</p>
+
+        <div class="definition"><strong>Test Statistic</strong> – the statistic we compute to make the decision in a hypothesis test (sampling distribution of test statistic given that H<sub>0</sub> is true must be known or well approximated – we have already covered these so they will look familiar)</div>
+        <div class="definition"><strong>Critical Region (Rejection Region)</strong> – the values of the test statistic such that we reject H<sub>0</sub> and conclude that H<sub>a</sub> is true (the critical region depends H<sub>a</sub> and α)</div>
+        <div class="definition"><strong>Critical value</strong> – the endpoint of the critical region</div>
+
+        <div class="key-idea card soft pad">
+          <strong>To perform a hypothesis test we will typically use the following steps</strong>
+          <ol>
+            <li>State H<sub>a</sub> and H<sub>0</sub></li>
+            <li>Specify critical region</li>
+            <li>Compute test statistic</li>
+            <li>Make decision</li>
+            <li>Interpret the results</li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="known-sigma" class="section">
+        <h2>Test of Hypothesis for μ with known σ</h2>
+        <p>When conducting a hypothesis test for μ with known σ, the sampling distribution is a standard normal distribution which means that our test statistic is a Z. The test statistic should look familiar. It is given below.</p>
+        <div class="formula">Z = <span class="frac"><span class="top">x̄ − μ</span><span class="bottom">σ/√n</span></span></div>
+        <p>(This is our test statistic when conducting a test for μ with known σ)</p>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>It is claimed that the mean score for elementary education majors on a test of mathematical competency is less than 35. Test the claim at α = .05. Assume n = 165, x̄ = 32.91, and σ = 9.5.</p>
+          <p>It may be beneficial to look at the steps of a hypothesis test given above. The steps will be number accordingly.</p>
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <p>1) H<sub>a</sub>: μ &lt; 35<br>H<sub>0</sub>: μ ≥ 35</p>
+              <p>2) This is a Z since we are doing a hypothesis test for μ with known σ. The critical region depends on H<sub>a</sub> (since we are testing &lt;, the critical region is to the left) and α (the area is α). I recommend you draw a picture of the critical region.</p>
+              <div class="figure"><img src="images/section9/z_left_1645.png" alt="Left-tailed critical region with critical value negative 1.645"></div>
+              <p><strong>Reject H<sub>0</sub> if Z ≤ −1.645</strong></p>
+              <p>3) To calculate the test statistic, just plug in the appropriate values. For the parameter, plug in what you are comparing the parameter to (here we will plug in μ = 35).</p>
+              <div class="formula">Z = <span class="frac"><span class="top">32.91 − 35</span><span class="bottom">9.5/√165</span></span> = −2.83</div>
+              <p>4) Reject H<sub>0</sub> (since −2.83 ≤ −1.645, the test statistic is in the critical region)</p>
+              <p>5) Conclude with 95% confidence that the mean score for elementary education majors on the test of mathematical competency is less than 35.</p>
+            </div>
+          </details>
+        </article>
+      </section>
+
+      <section id="pvalue" class="section">
+        <h2>The p-value Approach to a Test of Hypothesis</h2>
+        <p>The p-value approach is an alternative way to make the decision in a hypothesis test. This approach is commonly used when using software to complete a hypothesis test since the p-value will be reported in the analysis. We will focus on the traditional approach of a hypothesis test, but you are responsible for the p-value approach in the case of estimating μ with known σ. Always use the traditional approach unless specifically asked to give the p-value. If you take additional coursework in statistics, you will likely use software so it is important to know what the p-value represents.</p>
+        <p>The choice of α in a hypothesis test is subjective. You might choose α = .05 and I might choose α = .01. The smaller α is, the smaller the rejection region. Thus, the smaller α is the harder it is to Reject H<sub>0</sub>.</p>
+        <div class="definition"><strong>p-value</strong> – the smallest value of α such that H<sub>0</sub> would have been rejected (it is called the p-value since it’s a probability value, the probability that corresponds to the test statistic)</div>
+        <div class="key-idea card soft pad">
+          <strong>Rules for making decision based on a p-value</strong>
+          <p>If p-value ≤ α, Reject H<sub>0</sub><br>If p-value &gt; α, Fail to reject H<sub>0</sub></p>
+        </div>
+        <p>To perform a hypothesis test using the p-value approach</p>
+        <ol><li>State H<sub>a</sub> and H<sub>0</sub></li><li>Compute test statistic</li><li>Identify p-value</li><li>Make decision</li><li>Interpret the results</li></ol>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>Go back to the mathematical competency of elementary education majors.</p>
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <p>We already stated the hypotheses and calculated the test statistic,</p>
+              <div class="formula">Z = <span class="frac"><span class="top">32.91 − 35</span><span class="bottom">9.5/√165</span></span> = −2.83</div>
+              <p>To calculate the p-value, use we must use the z-table and find the area to left of the test statistic. We find the area to the left since we are testing less than. Picture of this calculation is below.</p>
+              <div class="figure"><img src="images/section9/pvalue_left_283.png" alt="p-value area to the left of negative 2.83"></div>
+              <p>Thus, p-value = P(z ≤ −2.83) = .5 − .4977 = .0023</p>
+              <p>Reject H<sub>0</sub> (since . 0023 ≤ .05, the p-value ≤ α)</p>
+              <p>Notice this is the same decision as with the other method as it will always be. If you compare the picture here to the picture using the traditional method, you can see how this works. In the traditional approach, we are comparing the Z values and in the p-value approach we are comparing the areas. Notice if the test statistic is in the critical region then the p-value will be less than or equal to α. Therefore, the outcome will be the same using the two methods.</p>
+            </div>
+          </details>
+        </article>
+      </section>
+
+      <section id="unknown-sigma" class="section">
+        <h2>Test of Hypothesis for μ with unknown σ</h2>
+        <p>The same issue arises in hypothesis tests for μ as was discussed in confidence intervals. The test statistic Z = (x̄ − μ)/(σ/√n) includes σ so it must be estimated by s yielding t = (x̄ − μ)/(s/√n) as our test statistic. Notice the only change in the formula is σ being replaced by s which means the standard normal distribution becomes a t-distribution. This is the more realistic case since we will not know the population standard deviation when estimating the population mean.</p>
+        <div class="formula">t = <span class="frac"><span class="top">x̄ − μ</span><span class="bottom">s/√n</span></span></div>
+        <p>(This is our test statistic when conducting a test for μ with unknown σ)</p>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>A consumer protection agency wants to prove that packages of Post Grape Nuts have an average weight that is not 24 oz. Test this assuming α = .05, n = 100, x̄ = 23.94, and s = .13.</p>
+          <details class="answer"><summary>Show Solution</summary><div class="answer-body">
+            <p>1) H<sub>a</sub>: μ ≠ 24<br>H<sub>0</sub>: μ = 24</p>
+            <p>2) This is a t since we are doing a hypothesis test for μ with unknown σ. The critical region depends on H<sub>a</sub> (since we are testing ≠, the critical region is divided in half and put in both tails) and α (the area is α). When the exact degrees of freedom are not available, pick the closest option. Remember that degrees of freedom is n − 1.</p>
+            <div class="figure"><img src="images/section9/t_two_1984.png" alt="Two-tailed critical region with critical values plus and minus 1.984"></div>
+            <p><strong>Reject H<sub>0</sub> if t ≤ −1.984 or if t ≥ 1.984</strong></p>
+            <div class="formula">t = <span class="frac"><span class="top">23.94 − 24</span><span class="bottom">.13/√100</span></span> = −4.615</div>
+            <p>4) Reject H<sub>0</sub> (since −4.615 ≤ −1.984, the test statistic is in the critical region)</p>
+            <p>5) Conclude with 95% confidence that packages of Post Grape Nuts have a population mean weight not equal to 24 oz.</p>
+          </div></details>
+        </article>
+
+        <article class="card example">
+          <h3>Give a 95% confidence interval using the Post Grape Nuts information.</h3>
+          <details class="answer"><summary>Show Solution</summary><div class="answer-body">
+            <div class="formula">E = t(s/√n) = 1.984(.13/√100) = .026</div>
+            <div class="work"><p>x̄ ± E</p><p>(23.94 − .026, 23.94 + .026)</p><p>(23.914, 23.966)</p></div>
+            <p>We are 95% confident that the population mean weight of Post Grape Nuts packages is between 23.914 and 23.966 oz.</p>
+          </div></details>
+        </article>
+
+        <div class="key-idea card soft pad">
+          <strong>Notice the consistency between the confidence interval and hypothesis test</strong>
+          <p>If α is the same, then the error in a two tailed hypothesis test is set up the same as it is in a confidence interval. Therefore, in these cases the conclusions will always be consistent. Notice that if we are confident that μ is between 23.914 and 23.966, then we are also confident that μ ≠ 24. Obviously, 24 is not in the interval. In these cases you can actually tell the conclusion of the hypothesis test by looking at the confidence interval.</p>
+        </div>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>It is desired to prove that the population mean weight of metal components produced by a process is greater than 4.5 oz. Assume α = .05, n = 10, x̄ = 4.59, and s = .504.</p>
+          <details class="answer"><summary>Show Solution</summary><div class="answer-body">
+            <p>1) H<sub>a</sub>: μ &gt; 4.5<br>H<sub>0</sub>: μ ≤ 4.5</p>
+            <p>2) This is a t since we are doing a hypothesis test for μ with unknown σ. The critical region depends on H<sub>a</sub> (since we are testing &gt;, the critical region is to the right) and α (the area is α).</p>
+            <div class="figure"><img src="images/section9/t_right_1833.png" alt="Right-tailed critical region with critical value 1.833"></div>
+            <p><strong>Reject H<sub>0</sub> if t ≥ 1.833</strong></p>
+            <div class="formula">t = <span class="frac"><span class="top">4.59 − 4.5</span><span class="bottom">.504/√10</span></span> = .565</div>
+            <p>4) Fail to Reject H<sub>0</sub> (since . 565 &lt; 1.833, the test statistic is not in the critical region)</p>
+            <p>5) There is not sufficient evidence to prove that the population mean weight of the metal components is greater than 4.5 oz.</p>
+          </div></details>
+        </article>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>A marketing consultant wants to prove that the population mean household income in Lexington is less than $50,000. Assume α = .05, n = 100, x̄ = 40,571, and s = 8316.</p>
+          <details class="answer"><summary>Show Solution</summary><div class="answer-body">
+            <p>1) H<sub>a</sub>: μ &lt; 50,000<br>H<sub>0</sub>: μ ≥ 50,000</p>
+            <p>2) This is a t since we are doing a hypothesis test for μ with unknown σ. The critical region depends on H<sub>a</sub> (since we are testing &lt;, the critical region is to the left) and α (the area is α).</p>
+            <div class="figure"><img src="images/section9/t_left_1661.png" alt="Left-tailed critical region with critical value negative 1.661"></div>
+            <p><strong>Reject H<sub>0</sub> if t ≤ −1.661</strong></p>
+            <div class="formula">t = <span class="frac"><span class="top">40,571 − 50,000</span><span class="bottom">8316/√100</span></span> = −11.338</div>
+            <p>4) Reject H<sub>0</sub> (since −11.338 ≤ −1.661, the test statistic is in the critical region)</p>
+            <p>5) Conclude with 95% confidence that the mean household income in Lexington is less than $50,000.</p>
+          </div></details>
+        </article>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>A farmer’s pigs have experienced an average weight gain of 200 lbs over a fixed time. He is experimenting with a new feeding technique and wants to know if the average weight gain will change in either direction. Assume α = .05, n = 24, x̄ = 197.2, and s = 9.8.</p>
+          <details class="answer"><summary>Show Solution</summary><div class="answer-body">
+            <p>1) H<sub>a</sub>: μ ≠ 200<br>H<sub>0</sub>: μ = 200</p>
+            <p>2) This is a t since we are doing a hypothesis test for μ with unknown σ. The critical region depends on H<sub>a</sub> (since we are testing ≠, the critical region is divided in half and put in both tails) and α (the area is α).</p>
+            <div class="figure"><img src="images/section9/t_two_2069.png" alt="Two-tailed critical region with critical values plus and minus 2.069"></div>
+            <p><strong>Reject H<sub>0</sub> if t ≤ −2.069 or if t ≥ 2.069</strong></p>
+            <div class="formula">t = <span class="frac"><span class="top">197.2 − 200</span><span class="bottom">9.8/√24</span></span> = −1.400</div>
+            <p>4) Fail to Reject H<sub>0</sub> (since −2.069 &lt; −1.400 &lt; 2.069, the test statistic is not in the critical region)</p>
+            <p>5) There is not sufficient evidence to prove the average weight gain of the pigs is different from 200 lbs using the new feeding technique.</p>
+          </div></details>
+        </article>
+      </section>
+
+      <section id="proportion" class="section">
+        <h2>Test of Hypothesis for p (when n is large)</h2>
+        <p>When conducting a hypothesis test for p when n is large (at least 30), the sampling distribution is a standard normal distribution which means that our test statistic is a Z. The test statistic should look familiar. It is given below.</p>
+        <div class="formula">Z = <span class="frac"><span class="top">p̂ − p</span><span class="bottom">√(p·q/n)</span></span></div>
+        <p>(This is our test statistic when conducting a test for p)</p>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>The current treatment for a type of cancer produces remission 20% of the time. An investigator wishes to prove that a new method is better. Suppose 26 of 100 patients go into remission using the new method. Assume α = .05.</p>
+          <details class="answer"><summary>Show Solution</summary><div class="answer-body">
+            <p>1) H<sub>a</sub>: p &gt; .20<br>H<sub>0</sub>: p ≤ .20</p>
+            <p>2) This is a Z since we are doing a hypothesis test for p with large n. The critical region depends on H<sub>a</sub> (since we are testing &gt;, the critical region is to the right) and α (the area is α).</p>
+            <div class="figure"><img src="images/section9/z_right_1645.png" alt="Right-tailed critical region with critical value 1.645"></div>
+            <p><strong>Reject H<sub>0</sub> if Z ≥ 1.645</strong></p>
+            <p>3) p̂ = 26/100 = .26</p>
+            <div class="formula">Z = <span class="frac"><span class="top">.26 − .20</span><span class="bottom">√((.20)(.80)/100)</span></span> = 1.5</div>
+            <p>4) Fail to reject H<sub>0</sub> (since 1.5 &lt; 1.645, the test statistic is not in the critical region)</p>
+            <p>5) There is not sufficient evidence to conclude the new method is better.</p>
+          </div></details>
+        </article>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>Do less than 50% of people prefer Murray’s Vanilla Wafer’s when compared to other brands? Suppose 42 of the 250 chose Murray’s. Assume α = .05.</p>
+          <details class="answer"><summary>Show Solution</summary><div class="answer-body">
+            <p>1) H<sub>a</sub>: p &lt; .50<br>H<sub>0</sub>: p ≥ .50</p>
+            <p>2) This is a Z since we are doing a hypothesis test for p with large n. The critical region depends on H<sub>a</sub> (since we are testing &lt;, the critical region is to the left) and α (the area is α).</p>
+            <div class="figure"><img src="images/section9/z_left_1645_p.png" alt="Left-tailed critical region with critical value negative 1.645"></div>
+            <p><strong>Reject H<sub>0</sub> if Z ≤ −1.645</strong></p>
+            <p>3) p̂ = 42/250 = .168</p>
+            <div class="formula">Z = <span class="frac"><span class="top">.168 − .50</span><span class="bottom">√((.50)(.50)/250)</span></span> = −10.499</div>
+            <p>4) Reject H<sub>0</sub> (since −10.499 ≤ −1.645, the test statistic is in the critical region)</p>
+            <p>5) Conclude with 95% confidence that less than 50% of people prefer Murray’s Vanilla Wafer’s when compared to other brands.</p>
+          </div></details>
+        </article>
+      </section>
+
+      <div class="back-row" style="margin-top:36px">
+        <a class="btn outline btn-sm" href="index.html">← Back to STA296U Notes</a>
+        <a class="btn btn-sm" href="STA296U_Section_9_Hypothesis_Tests_Based_on_a_Single_Sample.docx" download>Download Word Notes</a>
+      </div>
+      <footer class="notes-footer">Last updated: <span id="lastUpdated"></span></footer>
+    </div>
+  </main>
+  <script>
+    document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>
