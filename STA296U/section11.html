@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>STA296U - Section 11 | StatsLG</title>
+  <meta name="description" content="STA296U Section 11 - Inferences Based on Two Samples.">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <style>
+    .notes-page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 40px;
+    }
+
+    .notes-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .notes-content h2 {
+      margin-top: 2rem;
+      scroll-margin-top: 1rem;
+    }
+
+    .notes-content h3 {
+      margin-top: 1.5rem;
+      color: var(--ink);
+    }
+
+    .notes-content p,
+    .notes-content li {
+      line-height: 1.65;
+    }
+
+    .back-row {
+      margin: 0 0 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toc {
+      margin-bottom: 1.5rem;
+    }
+
+    .toc h2 {
+      margin-top: 0;
+    }
+
+    .toc a {
+      color: var(--kctcs-blue);
+      font-weight: 700;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+    .definition {
+      border-left: 5px solid var(--kctcs-blue);
+      padding: 12px 14px;
+      margin: 14px 0;
+      background: var(--panel);
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+
+    .definition strong {
+      color: var(--kctcs-blue);
+    }
+
+    .key-idea {
+      border-left: 5px solid var(--kctcs-gold);
+    }
+
+    .example {
+      margin: 18px 0;
+    }
+
+    .example > h3,
+    .example > h4 {
+      margin-top: 0;
+    }
+
+    details.answer {
+      margin-top: 14px;
+      border-top: 1px solid var(--rule);
+      padding-top: 10px;
+    }
+
+    details.answer summary {
+      cursor: pointer;
+      color: var(--kctcs-blue);
+      font-weight: 800;
+    }
+
+    details.answer summary:hover {
+      text-decoration: underline;
+    }
+
+    details.answer[open] summary {
+      margin-bottom: 10px;
+    }
+
+    .answer-body {
+      border-left: 5px solid var(--kctcs-gold);
+      padding: 10px 14px;
+      background: var(--panel);
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+
+    .math {
+      text-align: center;
+      margin: 16px 0;
+      padding: 10px 12px;
+      overflow-x: auto;
+    }
+
+    .math math {
+      font-size: 1.18em;
+    }
+
+    .math-lines {
+      display: grid;
+      gap: 8px;
+      justify-items: start;
+      padding-left: 4%;
+      margin: 14px 0;
+    }
+
+    .math-lines .math {
+      margin: 0;
+      padding: 0;
+      text-align: left;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+    }
+
+    .data-table th,
+    .data-table td {
+      border: 1px solid var(--rule);
+      padding: 8px 10px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .data-table th {
+      background: var(--panel);
+      color: var(--kctcs-blue);
+    }
+
+    .data-table td.left {
+      text-align: left;
+    }
+
+    .notes-footer {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid var(--rule);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 760px) {
+      .notes-page {
+        padding: 20px 16px;
+      }
+
+      .back-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .back-row .btn {
+        justify-content: center;
+      }
+
+      .math-lines {
+        padding-left: 0;
+      }
+
+      .data-table {
+        font-size: 0.9rem;
+      }
+    }
+
+    @media print {
+      .back-row {
+        display: none;
+      }
+
+      .notes-page,
+      .notes-content {
+        max-width: none;
+        padding: 0;
+      }
+
+      details.answer > * {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="notes-page">
+    <div class="notes-content">
+
+      <div class="back-row">
+        <a class="btn outline btn-sm" href="index.html">
+          ← Back to STA296U Notes
+        </a>
+
+        <a
+          class="btn btn-sm"
+          href="STA296U_Section_11_Inferences_Based_on_Two_Samples.docx"
+          download
+        >
+          Download Word Notes
+        </a>
+      </div>
+
+      <header class="header">
+        <h1>STA296U — Section 11</h1>
+        <p>Inferences Based on Two Samples</p>
+      </header>
+
+      <section class="section panel pad toc">
+        <h2>In This Section</h2>
+        <ul>
+          <li><a href="#comparison">Comparison of Two Population Means</a></li>
+          <li><a href="#dependent">Dependent Samples</a></li>
+          <li><a href="#dependent-test">Hypothesis Test and Confidence Interval for Dependent Samples</a></li>
+          <li><a href="#independent">Independent Samples</a></li>
+          <li><a href="#independent-test">Hypothesis Test and Confidence Interval for Independent Samples</a></li>
+          <li><a href="#unequal">When the Population Variances Are Not Equal</a></li>
+        </ul>
+      </section>
+
+      <section id="comparison" class="section">
+        <h2>Comparison of Two Population Means: μ<sub>1</sub> and μ<sub>2</sub></h2>
+
+        <p>The method of comparison depends on the design of the experiment</p>
+        <p>The samples will either be Independent or Dependent</p>
+
+        <div class="definition">
+          <strong>Independent Samples</strong> – implies data values obtained from one sample are unrelated to the values from the other sample
+        </div>
+
+        <h3>Example</h3>
+        <ul>
+          <li>Does a drug work? → Randomly assign patients in medical trials.</li>
+          <li>Which teaching method is better? → Randomly assign students to teaching methods.</li>
+        </ul>
+
+        <div class="definition">
+          <strong>Dependent Samples (also called paired samples)</strong> – implies subjects are paired so that they are as much alike as possible within each pair
+        </div>
+
+        <p>The purpose of pairing is to explain subject to subject variability. (In some studies we apply both treatments to the same subject)</p>
+
+        <h3>Example</h3>
+        <ul>
+          <li>Do Nike or Adidas shoes make you jump higher? → Each subject can jump in both shoes. Randomly assign which shoe they use first.</li>
+          <li>Does this drug work in weight loss? → Pair subjects so they are as much alike as possible. Randomly assign one person from each pair to take the drug and the other to take placebo.</li>
+        </ul>
+
+        <div class="key-idea card soft pad">
+          <p>If subject to subject variability is large relative to the expected treatment differences then a dependent sample design should be considered. Remember that reducing the variability will reduce the error in the study.</p>
+        </div>
+      </section>
+
+      <section id="dependent" class="section">
+        <h2>Hypothesis Test and Confidence Interval for Dependent Samples</h2>
+
+        <p>Do not focus too much on the notation, but it is important to have a basic understanding. Essentially, a subscript is added to the notation we are familiar with in order to identify the treatment group. Also, with dependent sample we will deal with the differences for each pair which is denoted by d.</p>
+
+        <div class="definition">
+          <p><strong>n</strong> = number of pairs (sample size)</p>
+          <p><strong>x<sub>ij</sub></strong> = observation for treatment i in pair j</p>
+          <p><strong>d<sub>j</sub> = x<sub>1j</sub> − x<sub>2j</sub></strong> = difference between treatment 1 and treatment 2 in pair j</p>
+        </div>
+
+        <p>The table below identifies the proper notation and layout when dealing with dependent samples. At the bottom of the table, you will see how the descriptive statistics are denoted. You should pay special attention to the notation for the d values since this is the part of the data set we actually analyze.</p>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Pair</th>
+              <th>Treatment 1</th>
+              <th>Treatment 2</th>
+              <th>Difference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>x<sub>11</sub></td><td>x<sub>21</sub></td><td>d<sub>1</sub> = x<sub>11</sub> − x<sub>21</sub></td></tr>
+            <tr><td>2</td><td>x<sub>12</sub></td><td>x<sub>22</sub></td><td>d<sub>2</sub> = x<sub>12</sub> − x<sub>22</sub></td></tr>
+            <tr><td>3</td><td>x<sub>13</sub></td><td>x<sub>23</sub></td><td>d<sub>3</sub> = x<sub>13</sub> − x<sub>23</sub></td></tr>
+            <tr><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td></tr>
+            <tr><td>n</td><td>x<sub>1n</sub></td><td>x<sub>2n</sub></td><td>d<sub>n</sub> = x<sub>1n</sub> − x<sub>2n</sub></td></tr>
+            <tr><th>Sample Mean</th><td>x̄<sub>1</sub></td><td>x̄<sub>2</sub></td><td>d̄ = x̄<sub>1</sub> − x̄<sub>2</sub></td></tr>
+            <tr><th>Sample Variance</th><td>s<sub>1</sub><sup>2</sup></td><td>s<sub>2</sub><sup>2</sup></td><td>s<sub>d</sub><sup>2</sup></td></tr>
+            <tr><th>Sample Standard Deviation</th><td>s<sub>1</sub></td><td>s<sub>2</sub></td><td>s<sub>d</sub></td></tr>
+          </tbody>
+        </table>
+
+        <p>For a dependent sample design all analysis is based on the differences: d<sub>1</sub>, d<sub>2</sub>, d<sub>3</sub>, ⋯ , d<sub>n</sub>. The differences are a sample from a distribution with mean μ<sub>d</sub> = μ<sub>1</sub> − μ<sub>2</sub> and unknown variance σ<sub>d</sub><sup>2</sup>. The point Estimate for μ<sub>d</sub> is d̄ (just like x̄ is the point estimate for μ).</p>
+
+        <p>Because of this setup, we can conduct hypothesis tests and confidence intervals in the same way as was done with a single sample except now we are using d values instead of x values. Below are the needed formulas. If you compare these to what was done with a single sample, you should see that we are basically doing the same thing.</p>
+
+        <p>The test statistic for dependent samples is</p>
+
+        <div class="math">
+          <math display="block">
+            <mi>t</mi><mo>=</mo>
+            <mfrac>
+              <mrow><mover><mi>d</mi><mo>¯</mo></mover><mo>−</mo><msub><mi>μ</mi><mi>d</mi></msub></mrow>
+              <mfrac><msub><mi>s</mi><mi>d</mi></msub><msqrt><mi>n</mi></msqrt></mfrac>
+            </mfrac>
+          </math>
+        </div>
+
+        <p>with n − 1 degrees of freedom.</p>
+
+        <p>Therefore, to calculate a confidence interval we take d̄ ± E with</p>
+
+        <div class="math">
+          <math display="block">
+            <mi>E</mi><mo>=</mo><mi>t</mi>
+            <mrow><mo>(</mo><mfrac><msub><mi>s</mi><mi>d</mi></msub><msqrt><mi>n</mi></msqrt></mfrac><mo>)</mo></mrow>
+          </math>
+        </div>
+
+        <p>Another thing to keep in mind is the relationship between μ<sub>1</sub> and μ<sub>2</sub> when conducting inferential statistics on μ<sub>d</sub>. Since μ<sub>d</sub> = μ<sub>1</sub> − μ<sub>2</sub> we know the following.</p>
+        <ul>
+          <li>If μ<sub>d</sub> &gt; 0, then μ<sub>1</sub> &gt; μ<sub>2</sub>.</li>
+          <li>If μ<sub>d</sub> &lt; 0, then μ<sub>1</sub> &lt; μ<sub>2</sub>.</li>
+          <li>If μ<sub>d</sub> ≠ 0, then μ<sub>1</sub> ≠ μ<sub>2</sub>.</li>
+        </ul>
+      </section>
+
+      <section id="dependent-test" class="section">
+        <h2>Dependent Samples Examples</h2>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>A marketing expert wishes to prove that a new product display will increase sales over a traditional display. There are 12 stores available for the study. There is considerable variability from store to store so a dependent sample design will be used. The stores are divided into six pairs such that within each pair the stores are as alike as possible. The measurement will be the number of cases sold in a one month period. Using the data that follow, perform a hypothesis test using α = .05.</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Pair</th>
+                <th>New Display<br>Treatment 1</th>
+                <th>Traditional Display<br>Treatment 2</th>
+                <th>Difference</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>13</td><td>11</td><td>2</td></tr>
+              <tr><td>2</td><td>31</td><td>29</td><td>2</td></tr>
+              <tr><td>3</td><td>20</td><td>21</td><td>-1</td></tr>
+              <tr><td>4</td><td>19</td><td>17</td><td>2</td></tr>
+              <tr><td>5</td><td>42</td><td>39</td><td>3</td></tr>
+              <tr><td>6</td><td>26</td><td>22</td><td>4</td></tr>
+            </tbody>
+          </table>
+
+          <p>Sample Mean d̄ = 2</p>
+          <p>Sample Variance s<sub>d</sub><sup>2</sup> = 2.8</p>
+          <p>Sample Standard Deviation s<sub>d</sub> = 1.6733</p>
+
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <p>1) H<sub>a</sub>: μ<sub>d</sub> &gt; 0 (Remember this is the same as testing μ<sub>1</sub> &gt; μ<sub>2</sub>)<br>H<sub>0</sub>: μ<sub>d</sub> ≤ 0</p>
+              <p>2) This is a t since we are doing a hypothesis test for μ<sub>d</sub> with a dependent sample design. The critical region depends on H<sub>a</sub> (since we are testing &gt;, the critical region is to the right) and α (the area is α). Remember that degrees of freedom is n − 1.</p>
+              <p>Reject H<sub>0</sub> if t ≥ 2.015</p>
+              <p>3)</p>
+              <div class="math">
+                <math display="block">
+                  <mi>t</mi><mo>=</mo>
+                  <mfrac>
+                    <mrow><mn>2</mn><mo>−</mo><mn>0</mn></mrow>
+                    <mfrac><mn>1.6733</mn><msqrt><mn>6</mn></msqrt></mfrac>
+                  </mfrac>
+                  <mo>=</mo><mn>2.928</mn>
+                </math>
+              </div>
+              <p>4) Reject H<sub>0</sub> (since 2.928 ≥ 2.015, the test statistic is in the critical region)</p>
+              <p>5) Conclude with 95% confidence that the new method produces larger sales.</p>
+            </div>
+          </details>
+        </article>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>Use the sales data presented in the previous example to construct and interpret a 95% confidence interval for μ<sub>d</sub>.</p>
+
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <div class="math-lines">
+                <div class="math">E = t(s<sub>d</sub>/√n) = 2.571(1.6733/√6) = 1.756</div>
+                <div class="math">d̄ ± E</div>
+                <div class="math">2 ± 1.756</div>
+                <div class="math">(0.244, 3.756)</div>
+              </div>
+              <p>We are 95% confident that the mean increase in sales is between 0.244 cases and 3.756 cases using the new product display.</p>
+            </div>
+          </details>
+        </article>
+      </section>
+
+      <section id="independent" class="section">
+        <h2>Hypothesis Test and Confidence Interval for Independent Samples</h2>
+
+        <p>With independent samples we cannot calculate d values since the samples are not paired. The process is still similar to the dependent case, but calculations are more cumbersome without the convenience of the d values. For independent samples we will estimate the parameter μ<sub>1</sub> − μ<sub>2</sub>.</p>
+
+        <p>The table below identifies the proper notation for two independent samples.</p>
+
+        <table class="data-table">
+          <thead>
+            <tr><th></th><th>Treatment 1</th><th>Treatment 2</th></tr>
+          </thead>
+          <tbody>
+            <tr><th>Sample Size</th><td>n<sub>1</sub></td><td>n<sub>2</sub></td></tr>
+            <tr><th>Data</th><td>x<sub>11</sub>, x<sub>12</sub>, x<sub>13</sub>, ⋯ x<sub>1n1</sub></td><td>x<sub>21</sub>, x<sub>22</sub>, x<sub>23</sub>, ⋯ x<sub>2n2</sub></td></tr>
+            <tr><th>Sample Mean</th><td>x̄<sub>1</sub></td><td>x̄<sub>2</sub></td></tr>
+            <tr><th>Sample Variance</th><td>s<sub>1</sub><sup>2</sup></td><td>s<sub>2</sub><sup>2</sup></td></tr>
+            <tr><th>Sample Standard Deviation</th><td>s<sub>1</sub></td><td>s<sub>2</sub></td></tr>
+          </tbody>
+        </table>
+
+        <p>The quantity x̄<sub>1</sub> − x̄<sub>2</sub> is the point estimate for μ<sub>1</sub> − μ<sub>2</sub> with a standard error of</p>
+
+        <div class="math">
+          <math display="block">
+            <msqrt>
+              <mrow>
+                <mfrac><msubsup><mi>σ</mi><mn>1</mn><mn>2</mn></msubsup><msub><mi>n</mi><mn>1</mn></msub></mfrac>
+                <mo>+</mo>
+                <mfrac><msubsup><mi>σ</mi><mn>2</mn><mn>2</mn></msubsup><msub><mi>n</mi><mn>2</mn></msub></mfrac>
+              </mrow>
+            </msqrt>
+          </math>
+        </div>
+
+        <p>Thus, if we sample from populations with means μ<sub>1</sub> and μ<sub>2</sub>, and standard deviations of σ<sub>1</sub><sup>2</sup> and σ<sub>2</sub><sup>2</sup> respectively, then</p>
+
+        <div class="math">
+          <math display="block">
+            <mi>Z</mi><mo>=</mo>
+            <mfrac>
+              <mrow><mo>(</mo><mover><msub><mi>x</mi><mn>1</mn></msub><mo>¯</mo></mover><mo>−</mo><mover><msub><mi>x</mi><mn>2</mn></msub><mo>¯</mo></mover><mo>)</mo><mo>−</mo><mo>(</mo><msub><mi>μ</mi><mn>1</mn></msub><mo>−</mo><msub><mi>μ</mi><mn>2</mn></msub><mo>)</mo></mrow>
+              <msqrt>
+                <mrow>
+                  <mfrac><msubsup><mi>σ</mi><mn>1</mn><mn>2</mn></msubsup><msub><mi>n</mi><mn>1</mn></msub></mfrac>
+                  <mo>+</mo>
+                  <mfrac><msubsup><mi>σ</mi><mn>2</mn><mn>2</mn></msubsup><msub><mi>n</mi><mn>2</mn></msub></mfrac>
+                </mrow>
+              </msqrt>
+            </mfrac>
+          </math>
+        </div>
+
+        <p>is approximately standard normal for large n<sub>1</sub> and n<sub>2</sub>.</p>
+
+        <p>As we should be accustomed to at this point, the issue with the above Z transformation is the fact we will not know σ<sub>1</sub><sup>2</sup> and σ<sub>2</sub><sup>2</sup> when estimating μ<sub>1</sub> − μ<sub>2</sub>. Therefore, we must estimate σ<sub>1</sub><sup>2</sup> and σ<sub>2</sub><sup>2</sup> with the sample. The form of the test statistic depends on whether σ<sub>1</sub><sup>2</sup> = σ<sub>2</sub><sup>2</sup>. For all of the problems we do in this class, we will assume σ<sub>1</sub><sup>2</sup> = σ<sub>2</sub><sup>2</sup>.</p>
+
+        <p>If we sample from populations with means μ<sub>1</sub> and μ<sub>2</sub>, standard deviations of σ<sub>1</sub><sup>2</sup> and σ<sub>2</sub><sup>2</sup> respectively, and σ<sub>1</sub><sup>2</sup> = σ<sub>2</sub><sup>2</sup>, then</p>
+
+        <div class="math">
+          <math display="block">
+            <mi>t</mi><mo>=</mo>
+            <mfrac>
+              <mrow><mo>(</mo><mover><msub><mi>x</mi><mn>1</mn></msub><mo>¯</mo></mover><mo>−</mo><mover><msub><mi>x</mi><mn>2</mn></msub><mo>¯</mo></mover><mo>)</mo><mo>−</mo><mo>(</mo><msub><mi>μ</mi><mn>1</mn></msub><mo>−</mo><msub><mi>μ</mi><mn>2</mn></msub><mo>)</mo></mrow>
+              <msqrt>
+                <mrow>
+                  <mfrac><msubsup><mi>s</mi><mi>p</mi><mn>2</mn></msubsup><msub><mi>n</mi><mn>1</mn></msub></mfrac>
+                  <mo>+</mo>
+                  <mfrac><msubsup><mi>s</mi><mi>p</mi><mn>2</mn></msubsup><msub><mi>n</mi><mn>2</mn></msub></mfrac>
+                </mrow>
+              </msqrt>
+            </mfrac>
+          </math>
+        </div>
+
+        <p>has a t-distribution with degrees of freedom n<sub>1</sub> + n<sub>2</sub> − 2.</p>
+
+        <p>The quantity</p>
+
+        <div class="math">
+          <math display="block">
+            <msubsup><mi>s</mi><mi>p</mi><mn>2</mn></msubsup><mo>=</mo>
+            <mfrac>
+              <mrow><mo>(</mo><msub><mi>n</mi><mn>1</mn></msub><mo>−</mo><mn>1</mn><mo>)</mo><msubsup><mi>s</mi><mn>1</mn><mn>2</mn></msubsup><mo>+</mo><mo>(</mo><msub><mi>n</mi><mn>2</mn></msub><mo>−</mo><mn>1</mn><mo>)</mo><msubsup><mi>s</mi><mn>2</mn><mn>2</mn></msubsup></mrow>
+              <mrow><msub><mi>n</mi><mn>1</mn></msub><mo>+</mo><msub><mi>n</mi><mn>2</mn></msub><mo>−</mo><mn>2</mn></mrow>
+            </mfrac>
+          </math>
+        </div>
+
+        <p>is the pooled variance which estimates σ<sub>1</sub><sup>2</sup> = σ<sub>2</sub><sup>2</sup>.</p>
+
+        <p>Hence, when doing a hypothesis test for independent samples when σ<sub>1</sub><sup>2</sup> = σ<sub>2</sub><sup>2</sup> the test statistic is the t above with n<sub>1</sub> + n<sub>2</sub> − 2 degrees of freedom.</p>
+
+        <p>To calculate a confidence interval we take (x̄<sub>1</sub> − x̄<sub>2</sub>) ± E with</p>
+
+        <div class="math">
+          <math display="block">
+            <mi>E</mi><mo>=</mo><mi>t</mi>
+            <msqrt>
+              <mrow>
+                <mfrac><msubsup><mi>s</mi><mi>p</mi><mn>2</mn></msubsup><msub><mi>n</mi><mn>1</mn></msub></mfrac>
+                <mo>+</mo>
+                <mfrac><msubsup><mi>s</mi><mi>p</mi><mn>2</mn></msubsup><msub><mi>n</mi><mn>2</mn></msub></mfrac>
+              </mrow>
+            </msqrt>
+          </math>
+        </div>
+      </section>
+
+      <section id="independent-test" class="section">
+        <h2>Independent Samples Examples</h2>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>A study is designed to compare gas mileage with a fuel additive to gas mileage without the additive.</p>
+          <p>A group of 10 Ford Mustangs are randomly divided into two groups and the gas mileage is recorded for one tank of gas.</p>
+
+          <table class="data-table">
+            <thead>
+              <tr><th></th><th>With Additive<br>Treatment 1</th><th>Without Additive<br>Treatment 2</th></tr>
+            </thead>
+            <tbody>
+              <tr><th>Sample Size</th><td>n<sub>1</sub> = 5</td><td>n<sub>2</sub> = 5</td></tr>
+              <tr><th>Data</th><td>26.3, 27.4, 25.1, 26.8, 27.1</td><td>24.5, 25.4, 23.7, 25.9, 25.7</td></tr>
+              <tr><th>Sample Mean</th><td>x̄<sub>1</sub> = 26.54</td><td>x̄<sub>2</sub> = 25.04</td></tr>
+              <tr><th>Sample Variance</th><td>s<sub>1</sub><sup>2</sup> = 0.813</td><td>s<sub>2</sub><sup>2</sup> = 0.848</td></tr>
+            </tbody>
+          </table>
+
+          <p>Use the information provided to conduct a hypothesis to see if the additive increases gas mileage. Assume σ<sub>1</sub><sup>2</sup> = σ<sub>2</sub><sup>2</sup> and use a significance level of σ = .05.</p>
+
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <p>1) H<sub>a</sub>: μ<sub>1</sub> − μ<sub>1</sub> &gt; 0 (Remember this is the same as testing μ<sub>1</sub> &gt; μ<sub>2</sub>)<br>H<sub>0</sub>: μ<sub>1</sub> − μ<sub>2</sub> ≤ 0</p>
+              <p>2) This is a t since we are doing a hypothesis test for μ<sub>1</sub> − μ<sub>2</sub> with an independent sample design. The critical region depends on H<sub>a</sub> (since we are testing &gt;, the critical region is to the right) and α (the area is α). Remember that d.f. is n<sub>1</sub> + n<sub>2</sub> − 2.</p>
+              <p>Reject H<sub>0</sub> if t ≥ 1.860</p>
+              <p>3) d.f. = n<sub>1</sub> + n<sub>2</sub> − 2 = 5 + 5 − 2 = 8</p>
+              <div class="math-lines">
+                <div class="math">s<sub>p</sub><sup>2</sup> = [(5 − 1)0.813 + (5 − 1)0.848] / (5 + 5 − 2) = 0.8305</div>
+                <div class="math">t = [(26.54 − 25.04) − 0] / √(.8305/5 + .8305/5) = 2.603</div>
+              </div>
+              <p>4) Reject H<sub>0</sub> (since 2.603 ≥ 1.860, the test statistic is in the critical region)</p>
+              <p>5) Conclude with 95% confidence that the additive improves gas mileage.</p>
+            </div>
+          </details>
+        </article>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>Use the gas mileage data presented in the previous example to construct and interpret a 95% confidence interval for μ<sub>1</sub> − μ<sub>2</sub>.</p>
+
+          <details class="answer">
+            <summary>Show Solution</summary>
+            <div class="answer-body">
+              <div class="math-lines">
+                <div class="math">E = t√(s<sub>p</sub><sup>2</sup>/n<sub>1</sub> + s<sub>p</sub><sup>2</sup>/n<sub>2</sub>) = 2.306√(.8305/5 + .8305/5) = 1.329</div>
+                <div class="math">(x̄<sub>1</sub> − x̄<sub>2</sub>) ± E</div>
+                <div class="math">(26.54 − 25.04) ± 1.329</div>
+                <div class="math">1.50 ± 1.329</div>
+                <div class="math">(0.171, 2.829)</div>
+              </div>
+              <p>We are 95% confident that the additive will increase gas mileage by an amount between 0.171 and 2.829 miles.</p>
+            </div>
+          </details>
+        </article>
+      </section>
+
+      <section id="unequal" class="section">
+        <h2>If σ<sub>1</sub><sup>2</sup> ≠ σ<sub>2</sub><sup>2</sup> what should we do?</h2>
+
+        <p>Without the assumption of equal variances, it makes no sense to compute s<sub>p</sub><sup>2</sup>.</p>
+
+        <p>A reasonable transformation in this case is</p>
+
+        <div class="math">
+          <math display="block">
+            <mi>t</mi><mo>=</mo>
+            <mfrac>
+              <mrow><mo>(</mo><mover><msub><mi>x</mi><mn>1</mn></msub><mo>¯</mo></mover><mo>−</mo><mover><msub><mi>x</mi><mn>2</mn></msub><mo>¯</mo></mover><mo>)</mo><mo>−</mo><mo>(</mo><msub><mi>μ</mi><mn>1</mn></msub><mo>−</mo><msub><mi>μ</mi><mn>2</mn></msub><mo>)</mo></mrow>
+              <msqrt>
+                <mrow>
+                  <mfrac><msubsup><mi>s</mi><mn>1</mn><mn>2</mn></msubsup><msub><mi>n</mi><mn>1</mn></msub></mfrac>
+                  <mo>+</mo>
+                  <mfrac><msubsup><mi>s</mi><mn>2</mn><mn>2</mn></msubsup><msub><mi>n</mi><mn>2</mn></msub></mfrac>
+                </mrow>
+              </msqrt>
+            </mfrac>
+          </math>
+        </div>
+
+        <p>Unfortunately, the distribution of this transformation is unknown.</p>
+        <p>For large n<sub>1</sub> and n<sub>2</sub>, the distribution of t can be approximated by the standard normal distribution (just like we did with proportions).</p>
+        <p>For small n<sub>1</sub> and n<sub>2</sub>, the distribution of t can be approximated by a t-distribution using a complicated formula for the degrees of freedom.</p>
+        <p>For this class, we will only do problems where we can assume σ<sub>1</sub><sup>2</sup> = σ<sub>2</sub><sup>2</sup>. As mentioned above, when this assumption is not satisfied there are methods of conducting a hypothesis test and constructing a confidence interval. These methods are most commonly applied with the utilization of statistical software.</p>
+      </section>
+
+      <div class="back-row" style="margin-top:36px">
+        <a class="btn outline btn-sm" href="index.html">
+          ← Back to STA296U Notes
+        </a>
+
+        <a
+          class="btn btn-sm"
+          href="STA296U_Section_11_Inferences_Based_on_Two_Samples.docx"
+          download
+        >
+          Download Word Notes
+        </a>
+      </div>
+
+      <footer class="notes-footer">
+        Last updated:
+        <span id="lastUpdated"></span>
+      </footer>
+
+    </div>
+  </main>
+
+  <script>
+    document.getElementById("lastUpdated").textContent =
+      new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>
