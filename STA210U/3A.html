@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>STA210U - Section 3A | StatsLG</title>
+<meta name="description" content="STA210U Section 3A - Introduction to Probability.">
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/style/bctcstyle.css">
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+.notes-page{max-width:1100px;margin:0 auto;padding:32px 40px}
+.notes-content{max-width:900px;margin:0 auto}
+.notes-content h2{margin-top:2rem;scroll-margin-top:1rem}
+.notes-content h3{margin-top:1.5rem}
+.notes-content p,.notes-content li{line-height:1.65}
+.back-row{margin:0 0 20px;display:flex;gap:10px;flex-wrap:wrap}
+.toc{margin-bottom:1.5rem}.toc h2{margin-top:0}
+.toc a{color:var(--kctcs-blue);font-weight:700}
+.definition{border-left:5px solid var(--kctcs-blue);padding:12px 14px;margin:14px 0;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.definition strong{color:var(--kctcs-blue)}
+.formula{font-size:1.12rem;text-align:center;color:var(--kctcs-blue);margin:16px 0;padding:14px;background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius);overflow-x:auto}
+.example{margin:18px 0}
+details.answer{margin-top:14px;border-top:1px solid var(--rule);padding-top:10px}
+details.answer summary{cursor:pointer;color:var(--kctcs-blue);font-weight:800}
+.answer-body{border-left:5px solid var(--kctcs-gold);padding:10px 14px;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.event-a{background:#fff36a} .event-b{background:#3fe0e5} .both{background:#ff625d}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 18px}
+.legend span{padding:5px 9px;border-radius:5px;border:1px solid var(--rule)}
+.prob-table{border-collapse:collapse;width:100%;margin:16px 0;text-align:center}
+.prob-table th,.prob-table td{border:1px solid #777;padding:7px}
+.prob-table th{font-weight:800}
+.table-wrap{overflow-x:auto}
+.callout{border-left:5px solid var(--kctcs-gold);padding:12px 14px;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0;margin:16px 0}
+.notes-footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted);font-size:12px}
+@media(max-width:760px){.notes-page{padding:20px 16px}.back-row{flex-direction:column;align-items:stretch}.back-row .btn{justify-content:center}}
+@media print{.back-row{display:none}.notes-page,.notes-content{max-width:none;padding:0}details.answer>*{display:block!important}}
+</style>
+</head>
+<body><main class="notes-page"><div class="notes-content">
+<div class="back-row">
+<a class="btn outline btn-sm" href="index.html">← Back to STA210U Notes</a>
+<a class="btn btn-sm" href="STA210U_Section_3A_Introduction_to_Probability.docx" download>Download Word Notes</a>
+</div>
+<header class="header"><h1>STA210U - Section 3A</h1><p>III. Probability - A. Introduction to Probability</p></header>
+
+<section class="section panel pad toc"><h2>In this section</h2><ul>
+<li><a href="#simple">Simple Probability</a></li>
+<li><a href="#common">Common Probabilities</a></li>
+<li><a href="#rules">Probability Rules</a></li>
+<li><a href="#events">Characteristics of Events</a></li>
+<li><a href="#misconceptions">Misconceptions of Probability</a></li>
+</ul></section>
+
+<section id="simple" class="section">
+<h2>1. Simple Probability</h2>
+<div class="definition"><strong>Sample Space</strong> - the set of all possible outcomes from an experiment</div>
+<article class="card example"><h3>Example</h3><p>Identify the sample space for each of the following</p>
+<ul><li>Roll a die</li></ul><div class="formula">\[\text{sample space}=\{1,2,3,4,5,6\}\]</div>
+<ul><li>Flip a coin</li></ul><div class="formula">\[\text{sample space}=\{H,T\}\]</div>
+<p>The above example illustrates a common way to denote a sample space. Notice that when you roll a die you get a discrete quantitative variable and when you flip a coin you get a qualitative variable. These are the types of variables we will deal with to introduce the basic ideas of probability.</p></article>
+
+<div class="definition"><strong>Event</strong> - a subset of the sample space</div>
+<article class="card example"><h3>Example</h3><p>Suppose you roll a die and event A is defined by getting an even number. We would represent this event as:</p>
+<div class="formula">\[A=\{2,4,6\}\]</div></article>
+
+<div class="definition"><strong>Probability (of an event A)</strong> - denoted \(P(A)\), is the expected proportion of occurrences of A if the experiment were performed a large number of times (keep in mind A is just an example, we could call the event whatever we wanted)</div>
+<div class="formula">\[\text{Probability of an event}=\frac{\#\text{ of outcomes in the event}}{\text{Total \# of outcomes}}\]</div>
+<p>We will look at a couple counting principal problems in order to understand how to identify the number of outcomes when there are a series of operations in an experiment.</p>
+
+<article class="card example"><h3>Example 1 (video solution)</h3>
+<ol><li>How many ways are there to arrange the letters in the word SUNDAY?</li>
+<li>If a burglar system has a 3 digit code and each digit is a number between 0 and 9, then how many possible codes are there?</li></ol>
+<details class="answer"><summary>Show Answers</summary><div class="answer-body">
+<p>1. \(6!=720\)</p><p>2. \(10\times10\times10=1000\)</p>
+</div></details></article>
+
+<div class="definition"><strong>Tree diagram</strong> - useful for determining sample space when there is a series of operations</div>
+<article class="card example"><h3>Example 2 (video solution)</h3><p>Flip a Penny, Nickel, and a Dime</p>
+<ol><li>How many possible outcomes are there?</li><li>Identify the sample space.</li>
+<li>If A is the event of getting all three tails, what is \(P(A)\)?</li>
+<li>If B is the event of getting exactly two tails, what is \(P(B)\)?</li>
+<li>If C is the event of getting exactly one tail, what is \(P(C)\)?</li>
+<li>If D is the event of getting no tails, what is \(P(D)\)?</li></ol>
+<details class="answer"><summary>Show Answers</summary><div class="answer-body">
+<p>There are 8 outcomes:</p><div class="formula">\[\{HHH,HHT,HTH,HTT,THH,THT,TTH,TTT\}\]</div>
+<p>\(P(A)=\frac{1}{8}\), \(P(B)=\frac{3}{8}\), \(P(C)=\frac{3}{8}\), and \(P(D)=\frac{1}{8}\).</p>
+</div></details></article>
+</section>
+
+<section id="common" class="section">
+<h2>2. Common Probabilities</h2>
+<div class="definition"><strong>Complement</strong> - (of an event A) denoted \(P(\bar A)\), is all sample points not in A</div>
+<div class="definition"><strong>Joint Probability</strong> - (A or B) denoted \(P(A\text{ or }B)\) or (A and B) denoted \(P(A\text{ and }B)\), is an event that has two or more characteristics</div>
+<div class="definition"><strong>Conditional Probability</strong> - (A conditioned on B) denoted \(P(A\mid B)\), is when we are interested in knowing if event A occurred given that we know event B occurred</div>
+</section>
+
+<section id="rules" class="section">
+<h2>3. Probability Rules</h2>
+<h3>Complement rule</h3><div class="formula">\[P(\bar A)=1-P(A)\]</div>
+<h3>Addition rule</h3><div class="formula">\[P(A\text{ or }B)=P(A)+P(B)-P(A\text{ and }B)\]</div>
+<h3>Conditional probability rule</h3><div class="formula">\[P(A\mid B)=\frac{P(A\text{ and }B)}{P(B)}\]</div>
+<h3>Multiplication rule</h3><div class="formula">\[P(A\text{ and }B)=P(A)P(B\mid A)\]</div>
+
+<article class="card example"><h3>Example 3 (video solution)</h3>
+<p>Roll a balanced green die and red die</p>
+<div class="callout"><strong>A</strong> = {sum of the dice is 7}<br><strong>B</strong> = {both numbers ≤ 4}</div>
+<p>We will look at the outcomes in table form in order to illustrate the different types of probabilities you will be responsible for in this section. Also, the reasoning and application of the rules above will be introduced. When looking at the table, it can be seen that the outcomes are denoted as ordered pairs by (Green die, Red die). The yellow highlight represents the outcomes that satisfy event A, the turquoise highlight represents the outcomes that satisfy event B, and the red highlight represents outcomes that satisfy both A and B.</p>
+<div class="legend"><span class="event-a">Event A</span><span class="event-b">Event B</span><span class="both">A and B</span></div>
+<div class="table-wrap"><table class="prob-table"><thead><tr><th>Red \ Green</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead><tbody><tr><th>1</th><td class="event-b">(1,1)</td><td class="event-b">(2,1)</td><td class="event-b">(3,1)</td><td class="event-b">(4,1)</td><td class="">(5,1)</td><td class="event-a">(6,1)</td></tr>
+<tr><th>2</th><td class="event-b">(1,2)</td><td class="event-b">(2,2)</td><td class="event-b">(3,2)</td><td class="event-b">(4,2)</td><td class="event-a">(5,2)</td><td class="">(6,2)</td></tr>
+<tr><th>3</th><td class="event-b">(1,3)</td><td class="event-b">(2,3)</td><td class="event-b">(3,3)</td><td class="both">(4,3)</td><td class="">(5,3)</td><td class="">(6,3)</td></tr>
+<tr><th>4</th><td class="event-b">(1,4)</td><td class="event-b">(2,4)</td><td class="both">(3,4)</td><td class="event-b">(4,4)</td><td class="">(5,4)</td><td class="">(6,4)</td></tr>
+<tr><th>5</th><td class="">(1,5)</td><td class="event-a">(2,5)</td><td class="">(3,5)</td><td class="">(4,5)</td><td class="">(5,5)</td><td class="">(6,5)</td></tr>
+<tr><th>6</th><td class="event-a">(1,6)</td><td class="">(2,6)</td><td class="">(3,6)</td><td class="">(4,6)</td><td class="">(5,6)</td><td class="">(6,6)</td></tr></tbody></table></div>
+<p>Find the following.</p><ol><li>\(P(A)\)</li><li>\(P(B)\)</li><li>\(P(\bar A)\)</li><li>\(P(\bar B)\)</li><li>\(P(A\text{ and }B)\)</li><li>\(P(A\text{ or }B)\)</li><li>\(P(A\mid B)\)</li><li>\(P(B\mid A)\)</li></ol>
+<details class="answer"><summary>Show Answers</summary><div class="answer-body">
+<p>\(P(A)=\frac{6}{36}=\frac{1}{6}\)</p><p>\(P(B)=\frac{16}{36}=\frac{4}{9}\)</p>
+<p>\(P(\bar A)=\frac{30}{36}=\frac{5}{6}\)</p><p>\(P(\bar B)=\frac{20}{36}=\frac{5}{9}\)</p>
+<p>\(P(A\text{ and }B)=\frac{2}{36}=\frac{1}{18}\)</p><p>\(P(A\text{ or }B)=\frac{20}{36}=\frac{5}{9}\)</p>
+<p>\(P(A\mid B)=\frac{2}{16}=\frac{1}{8}\)</p><p>\(P(B\mid A)=\frac{2}{6}=\frac{1}{3}\)</p>
+</div></details></article>
+
+<h3>Probability from a contingency table</h3>
+<article class="card example"><h3>Example 4 (video solution)</h3>
+<p>Select an individual at random from a population of students classified by gender and their favorite subject</p>
+<p>\(A=\{\text{selected student is female}\}\)</p>
+<p>\(B=\{\text{selected student chooses math as favorite subject}\}\)</p>
+<div class="table-wrap"><table class="prob-table">
+<thead><tr><th></th><th>Math</th><th>Science</th><th>History</th><th>English</th><th>Total</th></tr></thead>
+<tbody><tr><th>Female</th><td>1192</td><td>321</td><td>72</td><td>15</td><td>1600</td></tr>
+<tr><th>Male</th><td>695</td><td>487</td><td>141</td><td>77</td><td>1400</td></tr>
+<tr><th>Total</th><td>1887</td><td>808</td><td>213</td><td>92</td><td>3000</td></tr></tbody></table></div>
+<p>Find the following.</p><ol><li>\(P(A)\)</li><li>\(P(B)\)</li><li>\(P(\bar A)\)</li><li>\(P(A\text{ and }B)\)</li><li>\(P(A\text{ or }B)\)</li><li>\(P(A\mid B)\)</li></ol>
+<details class="answer"><summary>Show Answers</summary><div class="answer-body">
+<p>\(P(A)=\frac{1600}{3000}\)</p><p>\(P(B)=\frac{1887}{3000}\)</p><p>\(P(\bar A)=\frac{1400}{3000}\)</p>
+<p>\(P(A\text{ and }B)=\frac{1192}{3000}\)</p>
+<p>\(P(A\text{ or }B)=\frac{1600+1887-1192}{3000}=\frac{2295}{3000}\)</p>
+<p>\(P(A\mid B)=\frac{1192}{1887}\)</p>
+</div></details></article>
+</section>
+
+<section id="events" class="section">
+<h2>4. Characteristics of Events</h2>
+<div class="definition"><strong>Mutually Exclusive or Disjoint</strong> - when two events cannot occur together</div>
+<div class="formula">\[\text{If }P(A\text{ and }B)=0\text{ then A and B are mutually exclusive}\]</div>
+<p>You should notice that when you have mutually exclusive events the last term of the addition rule, \(P(A\text{ or }B)=P(A)+P(B)-P(A\text{ and }B)\), is zero.</p>
+<h3>Independence</h3>
+<div class="definition"><strong>Independent</strong> - two events are said to be independent if the occurrence (or nonoccurrence) of one does not affect the probability of occurrence of the other</div>
+<div class="formula">\[\text{If }P(A)=P(A\mid B)\text{ then A and B are independent.}\]</div>
+<p>Thinking about this relationship, we see that when given B, the probability of A has not changed from its original value. Or in other words, B occurring does not affect the probability of A.</p>
+<div class="definition"><strong>Dependent</strong> - events that are not independent</div>
+<div class="formula">\[\text{If }P(A)\ne P(A\mid B)\text{ then A and B are dependent}\]</div>
+
+<article class="card example"><h3>Example</h3>
+<p>Suppose we are dealing with a standard deck of cards (52 cards and 4 aces). We will draw two cards without replacement (meaning after the first card is drawn, it will not be put back in the deck before drawing the second card).</p>
+<p>\(A=\{\text{first card is an ace}\}\) &nbsp; \(B=\{\text{second card is an ace}\}\)</p>
+<ol><li>In this scenario are A and B dependent or independent?</li><li>Find the \(P(A\text{ and }B)\)</li></ol>
+<p>Suppose we change the scenario and return the first card, thoroughly shuffle the deck, and then draw the second card. (draw with replacement)</p>
+<ol start="3"><li>With this change are A and B dependent or independent?</li><li>Find the \(P(A\text{ and }B)\)</li></ol>
+<details class="answer"><summary>Show Answers</summary><div class="answer-body">
+<p>1. A and B are dependent. If the first card is an ace then the probability the second card is an ace is 3/51 but if the first card is not an ace then the probability the second card is an ace is 4/51. The probability of B depends on A.</p>
+<p>2. Multiplication rule \(P(A\text{ and }B)=P(A)P(B\mid A)=\left(\frac{4}{52}\right)\left(\frac{3}{51}\right)=.004525\)</p>
+<p>3. A and B are independent. No matter what happens with the first draw, the probability the second card is an ace is 4/52. The probability of B does not depend on A.</p>
+<p>4. \(P(A\text{ and }B)=P(A)P(B\mid A)=\left(\frac{4}{52}\right)\left(\frac{4}{52}\right)=.00591\)</p>
+</div></details></article>
+
+<article class="card example"><h3>Example 5 (video solution)</h3>
+<p>Ask random person ‘live in the city?’ &amp; ‘favor combining city and county government?’</p>
+<p>\(C=\{\text{lives in the city}\}\)</p><p>\(F=\{\text{favors combining city and county government}\}\)</p>
+<div class="table-wrap"><table class="prob-table"><thead><tr><th></th><th>Favor (F)</th><th>Oppose</th><th>Total</th></tr></thead>
+<tbody><tr><th>City (C)</th><td>80</td><td>40</td><td>120</td></tr><tr><th>Outside</th><td>20</td><td>10</td><td>30</td></tr><tr><th>Total</th><td>100</td><td>50</td><td>150</td></tr></tbody></table></div>
+<p>Find the following.</p><ol><li>\(P(C)\)</li><li>\(P(\bar C)\)</li><li>\(P(F)\)</li><li>\(P(C\text{ and }F)\)</li><li>\(P(C\text{ or }F)\)</li><li>\(P(C\mid F)\)</li><li>\(P(F\mid C)\)</li><li>Are C and F dependent or independent?</li></ol>
+<details class="answer"><summary>Show Answers</summary><div class="answer-body">
+<p>\(P(C)=\frac{120}{150}=.80\), \(P(\bar C)=\frac{30}{150}=.20\), \(P(F)=\frac{100}{150}=.667\)</p>
+<p>\(P(C\text{ and }F)=\frac{80}{150}=.533\), \(P(C\text{ or }F)=\frac{140}{150}=.933\)</p>
+<p>\(P(C\mid F)=\frac{80}{100}=.80\), \(P(F\mid C)=\frac{80}{120}=.667\)</p>
+<p>C and F are independent because \(P(C\mid F)=P(C)\) (equivalently, \(P(F\mid C)=P(F)\)).</p>
+</div></details></article>
+</section>
+
+<section id="misconceptions" class="section">
+<h2>5. Misconceptions of Probability</h2>
+<div class="definition"><strong>Gambler’s fallacy</strong> - thinking that the long-run frequency of an event should apply to the short run</div>
+<p>Some people believe that when gambling, a string of bad luck will be followed by good luck. Is this true? No, because of independence the probability of more bad luck does not change.</p>
+<h3>Probability of ‘Very Unlikely’ Events</h3>
+<p>As long as we agree on the physical assumptions underlying an uncertain process, we should agree on the probability of outcomes. In the simplest of cases if we flip a coin and agree the outcomes are equally likely, then we can agree that the probability of getting tails is 0.5. Every probability is going to be calculated based on some assumption.</p>
+<p>Most people think that coincidences have low probabilities of occurring. Is this correct?</p>
+<p>An event may be exceedingly improbable but what is not improbable is that someone, somewhere, someday will experience those events or something similar.</p>
+
+<article class="card example"><h3>Example</h3>
+<p>In a four month period of time a lady in New Jersey won the state lottery twice (getting millions of dollars each time). The local newspaper reported that the chance of this occurring is 1 in 17 trillion. When reading such a probability, you should always ask yourself what assumptions were made. It is true that the probability of a specific individual who plays the New Jersey state lottery exactly twice wins both times is 1 in 17 trillion. However, millions of people play the lottery every day, and it is not surprising that someone, somewhere, someday would win twice. In fact, if you take all possible opportunities for a double winner in a 4-month period of time, there is a 1 in 30 chance of this phenomena occurring.</p>
+</article>
+
+<article class="card example"><h3>Example</h3>
+<p>What do you think the chances are that two people in a class of 32 students have the same birthday? Let us start with only four people so you can see how the math works. We will make two assumptions that are not exactly true. We will assume nobody was born on February 29th and also that all birthdays are equally likely.</p>
+<p>What is the probability that four people have different birthdays? (Multiplication rule)</p>
+<div class="formula">\[\frac{365}{365}\cdot\frac{364}{365}\cdot\frac{363}{365}\cdot\frac{362}{365}
+=\frac{17,458,601,160}{17,748,900,625}=0.983\]</div>
+<p>What is the probability that at least two out of four people have the same birthday? (Complement rule)</p>
+<div class="formula">\[1-0.983=.017\]</div>
+<p>Now do the same thing for 32 people and you will find that the probability that everyone in the class has a different birthday is 0.255. This means that the probability at least two people in this class have the same birthday is 0.745 or 74.5%. Is this what you expected? The more people you include, the more of an opportunity there is for the event to occur. Thus, the higher the probability will be.</p>
+</article>
+</section>
+
+<div class="back-row" style="margin-top:36px">
+<a class="btn outline btn-sm" href="index.html">← Back to STA210U Notes</a>
+<a class="btn btn-sm" href="STA210U_Section_3A_Introduction_to_Probability.docx" download>Download Word Notes</a>
+</div>
+<footer class="notes-footer">Last updated: <span id="lastUpdated"></span></footer>
+</div></main>
+<script>document.getElementById('lastUpdated').textContent=new Date(document.lastModified).toLocaleString();</script>
+</body></html>
