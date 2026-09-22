@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   STA296U - Section 5 | StatsLG
+  </title>
+  <meta content="STA296U Section 5 - Discrete Probability Distributions." name="description"/>
+  <link href="/favicon.ico" rel="icon"/>
+  <link href="/style/bctcstyle.css" rel="stylesheet"/>
+  <style>
+   .notes-page { max-width: 1100px; margin: 0 auto; padding: 32px 40px; }
+    .notes-content { max-width: 900px; margin: 0 auto; }
+    .notes-content h2 { margin-top: 2rem; scroll-margin-top: 1rem; }
+    .notes-content h3 { margin-top: 1.5rem; color: var(--ink); }
+    .notes-content p, .notes-content li { line-height: 1.65; }
+    .back-row { margin: 0 0 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .toc { margin-bottom: 1.5rem; }
+    .toc h2 { margin-top: 0; }
+    .toc a { color: var(--kctcs-blue); font-weight: 700; }
+    .toc a:hover { text-decoration: underline; }
+    .definition { border-left: 5px solid var(--kctcs-blue); padding: 12px 14px; margin: 14px 0; background: var(--panel); border-radius: 0 var(--radius) var(--radius) 0; }
+    .definition strong { color: var(--kctcs-blue); }
+    .example { margin: 18px 0; }
+    .example > h3, .example > h4 { margin-top: 0; }
+    details.answer { margin-top: 14px; border-top: 1px solid var(--rule); padding-top: 10px; }
+    details.answer summary { cursor: pointer; color: var(--kctcs-blue); font-weight: 800; }
+    details.answer summary:hover { text-decoration: underline; }
+    details.answer[open] summary { margin-bottom: 10px; }
+    .answer-body { border-left: 5px solid var(--kctcs-gold); padding: 10px 14px; background: var(--panel); border-radius: 0 var(--radius) var(--radius) 0; }
+    .key-idea { border-left: 5px solid var(--kctcs-gold); }
+    .math { text-align: center; margin: 16px 0; padding: 8px 10px; overflow-x: auto; font-family: "Cambria Math", "STIX Two Math", serif; font-size: 1.14rem; }
+    .math math { font-size: 1.18em; }
+    .math-lines { display: grid; gap: 6px; justify-items: start; padding-left: 5%; }
+    .math-lines .math { margin: 0; padding: 0; text-align: left; }
+    .data-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+    .data-table th, .data-table td { border: 1px solid var(--rule); padding: 8px 10px; text-align: center; }
+    .data-table th { background: var(--panel); color: var(--kctcs-blue); }
+    .tree-figure { text-align: center; margin: 22px 0; }
+    .tree-figure img { max-width: 100%; height: auto; }
+    .notes-footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 12px; }
+    @media (max-width: 760px) {
+      .notes-page { padding: 20px 16px; }
+      .back-row { flex-direction: column; align-items: stretch; }
+      .back-row .btn { justify-content: center; }
+      .math-lines { padding-left: 0; }
+    }
+    @media print {
+      .back-row { display: none; }
+      .notes-page, .notes-content { max-width: none; padding: 0; }
+      details.answer > * { display: block !important; }
+    }
+  </style>
+ </head>
+ <body>
+  <main class="notes-page">
+   <div class="notes-content">
+    <div class="back-row">
+     <a class="btn outline btn-sm" href="index.html">
+      ← Back to STA296U Notes
+     </a>
+     <a class="btn btn-sm" download="" href="STA296U_Section_5_Discrete_Probability_Distributions.docx">
+      Download Word Notes
+     </a>
+    </div>
+    <header class="header">
+     <h1>
+      STA296U — Section 5
+     </h1>
+     <p>
+      Discrete Probability Distributions
+     </p>
+    </header>
+    <section class="section panel pad toc">
+     <h2>
+      In This Section
+     </h2>
+     <ul>
+      <li>
+       <a href="#random-variables">
+        Two Types of Random Variables
+       </a>
+      </li>
+      <li>
+       <a href="#discrete-distributions">
+        Probability Distributions for Discrete Random Variables
+       </a>
+      </li>
+      <li>
+       <a href="#mean-sd">
+        The Mean and Standard Deviation for Discrete Random Variables
+       </a>
+      </li>
+      <li>
+       <a href="#binomial">
+        The Binomial Probability Distribution
+       </a>
+      </li>
+      <li>
+       <a href="#binomial-formula">
+        Illustration of the Binomial Probability Formula
+       </a>
+      </li>
+      <li>
+       <a href="#binomial-mean-sd">
+        Mean and Standard Deviation of the Binomial
+       </a>
+      </li>
+     </ul>
+    </section>
+    <section class="section" id="random-variables">
+     <div class="definition">
+      <strong>
+       Random Variable
+      </strong>
+      – A variable that cannot be predicted with certainty whose values occur according to a frequency distribution
+     </div>
+     <h2>
+      Two Types of Random Variables
+     </h2>
+     <p>
+      First, it is important to make sure that we distinguish between a discrete and continuous random variable. While the idea of a probability distribution is the same in both cases, the way we have to look at the probability distribution is different. We will focus on the idea of probability for a discrete random variable here.
+     </p>
+     <div class="definition">
+      <strong>
+       Discrete Random Variable
+      </strong>
+      – potential values are separated points on the number line; there is a finite or countable number of values (outcomes are typically counted)
+     </div>
+     <h3>
+      Examples
+     </h3>
+     <ul>
+      <li>
+       The number of students in a statistics course
+      </li>
+      <li>
+       The number of times you must flip a coin in order to get a tail
+      </li>
+     </ul>
+     <div class="definition">
+      <strong>
+       Continuous Random Variable
+      </strong>
+      – potential values fall in an interval on the number line; there is an infinite number of values (outcomes are typically measured)
+     </div>
+     <h3>
+      Examples
+     </h3>
+     <ul>
+      <li>
+       The height of a person
+      </li>
+      <li>
+       The distance a person travels to get to work
+      </li>
+     </ul>
+     <p>
+      A discrete random variable will include a finite or countable number of outcomes. Therefore, we assign probabilities to each value of the random variable.
+     </p>
+    </section>
+    <section class="section" id="discrete-distributions">
+     <h2>
+      Probability Distributions for Discrete Random Variables
+     </h2>
+     <div class="definition">
+      <strong>
+       Probability distribution
+      </strong>
+      – the collection of P(x) values for all possible x values
+     </div>
+     <p>
+      For a discrete probability distribution to be valid, it must satisfy the following:
+     </p>
+     <ol>
+      <li>
+       The variable, x, must be discrete (there is a finite or countable number of outcomes)
+      </li>
+      <li>
+       0 ≤ P(x) ≤ 1 for all x (all probabilities are between 0 and 1)
+      </li>
+      <li>
+       ∑P(x) = 1 (the sum of all the probabilities is 1)
+      </li>
+     </ol>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       Flip a coin twice
+      </p>
+      <p>
+       x = number of tails
+      </p>
+      <p>
+       Identify the probability distribution for x
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answer
+       </summary>
+       <div class="answer-body">
+        <p>
+         First we should identify the possible outcomes when flipping a coin twice. The four possible outcomes are {HH, HT, TH, TT} (could also do this with a tree diagram). Next we should think about the probability of each. In this case H and T have equal probability so the probability for the outcomes are the same, each is ¼. You can also figure this out using the multiplication rule. For example, getting HH is (½)(½) = ¼. If the probabilities are not equal, then the multiplication rule must be used to find the probabilities. Now that we understand the probabilities, we can deal with the random variable, x. The number of tails we will get when flipping a coin twice is either 0, 1, or 2. The probability of 0, P(x = 0), = ¼ because the only way to get 0 tails is to get HH. The probability of 1, P(x = 1), = ½ because there are two ways to get 1 tail, HT or TH. Combining these probabilities gives us ¼ + ¼ = ½. The probability of 2, P(x = 2), = ¼ because this would mean we got TT. The probability distribution follows:
+        </p>
+        <table class="data-table">
+         <thead>
+          <tr>
+           <th>
+            x
+           </th>
+           <th>
+            P(x)
+           </th>
+          </tr>
+         </thead>
+         <tbody>
+          <tr>
+           <td>
+            0
+           </td>
+           <td>
+            ¼
+           </td>
+          </tr>
+          <tr>
+           <td>
+            1
+           </td>
+           <td>
+            ½
+           </td>
+          </tr>
+          <tr>
+           <td>
+            2
+           </td>
+           <td>
+            ¼
+           </td>
+          </tr>
+         </tbody>
+        </table>
+       </div>
+      </details>
+     </article>
+     <p>
+      Notice that the probability distribution above satisfies the criteria needed for a valid discrete probability distribution. The random variable, x, is discrete (finite number of outcomes). Each probability is between 0 and 1 (any time you calculate a probability, it is important to ensure that it is between 0 and 1). The sum of the probabilities in the distribution is 1, ¼ + ½ + ¼ = 1 (any time you create a distribution you should check and make sure the sum is 1, if not there is an error)
+     </p>
+    </section>
+    <section class="section" id="mean-sd">
+     <h2>
+      The Mean and Standard Deviation for Discrete Random Variables
+     </h2>
+     <div class="definition">
+      <strong>
+       Expected Value
+      </strong>
+      – the mean of a probability distribution (This value represents the same quantity as the mean did in section 2. The difference in the calculation comes from the fact that outcomes in a discrete probability distribution are not equally likely in most cases. Thus, this calculation is a weighted average. If all probabilities are the same then the calculation from section 2 will give the same outcome. The other big difference here as compared to what we looked at in section 2 is that we are now dealing with a population mean and not a sample mean. In a probability distribution, we have all of the possible outcomes meaning that we are describing the population.)
+     </div>
+     <p>
+      The population mean for a discrete probability distribution is:
+     </p>
+     <div class="math">
+      <math display="block">
+       <mi>
+        μ
+       </mi>
+       <mo>
+        =
+       </mo>
+       <mo>
+        ∑
+       </mo>
+       <mi>
+        x
+       </mi>
+       <mi>
+        P
+       </mi>
+       <mo>
+        (
+       </mo>
+       <mi>
+        x
+       </mi>
+       <mo>
+        )
+       </mo>
+      </math>
+     </div>
+     <p>
+      μ is a lowercase Greek letter said as ‘mu’ (Can be any real number)
+     </p>
+     <p>
+      The difference in notation for the mean and standard deviation is important. We are now dealing with population values. It is crucial to remember the notation for both the sample and population because later in the course you will see population and sample values in the same formula. (in statistics, most population values are denoted by Greek letters and most sample values are denoted with our alphabet)
+     </p>
+     <p>
+      As always, in order to calculate standard deviation, we must start by calculating the variance. The population variance for a discrete probability distribution is:
+     </p>
+     <div class="math">
+      <math display="block">
+       <msup>
+        <mi>
+         σ
+        </mi>
+        <mn>
+         2
+        </mn>
+       </msup>
+       <mo>
+        =
+       </mo>
+       <mo>
+        ∑
+       </mo>
+       <msup>
+        <mrow>
+         <mo>
+          (
+         </mo>
+         <mi>
+          x
+         </mi>
+         <mo>
+          −
+         </mo>
+         <mi>
+          μ
+         </mi>
+         <mo>
+          )
+         </mo>
+        </mrow>
+        <mn>
+         2
+        </mn>
+       </msup>
+       <mi>
+        P
+       </mi>
+       <mo>
+        (
+       </mo>
+       <mi>
+        x
+       </mi>
+       <mo>
+        )
+       </mo>
+       <mo>
+        =
+       </mo>
+       <mo>
+        ∑
+       </mo>
+       <msup>
+        <mi>
+         x
+        </mi>
+        <mn>
+         2
+        </mn>
+       </msup>
+       <mi>
+        P
+       </mi>
+       <mo>
+        (
+       </mo>
+       <mi>
+        x
+       </mi>
+       <mo>
+        )
+       </mo>
+       <mo>
+        −
+       </mo>
+       <msup>
+        <mi>
+         μ
+        </mi>
+        <mn>
+         2
+        </mn>
+       </msup>
+      </math>
+     </div>
+     <p>
+      The population standard deviation is the square root of the variance.
+     </p>
+     <div class="math">
+      <math display="block">
+       <mi>
+        σ
+       </mi>
+       <mo>
+        =
+       </mo>
+       <msqrt>
+        <msup>
+         <mi>
+          σ
+         </mi>
+         <mn>
+          2
+         </mn>
+        </msup>
+       </msqrt>
+      </math>
+     </div>
+     <p>
+      σ is a lowercase Greek letter said as ‘sigma’ (Can be any nonnegative real number)
+     </p>
+     <p>
+      As before, when dealing with variance, there are two different versions of the formula. The conceptual formula, ∑(x − μ)² · P(x), and the computational formula, ∑ x² · P(x) − μ². The conceptual formula comes directly from the definition. It still represents the average squared distance the data points are from the mean. Here, however, the variance is a weighted average. Comparing the conceptual formula for variance, σ² = ∑(x − μ)² · P(x), to the formula for the mean, μ = ∑ x · P(x), you can see that the formulas are similar. The difference is for the mean we are averaging x, and for the variance we are averaging (x − μ)², squared distance from the mean. The mean and variance formulas are the same except for these quantities. The computational formula, ∑ x² · P(x) − μ², is an algebraic manipulation of the conceptual formula. This is the formula I would recommend using when doing these problems by hand. The algebra is presented in the example below.
+     </p>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       Prove that ∑(x − μ)² · P(x) = ∑ x² · P(x) − μ² (Show algebraic steps)
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answer
+       </summary>
+       <div class="answer-body">
+        <div class="math-lines">
+         <div class="math">
+          ∑(x − μ)² · P(x)
+         </div>
+         <div class="math">
+          = ∑(x² − 2μx + μ²) · P(x)
+         </div>
+         <div class="math">
+          = ∑(x² · P(x) − 2μx · P(x) + μ² · P(x))
+         </div>
+         <div class="math">
+          = ∑ x² · P(x) − ∑ 2μx · P(x) + ∑ μ² · P(x)
+         </div>
+         <div class="math">
+          = ∑ x² · P(x) − 2μ ∑ x · P(x) + μ² ∑ P(x)
+         </div>
+         <div class="math">
+          = ∑ x² · P(x) − 2μ · μ + μ² · 1
+         </div>
+         <div class="math">
+          = ∑ x² · P(x) − 2μ² + μ²
+         </div>
+         <div class="math">
+          = ∑ x² · P(x) − μ²
+         </div>
+        </div>
+       </div>
+      </details>
+     </article>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       What happens if we take the squared off the variance (think about our discussion of variance in section 3)
+      </p>
+      <p>
+       Simplify ∑(x − μ) · P(x)
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answer
+       </summary>
+       <div class="answer-body">
+        <div class="math-lines">
+         <div class="math">
+          ∑(x − μ) · P(x)
+         </div>
+         <div class="math">
+          = ∑(x · P(x) − μ · P(x))
+         </div>
+         <div class="math">
+          = ∑ x · P(x) − ∑ μ · P(x)
+         </div>
+         <div class="math">
+          = ∑ x · P(x) − μ ∑ P(x)
+         </div>
+         <div class="math">
+          = μ − μ · 1
+         </div>
+         <div class="math">
+          = μ − μ
+         </div>
+         <div class="math">
+          = 0
+         </div>
+        </div>
+       </div>
+      </details>
+     </article>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       Roll a die and x is the number rolled.
+      </p>
+      <p>
+       a. Find the mean of x.
+       <br/>
+       b. Find the variance of x.
+       <br/>
+       c. Find the standard deviation of x.
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answers
+       </summary>
+       <div class="answer-body">
+        <p>
+         In order to find the mean and standard deviation of a discrete probability distribution, I would recommend that you create a table like the one below. The first two columns of the table, x and P(x), represent the probability distribution for the random variable. The other three columns, x · P(x), x², and x² · P(x), are used to find the mean and variance.
+        </p>
+        <table class="data-table">
+         <thead>
+          <tr>
+           <th>
+            x
+           </th>
+           <th>
+            P(x)
+           </th>
+           <th>
+            xP(x)
+           </th>
+           <th>
+            x²
+           </th>
+           <th>
+            x²P(x)
+           </th>
+          </tr>
+         </thead>
+         <tbody>
+          <tr>
+           <td>
+            1
+           </td>
+           <td>
+            1/6
+           </td>
+           <td>
+            1/6
+           </td>
+           <td>
+            1
+           </td>
+           <td>
+            1/6
+           </td>
+          </tr>
+          <tr>
+           <td>
+            2
+           </td>
+           <td>
+            1/6
+           </td>
+           <td>
+            2/6
+           </td>
+           <td>
+            4
+           </td>
+           <td>
+            4/6
+           </td>
+          </tr>
+          <tr>
+           <td>
+            3
+           </td>
+           <td>
+            1/6
+           </td>
+           <td>
+            3/6
+           </td>
+           <td>
+            9
+           </td>
+           <td>
+            9/6
+           </td>
+          </tr>
+          <tr>
+           <td>
+            4
+           </td>
+           <td>
+            1/6
+           </td>
+           <td>
+            4/6
+           </td>
+           <td>
+            16
+           </td>
+           <td>
+            16/6
+           </td>
+          </tr>
+          <tr>
+           <td>
+            5
+           </td>
+           <td>
+            1/6
+           </td>
+           <td>
+            5/6
+           </td>
+           <td>
+            25
+           </td>
+           <td>
+            25/6
+           </td>
+          </tr>
+          <tr>
+           <td>
+            6
+           </td>
+           <td>
+            1/6
+           </td>
+           <td>
+            6/6
+           </td>
+           <td>
+            36
+           </td>
+           <td>
+            36/6
+           </td>
+          </tr>
+          <tr>
+           <td>
+           </td>
+           <td>
+           </td>
+           <td>
+            21/6 = 3.5
+           </td>
+           <td>
+           </td>
+           <td>
+            91/6 = 15.167
+           </td>
+          </tr>
+         </tbody>
+        </table>
+        <p>
+         a. μ = ∑ x · P(x) = 3.5
+        </p>
+        <p>
+         b. σ² = ∑ x² · P(x) − μ² = 15.167 − (3.5)² = 15.167 − 12.25 = 2.917
+        </p>
+        <p>
+         c. σ = √σ² = √2.917 = 1.708
+        </p>
+       </div>
+      </details>
+     </article>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       This is a realistic example where at least the mean is an important value. Typically, standard deviation is not of much use in these situations. However, it is used as a unit of measure in more complex statistical analysis. It is important you understand the idea so that you will understand how standard deviation is used in more advanced analysis, which will be done in the coming material.
+      </p>
+      <p>
+       Suppose we sell life insurance policies. We will look at a $100,000 one year term policy. The random variable of interest in this case is x = payout of the policy. The payout is $100,000 if death occurs in the next year and $0 otherwise. When selling life insurance, a company figures out the probability of payout based on life expectancy. This is typically estimated based on a medical examination and/or a medical questionnaire. Suppose the policy has the following probability distribution.
+      </p>
+      <table class="data-table">
+       <thead>
+        <tr>
+         <th>
+          x
+         </th>
+         <th>
+          P(x)
+         </th>
+        </tr>
+       </thead>
+       <tbody>
+        <tr>
+         <td>
+          $0
+         </td>
+         <td>
+          0.995
+         </td>
+        </tr>
+        <tr>
+         <td>
+          $100,000
+         </td>
+         <td>
+          0.005
+         </td>
+        </tr>
+       </tbody>
+      </table>
+      <p>
+       a. Find the mean of x.
+       <br/>
+       b. What does the mean tell us in this example?
+       <br/>
+       c. Find the variance of x.
+       <br/>
+       d. Find the standard deviation of x.
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answers
+       </summary>
+       <div class="answer-body">
+        <table class="data-table">
+         <thead>
+          <tr>
+           <th>
+            x
+           </th>
+           <th>
+            P(x)
+           </th>
+           <th>
+            xP(x)
+           </th>
+           <th>
+            x²
+           </th>
+           <th>
+            x²P(x)
+           </th>
+          </tr>
+         </thead>
+         <tbody>
+          <tr>
+           <td>
+            0
+           </td>
+           <td>
+            .995
+           </td>
+           <td>
+            0
+           </td>
+           <td>
+            0
+           </td>
+           <td>
+            0
+           </td>
+          </tr>
+          <tr>
+           <td>
+            100,000
+           </td>
+           <td>
+            .005
+           </td>
+           <td>
+            500
+           </td>
+           <td>
+            10,000,000,000
+           </td>
+           <td>
+            50,000,000
+           </td>
+          </tr>
+          <tr>
+           <td>
+           </td>
+           <td>
+           </td>
+           <td>
+            500
+           </td>
+           <td>
+           </td>
+           <td>
+            50,000,000
+           </td>
+          </tr>
+         </tbody>
+        </table>
+        <p>
+         a. μ = ∑ x · P(x) = $500
+        </p>
+        <p>
+         b. This is the average payout (break-even point on the policy not including overhead costs). In order to make money on these term life insurance policies you must charge more than $500.
+        </p>
+        <p>
+         c. σ² = ∑ x² · P(x) − μ² = 50,000,000 − (500)² = 49,750,000
+        </p>
+        <p>
+         d. σ = √49,750,000 = 7053.37
+        </p>
+       </div>
+      </details>
+     </article>
+     <p>
+      Thus far in this section we have introduced the general idea of a discrete probability distribution. It is important to note that all discrete probability distributions satisfy the characteristics discussed and the mean and standard deviation can always be calculated using the formulas presented. However, the calculations can sometimes become very cumbersome and difficult. Therefore, in statistics, it is common to classify discrete distributions based on their common properties. There are many different types of discrete probability distributions and we will just introduce one of them to illustrate this idea. If you know the properties of a distribution, there is often times shortcut formulas for the probability, mean, variance, and standard deviation.
+     </p>
+    </section>
+    <section class="section" id="binomial">
+     <h2>
+      The Binomial Probability Distribution
+     </h2>
+     <p>
+      A binomial probability distribution is a common type of discrete probability distribution.
+     </p>
+     <p>
+      A binomial experiment has the following properties:
+     </p>
+     <ul>
+      <li>
+       Experiment consists of n identical and independent trials
+      </li>
+      <li>
+       Each trial results in one of two outcomes “success” = S or “failure” = F
+      </li>
+      <li>
+       P(S) = p, P(F) = 1 − p = q for all trials
+      </li>
+      <li>
+       The random variable of interest x is the number of successes in the n trials
+      </li>
+     </ul>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       Flip a fair coin 10 times and x = number of tails
+      </p>
+      <p>
+       n = 10
+       <br/>
+       “success” → S = tails     (you must define a success based on the experiment)
+       <br/>
+       “failure” → F = heads     (here we are interested in getting tails so that is a success)
+       <br/>
+       p = ½
+       <br/>
+       q = ½
+      </p>
+     </article>
+    </section>
+    <section class="section" id="binomial-formula">
+     <h2>
+      Illustration of the Binomial Probability Formula
+     </h2>
+     <p>
+      For this illustration, we will assume n = 3. We will look at the sample space in terms of successes and failures utilizing a tree diagram. On the branches of the tree diagram we will include p and q to represent the probability of a success and failure, respectively. Now with the sample space, we can identify probability. Keep in mind that we do not know p and q so we cannot assume the outcomes are equally likely. This would only happen if p = ½. Therefore, we must use the multiplication rule as seen below.
+     </p>
+     <div class="tree-figure">
+      <img alt="Tree diagram showing the sample space and probabilities for three binomial trials" src="images/section5/binomial_tree.png"/>
+     </div>
+     <p>
+      The next step is to look at the probability distribution of x. With n = 3, the possible outcomes for x (number of successes) would be 0, 1, 2, or 3. The probability for each outcome is included below.
+     </p>
+     <div class="math-lines">
+      <div class="math">
+       P(x = 0) = 1 · p⁰q³
+      </div>
+      <div class="math">
+       P(x = 1) = 3 · p¹q²
+      </div>
+      <div class="math">
+       P(x = 2) = 3 · p²q¹
+      </div>
+      <div class="math">
+       P(x = 3) = 1 · p³q⁰
+      </div>
+     </div>
+     <p>
+      Notice that there is a pattern to how these probabilities work. Each probability starts with a constant representing the number of outcomes from the tree diagram which satisfy the value of x (for example when x is 1, there are 3 ways to get exactly 1 success). Thus, the first part of the binomial probability formula gives the number of possible arrangements of S and F. The next thing in each probability is p to some power. Notice the power on p is always equal to x. So, the next part of the binomial probability formula is pˣ. Finally, each probability has a q to some power. The power on q is always n − x. Therefore, the last part of the binomial probability formula is qⁿ⁻ˣ. Knowing this pattern gives us a shortcut way to find probability when we know an experiment follows the properties of a binomial experiment. The formula is below.
+     </p>
+     <h3>
+      Binomial probability formula
+     </h3>
+     <div class="math">
+      <math display="block">
+       <mi>
+        P
+       </mi>
+       <mo>
+        (
+       </mo>
+       <mi>
+        x
+       </mi>
+       <mo>
+        )
+       </mo>
+       <mo>
+        =
+       </mo>
+       <mfrac>
+        <mrow>
+         <mi>
+          n
+         </mi>
+         <mo>
+          !
+         </mo>
+        </mrow>
+        <mrow>
+         <mi>
+          x
+         </mi>
+         <mo>
+          !
+         </mo>
+         <mo>
+          (
+         </mo>
+         <mi>
+          n
+         </mi>
+         <mo>
+          −
+         </mo>
+         <mi>
+          x
+         </mi>
+         <mo>
+          )
+         </mo>
+         <mo>
+          !
+         </mo>
+        </mrow>
+       </mfrac>
+       <msup>
+        <mi>
+         p
+        </mi>
+        <mi>
+         x
+        </mi>
+       </msup>
+       <msup>
+        <mi>
+         q
+        </mi>
+        <mrow>
+         <mi>
+          n
+         </mi>
+         <mo>
+          −
+         </mo>
+         <mi>
+          x
+         </mi>
+        </mrow>
+       </msup>
+      </math>
+     </div>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       Flip a fair coin 10 times and x = number of tails
+      </p>
+      <p>
+       Find the probability that you get exactly 7 tails
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answer
+       </summary>
+       <div class="answer-body">
+        <p>
+         n = 10
+         <br/>
+         p = ½
+        </p>
+        <div class="math-lines">
+         <div class="math">
+          P(x = 7) = n!/[x!(n − x)!] pˣqⁿ⁻ˣ
+         </div>
+         <div class="math">
+          = 10!/[7!(10 − 7)!] (½)⁷(½)¹⁰⁻⁷
+         </div>
+         <div class="math">
+          = 10!/[7!3!] (½)⁷(½)³
+         </div>
+         <div class="math">
+          = 120(½)¹⁰
+         </div>
+         <div class="math">
+          = 0.117
+         </div>
+        </div>
+        <p>
+         About 11.7% of the time you will get 7 tails out of 10 flips
+        </p>
+       </div>
+      </details>
+     </article>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       Roll a fair die 5 times and x = # of sixes
+      </p>
+      <p>
+       Find the probability of getting exactly 2 sixes
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answer
+       </summary>
+       <div class="answer-body">
+        <p>
+         n = 5
+         <br/>
+         p = 1/6
+        </p>
+        <div class="math-lines">
+         <div class="math">
+          P(x = 2) = n!/[x!(n − x)!] pˣqⁿ⁻ˣ
+         </div>
+         <div class="math">
+          = 5!/[2!(5 − 2)!] (1/6)²(5/6)⁵⁻²
+         </div>
+         <div class="math">
+          = 5!/[2!3!] (1/6)²(5/6)³
+         </div>
+         <div class="math">
+          = 10 · (1/6)²(5/6)³
+         </div>
+         <div class="math">
+          = 0.161
+         </div>
+        </div>
+        <p>
+         Approximately 16.1% of the time we will get exactly 2 sixes out of 5 rolls
+        </p>
+       </div>
+      </details>
+     </article>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       Suppose a cancer treatment produces remission in ¼ of patients. If three patients are currently using the treatment, what is the probability exactly 2 go into Remission?
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answer
+       </summary>
+       <div class="answer-body">
+        <p>
+         n = 3
+         <br/>
+         p = ¼
+        </p>
+        <div class="math-lines">
+         <div class="math">
+          P(x = 2) = n!/[x!(n − x)!] pˣqⁿ⁻ˣ
+         </div>
+         <div class="math">
+          = 3!/[2!(3 − 2)!] (¼)²(¾)³⁻²
+         </div>
+         <div class="math">
+          = 3!/[2!1!] (¼)²(¾)
+         </div>
+         <div class="math">
+          = 3(1/16)(¾)
+         </div>
+         <div class="math">
+          = .1406
+         </div>
+        </div>
+        <p>
+         About 14.1% of the time exactly 2 of the 3 patients would go into remission.
+        </p>
+       </div>
+      </details>
+     </article>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       Suppose x is binomial with n = 8 and p = .4
+      </p>
+      <p>
+       Find P(x ≤ 6)
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answer
+       </summary>
+       <div class="answer-body">
+        <p>
+         First, notice this is different than the rest of the probability questions that were asked because this one is an inequality. We want anything less than or equal to 6 in this case. There are two ways to do this problem. You could calculate it directly but 0, 1, 2, 3, 4, 5, and 6 all satisfy the inequality. Therefore, to do this problem directly you would have to calculate all these probabilities and add them together. That would be a lot of work. There is an easier way to do this one. Any time you are calculating probability and it seems difficult, you should think about the complement as it could be easier. With n = 8 and the complement being P(x &gt; 6), only two probabilities would have to be calculated to get the complement, 7 and 8. Therefore, it is much easier here to calculate the complement and then subtract from 1 (complement rule) to get the probability. Any time you are dealing with these inequalities, consider the direct route and the complement. This will allow you to choose the easier process.
+        </p>
+        <div class="math-lines">
+         <div class="math">
+          P(x = 7) = 8!/[7!(8 − 7)!](.4)⁷(.6)¹ = 8(.4)⁷(.6) = .007864
+         </div>
+         <div class="math">
+          P(x = 8) = 8!/[8!(8 − 8)!](.4)⁸(.6)⁰ = (.4)⁸ = .000655
+         </div>
+         <div class="math">
+          P(x &gt; 6) = P(x = 7) + P(x = 8) = .007864 + .000655 = .008519
+         </div>
+         <div class="math">
+          P(x ≤ 6) = 1 − P(x &gt; 6) = 1 − .008519 = .991481
+         </div>
+        </div>
+       </div>
+      </details>
+     </article>
+    </section>
+    <section class="section" id="binomial-mean-sd">
+     <h2>
+      Mean and Standard Deviation of the Binomial
+     </h2>
+     <p>
+      As with the probability, the mean, variance, and standard deviation for the binomial have short-cut formulas. These formulas are very straight forward and much easier than using the general formulas for a discrete probability distribution. Remember these formulas only work for the binomial. The formulas are as follows.
+     </p>
+     <div class="key-idea card soft pad">
+      <p>
+       <strong>
+        Mean (Expected Value)
+       </strong>
+       = μ = np
+      </p>
+      <p>
+       <strong>
+        Variance
+       </strong>
+       = σ² = npq
+      </p>
+      <p>
+       <strong>
+        Standard Deviation
+       </strong>
+       = σ = √σ² = √npq
+      </p>
+     </div>
+     <article class="card example">
+      <h3>
+       Example
+      </h3>
+      <p>
+       You take a 100 question multiple-choice exam and use random guessing as your strategy. Each question has 4 choices. The random variable x is the number of correct answers on the exam.
+      </p>
+      <p>
+       a. Find the mean of x.
+       <br/>
+       b. Find the variance of x.
+       <br/>
+       c. Find the standard deviation of x.
+      </p>
+      <details class="answer">
+       <summary>
+        Show Answers
+       </summary>
+       <div class="answer-body">
+        <p>
+         n = 100
+         <br/>
+         p = ¼
+         <br/>
+         q = ¾
+        </p>
+        <p>
+         a. μ = n · p = 100(¼) = 25
+        </p>
+        <p>
+         On average you would get 25 questions right (25%). This should make since given the scenario.
+        </p>
+        <p>
+         b. σ² = n · p · q = 100(¼)(¾) = 18.75
+        </p>
+        <p>
+         c. σ = √σ² = √n · p · q = √18.75 = 4.330
+        </p>
+       </div>
+      </details>
+     </article>
+    </section>
+    <div class="back-row" style="margin-top:36px">
+     <a class="btn outline btn-sm" href="index.html">
+      ← Back to STA296U Notes
+     </a>
+     <a class="btn btn-sm" download="" href="STA296U_Section_5_Discrete_Probability_Distributions.docx">
+      Download Word Notes
+     </a>
+    </div>
+    <footer class="notes-footer">
+     Last updated:
+     <span id="lastUpdated">
+     </span>
+    </footer>
+   </div>
+  </main>
+  <script>
+   document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
+  </script>
+ </body>
+</html>
