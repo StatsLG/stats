@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>STA210U - Section 3B | StatsLG</title>
+<meta name="description" content="STA210U Section 3B - Dichotomous Tests and Discrete Probability Distributions.">
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/style/bctcstyle.css">
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+.notes-page{max-width:1100px;margin:0 auto;padding:32px 40px}.notes-content{max-width:900px;margin:0 auto}
+.notes-content h2{margin-top:2rem;scroll-margin-top:1rem}.notes-content h3{margin-top:1.5rem}
+.notes-content p,.notes-content li{line-height:1.65}.back-row{margin:0 0 20px;display:flex;gap:10px;flex-wrap:wrap}
+.toc{margin-bottom:1.5rem}.toc h2{margin-top:0}.toc a{color:var(--kctcs-blue);font-weight:700}
+.definition{border-left:5px solid var(--kctcs-blue);padding:12px 14px;margin:14px 0;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.definition strong{color:var(--kctcs-blue)}.formula{font-size:1.08rem;text-align:center;color:var(--kctcs-blue);margin:16px 0;padding:14px;background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius);overflow-x:auto}
+.example{margin:18px 0}details.answer{margin-top:14px;border-top:1px solid var(--rule);padding-top:10px}
+details.answer summary{cursor:pointer;color:var(--kctcs-blue);font-weight:800}.answer-body{border-left:5px solid var(--kctcs-gold);padding:10px 14px;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.prob-table{border-collapse:collapse;width:100%;margin:16px 0;text-align:center}.prob-table th,.prob-table td{border:1px solid #777;padding:8px}.prob-table th{font-weight:800;background:var(--panel)}
+.table-wrap{overflow-x:auto}.callout{border-left:5px solid var(--kctcs-gold);padding:12px 14px;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0;margin:16px 0}
+.notes-footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted);font-size:12px}
+@media(max-width:760px){.notes-page{padding:20px 16px}.back-row{flex-direction:column;align-items:stretch}.back-row .btn{justify-content:center}}
+@media print{.back-row{display:none}.notes-page,.notes-content{max-width:none;padding:0}details.answer>*{display:block!important}}
+</style>
+</head>
+<body><main class="notes-page"><div class="notes-content">
+<div class="back-row">
+<a class="btn outline btn-sm" href="index.html">← Back to STA210U Notes</a>
+<a class="btn btn-sm" href="STA210U_Section_3B_Dichotomous_Tests_and_Discrete_Probability_Distributions.docx" download>Download Word Notes</a>
+</div>
+<header class="header"><h1>STA210U - Section 3B</h1><p>III. Probability - B. Dichotomous Tests and Discrete Probability Distributions</p></header>
+
+<section class="section panel pad toc"><h2>In this section</h2><ul>
+<li><a href="#dichotomous">Dichotomous Tests</a></li>
+<li><a href="#valid">Valid Discrete Probability Distributions</a></li>
+<li><a href="#mean">Mean of a Discrete Probability Distribution (Expected Value)</a></li>
+<li><a href="#sd">Standard Deviation of a Discrete Probability Distribution</a></li>
+</ul></section>
+
+<section id="dichotomous" class="section">
+<h2>1. Dichotomous Tests</h2>
+<div class="definition"><strong>Dichotomous Test</strong> - a test with only two possible results</div>
+<p>The concept of a dichotomous test is important in the field of statistics. Common examples of these tests include: roadside sobriety test (drunk or not drunk), home pregnancy test (pregnant or not pregnant), and cancer screening (have cancer or do not have cancer). The importance of these tests in the field of statistics extends to the idea of a statistical test (hypothesis test). Later in the course, we will cover hypothesis testing when dealing with inferential statistics. In hypothesis testing, we will have two possible outcomes and will use probability to deal with the error in the tests. In many respects, hypothesis testing is similar to the dichotomous tests introduced here. For example, we may collect data to test and see if a new drug is effective in treating a type of illness. Based on the results, either we will conclude that the drug is effective or there will not be enough evidence to conclude the drug is effective. For now, we will focus on the probability involved in a dichotomous test.</p>
+<p>Dichotomous test are summarized based on the four conditional probabilities defined below.</p>
+
+<div class="definition"><strong>False Positive Rate (FPR)</strong> - the probability a dichotomous test concludes positive given the actual condition is negative (in other words, the rate of positive test results in subjects who do not have the attribute tested)</div>
+<div class="formula">\[\text{False Positive Rate}=P(\text{test concludes positive}\mid\text{actual condition is negative})\]</div>
+<div class="formula">\[=\frac{\text{Number of subjects who get positive test results but do not have the attribute tested}}{\text{Number of subjects who do not have the attribute tested}}\]</div>
+
+<div class="definition"><strong>Specificity</strong> - the probability a dichotomous test concludes negative given the actual condition is negative (in other words, the rate of negative test results in subjects who do not have the attribute tested)</div>
+<p>Notice that <strong>FPR + Specificity = 1</strong> because these two rates include all the possible outcomes for subjects who do not have the attribute tested. Specificity is the complement of a false positive rate.</p>
+<div class="formula">\[\text{Specificity}=1-\text{False Positive Rate}\]</div>
+<div class="formula">\[=P(\text{test concludes negative}\mid\text{actual condition is negative})\]</div>
+<div class="formula">\[=\frac{\text{Number of subjects who get negative test results and do not have the attribute tested}}{\text{Number of subjects who do not have the attribute tested}}\]</div>
+
+<div class="definition"><strong>False Negative Rate (FNR)</strong> - the probability a dichotomous test concludes negative given the actual condition is positive (in other words, the rate of negative test results in subjects who do have the attribute tested)</div>
+<div class="formula">\[\text{False Negative Rate}=P(\text{test concludes negative}\mid\text{actual condition is positive})\]</div>
+<div class="formula">\[=\frac{\text{Number of subjects who get negative test results but do not have the attribute tested}}{\text{Number of subjects who do have the attribute tested}}\]</div>
+
+<div class="definition"><strong>Sensitivity</strong> - the probability a dichotomous test concludes positive given the actual condition is positive (in other words, the rate of positive test results in subjects who do have the attribute tested)</div>
+<p>Notice that <strong>FNR + Sensitivity = 1</strong> because these two rates include all the possible outcomes for subjects who do have the attribute tested. Sensitivity is the complement of a false negative rate.</p>
+<div class="formula">\[\text{Sensitivity}=1-\text{False Negative Rate}\]</div>
+<div class="formula">\[=P(\text{test concludes positive}\mid\text{actual condition is positive})\]</div>
+<div class="formula">\[=\frac{\text{Number of subjects who get positive test results and do have the attribute tested}}{\text{Number of subjects who do have the attribute tested}}\]</div>
+
+<div class="callout"><strong>Notice that the denominator in each of the fractions above is the actual condition of the subject.</strong>
+<ul><li>To calculate the false positive rate or the specificity, the denominator is the number of subjects who do not have the attribute tested.</li>
+<li>To calculate the false negative rate or the sensitivity, the denominator is the number of subjects who do have the attribute tested.</li></ul></div>
+
+<p>It can be beneficial to think about FPR, Specificity, FNR, and Sensitivity in table form since data collected from dichotomous tests are commonly presented in this way. A table identifying these probabilities is presented below. Each probability (FPR, Specificity, FNR, and Sensitivity) is calculated by taking the number identified in the cell and dividing by the number in the column total. The column totals will represent the number of subjects who have the condition and the number of subjects who do not have the condition (column totals are not identified in the table below).</p>
+<div class="table-wrap"><table class="prob-table">
+<thead><tr><th></th><th>Actual Condition<br>is Positive</th><th>Actual Condition<br>is Negative</th></tr></thead>
+<tbody><tr><th>Test Concludes Positive</th><td>Sensitivity</td><td>FPR</td></tr>
+<tr><th>Test Concludes Negative</th><td>FNR</td><td>Specificity</td></tr></tbody></table></div>
+<p>The false positive rate and the false negative rate represent the probability of the test being incorrect (probability of error). For a good test, these values will be small, indicating a small amount of error in the result. Conversely, the specificity and sensitivity identify the likelihood of the test being correct (complements of the errors). These values will be high when there is a small amount of error in the test. It is not necessary to look at all four probabilities when determining if a test is good. Commonly these types of dichotomous tests only report the sensitivity and specificity of the test.</p>
+
+<article class="card example"><h3>Example</h3>
+<p>Suppose we are looking at the utility of a home pregnancy test. The test checks for the presence of the hormone human chorionic gonadotropin (hCG). The hCG hormone is usually only present in urine if a woman is pregnant. The following table represents the outcomes for 514 women who took the test.</p>
+<div class="table-wrap"><table class="prob-table">
+<thead><tr><th rowspan="2">Home Pregnancy<br>Test Conclusion</th><th colspan="3">Actual Condition</th></tr>
+<tr><th>Pregnant</th><th>Not Pregnant</th><th>Totals</th></tr></thead>
+<tbody><tr><th>Pregnant</th><td>89</td><td>6</td><td>95</td></tr>
+<tr><th>Not Pregnant</th><td>84</td><td>335</td><td>419</td></tr>
+<tr><th>Totals</th><td>173</td><td>341</td><td>514</td></tr></tbody></table></div>
+<p>Find the following:</p><ol><li>False Positive Rate</li><li>Specificity</li><li>False Negative Rate</li><li>Sensitivity</li><li>Do you feel that this is a good test?</li></ol>
+<details class="answer"><summary>Show Answers</summary><div class="answer-body">
+<p>1. False Positive Rate =</p><div class="formula">\[\frac{6}{341}=0.018=1.8\%\]</div>
+<p>2. Specificity =</p><div class="formula">\[1-0.018=0.982\]</div><p>or</p><div class="formula">\[\frac{335}{341}=0.982=98.2\%\]</div>
+<p>3. False Negative Rate =</p><div class="formula">\[\frac{84}{173}=0.486=48.6\%\]</div>
+<p>4. Sensitivity =</p><div class="formula">\[1-0.486=0.514\]</div><p>or</p><div class="formula">\[\frac{89}{173}=0.514=51.4\%\]</div>
+<p>5. No, while the specificity of the test looks strong, the sensitivity is only 51.4%. This means when the woman is pregnant, the test is only getting it correct 51.4% of the time.</p>
+</div></details></article>
+</section>
+
+<section id="valid" class="section">
+<h2>2. Valid Discrete Probability Distributions</h2>
+<p>First, it is important to make sure that we distinguish between a discrete and continuous random variable. While the idea of a probability distribution is the same in both cases, the way we have to look at the probability distribution is different. We will focus on the idea of probability for a discrete random variable here.</p>
+<div class="definition"><strong>Discrete Random Variable</strong> - potential values are separated points on the number line; there is a finite or countable number of values (outcomes are typically counted)</div>
+<div class="definition"><strong>Continuous Random Variable</strong> - potential values fall in an interval on the number line; there is an infinite number of values (outcomes are typically measured)</div>
+<p>A discrete random variable will include a finite or countable number of outcomes. Therefore, we assign probabilities to each value of the random variable.</p>
+<div class="definition"><strong>Probability distribution</strong> - the collection of \(P(x)\) values for all possible \(x\) values</div>
+<p>For a discrete probability distribution to be valid, it must satisfy the following:</p>
+<ol><li>The variable, \(x\), must be discrete</li><li>\(0\le P(x)\le1\) for all \(x\)</li><li>\(\displaystyle\sum P(x)=1\)</li></ol>
+
+<article class="card example"><h3>Example 1 (video solution)</h3>
+<p>Flip a coin twice</p><p>\(x\) = number of tails</p><p>Identify the probability distribution for \(x\)</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body">
+<div class="table-wrap"><table class="prob-table"><thead><tr><th>\(x\)</th><th>\(P(x)\)</th></tr></thead>
+<tbody><tr><td>0</td><td>\(\frac14\)</td></tr><tr><td>1</td><td>\(\frac24=\frac12\)</td></tr><tr><td>2</td><td>\(\frac14\)</td></tr></tbody></table></div>
+</div></details></article>
+</section>
+
+<section id="mean" class="section">
+<h2>3. Mean of a Discrete Probability Distribution (Expected Value)</h2>
+<div class="definition"><strong>Expected Value</strong> - the mean of a probability distribution (This value represents the same quantity as the mean did in section II. B. The difference in the calculation comes from the fact that outcomes in a discrete probability distribution are not equally likely in most cases. Thus, this calculation is a weighted average. If all probabilities are the same then the calculation from section II. B. will give the same outcome. The other big difference here as compared to what we looked at in section II. B. is that we are now dealing with a population mean and not a sample mean. In a probability distribution, we have all of the possible outcomes meaning that we are describing the population.)</div>
+<p>The population mean for a discrete probability distribution is:</p>
+<div class="formula">\[\mu=\sum xP(x)\]</div>
+<p>\(\mu\) is a lowercase Greek letter said as ‘mu’ (Can be any real number)</p>
+<p>The difference in notation for the mean and standard deviation as compared to section II.B. is important. We are now dealing with population values. It is crucial to remember the notation for both the sample and population because later in the course you will see population and sample values in the same formula.</p>
+<article class="card example"><h3>Example 2 (video solution)</h3><p>Roll a die and \(x\) is the number rolled. Find the mean of \(x\).</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body"><div class="formula">\[\mu=\sum xP(x)=1\left(\frac16\right)+2\left(\frac16\right)+3\left(\frac16\right)+4\left(\frac16\right)+5\left(\frac16\right)+6\left(\frac16\right)=3.5\]</div></div></details></article>
+</section>
+
+<section id="sd" class="section">
+<h2>4. Standard Deviation of a Discrete Probability Distribution</h2>
+<p>As always in order to calculate standard deviation, we must start by calculating the variance. The population variance for a discrete probability distribution is:</p>
+<div class="formula">\[\sigma^2=\sum (x-\mu)^2P(x)=\sum x^2P(x)-\mu^2\]</div>
+<p>The population standard deviation is the square root of the variance.</p>
+<div class="formula">\[\sigma=\sqrt{\sigma^2}\]</div>
+<p>\(\sigma\) is a lowercase Greek letter said as ‘sigma’ (Can be any nonnegative real number)</p>
+
+<article class="card example"><h3>Example 3 (video solution)</h3><p>Roll a die and \(x\) is the number rolled. Find the standard deviation of \(x\).</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body">
+<div class="formula">\[\sigma^2=\sum x^2P(x)-\mu^2=\frac{1^2+2^2+3^2+4^2+5^2+6^2}{6}-(3.5)^2=\frac{35}{12}\]</div>
+<div class="formula">\[\sigma=\sqrt{\frac{35}{12}}\approx1.708\]</div>
+</div></details></article>
+
+<article class="card example"><h3>Example 4 (video solution)</h3>
+<p>This is a realistic example where at least the mean is an important value. Typically, standard deviation is not of much use in these situations. However, it is used as a unit of measure in more complex statistical analysis. It is important you understand the idea so that you will understand how standard deviation is used in more advanced analysis, which will be done in the coming material.</p>
+<p>Suppose we sell life insurance policies. We will look at a $100,000 one year term policy. The random variable of interest in this case is \(x\) = payout of the policy. The payout is $100,000 if death occurs in the next year and $0 otherwise. When selling life insurance, a company figures out the probability of payout based on life expectancy. This is typically estimated based on a medical examination and/or a medical questionnaire. Suppose the policy has the following probability distribution.</p>
+<div class="table-wrap"><table class="prob-table"><thead><tr><th>\(x\)</th><th>\(P(x)\)</th></tr></thead>
+<tbody><tr><td>$0</td><td>0.995</td></tr><tr><td>$100,000</td><td>0.005</td></tr></tbody></table></div>
+<p>Find the mean and standard deviation of \(x\). What does the mean tell you in this example?</p>
+<details class="answer"><summary>Show Answer</summary><div class="answer-body">
+<div class="formula">\[\mu=\sum xP(x)=0(0.995)+100{,}000(0.005)=500\]</div>
+<div class="formula">\[\sigma^2=\sum x^2P(x)-\mu^2=0^2(0.995)+100{,}000^2(0.005)-500^2=49{,}750{,}000\]</div>
+<div class="formula">\[\sigma=\sqrt{49{,}750{,}000}\approx7{,}053.37\]</div>
+<p>The mean tells you that the expected payout per policy is $500.</p>
+</div></details></article>
+</section>
+
+<div class="back-row" style="margin-top:36px">
+<a class="btn outline btn-sm" href="index.html">← Back to STA210U Notes</a>
+<a class="btn btn-sm" href="STA210U_Section_3B_Dichotomous_Tests_and_Discrete_Probability_Distributions.docx" download>Download Word Notes</a>
+</div>
+<footer class="notes-footer">Last updated: <span id="lastUpdated"></span></footer>
+</div></main>
+<script>document.getElementById('lastUpdated').textContent=new Date(document.lastModified).toLocaleString();</script>
+</body></html>
