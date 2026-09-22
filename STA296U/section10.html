@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>STA296U - Section 10 | StatsLG</title>
+  <meta name="description" content="STA296U Section 10 - Simple Linear Regression.">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <style>
+    .notes-page { max-width:1100px; margin:0 auto; padding:32px 40px; }
+    .notes-content { max-width:900px; margin:0 auto; }
+    .notes-content h2 { margin-top:2rem; scroll-margin-top:1rem; }
+    .notes-content h3 { margin-top:1.5rem; color:var(--ink); }
+    .notes-content p, .notes-content li { line-height:1.65; }
+    .back-row { margin:0 0 20px; display:flex; gap:10px; flex-wrap:wrap; }
+    .toc { margin-bottom:1.5rem; }
+    .toc h2 { margin-top:0; }
+    .toc a { color:var(--kctcs-blue); font-weight:700; }
+    .toc a:hover { text-decoration:underline; }
+    .definition { border-left:5px solid var(--kctcs-blue); padding:12px 14px; margin:14px 0; background:var(--panel); border-radius:0 var(--radius) var(--radius) 0; }
+    .definition strong { color:var(--kctcs-blue); }
+    .example { margin:18px 0; }
+    .example > h3, .example > h4 { margin-top:0; }
+    details.answer { margin-top:14px; border-top:1px solid var(--rule); padding-top:10px; }
+    details.answer summary { cursor:pointer; color:var(--kctcs-blue); font-weight:800; }
+    details.answer summary:hover { text-decoration:underline; }
+    details.answer[open] summary { margin-bottom:10px; }
+    .answer-body { border-left:5px solid var(--kctcs-gold); padding:10px 14px; background:var(--panel); border-radius:0 var(--radius) var(--radius) 0; }
+    .key-idea { border-left:5px solid var(--kctcs-gold); }
+    .formula { font-family:"Cambria Math","STIX Two Math","Times New Roman",serif; font-size:1.14rem; text-align:center; margin:14px 0; padding:10px 12px; overflow-x:auto; line-height:1.8; }
+    .frac { display:inline-flex; vertical-align:middle; flex-direction:column; text-align:center; line-height:1.08; margin:0 .2em; }
+    .frac>.top { border-bottom:1.5px solid currentColor; padding:0 .25em .08em; }
+    .frac>.bottom { padding:.08em .25em 0; }
+    .work { display:grid; gap:5px; margin:12px 0; padding-left:3%; }
+    .work p { margin:0; font-family:"Cambria Math","STIX Two Math","Times New Roman",serif; font-size:1.04rem; }
+    .figure { text-align:center; margin:22px 0; }
+    .figure img { max-width:720px; width:100%; height:auto; }
+    .grid-2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+    .data-table { width:100%; border-collapse:collapse; margin:18px 0; }
+    .data-table th, .data-table td { border:1px solid var(--rule); padding:8px 10px; text-align:center; }
+    .data-table th { background:var(--panel); color:var(--kctcs-blue); }
+    .notes-footer { margin-top:40px; padding-top:16px; border-top:1px solid var(--rule); color:var(--muted); font-size:12px; }
+    @media(max-width:760px) {
+      .notes-page { padding:20px 16px; }
+      .back-row { flex-direction:column; align-items:stretch; }
+      .back-row .btn { justify-content:center; }
+      .grid-2 { grid-template-columns:1fr; }
+      .work { padding-left:0; }
+    }
+    @media print {
+      .back-row { display:none; }
+      .notes-page, .notes-content { max-width:none; padding:0; }
+      details.answer > * { display:block !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="notes-page">
+    <div class="notes-content">
+
+      <div class="back-row">
+        <a class="btn outline btn-sm" href="index.html">← Back to STA296U Notes</a>
+        <a class="btn btn-sm" href="STA296U_Section_10_Simple_Linear_Regression.docx" download>Download Word Notes</a>
+      </div>
+
+      <header class="header">
+        <h1>STA296U — Section 10</h1>
+        <p>Simple Linear Regression</p>
+      </header>
+
+      <section class="section panel pad toc">
+        <h2>In This Section</h2>
+        <ul>
+          <li><a href="#graphical">Identifying Correlation Graphically</a></li>
+          <li><a href="#coefficient">The Correlation Coefficient</a></li>
+          <li><a href="#regression">The Simple Linear Regression Model</a></li>
+          <li><a href="#prediction">Prediction and Residuals</a></li>
+          <li><a href="#cautions">Cautions with Regression</a></li>
+        </ul>
+      </section>
+
+      <section id="graphical" class="section">
+        <h2>Identifying Correlation Graphically</h2>
+
+        <div class="definition"><strong>Correlation</strong> – an association or relationship between two variables</div>
+        <div class="definition"><strong>Scatter plot or Scatter diagram</strong> – displays the relationship between two quantitative variables.</div>
+        <ul>
+          <li>x axis – represents the x variable which is called the independent variable or explanatory variable</li>
+          <li>y axis – represents the y variable which is called the dependent variable or response variable</li>
+        </ul>
+
+        <p>A scatter plot is set up in a similar way to how you graph in an algebra class. The big difference is that there is not a perfect pattern so you cannot connect the points. We are simply looking for patterns in the data points themselves. The variables in a scatterplot are the same as when dealing with functions in algebra. You must always think about which variable is your x and which is your y based on which variable is dependent on the other. The difference between what is done in algebra and in this class comes from the definition of a function; each x will have exactly one y. That is not the case when dealing with data. Commonly you will give two individuals the same x and get different values for y. We must deal with the variation across individuals.</p>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>Suppose you have two variables, dosage of drug and reduction in blood pressure. Which one should be your x and which one should by your y? In this case reduction in blood pressure is the y variable because the reduction in blood pressure would be dependent on the dosage of the drug. Therefore, the dosage of the drug is x, your independent variable. Below is some sample data for this situation.</p>
+          <table class="data-table">
+            <thead><tr><th>x = Dosage of Drug</th><th>y = Reduction in Blood Pressure</th></tr></thead>
+            <tbody><tr><td>100</td><td>10</td></tr><tr><td>200</td><td>18</td></tr><tr><td>300</td><td>32</td></tr><tr><td>400</td><td>44</td></tr><tr><td>500</td><td>56</td></tr></tbody>
+          </table>
+          <p>In order to graph this data, you simply plot the points on the xy-plane. We will not actually graph these by hand. Instead we will use software to create scatterplots.</p>
+          <p>Remember that we are looking for a relationship or pattern in the data. The graph follows.</p>
+          <div class="figure"><img src="images/section10/drug_pressure_scatter.png" alt="Scatter plot of dosage of drug and reduction in blood pressure"></div>
+        </article>
+
+        <p>Notice in the above graph there is a pattern in the data. As the dosage of the drug increases, the reduction in blood pressure also increases. We will now look at the specific patterns you need to be able to identify.</p>
+
+        <div class="grid-2">
+          <article class="card example"><h3>Perfect Positive Linear Correlation</h3><p>We will focus on linear patterns in this class. For the graph below, all the points are exactly on a line with a positive slope. We only say perfect if all the points are exactly on a given function. Positive is used because the line has a positive slope. It is important you use these exact terms.</p><div class="figure"><img src="images/section10/perfect_positive.png" alt="Perfect positive linear correlation"></div></article>
+          <article class="card example"><h3>Perfect Negative Linear Correlation</h3><p>The only difference between this graph and the previous one is the negative slope.</p><div class="figure"><img src="images/section10/perfect_negative.png" alt="Perfect negative linear correlation"></div></article>
+          <article class="card example"><h3>Positive Linear Correlation</h3><p>The graph below is a much more reasonable situation. In practice, nothing is ever perfect. In this case there is no exact function that fits all of the points. However, if you draw a line with a positive slope, all of the points are close to the line. This is typically what we look for with this type of data.</p><div class="figure"><img src="images/section10/positive_linear.png" alt="Positive linear correlation"></div></article>
+          <article class="card example"><h3>Negative Linear Correlation</h3><p>Once again, the only difference between this graph and the previous one is that in this case we have a negative slope.</p><div class="figure"><img src="images/section10/negative_linear.png" alt="Negative linear correlation"></div></article>
+          <article class="card example"><h3>Non-Linear Correlation</h3><p>Since our focus is on linear relationships, you do not have to identify other types of correlation. If we have a pattern that is not linear, then you should identify it as non-linear correlation. Technically the relationship below is quadratic, but you do not have to identify the specific type.</p><div class="figure"><img src="images/section10/nonlinear.png" alt="Non-linear correlation"></div></article>
+          <article class="card example"><h3>No Correlation</h3><p>If there is not a pattern or relationship seen in the graph then there is no correlation as is seen in the graph below.</p><div class="figure"><img src="images/section10/no_correlation.png" alt="No correlation"></div></article>
+        </div>
+      </section>
+
+      <section id="coefficient" class="section">
+        <h2>The Correlation Coefficient</h2>
+        <p>The Pearson product-moment correlation coefficient, denoted as r, describes a linear relationship between two quantitative variables. It is important to notice that when looking at this value, it only indicates the linear relationship. You could have another kind of relationship present in the data. The r value indicates both the strength of the linear association and its direction.</p>
+
+        <p>The value of r is based on three variance components as defined below:</p>
+        <div class="formula">Sum of Squared X = SSX = Σ(x − x̄)²</div>
+        <div class="formula">Sum of Squared Y = SSY = Σ(y − ȳ)²</div>
+        <div class="formula">Sum of XY = SXY = Σ(x − x̄)(y − ȳ)</div>
+
+        <p>To calculate r, the following formula should be utilized:</p>
+        <div class="formula">r = <span class="frac"><span class="top">SXY</span><span class="bottom">√(SSX · SSY)</span></span> = <span class="frac"><span class="top">Σ(x − x̄)(y − ȳ)</span><span class="bottom">√[Σ(x − x̄)² · Σ(y − ȳ)²]</span></span> = <span class="frac"><span class="top">nΣxy − (Σx)(Σy)</span><span class="bottom">√[(nΣx² − (Σx)²)(nΣy² − (Σy)²)]</span></span></div>
+
+        <p>Above is the progression to arrive at the computational formula which is seen last. You should use this formula when computing r. The algebraic steps to derive the computational formula are included below. Each variance component is manipulated first and then from those, the computational formula is derived.</p>
+
+        <details class="answer">
+          <summary>Show Algebraic Derivation</summary>
+          <div class="answer-body">
+            <h3>SSX</h3>
+            <div class="work">
+              <p>SSX = Σ(x − x̄)²</p>
+              <p>= Σ(x² − 2x̄x + x̄²)</p>
+              <p>= Σx² − Σ2x̄x + Σx̄²</p>
+              <p>= Σx² − 2x̄Σx + n · x̄²</p>
+              <p>= Σx² − 2(Σx/n)Σx + n(Σx/n)²</p>
+              <p>= Σx² − 2(Σx)²/n + (Σx)²/n</p>
+              <p>= Σx² − (Σx)²/n</p>
+            </div>
+            <h3>SSY</h3>
+            <div class="work">
+              <p>SSY = Σ(y − ȳ)²</p>
+              <p>= Σ(y² − 2ȳy + ȳ²)</p>
+              <p>= Σy² − Σ2ȳy + Σȳ²</p>
+              <p>= Σy² − 2ȳΣy + n · ȳ²</p>
+              <p>= Σy² − 2(Σy/n)Σy + n(Σy/n)²</p>
+              <p>= Σy² − 2(Σy)²/n + (Σy)²/n</p>
+              <p>= Σy² − (Σy)²/n</p>
+            </div>
+            <h3>SXY</h3>
+            <div class="work">
+              <p>SXY = Σ(x − x̄)(y − ȳ)</p>
+              <p>= Σ(xy − ȳx − x̄y + x̄ȳ)</p>
+              <p>= Σxy − Σȳx − Σx̄y + Σx̄ȳ</p>
+              <p>= Σxy − ȳΣx − x̄Σy + n · x̄ȳ</p>
+              <p>= Σxy − (Σy/n)Σx − (Σx/n)Σy + n(Σx/n)(Σy/n)</p>
+              <p>= Σxy − (Σx)(Σy)/n − (Σx)(Σy)/n + (Σx)(Σy)/n</p>
+              <p>= Σxy − (Σx)(Σy)/n</p>
+            </div>
+            <h3>Substitute into r</h3>
+            <div class="formula">r = <span class="frac"><span class="top">SXY</span><span class="bottom">√(SSX · SSY)</span></span> = <span class="frac"><span class="top">Σ(x − x̄)(y − ȳ)</span><span class="bottom">√[Σ(x − x̄)² · Σ(y − ȳ)²]</span></span> = <span class="frac"><span class="top">nΣxy − (Σx)(Σy)</span><span class="bottom">√[(nΣx² − (Σx)²)(nΣy² − (Σy)²)]</span></span></div>
+          </div>
+        </details>
+
+        <p>Positive r suggests large values of x and y occur together and that small values of x and y occur together. This means that the slope of the line that best fits the points is positive. An example would be Experience and Salary. People with lower levels of experience tend to have lower salaries and people with more experience tend to have higher salaries.</p>
+        <p>Negative r suggests large values of one variable tend to occur with small values of the other variable. This means that the slope of the line that best fits the points is negative. An example would be Weight of a car and Gas mileage. Light cars tend to have higher gas mileage and heavier cars tend to have lower gas mileage.</p>
+        <p>So the sign of the r value tells us the direction of the relationship. Strength of the relationship is measured by the actual value of the number. By the term strength, we mean how close are the points to a line? The closer the points are to a line, the stronger the relationship. Because of the setup of r, the maximum value for r (in terms of absolute value) is 1. Below are some useful things to keep in mind.</p>
+        <div class="formula">−1 ≤ r ≤ 1</div>
+        <ul>
+          <li>If r = 1 then there is perfect positive linear correlation – all data are exactly on a line with positive slope</li>
+          <li>If r = −1 then there is perfect negative linear correlation – all data are exactly on a line with negative slope</li>
+          <li>If r = 0 then there is no linear relationship (keep in mind there could be another type of correlation)</li>
+        </ul>
+        <p>The stronger the linear relationship, the larger |r| (the closer to 1 this value will be). Generally, we will say there is a strong relationship if |r| ≥ .75.</p>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>Looking back to our example where we had x = Dosage of Drug and y = Reduction in Blood Pressure, what do you think the r value will be? Remember based on the scatterplot that the points had a strong positive linear relationship. Not perfect but pretty close meaning the r value should be close to 1. The calculation of the r value follows.</p>
+          <table class="data-table"><thead><tr><th>x</th><th>y</th><th>x²</th><th>y²</th><th>xy</th></tr></thead><tbody>
+            <tr><td>100</td><td>10</td><td>10,000</td><td>100</td><td>1,000</td></tr>
+            <tr><td>200</td><td>18</td><td>40,000</td><td>324</td><td>3,600</td></tr>
+            <tr><td>300</td><td>32</td><td>90,000</td><td>1,024</td><td>9,600</td></tr>
+            <tr><td>400</td><td>44</td><td>160,000</td><td>1,936</td><td>17,600</td></tr>
+            <tr><td>500</td><td>56</td><td>250,000</td><td>3,136</td><td>28,000</td></tr>
+            <tr><th>Σx = 1500</th><th>Σy = 160</th><th>Σx² = 550,000</th><th>Σy² = 6,520</th><th>Σxy = 59,800</th></tr>
+          </tbody></table>
+          <details class="answer"><summary>Show Calculation</summary><div class="answer-body">
+            <div class="work">
+              <p>r = [nΣxy − (Σx)(Σy)] / √[(nΣx² − (Σx)²)(nΣy² − (Σy)²)]</p>
+              <p>= [5(59,800) − (1500)(160)] / √[(5(550,000) − (1500)²)(5(6,520) − (160)²)]</p>
+              <p>= 59,000 / √[(500,000)(7,000)]</p>
+              <p>= 0.99728</p>
+            </div>
+          </div></details>
+        </article>
+
+        <div class="key-idea card soft pad"><strong>Existence of correlation does not imply a cause and effect relationship</strong></div>
+        <article class="card example">
+          <h3>Example</h3>
+          <p>There is a strong statistical correlation over the months of the year between ice cream consumption and the number of assaults in the U.S. The r value for this data is above .9.</p>
+          <p>Does this mean ice cream manufacturers are responsible for assaults?</p>
+          <details class="answer"><summary>Show Answer</summary><div class="answer-body"><p>No! The correlation occurs statistically because the hot temperatures of summer increases both ice cream consumption and assaults (High values occur at the same time and low values occur at the same time)</p><p>Thus, correlation does NOT imply causation. This is one of the biggest mistakes that I see in the interpretation of a correlation. You should always keep in mind that other factors besides cause and effect can create an observed correlation.</p></div></details>
+        </article>
+      </section>
+
+      <section id="regression" class="section">
+        <h2>The Simple Linear Regression Model</h2>
+        <div class="definition"><strong>Regression</strong> – A technique used to predict variables (typically difficult to measure variables) based on a set of other variables (typically easier to measure variables).</div>
+        <div class="definition"><strong>Linear Regression</strong> – Used to predict the value of y (the response variable), based on x (the explanatory variable) using a linear equation.</div>
+        <article class="card example"><h3>Example</h3><p>Predict reaction time based on blood alcohol level. Reaction time is difficult to measure so instead we predict it with blood alcohol level which is easy to measure.</p></article>
+        <p>The linear regression model expresses y as a function of x plus random error.</p>
+        <p>Random error reflects variation in y values. Keep in mind we are going to measure x, so assuming we get a good measure there is no error in the x variable. However, when we go to use x to predict y, the prediction will not be exact. Therefore, there is error in the y variable. Graphically this error is represented by the vertical distance between the points and the line.</p>
+
+        <p>The linear regression model is:</p>
+        <div class="formula">y = b<sub>0</sub> + b<sub>1</sub>x</div>
+        <p>where b<sub>0</sub> is the y-intercept<br>b<sub>1</sub> is the slope</p>
+        <p>The above formula is the same format as what you should be used to from an algebra class. However, the way we denote the relationship is different. It is important you become familiar with this notation.</p>
+        <p>In order to use linear regression, we must first make sure the model is reasonable. The scatter plot and r should indicate a strong relationship. If the model is not reasonable, do not fit a line. It may still be possible to do regression with a more complicated model. However, if there is no relationship between the variables then regression cannot be used. Here, we will not worry about more complicated models, but you should understand that a simple linear model is just one of the many options available.</p>
+        <p>When using a linear regression model, we need the line that is the “best” fit for our data. Since our purpose will be to predict, we will want to pick the line that will minimize the error in the prediction. To accomplish this we will use the method of least-squares.</p>
+        <div class="definition"><strong>Method of Least-Squares</strong> – says that the sum of the squares of the vertical distances from the points to the line is minimized. Remember it is the vertical distance that represents the error.</div>
+        <p>To calculate the slope and y-intercept of the “best” fit line you can use the following formulas.</p>
+        <div class="formula">b<sub>1</sub> = <span class="frac"><span class="top">SXY</span><span class="bottom">SSX</span></span> = <span class="frac"><span class="top">Σ(x − x̄)(y − ȳ)</span><span class="bottom">Σ(x − x̄)²</span></span> = <span class="frac"><span class="top">nΣxy − (Σx)(Σy)</span><span class="bottom">nΣx² − (Σx)²</span></span></div>
+        <div class="formula">b<sub>0</sub> = ȳ − b<sub>1</sub>x̄ = <span class="frac"><span class="top">Σy − b₁Σx</span><span class="bottom">n</span></span></div>
+        <p>It is important to note that the numerator of b<sub>1</sub> is the same as the numerator of r. This should make since because these two values will always have the same sign (the denominator of both are always positive). Positive slope means r is positive and negative slope means r is negative. Also, notice the denominator of b<sub>1</sub> is the same as the first parentheses in the denominator of r. This is useful because if you calculate r first then you can just pull these two quantities to calculate b<sub>1</sub>.</p>
+
+        <article class="card example">
+          <h3>Example</h3>
+          <p>Previously in this section, when looking at the correlation for dosage of drug and reduction in blood pressure we established a strong positive linear correlation (based on the scatterplot and r). Therefore, we can justify using linear regression in this case. Find the regression equation for the dosage of drug and reduction in blood pressure data.</p>
+          <details class="answer"><summary>Show Solution</summary><div class="answer-body">
+            <div class="work"><p>b₁ = [nΣxy − (Σx)(Σy)] / [nΣx² − (Σx)²] = 59,000 / 500,000 = 0.118</p><p>b₀ = [Σy − b₁Σx] / n = [160 − 0.118(1500)] / 5 = −3.4</p><p>y = b₀ + b₁x</p><p>y = −3.4 + 0.118x</p></div>
+          </div></details>
+          <p>Another way to get the regression equation is to use software. We will mainly do the calculation by hand, but if given output you should be able to identify the information needed to justify regression and predict using the model. Computer output for the dosage of drug and reduction in blood pressure data is given below.</p>
+          <div class="figure"><img src="images/section10/drug_regression.png" alt="Regression plot for dosage of drug and reduction in blood pressure"></div>
+          <p>In this output, the equation (y = −3.4 + 0.118x) and the R-squared value are given. If you look above the graph, you will see this information. The R-squared value is common for computer software. This value represents the percent of variation in y explained by the model. R-squared is always between 0% and 100%. In the linear case it is simply calculated by squaring the r value (R-squared = (. 99728)² = .995 = 99.5%). The higher R-squared is, the better the model. The R-squared value can be calculated for all regression models so it is commonly used to compare a linear model to other non-linear models.</p>
+        </article>
+      </section>
+
+      <section id="prediction" class="section">
+        <h2>Prediction and Residuals</h2>
+        <p>You should be able to get the r value based on the R-squared value that is given in the output. All you have to do is take the square root of the R-squared value. The thing you have to be careful of is the direction of the relationship. Remember, if the slope of the line is positive then r is positive and if the slope is negative then r is negative. Therefore, you must look at the slope in order to decide if r is positive or negative.</p>
+        <p>In terms of the equation, you need to be able to use it for prediction. This is a pretty direct process as we will always be predicting y based on x. Therefore, you will plug in for x and solve for y.</p>
+        <article class="card example"><h3>Example</h3><p>For our example, predict the Reduction in Blood Pressure if 250 is the Dosage of Drug.</p><details class="answer"><summary>Show Answer</summary><div class="answer-body"><div class="formula">y = −3.4 + 0.118x = −3.4 + 0.118(250) = 26.1</div></div></details></article>
+        <div class="definition"><strong>Residual</strong> – the difference between an actual value and the fitted value (a measure of error, denoted by e)</div>
+        <div class="formula">e = y − (b<sub>0</sub> + b<sub>1</sub>x)</div>
+        <article class="card example"><h3>Example</h3><p>Find the residual value for the point (400, 44) in the dosage of drug and reduction in blood pressure data.</p><details class="answer"><summary>Show Answer</summary><div class="answer-body"><div class="formula">e = y − (b₀ + b₁x) = 44 − (−3.4 + 0.118(400)) = 44 − 43.8 = 0.2</div><p>This tells us that the point (400, 44) is 0.2 units above the “best” fit line.</p></div></details></article>
+      </section>
+
+      <section id="cautions" class="section">
+        <h2>Cautions with regression</h2>
+        <p>There are two common mistakes with regression. You must be aware of the problems with extrapolation and extreme values.</p>
+        <div class="definition"><strong>Interpolation</strong> – predicting Y values for X values that are within the range of the scatter plot (this is what regression should be used for)</div>
+        <div class="definition"><strong>Extrapolation</strong> – predicting Y values for X values beyond the range of the observations (this should not be done with a basic regression model, it is a complex problem)</div>
+        <p>If our x variable ranges from 100 to 500 as it does in the dosage of drug and reduction in blood pressure example then it is reasonable to predict within that range (interpolation). However, if you try and predict for an x of 1000 (extrapolation) then you have no data indicating that this relationship holds at that value. It is quite possible that the relationship changes beyond the range of the data. There is no way to know this without collecting data consistent with the x values you want to predict. Regression should not be used to extrapolate.</p>
+        <p>The least-squares line and the r value can be affected greatly by extreme data points. In order to illustrate this we will look at some computer output.</p>
+        <div class="figure"><img src="images/section10/extreme_before.png" alt="Regression plot showing no linear relationship before adding an extreme value"></div>
+        <p>Calculate the r value for the above data.</p>
+        <div class="formula">r = √0 = 0</div>
+        <p>With an r of 0, we know that there is no linear relationship between x and y.</p>
+        <div class="figure"><img src="images/section10/extreme_after.png" alt="Regression plot after adding one extreme value"></div>
+        <p>Calculate r for the above data.</p>
+        <div class="formula">r = √.779 = .883</div>
+        <p>With an r of .883, which is bigger than the criteria of .75 it seems like we have a strong relationship. With further investigation via the scatterplot, you will see that all of the data is in the bottom left of the graph except one data point which is extreme. What I actually did was take the data from the previous graph with an r value of 0 and add one extreme value. Notice the extreme value makes the other data points appear close together. They also appear numerically close since the one value is so extreme. Therefore, the r value is high because the points are close to the line. In this case linear regression is not justified. If you have an extreme value in a plot like in this case, you should remove the extreme value and see if the relationship still exists. In this case it does not, so linear regression will not work for this data.</p>
+      </section>
+
+      <div class="back-row" style="margin-top:36px">
+        <a class="btn outline btn-sm" href="index.html">← Back to STA296U Notes</a>
+        <a class="btn btn-sm" href="STA296U_Section_10_Simple_Linear_Regression.docx" download>Download Word Notes</a>
+      </div>
+
+      <footer class="notes-footer">Last updated: <span id="lastUpdated"></span></footer>
+    </div>
+  </main>
+  <script>
+    document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleString();
+  </script>
+</body>
+</html>
