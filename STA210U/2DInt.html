@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>STA210U — Section 2D | StatsLG</title>
+<meta content="STA210U Section 2D — Linear Correlation and Regression." name="description"/>
+<link href="/favicon.ico" rel="icon"/>
+<link href="/style/bctcstyle.css" rel="stylesheet"/>
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};
+</script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --kctcs-blue:#00467f;--kctcs-gold:#e7a614;--ink:#17202a;--muted:#5c6670;
+  --panel:#f6f8fa;--rule:#d7dde3;--radius:12px;--shadow-1:0 2px 10px rgba(0,0,0,.08);
+  --good:#176b3a;--bad:#a02f2f;--soft-blue:#eef6fc;--soft-gold:#fff9e9;
+}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);background:#fff;font-family:Arial,Helvetica,sans-serif}
+a{color:var(--kctcs-blue)}
+button,input,select{font:inherit}
+button{touch-action:manipulation}
+.notes-page{max-width:1180px;margin:0 auto;padding:24px 34px 40px}
+.notes-content{max-width:940px;margin:0 auto}
+.notes-content h2{margin-top:2.2rem;scroll-margin-top:90px}
+.notes-content h3{margin-top:1.55rem;color:var(--ink)}
+.notes-content p,.notes-content li{line-height:1.65}
+.header{padding:8px 0 2px}.header h1{margin-bottom:.25rem}.header p{margin-top:0;color:var(--muted);font-size:1.08rem}
+.back-row{margin:0 0 18px;display:flex;gap:10px;flex-wrap:wrap}
+.btn,.lecture-btn{border:0;border-radius:8px;padding:9px 13px;background:var(--kctcs-blue);color:#fff;font-weight:800;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.btn.outline,.lecture-btn.secondary{background:#fff;color:var(--kctcs-blue);border:1px solid var(--kctcs-blue)}
+.btn-sm{font-size:.92rem}
+.toc{margin-bottom:1.5rem}.toc h2{margin-top:0}.toc a{color:var(--kctcs-blue);font-weight:700}.toc a:hover{text-decoration:underline}
+.panel,.card{border:1px solid var(--rule);border-radius:var(--radius);background:#fff;box-shadow:var(--shadow-1)}
+.pad{padding:18px 20px}.soft{background:var(--panel)}
+.definition{border-left:5px solid var(--kctcs-blue);padding:12px 14px;margin:14px 0;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.definition strong{color:var(--kctcs-blue)}
+.formula{font-size:1.15rem;text-align:center;color:var(--kctcs-blue);margin:16px 0;padding:14px;background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius);overflow-x:auto}
+.example{margin:18px 0;padding:18px}.key-idea{border-left:5px solid var(--kctcs-gold)}
+details.answer{margin-top:14px;border-top:1px solid var(--rule);padding-top:10px}
+details.answer summary{cursor:pointer;color:var(--kctcs-blue);font-weight:800}
+.answer-body{border-left:5px solid var(--kctcs-gold);padding:10px 14px;background:var(--panel);border-radius:0 var(--radius) var(--radius) 0}
+.notes-footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted);font-size:12px}
+table{width:100%;border-collapse:collapse;margin:14px 0 20px;background:#fff}
+th,td{border:1px solid var(--rule);padding:8px 10px;text-align:left}th{background:var(--panel)}
+
+/* Lecture controls */
+.lecture-toolbar{position:sticky;top:0;z-index:20;margin:0 -6px 18px;padding:10px 8px;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mode-status{font-size:.92rem;color:var(--muted);margin-left:auto}
+.progress-wrap{width:100%;height:7px;background:#e8edf1;border-radius:99px;overflow:hidden}
+.progress-bar{height:100%;width:0;background:var(--kctcs-gold);transition:width .2s ease}
+.lecture-note{border-left:5px solid var(--kctcs-gold);background:var(--soft-gold);padding:13px 15px;border-radius:0 10px 10px 0;margin:16px 0}
+.activity{margin:20px 0;padding:18px;border:1px solid #bfd2e2;border-radius:var(--radius);background:var(--soft-blue)}
+.activity h3,.activity h4{margin-top:0}
+.prompt{font-weight:800;color:var(--kctcs-blue)}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0}
+.controls label{font-weight:700}
+.controls input[type="number"]{width:110px;padding:8px;border:1px solid #aeb9c2;border-radius:7px}
+.controls input[type="range"]{min-width:220px;flex:1}
+.controls select{padding:8px;border:1px solid #aeb9c2;border-radius:7px;background:#fff}
+.feedback{min-height:24px;margin-top:8px;font-weight:800}
+.feedback.good{color:var(--good)}.feedback.bad{color:var(--bad)}
+.choice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}
+.choice{border:1px solid #b8c6d0;border-radius:9px;background:#fff;padding:12px;cursor:pointer;font-weight:700;text-align:left}
+.choice:hover{border-color:var(--kctcs-blue)}
+.choice.correct{outline:3px solid rgba(23,107,58,.22);border-color:var(--good)}
+.choice.incorrect{outline:3px solid rgba(160,47,47,.15);border-color:var(--bad)}
+.chart-shell{position:relative;height:360px;margin:14px 0;background:#fff;border:1px solid var(--rule);border-radius:10px;padding:10px}
+.chart-shell.short{height:300px}
+.chart-shell canvas{display:block;max-width:100%;max-height:100%}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:12px 0}
+.metric{background:#fff;border:1px solid var(--rule);border-radius:10px;padding:12px;text-align:center}
+.metric .big{display:block;color:var(--kctcs-blue);font-weight:900;font-size:1.35rem;margin-top:4px}
+.step-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:14px 0}
+.step-card{border:1px solid var(--rule);border-radius:10px;padding:14px;background:#fff}
+.step-card strong{color:var(--kctcs-blue)}
+.callout{padding:12px 14px;border-radius:9px;background:#fff;border:1px solid var(--rule);margin:10px 0}
+.hidden-explanation{display:none}
+.review-mode .hidden-explanation{display:block}
+.review-mode details.answer{border-top:0;padding-top:0}
+.review-mode details.answer summary{display:none}
+.review-mode details.answer .answer-body{display:block}
+
+
+/* Two compact examples of the direction of linear association */
+.relationship-examples{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:18px 0 22px}
+.relationship-card{min-width:0;border:1px solid var(--rule);border-radius:12px;background:#fff;padding:16px;box-shadow:var(--shadow-1)}
+.relationship-card h4{font-size:1.06rem;margin:0 0 8px;color:var(--kctcs-blue)}
+.relationship-card p{margin:8px 0 0;font-size:.96rem}
+.relationship-card .chart-shell{height:245px;margin:12px 0;padding:8px}
+.relationship-label{display:inline-block;font-size:.86rem;font-weight:800;padding:4px 9px;border-radius:5px;background:var(--soft-blue);color:var(--kctcs-blue)}
+@media(max-width:690px){.relationship-examples{grid-template-columns:1fr}.relationship-card .chart-shell{height:260px}}
+
+/* Regression prediction notes */
+.equation-table td:first-child,.equation-table td:nth-child(2){font-weight:800;text-align:center;white-space:nowrap}
+.prediction-steps .formula{font-size:.98rem;padding:8px 4px;margin:10px 0}
+.prediction-steps .step-card p{margin:.6rem 0}
+.slider-help{font-size:.93rem;color:var(--muted);margin:6px 0 10px}
+@media(max-width:580px){.equation-table th,.equation-table td{padding:7px 5px;font-size:.88rem}}
+
+/* Spreadsheet capstone */
+.study-card{margin-top:28px;padding:20px;border:2px solid var(--kctcs-blue);border-radius:var(--radius);background:#fff}
+.study-card h2{margin-top:0}
+.study-examples{margin-top:30px}
+.study-example-dropdown{margin:16px 0;border:2px solid var(--kctcs-blue);border-radius:var(--radius);background:#fff;overflow:hidden}
+.study-example-dropdown>summary{cursor:pointer;list-style:none;padding:16px 18px;background:var(--panel);color:var(--kctcs-blue);font-weight:900;font-size:1.08rem;display:flex;align-items:center;gap:10px}
+.study-example-dropdown>summary::-webkit-details-marker{display:none}
+.study-example-dropdown>summary::before{content:"▶";font-size:.8rem;transition:transform .15s ease}
+.study-example-dropdown[open]>summary::before{transform:rotate(90deg)}
+.study-example-dropdown[open]>summary{border-bottom:1px solid var(--rule)}
+.study-example-body{padding:20px}
+.study-example-dropdown .study-card{margin:0;padding:0;border:0;border-radius:0;background:transparent}
+.example-kicker{display:block;color:var(--muted);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.sheet-wrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px;margin:14px 0}
+table.sheet{margin:0;min-width:620px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.94rem}
+table.sheet th{background:#edf2f6;text-align:center}
+table.sheet td:first-child,table.sheet th:first-child{background:#f7f9fa;text-align:center;font-weight:800;width:48px}
+.study-questions{display:grid;gap:12px}
+.study-q{padding:14px;border:1px solid var(--rule);border-radius:10px;background:var(--panel)}
+.study-q input{padding:7px;border:1px solid #aeb9c2;border-radius:7px;width:125px}
+.tag{display:inline-block;padding:3px 8px;border-radius:99px;background:#e8f1f8;color:var(--kctcs-blue);font-weight:800;font-size:.86rem}
+
+@media(max-width:760px){
+ .notes-page{padding:16px 12px 30px}.back-row{flex-direction:column;align-items:stretch}.back-row .btn{justify-content:center}
+ .lecture-toolbar{top:0}.mode-status{width:100%;margin-left:0}.chart-shell{height:300px}.controls input[type="range"]{min-width:160px;width:100%}
+}
+@media print{.back-row,.lecture-toolbar,.activity button{display:none!important}.notes-page,.notes-content{max-width:none;padding:0}details.answer>*{display:block!important}.chart-shell{break-inside:avoid}}
+
+.capstone-step{margin:14px 0;border:1px solid var(--rule);border-radius:var(--radius);background:#fff;overflow:hidden}
+.capstone-step summary{cursor:pointer;font-weight:800;color:var(--kctcs-blue);padding:12px 14px;background:var(--panel)}
+.capstone-step[open] summary{border-bottom:1px solid var(--rule)}
+.capstone-step .answer-body{margin:0;padding:12px 14px;border-left:5px solid var(--kctcs-gold)}
+.split-grid{display:grid;grid-template-columns:minmax(280px,.8fr) minmax(360px,1.2fr);gap:18px;align-items:stretch;margin:18px 0}
+.split-grid .chart-wrap{min-height:430px}
+@media(max-width:820px){.split-grid{grid-template-columns:1fr}.split-grid .chart-wrap{min-height:360px}}
+</style>
+</head>
+<body>
+<main class="notes-page"><div class="notes-content" id="notesContent">
+<div class="back-row">
+<a class="btn outline btn-sm" href="index.html">← Back to STA210U Notes</a>
+<a class="btn btn-sm" download="" href="STA210U_Section_2D_Linear_Correlation_and_Regression.docx">Download Word Notes</a>
+</div>
+<header class="header">
+<h1>STA210U — Section 2D</h1>
+<p>Descriptive Statistics: Linear Correlation and Regression</p>
+</header>
+<div aria-label="Notes display options" class="lecture-toolbar">
+<button class="lecture-btn" id="lectureModeBtn" type="button">Practice</button>
+<button class="lecture-btn secondary" id="reviewModeBtn" type="button">Review</button>
+<span class="mode-status" id="modeStatus">Practice: try each question before opening the answer.</span>
+<div aria-label="Page progress" class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+</div>
+<section class="section panel pad toc">
+<h2>In This Section</h2>
+<ul>
+<li><a href="#correlation">Linear Correlation</a></li>
+<li><a href="#causation">Cause and Effect</a></li>
+<li><a href="#regression">Linear Regression</a></li>
+<li><a href="#prediction-basics">Making Predictions</a></li>
+<li><a href="#study">Two Worked Examples</a></li>
+</ul>
+<div class="lecture-note"><strong>How to use these notes:</strong> read a short chunk, make a prediction or calculation, then check the explanation. Select Review to open the worked explanations when studying.</div>
+</section>
+<section class="section" id="correlation">
+<h2>1. Linear Correlation</h2>
+<h3>Quantifying Linear Correlation</h3>
+<div class="definition"><strong>Pearson Product-Moment Correlation Coefficient, \(r\)</strong> — describes the direction and strength of a linear relationship between two quantitative variables.</div>
+<p>It is important to notice that \(r\) only indicates the <strong>linear</strong> relationship. Another kind of relationship could still be present in the data.</p>
+<p>You will not need to calculate \(r\) by hand, but the formula is:</p>
+<div class="formula">\[r=\frac{SXY}{\sqrt{SSX\,SSY}}\]</div>
+<div class="formula">\[SSX=\sum(x-\bar{x})^2=\sum x^2-\frac{(\sum x)^2}{n}\]</div>
+<div class="formula">\[SSY=\sum(y-\bar{y})^2=\sum y^2-\frac{(\sum y)^2}{n}\]</div>
+<div class="formula">\[SXY=\sum(x-\bar{x})(y-\bar{y})=\sum xy-\frac{(\sum x)(\sum y)}{n}\]</div>
+<h3>Direction and Strength</h3>
+<p><strong>Positive \(r\)</strong> means larger X values tend to occur with larger Y values. <strong>Negative \(r\)</strong> means larger values of one variable tend to occur with smaller values of the other.</p>
+<p>Strength describes how close the points are to a line.</p>
+<div class="formula">\[-1\le r\le1\]</div>
+<ul>
+<li>\(r=1\): perfect positive linear correlation.</li>
+<li>\(r=-1\): perfect negative linear correlation.</li>
+<li>\(r=0\): no linear relationship, although another kind of relationship may exist.</li>
+<li>In this course, a relationship is generally considered strong when \(|r|\ge .75\).</li>
+</ul>
+<div class="relationship-examples" aria-label="Examples of positive and negative correlation">
+<article class="relationship-card">
+<h4>Positive Correlation</h4>
+<span class="relationship-label">Study time and exam grades</span>
+<p>Students who study more hours per week tend to have higher exam scores. As X increases, Y tends to increase.</p>
+<div class="chart-shell"><canvas id="positiveExampleChart" role="img" aria-label="Scatterplot showing a positive relationship between weekly study hours and exam scores"></canvas></div>
+<p><strong>Direction:</strong> upward from left to right. <strong>Correlation:</strong> <span id="positiveExampleR">positive</span>.</p>
+</article>
+<article class="relationship-card">
+<h4>Negative Correlation</h4>
+<span class="relationship-label">Temperature and gas bills</span>
+<p>For a home heated with natural gas, colder months often have higher gas bills. As temperature increases, the bill tends to decrease.</p>
+<div class="chart-shell"><canvas id="negativeExampleChart" role="img" aria-label="Scatterplot showing a negative relationship between temperature and natural-gas bills"></canvas></div>
+<p><strong>Direction:</strong> downward from left to right. <strong>Correlation:</strong> <span id="negativeExampleR">negative</span>.</p>
+</article>
+</div>
+<p class="lecture-note"><strong>Remember:</strong> positive and negative describe the <em>direction</em>, not how strong the relationship is. Neither one, on its own, proves causation. Both datasets are illustrative classroom examples.</p>
+<div class="activity" id="correlationLab">
+<h3>Explore Correlation</h3>
+<p class="prompt">Before moving the controls: what should happen to \(|r|\) when the dots spread farther away from a line?</p>
+<div class="controls">
+<label for="directionSelect">Direction</label>
+<select id="directionSelect"><option value="1">Positive</option><option value="-1">Negative</option></select>
+<label for="noiseRange">Scatter</label>
+<input id="noiseRange" max="100" min="0" step="1" type="range" value="15" aria-describedby="scatterHelp"/>
+<output class="tag" id="noiseLabel" for="noiseRange">15 / 100</output>
+</div>
+<p class="slider-help" id="scatterHelp">At 0 the points form a perfect straight line (\(|r|=1\)). At 100, the points have no linear relationship (\(r=0\)). Try both directions.</p>
+<div class="chart-shell"><canvas aria-label="Correlation scatterplot that can vary from a perfect positive or negative line to no linear correlation" id="correlationChart"></canvas></div>
+<div class="metric-grid">
+<div class="metric">Current correlation<span class="big" id="corrMetric">—</span></div>
+<div class="metric">Direction<span class="big" id="corrDirection">—</span></div>
+<div class="metric">Course strength rule<span class="big" id="corrStrength">—</span></div>
+</div>
+<div class="callout" id="corrExplanation" aria-live="polite">Move the slider to compare strength and direction.</div>
+<details class="answer"><summary>Show Explanation</summary><div class="answer-body"><p>At the left end the points lie on a straight line and \(|r|=1\). Moving right reduces the strength of the linear relationship until \(r=0\) exactly. At that point the regression line is horizontal, and choosing Positive or Negative no longer changes its direction. A zero correlation means <em>no linear</em> relationship; it does not rule out every other kind of relationship. The points in this demonstration are constructed to make the progression smooth, not collected from a real study.</p></div></details>
+</div>
+<h3>Drug Dosage Example</h3>
+<table><thead><tr><th>Dosage of Drug, X</th><th>Reduction in Blood Pressure, Y</th></tr></thead><tbody>
+<tr><td>100</td><td>10</td></tr><tr><td>200</td><td>18</td></tr><tr><td>300</td><td>32</td></tr><tr><td>400</td><td>44</td></tr><tr><td>500</td><td>56</td></tr>
+</tbody></table>
+<p>The scatterplot indicates a very strong positive linear relationship:</p>
+<div class="formula">\[r=.99728\]</div>
+<div class="chart-shell short"><canvas id="drugScatter"></canvas></div>
+<h3>R-Squared</h3>
+<div class="definition"><strong>\(R^2\)</strong> — the percent of variation in Y explained by the model. In simple linear regression, \(R^2=r^2\).</div>
+<div class="formula">\[0\%\le R^2\le100\%\]</div>
+<div class="formula">\[R^2=(.99728)^2\approx.995=99.5\%\]</div>
+<div class="activity">
+<h3>Quick Check: From \(r\) to \(R^2\)</h3>
+<p class="prompt">Suppose \(r=-.80\). What percent of the variation in Y is explained by the linear model?</p>
+<div class="controls"><input id="r2Input" max="100" min="0" placeholder="Percent" step="0.1" type="number"/><button class="lecture-btn" id="r2Check" type="button">Check</button></div>
+<div aria-live="polite" class="feedback" id="r2Feedback"></div>
+<details class="answer"><summary>Show Explanation</summary><div class="answer-body"><p>Square the correlation: \((-0.80)^2=0.64\). Therefore, \(R^2=64\%\). The sign disappears when we square \(r\).</p></div></details>
+</div>
+</section>
+<section class="section" id="causation">
+<h2>2. Cause and Effect</h2>
+<div class="definition"><strong>“Causal” Research</strong> — research whose objective is to determine whether one variable causes changes in another.</div>
+<div class="card soft key-idea pad"><h3>Correlation Does Not Imply Causation</h3><p>It is never possible to prove causality just from the relationship between two variables.</p></div>
+<h3>Ice Cream and Assaults</h3>
+<p>The notes give an example of a strong correlation between ice cream consumption and assaults over the months of the year. That does not mean ice cream causes crime. Hot summer temperatures can increase both variables.</p>
+<div class="activity">
+<h3>Check Your Understanding</h3>
+<p class="prompt">A city finds a strong positive correlation between monthly ice cream sales and assaults. Which conclusion is justified from the correlation alone?</p>
+<div class="choice-grid" id="causalChoices">
+<button class="choice" data-correct="false">Ice cream causes assaults.</button>
+<button class="choice" data-correct="false">Assaults cause people to buy ice cream.</button>
+<button class="choice" data-correct="true">The variables are associated, but a third variable may explain the relationship.</button>
+<button class="choice" data-correct="false">The correlation proves temperature has no role.</button>
+</div>
+<div aria-live="polite" class="feedback" id="causalFeedback"></div>
+<details class="answer"><summary>Show Explanation</summary><div class="answer-body"><p>Correlation documents association, not a causal mechanism. Temperature is a plausible rival explanation because warmer months can increase both ice cream consumption and outdoor activity, including opportunities for assaults.</p></div></details>
+</div>
+<h3>Criteria for Establishing a Causal Relationship</h3>
+<ol>
+<li><strong>Time order:</strong> the cause must occur before the effect.</li>
+<li><strong>Co-variation:</strong> the graph and correlation coefficient must show a strong relationship.</li>
+<li><strong>Rationale:</strong> there must be a logical and compelling explanation for the causal mechanism.</li>
+<li><strong>Non-spuriousness:</strong> rival explanations must be ruled out.</li>
+</ol>
+<p>The fourth criterion is especially difficult. Repeating studies under differing conditions can help rule out rival explanations.</p>
+<div class="step-grid">
+<div class="step-card"><strong>1. Time order</strong><br/>The proposed cause occurs first.</div>
+<div class="step-card"><strong>2. Co-variation</strong><br/>The variables actually move together.</div>
+<div class="step-card"><strong>3. Rationale</strong><br/>A believable mechanism connects them.</div>
+<div class="step-card"><strong>4. Non-spuriousness</strong><br/>Competing explanations are ruled out.</div>
+</div>
+</section>
+<section class="section" id="regression">
+<h2>3. Linear Regression</h2>
+<div class="definition"><strong>Deterministic View</strong> — once X is known, the exact value of Y is known.</div>
+<div class="definition"><strong>Regression</strong> — a technique used to predict variables based on other variables.</div>
+<div class="definition"><strong>Linear Regression</strong> — predicts Y, the response variable, from X, the explanatory variable, using a linear equation.</div>
+<p>Prediction is not exact. The error is represented by the vertical distance between a point and the regression line.</p>
+<div class="formula">\[\hat{Y}=b_0+b_1X\]</div>
+<ul><li>\(b_0\) is the y-intercept.</li><li>\(b_1\) is the slope.</li></ul>
+<p>Before fitting a line, the scatterplot and \(r\) should indicate that a linear model is reasonable.</p>
+<h3 id="prediction-basics">The Same Equation You Already Know</h3>
+<p>In algebra, a straight line is written in <strong>slope-intercept form</strong>. Linear regression uses the same equation with statistical notation:</p>
+<div class="formula">\[y=mx+b\qquad\longleftrightarrow\qquad\hat{Y}=b_0+b_1X\]</div>
+<table class="equation-table"><thead><tr><th>From algebra</th><th>In regression</th><th>What it means</th></tr></thead><tbody>
+<tr><td>\(x\)</td><td>\(X\)</td><td>The known input (explanatory variable), such as dosage.</td></tr>
+<tr><td>\(m\)</td><td>\(b_1\)</td><td>The <strong>slope</strong>: predicted change in Y for a one-unit increase in X.</td></tr>
+<tr><td>\(b\)</td><td>\(b_0\)</td><td>The <strong>y-intercept</strong>: the model's predicted value when X = 0.</td></tr>
+<tr><td>\(y\)</td><td>\(\hat{Y}\)</td><td>The <strong>predicted</strong> response. The hat reminds us it may differ from an actual observation.</td></tr>
+</tbody></table>
+<p>Writing the intercept first or last does not change the line: \(b_0+b_1X=b_1X+b_0\). For a prediction, we know X, substitute it into the equation, and calculate \(\hat{Y}\). A regression prediction describes what the <em>fitted line</em> predicts, not what every individual observation must equal.</p>
+<h3>Method of Least Squares</h3>
+<div class="definition"><strong>Method of Least Squares</strong> — minimizes the sum of the squared vertical distances from the observed points to the regression line.</div>
+<div class="formula">\[b_1=\frac{SXY}{SSX}\]</div>
+<div class="formula">\[b_0=\bar{y}-b_1\bar{x}\]</div>
+<h3>Drug Dosage Regression</h3>
+<div class="formula">\[b_1=.118\qquad b_0=-3.4\]</div>
+<div class="formula">\[\hat{Y}=-3.4+.118X\]</div>
+<div class="chart-shell short"><canvas id="drugRegression"></canvas></div>
+<p>If \(R^2\) is provided instead of \(r\), take the square root of \(R^2\) and use the sign of the slope to determine whether \(r\) is positive or negative.</p>
+<h3>How to Make a Prediction</h3>
+<p>For this illustrative dosage dataset, \(b_1=0.118\) and \(b_0=-3.4\). The slope says that each additional dosage unit corresponds to an increase of <strong>0.118 units in the predicted blood-pressure reduction</strong>. The intercept is the line's prediction at dosage 0, but 0 lies outside our observed dosage range, so we should not give it a practical interpretation.</p>
+<div class="step-grid prediction-steps">
+<div class="step-card"><strong>1. Identify X</strong><p>We want a prediction for dosage 250, so \(X=250\).</p></div>
+<div class="step-card"><strong>2. Substitute</strong><p>Put 250 in place of X in the regression equation.</p><div class="formula">\[\hat{Y}=-3.4+0.118(250)\]</div></div>
+<div class="step-card"><strong>3. Calculate</strong><p>Multiply first: \(0.118(250)=29.5\). Then add the intercept:</p><div class="formula">\[\hat{Y}=-3.4+29.5=26.1\]</div></div>
+<div class="step-card"><strong>4. Interpret and check</strong><p>The fitted model predicts a reduction of <strong>26.1</strong> for dosage 250. This is a prediction, not an exact outcome. Since 250 is within the observed dosage range of 100–500, this is interpolation.</p></div>
+</div>
+<div class="activity">
+<h3>Prediction Lab</h3>
+<p class="prompt">Use \(\hat{Y}=-3.4+.118X\) to predict the reduction in blood pressure for a dosage you choose.</p>
+<div class="controls">
+<label for="drugDose">Dosage:</label><input id="drugDose" max="1200" min="0" step="10" type="number" value="250"/>
+<button class="lecture-btn" id="predictDrug" type="button">Predict</button>
+</div>
+<div class="metric">Predicted reduction<span class="big" id="drugPrediction">26.1</span></div>
+<div class="callout" id="drugCalculation" aria-live="polite">Substitute the dosage into the equation to see the calculation.</div>
+<div class="feedback" id="drugRangeMessage"></div>
+<details class="answer"><summary>Why is this only a prediction?</summary><div class="answer-body"><p>The regression line gives the estimated response for a selected value of X. Real observations can fall above or below the line. We should also check whether the chosen dosage falls inside the range of values used to fit the model (100–500). This classroom example is for learning regression, not medical dose guidance.</p></div></details>
+</div>
+<h3>Automobile Weight and Gas Mileage</h3>
+<table><thead><tr><th>Weight, X (1000 lb)</th><th>Gas Mileage, Y (mpg)</th></tr></thead><tbody><tr><td>2.5</td><td>40.0</td></tr><tr><td>3.0</td><td>43.0</td></tr><tr><td>4.0</td><td>30.0</td></tr><tr><td>3.5</td><td>35.0</td></tr><tr><td>2.7</td><td>42.0</td></tr><tr><td>4.5</td><td>19.0</td></tr><tr><td>3.8</td><td>32.0</td></tr><tr><td>2.9</td><td>39.0</td></tr><tr><td>5.0</td><td>15.0</td></tr><tr><td>2.2</td><td>44.0</td></tr></tbody></table>
+<div class="chart-shell short"><canvas id="autoRegression"></canvas></div>
+<div class="formula">\[R^2=92.0\%\qquad \hat{Y}=70.1058-10.6175X\]</div>
+<div class="activity">
+<h3>Work the Automobile Example</h3>
+<p><strong>1.</strong> Calculate \(r\). Remember: use the sign of the slope.</p>
+<div class="controls"><input id="autoR" placeholder="r" step="0.001" type="number"/><button class="lecture-btn" id="checkAutoR" type="button">Check r</button></div>
+<div class="feedback" id="autoRFeedback"></div>
+<p><strong>2.</strong> Predict gas mileage for a car weighing 4,200 pounds. Our X variable is measured in <strong>thousands of pounds</strong>, so first convert 4,200 lb to \(X=4.2\). Then replace X in the equation \(\hat{Y}=70.1058-10.6175X\).</p>
+<div class="controls"><input id="autoPred" placeholder="mpg" step="0.01" type="number"/><button class="lecture-btn" id="checkAutoPred" type="button">Check prediction</button></div>
+<div class="feedback" id="autoPredFeedback"></div>
+<details class="answer"><summary>Show Worked Answers</summary><div class="answer-body"><p><strong>1. Correlation:</strong> the slope is negative, so use the negative square root of \(R^2\):</p><div class="formula">\[r=-\sqrt{0.92}\approx-0.959\]</div><p>The relationship is strong under our course rule, and the scatterplot is reasonably linear.</p><p><strong>2. Prediction:</strong> use 4.2 (not 4,200) because X is in thousands of pounds:</p><div class="formula">\[\hat{Y}=70.1058-10.6175(4.2)=70.1058-44.5935\approx25.51\]</div><p><strong>Interpretation:</strong> the model predicts about <strong>25.5 mpg</strong> for a 4,200-pound car. This is interpolation because the observed weights run from 2.2 to 5.0 thousand pounds. Actual mileage may differ from the fitted line.</p></div></details>
+</div>
+<h3>Cautions with Regression</h3>
+<div class="definition"><strong>Interpolation</strong> — predicting Y for X values within the observed range.</div>
+<div class="definition"><strong>Extrapolation</strong> — predicting Y for X values beyond the observed range. This should not be done with a basic regression model.</div>
+<p>In the drug example, X ranges from 100 to 500. Predicting within that range is reasonable. Predicting at X = 1000 assumes the relationship continues beyond the observed data.</p>
+<div class="activity">
+<h3>Interpolation or Extrapolation?</h3>
+<p class="prompt">Move the dosage. The observed X values run from 100 to 500.</p>
+<div class="controls"><input id="rangeDose" max="1000" min="0" step="10" type="range" value="250"/><span class="tag" id="rangeDoseLabel">250</span></div>
+<div class="metric">Classification<span class="big" id="rangeClass">Interpolation</span></div>
+<div class="callout" id="rangeExplain"></div>
+</div>
+<div class="activity" id="ageHeightExtrapolation">
+<h3>Why Extrapolation Can Go Wrong: Age and Height</h3>
+<p>Suppose we collect height data from people ranging from <strong>birth through age 18</strong> and fit a linear regression model. The model may be useful for summarizing the data we actually observed, but what happens if we keep extending that line into adulthood?</p>
+<p class="prompt">Before moving the slider: would you trust this model to predict someone’s height at age 30?</p>
+<div class="chart-shell"><canvas aria-label="Age and height regression with extrapolation beyond age 18" id="ageHeightChart"></canvas></div>
+<div class="controls">
+<label for="agePredict">Age to predict</label>
+<input id="agePredict" max="60" min="0" step="1" type="range" value="16"/>
+<span class="tag" id="agePredictLabel">16 years</span>
+</div>
+<div class="metric-grid">
+<div class="metric">Classification<span class="big" id="ageRangeClass">Interpolation</span></div>
+<div class="metric">Predicted height<span class="big" id="ageHeightPrediction">—</span></div>
+</div>
+<div class="callout" id="ageHeightExplain"></div>
+<details class="answer"><summary>Show Explanation</summary><div class="answer-body">
+<p>The illustrative data only contain ages 0 through 18, so any prediction above age 18 is <strong>extrapolation</strong>. The regression equation for these classroom data is approximately:</p>
+<div class="formula">\[\hat{Y}=25.22+2.61X\]</div>
+<p>At age 30, this equation predicts a height of about 103.5 inches—roughly 8 feet 7 inches. The arithmetic is correct, but the prediction is not reasonable because the model assumes people continue growing at the same linear rate after age 18.</p>
+<p><strong>Key idea:</strong> a regression equation does not know when the real-world relationship changes. Extrapolation asks the model to make predictions in a region where we collected no data.</p>
+<p><em>The height values in this activity are illustrative classroom data, not a medical growth chart.</em></p>
+</div></details>
+</div>
+<h3>Extreme Values Can Distort Regression</h3>
+<p>The least-squares line and \(r\) can be affected greatly by extreme data points.</p>
+<p>An influential extreme point can make the remaining observations look compressed and artificially close to a line. Remove an extreme value temporarily and check whether the relationship still exists before trusting the regression.</p>
+<div class="activity">
+<h3>Extreme-Value Demonstration</h3>
+<p class="prompt">Look at the original cloud first. Predict what will happen to \(r\) when one far-away point is added.</p>
+<div class="controls"><button class="lecture-btn" id="toggleOutlier" type="button">Add Extreme Point</button></div>
+<div class="chart-shell"><canvas id="outlierChart"></canvas></div>
+<div class="metric-grid"><div class="metric">Current \(r\)<span class="big" id="outlierR">—</span></div><div class="metric">Interpretation<span class="big" id="outlierInterpret">—</span></div></div>
+<details class="answer"><summary>Show Explanation</summary><div class="answer-body"><p>The original points have little linear relationship. One extreme point can pull the regression line toward itself and produce a much larger \(|r|\). That is why a scatterplot should always be examined instead of trusting \(r\) alone.</p></div></details>
+</div>
+</section>
+<section class="study-examples" id="study">
+<h2>Putting It Together: Two Examples</h2>
+<p>Both examples below use the same workflow: examine the data and scatterplot, interpret \(r\) and \(R^2\), use the regression equation for prediction, decide whether a prediction is interpolation or extrapolation, and separate association from causation.</p>
+
+<details class="study-example-dropdown" id="study-time-example">
+<summary><span><span class="example-kicker">Example 1</span>Study Time and Exam Grades</span></summary>
+<div class="study-example-body"><div class="study-card">
+<p><span class="tag">Research Question</span></p>
+<p><strong>Among a sample of BCTC students, is weekly study time linearly related to exam score?</strong></p>
+<p>The spreadsheet below contains fictional practice data for 12 sampled students. Each row is one student and each column is one variable.</p>
+<div class="sheet-wrap">
+<table aria-label="Spreadsheet-style study data" class="sheet"><thead><tr><th>#</th><th>Student ID</th><th>Study Hours / Week (X)</th><th>Exam Score (Y)</th></tr></thead><tbody>
+<tr><td>1</td><td>S01</td><td>2.0</td><td>60</td></tr>
+<tr><td>2</td><td>S02</td><td>3.0</td><td>68</td></tr>
+<tr><td>3</td><td>S03</td><td>4.0</td><td>64</td></tr>
+<tr><td>4</td><td>S04</td><td>4.5</td><td>77</td></tr>
+<tr><td>5</td><td>S05</td><td>5.0</td><td>69</td></tr>
+<tr><td>6</td><td>S06</td><td>6.0</td><td>81</td></tr>
+<tr><td>7</td><td>S07</td><td>6.5</td><td>73</td></tr>
+<tr><td>8</td><td>S08</td><td>7.0</td><td>87</td></tr>
+<tr><td>9</td><td>S09</td><td>8.0</td><td>78</td></tr>
+<tr><td>10</td><td>S10</td><td>9.0</td><td>91</td></tr>
+<tr><td>11</td><td>S11</td><td>10.0</td><td>82</td></tr>
+<tr><td>12</td><td>S12</td><td>11.0</td><td>94</td></tr>
+</tbody></table>
+</div>
+<div class="chart-shell"><canvas id="studyChart"></canvas></div>
+<div class="metric-grid">
+<div class="metric">Correlation \(r\)<span class="big" id="studyR">—</span></div>
+<div class="metric">\(R^2\)<span class="big" id="studyR2">—</span></div>
+<div class="metric">Regression line<span class="big" id="studyLine" style="font-size:1rem">—</span></div>
+</div>
+<div class="study-questions">
+<div class="study-q"><strong>A. Direction and strength:</strong> Is the relationship positive or negative? Is it strong using the course rule \(|r|\ge.75\)?</div>
+<div class="study-q"><strong>B. Meaning of \(R^2\):</strong> Interpret the displayed \(R^2\) in the context of study hours and exam scores.</div>
+<div class="study-q"><strong>C. Prediction:</strong> In \(\hat{Y}=b_0+b_1X\), X is weekly study hours. Substitute \(X=7.5\), multiply the slope by 7.5, then add the intercept. What exam score does the line predict? <div class="controls"><input id="studyPred" placeholder="score" step="0.1" type="number"/><button class="lecture-btn" id="checkStudyPred" type="button">Check</button></div><div class="feedback" id="studyPredFeedback"></div></div>
+<div class="study-q"><strong>D. Interpolation or extrapolation?</strong> Would predicting at 16 study hours be interpolation or extrapolation? Why?</div>
+<div class="study-q"><strong>E. Causation:</strong> Can this observational sample, by itself, prove that studying more causes a higher exam score? Explain using the causation ideas from this section.</div>
+</div>
+<details class="answer"><summary>Show Study Walkthrough</summary><div class="answer-body" id="studyWalkthrough">
+<p><strong>A.</strong> The relationship is positive and strong because the calculated \(r\) is positive and \(|r|\ge .75\).</p>
+<p><strong>B.</strong> \(R^2\) is the percent of variation in exam scores explained by the linear model using weekly study hours.</p>
+<p><strong>C. Predict:</strong> the model is approximately \(\hat{Y}=55.979+3.319X\). Here X means study hours per week, so use \(X=7.5\):</p><div class="formula">\[\hat{Y}\approx55.979+3.319(7.5)=55.979+24.893\approx80.9\]</div><p><strong>Interpretation:</strong> the fitted line predicts an exam score of about <strong>80.9</strong> for a student who studies 7.5 hours per week. The observed range is 2–11 hours, making this interpolation. The actual score could differ; keeping extra decimals until the end limits rounding error.</p>
+<p><strong>D.</strong> Extrapolation. The observed study-hour values only run from 2 to 11 hours, so 16 hours is outside the observed range.</p>
+<p><strong>E.</strong> No. The data show association, but correlation alone does not establish causation. Rival explanations such as preparation, course difficulty, prior knowledge, attendance, or other study behaviors could also affect exam scores.</p>
+</div></details>
+</div></div>
+</details>
+
+<details class="study-example-dropdown" id="gas-bill-example">
+<summary><span><span class="example-kicker">Example 2</span>Temperature and Natural-Gas Bill</span></summary>
+<div class="study-example-body"><div class="study-card">
+<p><span class="tag">Research Question</span></p>
+<p><strong>For one household, is average outdoor temperature linearly related to the monthly natural-gas bill?</strong></p>
+<p>The spreadsheet below contains illustrative practice data for 12 months. Each row is one month and each column is one variable.</p>
+<div class="sheet-wrap">
+<table aria-label="Spreadsheet-style temperature and gas bill data" class="sheet"><thead><tr><th>#</th><th>Month ID</th><th>Average Temperature °F (X)</th><th>Gas Bill $ (Y)</th></tr></thead><tbody>
+<tr><td>1</td><td>M01</td><td>22</td><td>230</td></tr>
+<tr><td>2</td><td>M02</td><td>28</td><td>198</td></tr>
+<tr><td>3</td><td>M03</td><td>31</td><td>215</td></tr>
+<tr><td>4</td><td>M04</td><td>36</td><td>162</td></tr>
+<tr><td>5</td><td>M05</td><td>41</td><td>180</td></tr>
+<tr><td>6</td><td>M06</td><td>47</td><td>145</td></tr>
+<tr><td>7</td><td>M07</td><td>52</td><td>150</td></tr>
+<tr><td>8</td><td>M08</td><td>57</td><td>110</td></tr>
+<tr><td>9</td><td>M09</td><td>61</td><td>124</td></tr>
+<tr><td>10</td><td>M10</td><td>66</td><td>85</td></tr>
+<tr><td>11</td><td>M11</td><td>71</td><td>100</td></tr>
+<tr><td>12</td><td>M12</td><td>76</td><td>70</td></tr>
+</tbody></table>
+</div>
+<div class="chart-shell"><canvas id="gasChart"></canvas></div>
+<div class="metric-grid">
+<div class="metric">Correlation \(r\)<span class="big" id="gasRMetric">—</span></div>
+<div class="metric">\(R^2\)<span class="big" id="gasR2Metric">—</span></div>
+<div class="metric">Regression line<span class="big" id="gasLine" style="font-size:1rem">—</span></div>
+</div>
+<div class="study-questions">
+<div class="study-q"><strong>A. Direction and strength:</strong> Is the relationship positive or negative? Is it strong using the course rule \(|r|\ge.75\)?</div>
+<div class="study-q"><strong>B. Meaning of \(R^2\):</strong> Interpret the displayed \(R^2\) in the context of average temperature and monthly gas bills.</div>
+<div class="study-q"><strong>C. Prediction:</strong> In \(\hat{Y}=b_0+b_1X\), X is the average outdoor temperature. Substitute \(X=38\), multiply the slope by 38, then add the intercept. What monthly gas bill does the line predict? <div class="controls"><span>$</span><input id="gasPred" placeholder="bill" step="0.1" type="number"/><button class="lecture-btn" id="checkGasPred" type="button">Check</button></div><div class="feedback" id="gasPredFeedback"></div></div>
+<div class="study-q"><strong>D. Interpolation or extrapolation?</strong> Would predicting a gas bill at 10°F be interpolation or extrapolation? Why?</div>
+<div class="study-q"><strong>E. Causation:</strong> Does this strong relationship, by itself, prove that outdoor temperature causes the amount of the gas bill? What other variables might matter?</div>
+</div>
+<details class="answer"><summary>Show Study Walkthrough</summary><div class="answer-body" id="gasWalkthrough">
+<p><strong>A.</strong> The relationship is negative and strong. As temperature increases, gas bills tend to decrease, and \(|r|\ge .75\).</p>
+<p><strong>B.</strong> About 93.4% of the variation in monthly gas bills in these 12 observations is explained by the linear model using average outdoor temperature.</p>
+<p><strong>C. Predict:</strong> the model is approximately \(\hat{Y}=285.483-2.818X\). Here X is the average outdoor temperature in °F, so substitute \(X=38\):</p><div class="formula">\[\hat{Y}\approx285.483-2.818(38)=285.483-107.084\approx178.4\]</div><p><strong>Interpretation:</strong> for a month with an average temperature of 38°F, the model predicts a natural-gas bill of about <strong>$178.40</strong>. Because 38°F lies between the observed 22°F and 76°F, this is interpolation. An actual bill could differ due to other factors; small differences from rounding the displayed equation are normal.</p>
+<p><strong>D.</strong> Extrapolation. The observed temperatures only run from 22°F to 76°F, so 10°F is outside the observed range.</p>
+<p><strong>E.</strong> No. The data show a strong association, but correlation alone does not prove causation. Home size, insulation, thermostat settings, occupancy, furnace efficiency, and gas prices could also affect the bill.</p>
+</div></details>
+</div></div>
+</details>
+</section>
+<div class="back-row" style="margin-top:36px">
+<a class="btn outline btn-sm" href="index.html">← Back to STA210U Notes</a>
+<a class="btn btn-sm" download="" href="STA210U_Section_2D_Linear_Correlation_and_Regression.docx">Download Word Notes</a>
+</div>
+<footer class="notes-footer">Last updated: <span id="lastUpdated"></span></footer>
+</div></main>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('lastUpdated').textContent=new Date(document.lastModified).toLocaleString();
+  const root=document.getElementById('notesContent');
+  const lectureBtn=document.getElementById('lectureModeBtn');
+  const reviewBtn=document.getElementById('reviewModeBtn');
+  const modeStatus=document.getElementById('modeStatus');
+
+  function setMode(review){
+    root.classList.toggle('review-mode',review);
+    document.querySelectorAll('details.answer').forEach(d=>d.open=review);
+    lectureBtn.classList.toggle('secondary',review);
+    reviewBtn.classList.toggle('secondary',!review);
+    modeStatus.textContent=review?'Review: worked answers and explanations are open.':'Practice: try each question before opening the answer.';
+  }
+  lectureBtn.addEventListener('click',()=>setMode(false));
+  reviewBtn.addEventListener('click',()=>setMode(true));
+  setMode(false);
+
+  const progress=document.getElementById('progressBar');
+  function updateProgress(){
+    const doc=document.documentElement;
+    const max=doc.scrollHeight-doc.clientHeight;
+    const pct=max>0?(doc.scrollTop/max)*100:0;
+    progress.style.width=Math.max(0,Math.min(100,pct))+'%';
+  }
+  document.addEventListener('scroll',updateProgress,{passive:true});updateProgress();
+
+  function pearson(points){
+    const n=points.length;
+    const mx=points.reduce((s,p)=>s+p.x,0)/n, my=points.reduce((s,p)=>s+p.y,0)/n;
+    let num=0,dx=0,dy=0;
+    points.forEach(p=>{const a=p.x-mx,b=p.y-my;num+=a*b;dx+=a*a;dy+=b*b;});
+    return num/Math.sqrt(dx*dy);
+  }
+  function regression(points){
+    const n=points.length;
+    const mx=points.reduce((s,p)=>s+p.x,0)/n, my=points.reduce((s,p)=>s+p.y,0)/n;
+    let num=0,den=0;
+    points.forEach(p=>{num+=(p.x-mx)*(p.y-my);den+=(p.x-mx)**2;});
+    const slope=num/den, intercept=my-slope*mx;
+    return {slope,intercept};
+  }
+  function linePoints(points,reg){
+    const xs=points.map(p=>p.x),min=Math.min(...xs),max=Math.max(...xs);
+    return [{x:min,y:reg.intercept+reg.slope*min},{x:max,y:reg.intercept+reg.slope*max}];
+  }
+  const chartDefaults={responsive:true,maintainAspectRatio:false,animation:{duration:250},plugins:{legend:{display:false}},scales:{x:{type:'linear',grid:{color:'#e8edf1'}},y:{grid:{color:'#e8edf1'}}}};
+  function makeScatter(canvas,points,xTitle,yTitle,withLine=true){
+    const reg=regression(points);
+    const sets=[{type:'scatter',data:points,pointRadius:5,pointHoverRadius:7}];
+    if(withLine) sets.push({type:'line',data:linePoints(points,reg),pointRadius:0,borderWidth:2,tension:0});
+    const opts=structuredClone(chartDefaults);
+    opts.scales.x.title={display:true,text:xTitle};opts.scales.y.title={display:true,text:yTitle};
+    return new Chart(canvas,{type:'scatter',data:{datasets:sets},options:opts});
+  }
+
+  // The opening examples use exactly the same illustrative observations as
+  // their matching worked examples at the end of these notes.
+  const studyPts=[{x:2,y:60},{x:3,y:68},{x:4,y:64},{x:4.5,y:77},{x:5,y:69},{x:6,y:81},{x:6.5,y:73},{x:7,y:87},{x:8,y:78},{x:9,y:91},{x:10,y:82},{x:11,y:94}];
+  const gasPts=[{x:22,y:230},{x:28,y:198},{x:31,y:215},{x:36,y:162},{x:41,y:180},{x:47,y:145},{x:52,y:150},{x:57,y:110},{x:61,y:124},{x:66,y:85},{x:71,y:100},{x:76,y:70}];
+  const positiveExampleChart=makeScatter(document.getElementById('positiveExampleChart'),studyPts,'Study hours per week','Exam score',true);
+  const negativeExampleChart=makeScatter(document.getElementById('negativeExampleChart'),gasPts,'Avg. temperature (°F)','Gas bill ($)',true);
+  positiveExampleChart.options.animation=false;
+  negativeExampleChart.options.animation=false;
+  document.getElementById('positiveExampleR').textContent='r = '+pearson(studyPts).toFixed(3);
+  document.getElementById('negativeExampleR').textContent='r = '+pearson(gasPts).toFixed(3);
+
+  // Correlation explorer: initialize once; never destroy/recreate on slider input.
+  // Fixed axes and updates without animation keep the graph stable while dragging.
+  // Center the X values, then remove both the mean and linear trend from
+  // the scatter pattern. The two resulting unit vectors are orthogonal.
+  // That lets the slider set Pearson r precisely from ±1 through 0.
+  const baseNoise=[-1.2,.5,-.8,1.3,-.2,.9,-1.5,.3,1.1,-.6,1.4,-.4];
+  const cx=Array.from({length:baseNoise.length},(_,i)=>i+1-(baseNoise.length+1)/2);
+  const noiseMean=baseNoise.reduce((a,b)=>a+b,0)/baseNoise.length;
+  const xSumSq=cx.reduce((a,b)=>a+b*b,0);
+  const projection=cx.reduce((a,b,i)=>a+b*(baseNoise[i]-noiseMean),0)/xSumSq;
+  const orthNoise=baseNoise.map((v,i)=>v-noiseMean-projection*cx[i]);
+  const noiseNorm=Math.hypot(...orthNoise),xNorm=Math.hypot(...cx);
+  const normalizedX=cx.map(x=>x/xNorm);
+  const normalizedNoise=orthNoise.map(e=>e/noiseNorm);
+  const corrCanvas=document.getElementById('correlationChart');
+  const directionSelect=document.getElementById('directionSelect');
+  const noiseSlider=document.getElementById('noiseRange');
+  const corrOpts=structuredClone(chartDefaults);
+  corrOpts.animation=false;
+  corrOpts.transitions={active:{animation:{duration:0}},resize:{animation:{duration:0}}};
+  corrOpts.scales.x.title={display:true,text:'X'};
+  corrOpts.scales.y.title={display:true,text:'Y'};
+  corrOpts.scales.x.min=0;
+  corrOpts.scales.x.max=13;
+  corrOpts.scales.y.min=50;
+  corrOpts.scales.y.max=150;
+  const corrChart=new Chart(corrCanvas,{
+    type:'scatter',
+    data:{datasets:[
+      {type:'scatter',label:'Observations',data:[],pointRadius:5,pointHoverRadius:7,order:1},
+      {type:'line',label:'Least-squares line',data:[],pointRadius:0,borderWidth:3,tension:0,order:2}
+    ]},
+    options:corrOpts
+  });
+  function updateCorrelationLab(){
+    const sign=Number(directionSelect.value);
+    const noise=Number(noiseSlider.value);
+    document.getElementById('noiseLabel').textContent=noise+' / 100';
+    noiseSlider.setAttribute('aria-valuetext',noise+' out of 100 scatter');
+    const desiredR=sign*(1-noise/100);
+    const residualWeight=Math.sqrt(Math.max(0,1-desiredR*desiredR));
+    const pts=normalizedX.map((x,i)=>({x:i+1,y:100+62*(desiredR*x+residualWeight*normalizedNoise[i])}));
+    const r=pearson(pts);
+    const nearZero=Math.abs(r)<0.005;
+    document.getElementById('corrMetric').textContent=nearZero?'0.000':r.toFixed(3);
+    document.getElementById('corrDirection').textContent=nearZero?'None (r ≈ 0)':r>0?'Positive':'Negative';
+    document.getElementById('corrStrength').textContent=nearZero?'No linear correlation':Math.abs(r)>=.75?'Strong':'Not strong';
+    document.getElementById('corrExplanation').textContent=nearZero
+      ? 'At this setting, r = 0: there is no linear trend. The fitted line is horizontal. This does not rule out every possible nonlinear relationship.'
+      : Math.abs(r)>=.75
+        ? 'The points '+(r>0?'rise':'fall')+' as X increases, and |r| is at least 0.75 (the course rule for a strong relationship).'
+        : 'The '+(r>0?'positive':'negative')+' linear relationship is weaker. Move farther right to reach r = 0, or left to strengthen the relationship.';
+    corrChart.data.datasets[0].data=pts;
+    corrChart.data.datasets[1].data=linePoints(pts,regression(pts));
+    corrChart.update('none');
+  }
+  let corrFrame=null;
+  function scheduleCorrelationUpdate(){
+    if(corrFrame!==null)return;
+    corrFrame=requestAnimationFrame(()=>{corrFrame=null;updateCorrelationLab();});
+  }
+  directionSelect.addEventListener('change',scheduleCorrelationUpdate);
+  noiseSlider.addEventListener('input',scheduleCorrelationUpdate);
+  updateCorrelationLab();
+
+  // Drug charts
+  const drugPts=[{x:100,y:10},{x:200,y:18},{x:300,y:32},{x:400,y:44},{x:500,y:56}];
+  makeScatter(document.getElementById('drugScatter'),drugPts,'Dosage','Reduction in Blood Pressure',false);
+  makeScatter(document.getElementById('drugRegression'),drugPts,'Dosage','Reduction in Blood Pressure',true);
+
+  // R2 check
+  document.getElementById('r2Check').addEventListener('click',()=>{
+    const v=Number(document.getElementById('r2Input').value),f=document.getElementById('r2Feedback');
+    if(Math.abs(v-64)<=.2){f.textContent='Correct — 64%.';f.className='feedback good';}
+    else{f.textContent='Try squaring -0.80, then convert the decimal to a percent.';f.className='feedback bad';}
+  });
+
+  // Causation choices
+  document.querySelectorAll('#causalChoices .choice').forEach(btn=>btn.addEventListener('click',()=>{
+    document.querySelectorAll('#causalChoices .choice').forEach(b=>b.classList.remove('correct','incorrect'));
+    const good=btn.dataset.correct==='true';btn.classList.add(good?'correct':'incorrect');
+    const f=document.getElementById('causalFeedback');
+    if(good){f.textContent='Correct. Association alone does not establish a causal explanation.';f.className='feedback good';}
+    else{f.textContent='Not from correlation alone. Look for an answer that allows a rival explanation.';f.className='feedback bad';}
+  }));
+
+  // Drug predictor
+  function updateDrugPrediction(){
+    const input=document.getElementById('drugDose');
+    const x=Number(input.value),msg=document.getElementById('drugRangeMessage');
+    if(input.value.trim()==='' || !Number.isFinite(x) || x<0 || x>1200){
+      document.getElementById('drugPrediction').textContent='—';
+      document.getElementById('drugCalculation').textContent='Enter a dosage between 0 and 1200 to see the calculation.';
+      msg.textContent='Enter a valid dosage before making a prediction.';msg.className='feedback bad';
+      return;
+    }
+    const increase=.118*x,y=-3.4+increase;
+    document.getElementById('drugPrediction').textContent=y.toFixed(1);
+    document.getElementById('drugCalculation').textContent='Substitute X = '+x+': Ŷ = −3.4 + 0.118('+x+') = −3.4 + '+increase.toFixed(2)+' = '+y.toFixed(2)+'. This is the model’s prediction, not a guaranteed result.';
+    if(x>=100&&x<=500){msg.textContent='This is interpolation because the dosage is within the observed 100–500 range.';msg.className='feedback good';}
+    else{msg.textContent='This is extrapolation because the dosage is outside the observed 100–500 range.';msg.className='feedback bad';}
+  }
+  document.getElementById('predictDrug').addEventListener('click',updateDrugPrediction);updateDrugPrediction();
+
+  // Automobile
+  const autoPts=[{x:2.5,y:40},{x:3,y:43},{x:4,y:30},{x:3.5,y:35},{x:2.7,y:42},{x:4.5,y:19},{x:3.8,y:32},{x:2.9,y:39},{x:5,y:15},{x:2.2,y:44}];
+  makeScatter(document.getElementById('autoRegression'),autoPts,'Weight (1000 lb)','Gas Mileage (mpg)',true);
+  document.getElementById('checkAutoR').addEventListener('click',()=>{
+    const v=Number(document.getElementById('autoR').value),f=document.getElementById('autoRFeedback');
+    if(Math.abs(v+Math.sqrt(.92))<=.015){f.textContent='Correct. The negative slope tells us r must be negative.';f.className='feedback good';}
+    else{f.textContent='Use r = ±√(.92), then use the negative slope to choose the sign.';f.className='feedback bad';}
+  });
+  document.getElementById('checkAutoPred').addEventListener('click',()=>{
+    const ans=70.1058-10.6175*4.2,v=Number(document.getElementById('autoPred').value),f=document.getElementById('autoPredFeedback');
+    if(Math.abs(v-ans)<=.08){f.textContent='Correct — about '+ans.toFixed(2)+' mpg.';f.className='feedback good';}
+    else{f.textContent='Substitute X = 4.2 into the regression equation.';f.className='feedback bad';}
+  });
+
+  // Interpolation range
+  function updateRange(){
+    const x=Number(document.getElementById('rangeDose').value);document.getElementById('rangeDoseLabel').textContent=x;
+    const inside=x>=100&&x<=500;document.getElementById('rangeClass').textContent=inside?'Interpolation':'Extrapolation';
+    document.getElementById('rangeExplain').textContent=inside?'The value is inside the observed dosage range of 100 to 500.':'The value is outside the observed dosage range of 100 to 500, so the fitted relationship is being extended beyond the data.';
+  }
+  document.getElementById('rangeDose').addEventListener('input',updateRange);updateRange();
+
+  // Age-height extrapolation demo
+  const ageHeightPts=[{x:0,y:20},{x:2,y:31},{x:4,y:37},{x:6,y:43},{x:8,y:48},{x:10,y:53},{x:12,y:58},{x:14,y:62},{x:16,y:66},{x:18,y:69}];
+  const ageReg=regression(ageHeightPts);
+  const ageCanvas=document.getElementById('ageHeightChart');
+  let ageChart=null;
+  function formatFeetInches(inches){
+    const total=Math.round(inches);
+    return Math.floor(total/12)+' ft '+(total%12)+' in';
+  }
+  function initAgeHeightChart(){
+    const observedLine=[{x:0,y:ageReg.intercept},{x:18,y:ageReg.intercept+ageReg.slope*18}];
+    const opts=structuredClone(chartDefaults);
+    // This chart is controlled continuously by a slider. Keep the axes fixed and
+    // disable Chart.js animation so dragging does not restart an animation or
+    // rescale the plotting area on every input event.
+    opts.animation=false;
+    opts.transitions={active:{animation:{duration:0}},resize:{animation:{duration:0}}};
+    opts.plugins.legend={display:true,labels:{boxWidth:18}};
+    opts.scales.x.title={display:true,text:'Age (years)'};
+    opts.scales.y.title={display:true,text:'Height (inches)'};
+    opts.scales.x.min=0;opts.scales.x.max=60;
+    opts.scales.y.min=0;opts.scales.y.max=190;
+    ageChart=new Chart(ageCanvas,{type:'scatter',data:{datasets:[
+      {type:'scatter',label:'Observed ages 0–18',data:ageHeightPts,pointRadius:5,pointHoverRadius:7},
+      {type:'line',label:'Regression within observed range',data:observedLine,pointRadius:0,borderWidth:3,tension:0},
+      {type:'line',label:'Extrapolated extension',data:[],pointRadius:0,borderWidth:3,borderDash:[8,6],tension:0},
+      {type:'scatter',label:'Current prediction',data:[],pointRadius:6,pointHoverRadius:7}
+    ]},options:opts});
+  }
+  function renderAgeHeight(){
+    const x=Number(document.getElementById('agePredict').value);
+    const y=ageReg.intercept+ageReg.slope*x;
+    const inside=x>=0&&x<=18;
+    document.getElementById('agePredictLabel').textContent=x+' years';
+    document.getElementById('ageRangeClass').textContent=inside?'Interpolation':'Extrapolation';
+    document.getElementById('ageHeightPrediction').textContent=y.toFixed(1)+' in ('+formatFeetInches(y)+')';
+    const explain=document.getElementById('ageHeightExplain');
+    if(inside){
+      explain.textContent='Age '+x+' is inside the observed 0–18 year range, so this is interpolation. The model is being used where we actually have data.';
+    }else{
+      explain.textContent='Age '+x+' is outside the observed 0–18 year range. The model is now extrapolating and assumes the same growth trend continues into adulthood.';
+    }
+    if(!ageChart)initAgeHeightChart();
+    ageChart.data.datasets[2].data=x>18?[{x:18,y:ageReg.intercept+ageReg.slope*18},{x:x,y:y}]:[];
+    ageChart.data.datasets[3].data=[{x:x,y:y}];
+    ageChart.update('none');
+  }
+  const ageSlider=document.getElementById('agePredict');
+  let ageFrame=null;
+  ageSlider.addEventListener('input',()=>{
+    if(ageFrame!==null)return;
+    ageFrame=requestAnimationFrame(()=>{ageFrame=null;renderAgeHeight();});
+  });
+  renderAgeHeight();
+
+  // Outlier demo — keep the plotting window identical before and after the
+  // extreme point is added. Update the existing chart in place with animation
+  // disabled so students can focus on the one added point and the changed line.
+  const basePts=[{x:1,y:5},{x:2,y:3},{x:3,y:6},{x:4,y:4},{x:5,y:5},{x:6,y:2},{x:7,y:6},{x:8,y:3}];
+  const extremePt={x:20,y:20};
+  let outlierOn=false,outlierChart=null;
+  function outlierLine(points){
+    const reg=regression(points);
+    return [{x:0,y:reg.intercept},{x:22,y:reg.intercept+reg.slope*22}];
+  }
+  function initOutlierChart(){
+    const opts=structuredClone(chartDefaults);
+    opts.animation=false;
+    opts.transitions={active:{animation:{duration:0}},resize:{animation:{duration:0}}};
+    opts.plugins.legend={display:true,labels:{boxWidth:18}};
+    opts.scales.x.title={display:true,text:'X'};
+    opts.scales.y.title={display:true,text:'Y'};
+    opts.scales.x.min=0;opts.scales.x.max=22;
+    opts.scales.y.min=0;opts.scales.y.max=22;
+    outlierChart=new Chart(document.getElementById('outlierChart'),{
+      type:'scatter',
+      data:{datasets:[
+        {type:'scatter',label:'Original observations',data:basePts,pointRadius:5,pointHoverRadius:7},
+        {type:'scatter',label:'Added extreme point',data:[],pointRadius:7,pointHoverRadius:8},
+        {type:'line',label:'Least-squares line',data:outlierLine(basePts),pointRadius:0,borderWidth:3,tension:0}
+      ]},
+      options:opts
+    });
+  }
+  function renderOutlier(){
+    const pts=outlierOn?[...basePts,extremePt]:basePts;
+    const r=pearson(pts);
+    document.getElementById('outlierR').textContent=r.toFixed(3);
+    document.getElementById('outlierInterpret').textContent=Math.abs(r)>=.75?'Looks strong by r':'Not strong by r';
+    document.getElementById('toggleOutlier').textContent=outlierOn?'Remove Extreme Point':'Add Extreme Point';
+    if(!outlierChart)initOutlierChart();
+    outlierChart.data.datasets[1].data=outlierOn?[extremePt]:[];
+    outlierChart.data.datasets[2].data=outlierLine(pts);
+    outlierChart.update('none');
+  }
+  document.getElementById('toggleOutlier').addEventListener('click',()=>{outlierOn=!outlierOn;renderOutlier();});renderOutlier();
+
+
+  // Big Example 1: Study time and exam grades
+  const sr=pearson(studyPts),sreg=regression(studyPts),sr2=sr*sr;
+  document.getElementById('studyR').textContent=sr.toFixed(3);
+  document.getElementById('studyR2').textContent=(sr2*100).toFixed(1)+'%';
+  document.getElementById('studyLine').textContent='Ŷ = '+sreg.intercept.toFixed(3)+' + '+sreg.slope.toFixed(3)+'X';
+  const studyChart=makeScatter(document.getElementById('studyChart'),studyPts,'Study Hours / Week','Exam Score',true);
+  const pred75=sreg.intercept+sreg.slope*7.5;
+  document.getElementById('checkStudyPred').addEventListener('click',()=>{
+    const v=Number(document.getElementById('studyPred').value),f=document.getElementById('studyPredFeedback');
+    if(Math.abs(v-pred75)<=.2){f.textContent='Correct — about '+pred75.toFixed(1)+'.';f.className='feedback good';}
+    else{f.textContent='Use the displayed regression equation and substitute X = 7.5.';f.className='feedback bad';}
+  });
+
+  // Big Example 2: Temperature and natural-gas bill
+  const gasR=pearson(gasPts),gasReg=regression(gasPts),gasR2=gasR*gasR;
+  document.getElementById('gasRMetric').textContent=gasR.toFixed(3);
+  document.getElementById('gasR2Metric').textContent=(gasR2*100).toFixed(1)+'%';
+  document.getElementById('gasLine').textContent='Ŷ = '+gasReg.intercept.toFixed(3)+' '+(gasReg.slope<0?'− ':'+ ')+Math.abs(gasReg.slope).toFixed(3)+'X';
+  const gasChart=makeScatter(document.getElementById('gasChart'),gasPts,'Average Temperature (°F)','Monthly Natural-Gas Bill ($)',true);
+  const gasPred38=gasReg.intercept+gasReg.slope*38;
+  document.getElementById('checkGasPred').addEventListener('click',()=>{
+    const v=Number(document.getElementById('gasPred').value),f=document.getElementById('gasPredFeedback');
+    if(Math.abs(v-gasPred38)<=.5){f.textContent='Correct — about $'+gasPred38.toFixed(1)+'.';f.className='feedback good';}
+    else{f.textContent='Use the displayed regression equation and substitute X = 38.';f.className='feedback bad';}
+  });
+
+  // Charts are created while their example dropdowns are closed. Resize when opened.
+  document.querySelectorAll('.study-example-dropdown').forEach(d=>d.addEventListener('toggle',()=>{
+    if(!d.open)return;
+    requestAnimationFrame(()=>{studyChart.resize();gasChart.resize();});
+  }));
+});
+</script>
+</body>
+</html>
