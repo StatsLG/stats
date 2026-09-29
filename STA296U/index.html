@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,6 +14,35 @@
 
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/style/bctcstyle.css">
+
+  <style>
+    /* =========================================================
+       STA296U NOTES PAGE
+       ========================================================= */
+
+    .section-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .section-links .btn {
+      flex: 1;
+      min-width: 125px;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .section-links {
+        flex-direction: column;
+      }
+
+      .section-links .btn {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -217,6 +245,9 @@
     // =========================================================
 
     /*
+      "file" = converted HTML notes
+      "pdf"  = original PDF notes
+
       As we convert each section, we can replace the
       description with the actual topic for that section.
     */
@@ -226,78 +257,89 @@
       {
         id: "1",
         title: "Section 1",
-        desc: "",
-        file: "section1.html"
+        desc: "Introduction to Statistics and Data Collection",
+        file: "section1.html",
+        pdf: "section1.pdf"
       },
 
       {
         id: "2",
         title: "Section 2",
         desc: "",
-        file: "section2.html"
+        file: "section2.html",
+        pdf: "section2.pdf"
       },
 
       {
         id: "3",
         title: "Section 3",
         desc: "",
-        file: "section3.html"
+        file: "section3.html",
+        pdf: "section3.pdf"
       },
 
       {
         id: "4",
         title: "Section 4",
         desc: "",
-        file: "section4.html"
+        file: "section4.html",
+        pdf: "section4.pdf"
       },
 
       {
         id: "5",
         title: "Section 5",
         desc: "",
-        file: "section5.html"
+        file: "section5.html",
+        pdf: "section5.pdf"
       },
 
       {
         id: "6",
         title: "Section 6",
         desc: "",
-        file: "section6.html"
+        file: "section6.html",
+        pdf: "section6.pdf"
       },
 
       {
         id: "7",
         title: "Section 7",
         desc: "",
-        file: "section7.html"
+        file: "section7.html",
+        pdf: "section7.pdf"
       },
 
       {
         id: "8",
         title: "Section 8",
         desc: "",
-        file: "section8.html"
+        file: "section8.html",
+        pdf: "section8.pdf"
       },
 
       {
         id: "9",
         title: "Section 9",
         desc: "",
-        file: "section9.html"
+        file: "section9.html",
+        pdf: "section9.pdf"
       },
 
       {
         id: "10",
         title: "Section 10",
         desc: "",
-        file: "section10.html"
+        file: "section10.html",
+        pdf: "section10.pdf"
       },
 
       {
         id: "11",
         title: "Section 11",
         desc: "",
-        file: "section11.html"
+        file: "section11.html",
+        pdf: "section11.pdf"
       }
 
     ];
@@ -336,12 +378,20 @@
               : ''
           }
 
-          <div class="btns">
+          <div class="section-links">
 
             <a
               class="btn"
               href="${s.file}">
-              Open
+              Open Notes
+            </a>
+
+            <a
+              class="btn outline"
+              href="${s.pdf}"
+              target="_blank"
+              rel="noopener">
+              PDF Notes
             </a>
 
           </div>
@@ -425,4 +475,3 @@
 </body>
 
 </html>
-```
