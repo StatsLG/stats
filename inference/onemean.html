@@ -11,71 +11,31 @@
 
   <link rel="stylesheet" href="/style/bctcstyle.css">
 
-  <style>
-    /* Custom z-test checkbox */
-    .z-test-toggle {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 12px 0;
-      cursor: pointer;
-      user-select: none;
-      font-size: 13px;
-    }
+<style>
+  /* Fix z-test checkbox styling */
+  #knownSigma {
+    appearance: auto !important;
+    -webkit-appearance: checkbox !important;
+    width: 20px !important;
+    min-width: 20px !important;
+    max-width: 20px !important;
+    height: 20px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex: 0 0 20px !important;
+    background: revert !important;
+    border: revert !important;
+    border-radius: revert !important;
+    box-shadow: none !important;
+    accent-color: #00467f !important;
+    cursor: pointer !important;
+  }
 
-    /* Hide the native checkbox visually */
-    #knownSigma {
-      position: absolute !important;
-      opacity: 0 !important;
-      width: 20px !important;
-      height: 20px !important;
-      padding: 0 !important;
-      margin: 0 !important;
-      cursor: pointer;
-    }
-
-    /* Custom checkbox appearance */
-    .z-test-box {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px;
-      height: 20px;
-      min-width: 20px;
-      flex-shrink: 0;
-      background: #ffffff;
-      border: 2px solid #9ca3af;
-      border-radius: 4px;
-      box-sizing: border-box;
-    }
-
-    /* Selected checkbox */
-    #knownSigma:checked + .z-test-box {
-      background: #00467f;
-      border-color: #00467f;
-    }
-
-    /* Visible checkmark */
-    #knownSigma:checked + .z-test-box::after {
-      content: "";
-      width: 5px;
-      height: 10px;
-      border: solid white;
-      border-width: 0 2px 2px 0;
-      transform: translateY(-1px) rotate(45deg);
-    }
-
-    /* Keyboard accessibility */
-    #knownSigma:focus-visible + .z-test-box {
-      outline: 3px solid #e7a614;
-      outline-offset: 3px;
-    }
-
-    .z-test-toggle:hover .z-test-box {
-      border-color: #00467f;
-    }
-  </style>
+  #knownSigma:focus-visible {
+    outline: 3px solid #e7a614 !important;
+    outline-offset: 3px !important;
+  }
+</style>
 </head>
 
 <body>
