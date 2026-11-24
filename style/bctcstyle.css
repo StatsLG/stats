@@ -6,6 +6,7 @@
 
 /* ---------- Variables ---------- */
 :root{
+  color-scheme: light;
   --kctcs-blue: #00467f;
   --kctcs-gold: #e7a614;
 
@@ -33,6 +34,7 @@
 }
 
 /* ---------- Dark Mode ---------- */
+/* Disabled dark mode — retained for future use.
 @media (prefers-color-scheme: dark){
   :root{
     --bg: #0f172a;
@@ -47,6 +49,7 @@
     --input-placeholder: #9ca3af;
   }
 }
+*/
 
 /* ---------- Base ---------- */
 *{ box-sizing: border-box }
@@ -252,7 +255,7 @@ main{ padding:24px; max-width:1100px }
 
 /* ---------- Forms ---------- */
 label{ display:block; font-size:13px; color: var(--muted); margin-bottom:6px }
-input, select, textarea{
+input:not([type="checkbox"]):not([type="radio"]), select, textarea{
   width: 100%;
   padding: 10px 12px;
   background: var(--input-bg);
@@ -360,10 +363,10 @@ footer.site-footer{
   --field-bg: #ffffff;
   --field-ink: #111;
 }
-body .wrap .panel input,
+body .wrap .panel input:not([type="checkbox"]):not([type="radio"]),
 body .wrap .panel select,
 body .wrap .panel textarea,
-body .card input,
+body .card input:not([type="checkbox"]):not([type="radio"]),
 body .card select,
 body .card textarea{
   width: 100%;
@@ -378,10 +381,10 @@ body .card textarea{
   box-shadow: none !important;
   outline: none !important;
 }
-body .wrap .panel input:focus,
+body .wrap .panel input:not([type="checkbox"]):not([type="radio"]):focus,
 body .wrap .panel select:focus,
 body .wrap .panel textarea:focus,
-body .card input:focus,
+body .card input:not([type="checkbox"]):not([type="radio"]):focus,
 body .card select:focus,
 body .card textarea:focus{
   border-color: #000 !important;
@@ -423,3 +426,34 @@ body .card input[type="color"]{
   width: 100%;
   height: auto;
 }
+/* ---------- Native Checkboxes & Radio Buttons ---------- */
+input[type="checkbox"],
+input[type="radio"]{
+  appearance: auto;
+  -webkit-appearance: auto;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0;
+  flex: 0 0 20px;
+  accent-color: var(--kctcs-blue);
+  cursor: pointer;
+}
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible{
+  outline: 3px solid var(--kctcs-gold);
+  outline-offset: 2px;
+}
+.checkline label{
+  margin: 0;
+  cursor: pointer;
+}
+/* Disabled dark mode — retained for future use.
+@media (prefers-color-scheme: dark){
+  input[type="checkbox"], input[type="radio"]{
+    color-scheme: dark;
+  }
+}
+*/
+
+/* ---------- End of StatsLG / BCTC stylesheet ---------- */
