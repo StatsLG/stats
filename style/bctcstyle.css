@@ -457,3 +457,34 @@ input[type="radio"]:focus-visible{
 */
 
 /* ---------- End of StatsLG / BCTC stylesheet ---------- */
+
+/* ---------- Final native checkbox/radio override ---------- */
+body input[type="checkbox"],
+body input[type="radio"],
+body .wrap .panel input[type="checkbox"],
+body .wrap .panel input[type="radio"],
+body .card input[type="checkbox"],
+body .card input[type="radio"] {
+  -webkit-appearance: auto !important;
+  appearance: auto !important;
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  max-width: 20px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  flex: 0 0 20px !important;
+  background: revert !important;
+  border: revert !important;
+  border-radius: revert !important;
+  box-shadow: none !important;
+  accent-color: var(--kctcs-blue);
+  color-scheme: light;
+  cursor: pointer;
+}
+body .wrap .panel input:is([type="checkbox"], [type="radio"]):focus-visible,
+body .card input:is([type="checkbox"], [type="radio"]):focus-visible {
+  outline: 3px solid var(--kctcs-gold) !important;
+  outline-offset: 2px;
+}
+/* ---------- End of stylesheet ---------- */
